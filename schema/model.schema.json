@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/model.schema.json",
+  "title": "model",
+  "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
+  "properties": {
+    "type": { "const": "model" },
+    "organization": { "type": "string" },
+    "release_date": { "type": "string" },
+    "release_year": { "type": "integer" },
+    "release_month": { "type": "integer", "minimum": 1, "maximum": 12 },
+    "license": { "type": "string", "description": "license ID (license/<slug>) or SPDX/string" },
+    "signal_strength": { "type": "string", "enum": ["high", "medium", "low"] },
+    "architecture_id": { "type": "string", "description": "FK → architecture-era/<slug>" },
+    "model_category": { "type": "string" },
+    "parameters_active_b": { "type": "number" },
+    "total_parameters": { "type": "integer" },
+    "context_window_tokens": { "type": "integer" },
+    "summary": { "type": "string" },
+    "why_it_matters": { "type": "string" },
+    "fingerprint": {
+      "type": "object",
+      "required": ["attention_type", "num_layers", "attention_heads", "kv_heads", "hidden_size", "activation_function", "normalization", "positional_encoding"],
+      "properties": {
+        "attention_type": { "type": "string" },
+        "num_layers": { "type": "integer" },
+        "attention_heads": { "type": "integer" },
+        "kv_heads": { "type": "integer" },
+        "head_size": { "type": "integer" },
+        "hidden_size": { "type": "integer" },
+        "intermediate_size": { "type": "integer" },
+        "context_window_tokens": { "type": "integer" },
+        "vocabulary_size": { "type": "integer" },
+        "activation_function": { "type": "string" },
+        "normalization": { "type": "string" },
+        "positional_encoding": { "type": "string" },
+        "rope_theta": { "type": ["number", "null"] },
+        "parameters_active_b": { "type": "number" },
+        "kv_cache_rating": { "type": "string", "enum": ["low", "medium", "high"] },
+        "key_detail": { "type": "string" }
+      }
+    },
+    "moe_config": {
+      "type": ["object", "null"],
+      "properties": {
+        "expert_count": { "type": "integer" },
+        "active_experts": { "type": "integer" },
+        "shared_expert": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "filters": {
+      "type": "object",
+      "properties": {
+        "size_category": { "type": "string", "enum": ["tiny", "small", "medium", "large", "xlarge"] },
+        "is_quantized": { "type": "boolean" },
+        "quant_format": { "type": "string" },
+        "is_moe": { "type": "boolean" },
+        "pipeline_tag": { "type": "string" },
+        "attention_type": { "type": "string" }
+      }
+    },
+    "benchmarks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "score"],
+        "properties": {
+          "name": { "type": "string" },
+          "score": { "type": "number" },
+          "score_display": { "type": "string" },
+          "method": { "type": "string" },
+          "self_reported": { "type": "boolean" },
+          "source_url": { "type": "string" }
+        }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "properties": {
+        "parents": { "type": "array", "items": { "type": "string" } },
+        "children": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "required": ["organization", "license", "fingerprint", "summary"]
+}

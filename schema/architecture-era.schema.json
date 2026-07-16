@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/architecture-era.schema.json",
+  "title": "architecture-era",
+  "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
+  "properties": {
+    "type": { "const": "architecture-era" },
+    "name": { "type": "string" },
+    "era": { "type": "string", "enum": ["early", "foundation", "scaling", "post-transformer"] },
+    "era_range": { "type": "string" },
+    "year": { "type": "integer" },
+    "family": {
+      "type": "string",
+      "enum": ["classical-nn", "classical-dl", "llm", "vision", "generation", "multimodal", "other"]
+    },
+    "core_innovation": { "type": "string" },
+    "description": { "type": "string" },
+    "long_description": { "type": "string" },
+    "key_features": { "type": "array", "items": { "type": "string" } },
+    "key_models": { "type": "array", "items": { "type": "string" } },
+    "paper_title": { "type": "string" },
+    "paper_url": { "type": "string", "format": "uri" },
+    "diagram_url": { "type": "string" },
+    "influenced_by": { "type": "array", "items": { "type": "string" }, "description": "FKs → architecture-era/<slug>" },
+    "led_to": { "type": "array", "items": { "type": "string" }, "description": "FKs → architecture-era/<slug>" }
+  },
+  "required": ["name", "era", "year", "family", "core_innovation"]
+}

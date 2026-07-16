@@ -1,0 +1,23 @@
+{
+  "name": "ai-models-content",
+  "domain": "models",
+  "title": "AI Models — reference knowledge",
+  "schema_version": "1.0",
+  "description": "Portable, reusable reference knowledge for AI models: catalog cards with architecture fingerprints, the era-wise architecture evolution (1950s to now), structural parameters, training/inference hyperparameters ranked by criticality, fine-tuning methods, and licenses. Content only — Markdown + JSON Schema + docs, zero code.",
+  "entrypoints": {
+    "human": "README.md",
+    "agent": "AGENTS.md",
+    "conventions": "CONVENTIONS.md",
+    "registry": "schema/registry.json"
+  },
+  "types": [
+    "model",
+    "architecture-era",
+    "parameter",
+    "hyperparameter",
+    "fine-tuning-method",
+    "license"
+  ],
+  "license": "CC-BY-4.0",
+  "standard": "https://github.com/sudhir13s/TheAIAtlas/blob/main/docs/standards/content-repo-standard.md"
+}

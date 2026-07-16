@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "shared": "schema/_shared.schema.json",
+  "types": {
+    "model": {
+      "folder": "catalog",
+      "schema": "schema/model.schema.json",
+      "id_prefix": "model/",
+      "sections": ["Summary", "Why It Matters", "Notes"]
+    },
+    "architecture-era": {
+      "folder": "architectures",
+      "schema": "schema/architecture-era.schema.json",
+      "id_prefix": "architecture-era/",
+      "sections": ["What Changed", "Key Ideas"]
+    },
+    "parameter": {
+      "folder": "parameters",
+      "schema": "schema/parameter.schema.json",
+      "id_prefix": "parameter/",
+      "sections": ["Overview", "Components", "Worked Example"]
+    },
+    "hyperparameter": {
+      "folder": "hyperparameters",
+      "schema": "schema/hyperparameter.schema.json",
+      "id_prefix": "hyperparameter/",
+      "sections": ["Definition", "What to look for", "Calculation", "Example"]
+    },
+    "fine-tuning-method": {
+      "folder": "fine-tuning-methods",
+      "schema": "schema/fine-tuning-method.schema.json",
+      "id_prefix": "fine-tuning-method/",
+      "sections": ["Definition", "What to look for", "Calculation", "Example"]
+    },
+    "license": {
+      "folder": "licenses",
+      "schema": "schema/license.schema.json",
+      "id_prefix": "license/",
+      "sections": ["Plain-English"]
+    }
+  }
+}

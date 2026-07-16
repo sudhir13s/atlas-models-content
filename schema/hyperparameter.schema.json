@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/hyperparameter.schema.json",
+  "title": "hyperparameter",
+  "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
+  "properties": {
+    "type": { "const": "hyperparameter" },
+    "name": { "type": "string", "description": "exact config key, e.g. learning_rate" },
+    "context": { "type": "string", "enum": ["training", "inference"], "description": "which ranked list this belongs to" },
+    "priority": { "type": "integer", "minimum": 1, "description": "criticality rank within its context; 1 = most impactful" },
+    "importance": { "type": "string", "enum": ["critical", "important", "optional"] },
+    "goals": { "type": "array", "items": { "type": "string", "enum": ["training", "finetuning", "inference", "architecture"] } },
+    "models": { "type": "array", "items": { "type": "string", "enum": ["llm", "vision", "audio", "diffusion", "rl"] } },
+    "range": { "type": "string" },
+    "starting_value": { "type": "string" },
+    "controls": { "type": "string" },
+    "if_increased": { "type": "string" },
+    "if_decreased": { "type": "string" },
+    "common_mistake": { "type": "string" }
+  },
+  "required": ["name", "context", "priority", "importance", "range"]
+}
