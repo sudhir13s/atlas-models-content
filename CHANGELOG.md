@@ -9,13 +9,17 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 - Repository scaffold to the content-repo standard: `meta.json`, `schema/registry.json`, the seven
   JSON Schemas (`_shared`, `model`, `architecture-era`, `parameter`, `hyperparameter`,
   `fine-tuning-method`, `license`), templates, and docs (`README`, `AGENTS`, `CONVENTIONS`).
-- Seed content (schema version 1.0):
-  - `catalog/llama-3-1-8b-instruct.md` — gold-standard model card with a full, cited fingerprint.
-  - `architectures/transformer.md`, `architectures/mixture-of-experts.md` — evolution eras.
-  - `parameters/llm-transformer.md` — structural parameters + master formula + worked example.
-  - `hyperparameters/learning-rate.md`, `hyperparameters/temperature.md` — flagship ranked knobs.
-  - `fine-tuning-methods/lora.md` — worked LoRA example.
-  - `licenses/apache-2-0.md`, `licenses/llama-3-1.md` — license entries.
+- Initial LLM-first content library (schema version 1.0), 67 files, all cited and cross-link-validated:
+  - **8 model cards** — Llama-3.1-8B, Mistral-7B-v0.3, Qwen2.5-7B/72B, Gemma-2-9B, Mixtral-8x7B,
+    Phi-3-mini, DeepSeek-V3 — with fingerprints verified against Hugging Face `config.json`.
+  - **21 architecture eras** — perceptron → reasoning models, with resolvable `led_to`/`influenced_by`
+    lineage for the evolution graph.
+  - **21 hyperparameters** — training (12) + inference (7) + the two seeds, each criticality-ranked
+    (`priority`) with Definition / What to look for / Calculation / worked Example.
+  - **5 parameter families** — LLM/transformer, MoE, SSM/Mamba, CNN, RNN/LSTM — each with a master
+    formula and a worked numeric example.
+  - **6 fine-tuning methods** — LoRA, QLoRA, full fine-tuning, DPO, RLHF/PPO, ORPO.
+  - **6 licenses** — Apache-2.0, MIT, Llama-3.1, Gemma, Qwen, DeepSeek — with permission matrices.
 
 ## Schema versions
 
