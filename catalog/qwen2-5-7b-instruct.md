@@ -1,0 +1,83 @@
+---
+id: model/qwen2-5-7b-instruct
+type: model
+slug: qwen2-5-7b-instruct
+schema_version: 1.0
+title: "Qwen2.5 7B Instruct"
+organization: "Alibaba (Qwen Team)"
+release_date: "2024-09-19"
+release_year: 2024
+release_month: 9
+license: license/apache-2-0
+signal_strength: high
+architecture_id: architecture-era/transformer
+model_category: language
+parameters_active_b: 7.61
+total_parameters: 7615616512
+context_window_tokens: 131072
+summary: "Dense decoder-only transformer, ~7.61B parameters, 128K context via YaRN, using GQA, SwiGLU, RMSNorm and RoPE."
+why_it_matters: "The strongest Apache-2.0 model at the 7B tier, and the multilingual default that displaced Llama 3.1 8B for many builders."
+fingerprint:
+  attention_type: GQA
+  num_layers: 28
+  attention_heads: 28
+  kv_heads: 4
+  head_size: 128
+  hidden_size: 3584
+  intermediate_size: 18944
+  context_window_tokens: 131072
+  vocabulary_size: 152064
+  activation_function: SwiGLU
+  normalization: RMSNorm
+  positional_encoding: RoPE
+  rope_theta: 1000000
+  parameters_active_b: 7.61
+  kv_cache_rating: low
+  key_detail: "Only 4 KV heads (aggressive GQA); QKV projections carry bias; 128K context via YaRN on a 32768-trained base"
+moe_config: null
+filters:
+  size_category: small
+  is_quantized: false
+  quant_format: original
+  is_moe: false
+  pipeline_tag: text-generation
+  attention_type: GQA
+benchmarks:
+  - { name: MMLU-Pro, score: 0.563, score_display: "56.3%", method: "5-shot", self_reported: true, source_url: "https://qwenlm.github.io/blog/qwen2.5-llm/" }
+  - { name: GSM8K, score: 0.916, score_display: "91.6%", method: "vendor-reported", self_reported: true, source_url: "https://qwenlm.github.io/blog/qwen2.5-llm/" }
+  - { name: HumanEval, score: 0.848, score_display: "84.8%", method: "0-shot", self_reported: true, source_url: "https://qwenlm.github.io/blog/qwen2.5-llm/" }
+  - { name: MATH, score: 0.755, score_display: "75.5%", method: "vendor-reported", self_reported: true, source_url: "https://qwenlm.github.io/blog/qwen2.5-llm/" }
+lineage:
+  parents: []
+  children: []
+tags: [llm, qwen, alibaba, dense, gqa, instruct, multilingual, apache-2-0]
+updated: 2026-07-17
+sources:
+  - { url: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct", title: "Qwen2.5-7B-Instruct — model card + config.json", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/2412.15115", title: "Qwen2.5 Technical Report", trust: 0.95 }
+related: [architecture-era/transformer, license/apache-2-0]
+---
+
+## Summary
+Qwen2.5 7B Instruct is a dense, decoder-only transformer with 28 layers and a 3584-dimensional
+residual stream. It uses grouped-query attention with an unusually aggressive ratio — 28 query heads
+sharing just 4 key/value heads (head size 128) — plus SwiGLU feed-forward blocks (intermediate size
+18944), RMSNorm pre-normalization, and rotary positional embeddings with a base frequency of
+1000000. Following the Qwen2 lineage, the query/key/value projections carry additive bias terms, a
+departure from the bias-free projections used by Llama and Mistral. The 128K-token context window is
+obtained by applying YaRN RoPE scaling at inference on top of a 32768-token-trained base.
+
+## Why It Matters
+Qwen2.5 raised the ceiling at the 7B tier: on knowledge, math, and code it outperforms Llama 3.1 8B
+while remaining Apache-2.0 licensed, making it a genuinely permissive drop-in for commercial use. Its
+strong multilingual coverage (29+ languages) and long-context support made it the default open small
+model for many builders through 2025. The four-KV-head design keeps the KV cache small, which is a
+material advantage for long-context serving and batched inference — at 128K tokens the cache is a
+fraction of what an eight-KV-head model of similar size would require.
+
+## Notes
+The base `config.json` reports `max_position_embeddings: 32768`; the advertised 128K context requires
+enabling YaRN scaling (set in `rope_scaling`) at load time — running without it caps effective context
+at 32K. The tokenizer vocabulary is 152064 tokens with strong CJK coverage. Recommended usage follows
+the ChatML template with `<|im_start|>` / `<|im_end|>` role markers. See [[license/apache-2-0]] for
+licensing and [[architecture-era/transformer]] for the architecture lineage.
