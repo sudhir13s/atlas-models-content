@@ -10,9 +10,16 @@ color_key: rnn
 components:
   - { name: "hidden_size (h)", rank: 1, importance: critical, badge: "Per Layer", formula: "params ≈ 4 × (h² + h·input + h); the h² term dominates", range: "128 → 2048" }
   - { name: "input_size (x)", rank: 2, importance: critical, badge: "Per Layer", formula: "each gate has an h × input weight block", range: "embedding / feature dim" }
-  - { name: "gate count (LSTM = 4)", rank: 3, importance: architectural, badge: "Per Layer", formula: "×4 for LSTM (i,f,g,o); ×3 for GRU; ×1 for vanilla RNN", range: "1 (RNN) → 4 (LSTM)" }
-  - { name: "num_layers (stacked depth)", rank: 4, importance: important, badge: "Structure", formula: "layer 2+ take input_size = hidden_size", range: "1 → 4" }
-  - { name: "bidirectional", rank: 5, importance: optional, badge: "Structure", formula: "doubles params (a forward and a backward RNN)", range: "1× or 2×" }
+  - { name: "gate count (LSTM = 4, GRU = 3, RNN = 1)", rank: 3, importance: architectural, badge: "Per Layer", formula: "flat multiplier on the whole layer", range: "1 → 4" }
+  - { name: "input gate (i): W_ii, W_hi, b_i", rank: 4, importance: important, badge: "Per Gate", formula: "h·x + h·h + h", range: "≈ h(x+h)" }
+  - { name: "forget gate (f): W_if, W_hf, b_f", rank: 5, importance: important, badge: "Per Gate", formula: "h·x + h·h + h", range: "≈ h(x+h)" }
+  - { name: "cell/candidate gate (g): W_ig, W_hg, b_g", rank: 6, importance: important, badge: "Per Gate", formula: "h·x + h·h + h", range: "≈ h(x+h)" }
+  - { name: "output gate (o): W_io, W_ho, b_o", rank: 7, importance: important, badge: "Per Gate", formula: "h·x + h·h + h", range: "≈ h(x+h)" }
+  - { name: "gate biases", rank: 8, importance: optional, badge: "Per Gate", formula: "h per gate (PyTorch stores 2 bias vectors → 2h)", range: "4h or 8h" }
+  - { name: "num_layers (stacked depth)", rank: 9, importance: important, badge: "Structure", formula: "layer 2+ take input_size = hidden_size", range: "1 → 4" }
+  - { name: "token embedding table", rank: 10, importance: important, badge: "Embedding", formula: "vocab × input_size (when inputs are tokens)", range: "V·x" }
+  - { name: "output projection (head)", rank: 11, importance: important, badge: "Head", formula: "hidden × n_out + n_out", range: "task-dependent" }
+  - { name: "bidirectional", rank: 12, importance: optional, badge: "Structure", formula: "doubles params (a forward and a backward RNN)", range: "1× or 2×" }
 worked_example:
   label: "Single LSTM layer (input 100, hidden 256)"
   config: { inputSize: 100, hiddenSize: 256, gates: 4, numLayers: 1, bidirectional: false, bias: true }

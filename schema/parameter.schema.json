@@ -5,7 +5,7 @@
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "properties": {
     "type": { "const": "parameter" },
-    "arch": { "type": "string", "enum": ["llm", "cnn", "rnn", "gan", "diffusion", "moe", "ssm", "mlp"] },
+    "arch": { "type": "string", "enum": ["llm", "cnn", "rnn", "gan", "diffusion", "moe", "ssm", "mlp", "hybrid"] },
     "order": { "type": "integer", "description": "section order on the parameters page" },
     "color_key": { "type": "string" },
     "diagram_url": { "type": "string" },
