@@ -10,11 +10,17 @@ color_key: moe
 components:
   - { name: "num_local_experts (expert count)", rank: 1, importance: critical, badge: "Per Layer", formula: "total FFN params = num_experts × per-expert FFN", range: "8 → 256" }
   - { name: "num_experts_per_tok (top_k, active)", rank: 2, importance: critical, badge: "Per Layer", formula: "active FFN params = top_k × per-expert FFN", range: "1 → 8 (usually 2)" }
-  - { name: "expert intermediate_size (FFN width)", rank: 3, importance: critical, badge: "Per Expert", formula: "per-expert = 3 × hidden × intermediate (SwiGLU)", range: "≈ 1.75–4 × hidden" }
-  - { name: "router / gate", rank: 4, importance: important, badge: "Per Layer", formula: "hidden × num_experts", range: "tiny (≪ 0.1% of layer)" }
-  - { name: "shared_expert (optional, always-on)", rank: 5, importance: optional, badge: "Per Layer", formula: "adds one always-active FFN to every token", range: "0 or 1" }
-  - { name: "hidden_size (d_model)", rank: 6, importance: critical, badge: "Structure", formula: "scales attention and every expert", range: "2048 → 8192" }
-  - { name: "num_hidden_layers (depth)", rank: 7, importance: critical, badge: "Structure", formula: "total = layers × per-layer params", range: "24 → 60" }
+  - { name: "expert FFN gate/up/down (per-expert SwiGLU)", rank: 3, importance: critical, badge: "Per Expert", formula: "per-expert = 3 × hidden × intermediate", range: "intermediate ≈ 1.75–4 × hidden" }
+  - { name: "hidden_size (d_model)", rank: 4, importance: critical, badge: "Structure", formula: "scales attention and every expert", range: "2048 → 8192" }
+  - { name: "num_hidden_layers (depth)", rank: 5, importance: critical, badge: "Structure", formula: "total = layers × per-layer params", range: "24 → 60" }
+  - { name: "token embedding table", rank: 6, importance: critical, badge: "Embedding", formula: "vocab_size × hidden_size (dense)", range: "V = 32k → 150k" }
+  - { name: "attention Q/K/V/O projections (GQA)", rank: 7, importance: critical, badge: "Per Layer", formula: "Q,O ≈ d² each; K,V shrink by kv_heads/num_heads (dense)", range: "≈ 2d² + GQA K/V" }
+  - { name: "output / unembedding head", rank: 8, importance: important, badge: "Head", formula: "vocab_size × hidden_size (0 if tied)", range: "0 or V·d" }
+  - { name: "shared_expert (optional, always-on)", rank: 9, importance: optional, badge: "Per Layer", formula: "adds one always-active FFN (3·d·d_ffn) to every token", range: "0 or 1" }
+  - { name: "router / gate network", rank: 10, importance: important, badge: "Per Layer", formula: "hidden × num_experts logits", range: "tiny (≪ 0.1% of layer)" }
+  - { name: "num_attention_heads / num_key_value_heads", rank: 11, importance: important, badge: "Per Layer", formula: "head_dim = hidden/num_heads; GQA sets KV cache", range: "MQA → MHA" }
+  - { name: "load-balancing auxiliary loss", rank: 12, importance: architectural, badge: "Training", formula: "0 params — a training-time term, not stored weights", range: "0" }
+  - { name: "RMSNorm (pre-attn + pre-MoE + final)", rank: 13, importance: optional, badge: "Per Layer", formula: "≈ (2L+1)·d (dense)", range: "tiny" }
 worked_example:
   label: "Mixtral 8x7B"
   config: { hiddenDim: 4096, numLayers: 32, attentionHeads: 32, kvHeads: 8, headDim: 128, ffnDim: 14336, vocabSize: 32000, numExperts: 8, topK: 2, activation: SwiGLU, normalization: RMSNorm, tiedEmbeddings: false }

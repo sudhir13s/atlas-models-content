@@ -8,13 +8,20 @@ arch: llm
 order: 1
 color_key: llm
 components:
-  - { name: "num_hidden_layers (depth)", rank: 1, importance: critical, badge: "Structure", formula: "layers × per-layer params", range: "12 (small) → 80 (70B)" }
-  - { name: "hidden_size (d_model, width)", rank: 2, importance: critical, badge: "Structure", formula: "must be divisible by num_heads", range: "768 → 8192" }
-  - { name: "num_attention_heads", rank: 3, importance: critical, badge: "Per Layer", formula: "head_dim = hidden_size / num_heads", range: "12 → 64" }
-  - { name: "intermediate_size (FFN, SwiGLU)", rank: 4, importance: important, badge: "Per Layer", formula: "≈ 2.67 × hidden_size for SwiGLU (3 matrices)", range: "≈ 2.67–4 × hidden" }
-  - { name: "num_key_value_heads (GQA)", rank: 5, importance: important, badge: "Per Layer", formula: "KV cache ∝ kv_heads", range: "1 (MQA) → num_heads (MHA)" }
-  - { name: "vocab_size", rank: 6, importance: important, badge: "Embedding", formula: "embedding = vocab_size × hidden_size", range: "32k → 152k" }
-  - { name: "max_position_embeddings (context)", rank: 7, importance: critical, badge: "Structure", formula: "KV cache grows linearly with used context", range: "8k → 1M" }
+  - { name: "num_hidden_layers (depth)", rank: 1, importance: critical, badge: "Structure", formula: "total = layers × per-layer params", range: "12 (small) → 80 (70B)" }
+  - { name: "hidden_size (d_model, width)", rank: 2, importance: critical, badge: "Structure", formula: "must be divisible by num_heads; scales every block", range: "768 → 8192" }
+  - { name: "FFN gate/up/down (SwiGLU, 3 matrices)", rank: 3, importance: critical, badge: "Per Layer", formula: "3 × hidden × intermediate; ~70% of all params", range: "intermediate ≈ 2.67–4 × hidden" }
+  - { name: "token embedding table", rank: 4, importance: critical, badge: "Embedding", formula: "vocab_size × hidden_size", range: "V = 32k → 152k" }
+  - { name: "attention query projection (Wq)", rank: 5, importance: critical, badge: "Per Layer", formula: "hidden × (num_heads × head_dim) = d²", range: "≈ d²" }
+  - { name: "attention output projection (Wo)", rank: 6, importance: critical, badge: "Per Layer", formula: "(num_heads × head_dim) × hidden = d²", range: "≈ d²" }
+  - { name: "attention key/value projections (Wk, Wv)", rank: 7, importance: important, badge: "Per Layer", formula: "2 × hidden × (kv_heads × head_dim); GQA shrinks by kv_heads/num_heads", range: "d² (MHA) → small (MQA)" }
+  - { name: "num_attention_heads / head_dim", rank: 8, importance: critical, badge: "Per Layer", formula: "head_dim = hidden_size / num_heads", range: "12 → 128 heads" }
+  - { name: "num_key_value_heads (GQA / MQA)", rank: 9, importance: important, badge: "Per Layer", formula: "KV cache ∝ kv_heads", range: "1 (MQA) → num_heads (MHA)" }
+  - { name: "output / unembedding head", rank: 10, importance: important, badge: "Head", formula: "vocab_size × hidden_size (0 if tied)", range: "0 or V·d" }
+  - { name: "tied vs untied embeddings", rank: 11, importance: architectural, badge: "Structure", formula: "tying reuses the embedding as the head, saving V·d", range: "tie (small) vs untie (large)" }
+  - { name: "positional encoding (RoPE / learned / ALiBi)", rank: 12, importance: architectural, badge: "Per Model", formula: "RoPE & ALiBi = 0 learned params; learned absolute = max_pos × hidden", range: "0 → max_pos·d" }
+  - { name: "RMSNorm / LayerNorm (pre/post + final)", rank: 13, importance: optional, badge: "Per Layer", formula: "RMSNorm = d per norm (LayerNorm = 2d); ≈ (2L+1)·d total", range: "tiny" }
+  - { name: "attention & FFN biases (optional)", rank: 14, importance: optional, badge: "Per Layer", formula: "usually 0 in modern LLMs (Llama/Mistral drop them)", range: "0 (typical)" }
 worked_example:
   label: "Llama 3 8B"
   config: { vocabSize: 128256, hiddenDim: 4096, ffnDim: 14336, numLayers: 32, attentionHeads: 32, kvHeads: 8, headDim: 128, normalization: RMSNorm, activation: SwiGLU, tiedEmbeddings: false }
@@ -22,7 +29,7 @@ worked_example:
     - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models", trust: 0.9 }
     - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need", trust: 0.95 }
 tags: [llm, transformer, parameters]
-updated: 2026-07-16
+updated: 2026-07-17
 sources:
   - { url: "https://arxiv.org/abs/2002.05202", title: "GLU Variants Improve Transformer (SwiGLU)", trust: 0.9 }
   - { url: "https://arxiv.org/abs/2305.13245", title: "GQA: Grouped-Query Attention", trust: 0.9 }

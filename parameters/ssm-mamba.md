@@ -8,12 +8,20 @@ arch: ssm
 order: 3
 color_key: ssm
 components:
-  - { name: "d_model (width)", rank: 1, importance: critical, badge: "Structure", formula: "block cost ≈ 3 × expand × d_model² (in/out projections)", range: "768 → 4096" }
+  - { name: "d_model (width)", rank: 1, importance: critical, badge: "Structure", formula: "block cost ≈ 3E × d_model² (in/out projections)", range: "768 → 4096" }
   - { name: "expand factor (E)", rank: 2, importance: critical, badge: "Per Block", formula: "d_inner = expand × d_model; scales every inner op", range: "2 (default)" }
   - { name: "num_hidden_layers (depth)", rank: 3, importance: critical, badge: "Structure", formula: "total = layers × per-block params", range: "24 → 64" }
-  - { name: "d_state (N, SSM memory)", rank: 4, importance: important, badge: "Per Block", formula: "A_log = d_inner × N; controls recurrent state size", range: "16 → 128" }
-  - { name: "dt_rank (Δ projection rank)", rank: 5, importance: optional, badge: "Per Block", formula: "≈ ceil(d_model / 16); sizes x_proj and dt_proj", range: "auto (d_model/16)" }
-  - { name: "d_conv (short conv kernel)", rank: 6, importance: optional, badge: "Per Block", formula: "conv1d = d_inner × d_conv (depthwise)", range: "3 → 4" }
+  - { name: "in_proj (input + gate)", rank: 4, importance: critical, badge: "Per Block", formula: "d_model × 2·d_inner (SSM path + gating path)", range: "2E·d² (dominant)" }
+  - { name: "out_proj", rank: 5, importance: critical, badge: "Per Block", formula: "d_inner × d_model", range: "E·d² (dominant)" }
+  - { name: "token embedding table", rank: 6, importance: important, badge: "Embedding", formula: "vocab_size × d_model (tied → doubles as head)", range: "V = 50k+" }
+  - { name: "A parameter (A_log state matrix)", rank: 7, importance: important, badge: "Per Block", formula: "d_inner × d_state (only stored SSM tensor besides D)", range: "d_inner·N" }
+  - { name: "d_state (N, SSM memory)", rank: 8, importance: important, badge: "Per Block", formula: "sizes A, and B/C inside x_proj; mostly runtime state", range: "16 → 128" }
+  - { name: "x_proj (selective Δ, B, C)", rank: 9, importance: important, badge: "Per Block", formula: "d_inner × (dt_rank + 2·d_state)", range: "small" }
+  - { name: "dt_proj + dt_rank (Δ projection)", rank: 10, importance: optional, badge: "Per Block", formula: "dt_rank × d_inner; dt_rank ≈ ceil(d_model/16)", range: "auto" }
+  - { name: "conv1d (short depthwise causal conv)", rank: 11, importance: optional, badge: "Per Block", formula: "d_inner × d_conv (+ d_inner bias)", range: "d_conv 3 → 4" }
+  - { name: "D (skip connection)", rank: 12, importance: optional, badge: "Per Block", formula: "d_inner (per-channel skip scalar)", range: "d_inner" }
+  - { name: "gating branch (z, SiLU)", rank: 13, importance: architectural, badge: "Per Block", formula: "0 extra — it is the second half of in_proj", range: "n/a" }
+  - { name: "RMSNorm (per block + final)", rank: 14, importance: optional, badge: "Per Block", formula: "≈ (L+1)·d_model", range: "tiny" }
 worked_example:
   label: "Mamba-130M"
   config: { dModel: 768, numLayers: 24, expand: 2, dInner: 1536, dState: 16, dtRank: 48, dConv: 4, vocabSize: 50280, normalization: RMSNorm, tiedEmbeddings: true }

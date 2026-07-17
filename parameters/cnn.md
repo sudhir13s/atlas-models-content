@@ -13,7 +13,11 @@ components:
   - { name: "in_channels", rank: 3, importance: critical, badge: "Per Layer", formula: "multiplies every filter's weight count", range: "3 → 512" }
   - { name: "fully-connected head (classifier)", rank: 4, importance: important, badge: "Head", formula: "flatten × units + units; often dominates the total", range: "task-dependent" }
   - { name: "network depth (num conv layers)", rank: 5, importance: important, badge: "Structure", formula: "total = Σ per-layer params", range: "3 → 150+" }
-  - { name: "stride / padding", rank: 6, importance: architectural, badge: "Per Layer", formula: "0 params; changes spatial size → changes FC head size", range: "stride 1–2" }
+  - { name: "conv bias", rank: 6, importance: optional, badge: "Per Layer", formula: "+ out_ch per conv; usually off when BatchNorm follows", range: "0 or out_ch" }
+  - { name: "batch normalization (γ, β)", rank: 7, importance: important, badge: "Per Layer", formula: "2 × out_ch trainable (running mean/var are buffers)", range: "2·out_ch" }
+  - { name: "pooling (max / average)", rank: 8, importance: architectural, badge: "Per Layer", formula: "0 params; shrinks spatial size → shrinks FC head", range: "0" }
+  - { name: "global average pooling", rank: 9, importance: architectural, badge: "Head", formula: "0 params; collapses maps, removes the FC-head explosion", range: "0" }
+  - { name: "stride / padding", rank: 10, importance: architectural, badge: "Per Layer", formula: "0 params; changes spatial size → changes FC head size", range: "stride 1–2" }
 worked_example:
   label: "Small CIFAR-10 CNN (3 conv + 2 FC)"
   config: { inputShape: "3×32×32", conv1: "3×3, 3→32", conv2: "3×3, 32→64", conv3: "3×3, 64→64", pooling: "2×2 max after each conv", flatten: "64×4×4 = 1024", fc1: "1024→64", fc2: "64→10", classes: 10 }
