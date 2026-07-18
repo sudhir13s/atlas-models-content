@@ -18,6 +18,12 @@
       "folder": "parameters",
       "schema": "schema/parameter.schema.json",
       "id_prefix": "parameter/",
+      "sections": ["Definition", "What to look for", "Calculation", "Example"]
+    },
+    "parameter-calculator": {
+      "folder": "parameter-calculators",
+      "schema": "schema/parameter-calculator.schema.json",
+      "id_prefix": "parameter-calculator/",
       "sections": ["Overview", "Components", "Worked Example"]
     },
     "hyperparameter": {

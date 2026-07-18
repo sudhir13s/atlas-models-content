@@ -1,6 +1,6 @@
 ---
-id: parameter/cnn
-type: parameter
+id: parameter-calculator/cnn
+type: parameter-calculator
 slug: cnn
 schema_version: 1.0
 title: "Convolutional Network (CNN) Parameters"

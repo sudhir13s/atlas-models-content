@@ -5,35 +5,19 @@
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "properties": {
     "type": { "const": "parameter" },
-    "arch": { "type": "string", "enum": ["llm", "cnn", "rnn", "gan", "diffusion", "moe", "ssm", "mlp", "hybrid"] },
-    "order": { "type": "integer", "description": "section order on the parameters page" },
-    "color_key": { "type": "string" },
-    "diagram_url": { "type": "string" },
-    "components": {
+    "name": { "type": "string", "description": "exact config key, e.g. num_hidden_layers" },
+    "importance": { "type": "string", "enum": ["critical", "important", "optional"] },
+    "priority": { "type": "integer", "minimum": 1, "description": "criticality rank; 1 = most impactful" },
+    "applies_to": {
       "type": "array",
-      "description": "structural knobs, ranked by importance (rank 1 = most impactful)",
-      "items": {
-        "type": "object",
-        "required": ["name", "rank", "formula"],
-        "properties": {
-          "name": { "type": "string" },
-          "rank": { "type": "integer", "minimum": 1 },
-          "importance": { "type": "string", "enum": ["critical", "important", "optional", "architectural"] },
-          "badge": { "type": "string" },
-          "formula": { "type": "string" },
-          "range": { "type": "string" }
-        }
-      }
+      "items": { "type": "string", "enum": ["llm", "transformer", "moe", "ssm", "cnn", "rnn", "gan", "diffusion", "mlp", "hybrid"] },
+      "description": "architecture families this structural parameter appears in"
     },
-    "worked_example": {
-      "type": "object",
-      "required": ["label", "config"],
-      "properties": {
-        "label": { "type": "string" },
-        "config": { "type": "object" },
-        "sources": { "type": "array", "items": { "$ref": "_shared.schema.json#/$defs/source" } }
-      }
-    }
+    "range": { "type": "string" },
+    "controls": { "type": "string" },
+    "if_increased": { "type": "string" },
+    "if_decreased": { "type": "string" },
+    "formula": { "type": "string", "description": "how this parameter contributes to the parameter count" }
   },
-  "required": ["arch", "components", "worked_example"]
+  "required": ["name", "importance", "priority"]
 }

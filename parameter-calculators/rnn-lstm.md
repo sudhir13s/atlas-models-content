@@ -1,6 +1,6 @@
 ---
-id: parameter/rnn-lstm
-type: parameter
+id: parameter-calculator/rnn-lstm
+type: parameter-calculator
 slug: rnn-lstm
 schema_version: 1.0
 title: "Recurrent Network / LSTM Parameters"

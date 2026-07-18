@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/parameter-calculator.schema.json",
+  "title": "parameter-calculator",
+  "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
+  "properties": {
+    "type": { "const": "parameter-calculator" },
+    "arch": { "type": "string", "enum": ["llm", "cnn", "rnn", "gan", "diffusion", "moe", "ssm", "mlp", "hybrid"] },
+    "order": { "type": "integer", "description": "section order on the parameter-calculators view" },
+    "color_key": { "type": "string" },
+    "diagram_url": { "type": "string" },
+    "components": {
+      "type": "array",
+      "description": "structural knobs of this architecture, ranked by importance (rank 1 = most impactful)",
+      "items": {
+        "type": "object",
+        "required": ["name", "rank", "formula"],
+        "properties": {
+          "name": { "type": "string" },
+          "rank": { "type": "integer", "minimum": 1 },
+          "importance": { "type": "string", "enum": ["critical", "important", "optional", "architectural"] },
+          "badge": { "type": "string" },
+          "formula": { "type": "string" },
+          "range": { "type": "string" }
+        }
+      }
+    },
+    "worked_example": {
+      "type": "object",
+      "required": ["label", "config"],
+      "properties": {
+        "label": { "type": "string" },
+        "config": { "type": "object" },
+        "sources": { "type": "array", "items": { "$ref": "_shared.schema.json#/$defs/source" } }
+      }
+    }
+  },
+  "required": ["arch", "components", "worked_example"]
+}

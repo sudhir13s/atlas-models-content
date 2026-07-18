@@ -1,6 +1,6 @@
 ---
-id: parameter/ssm-mamba
-type: parameter
+id: parameter-calculator/ssm-mamba
+type: parameter-calculator
 slug: ssm-mamba
 schema_version: 1.0
 title: "State-Space Model / Mamba Parameters"
