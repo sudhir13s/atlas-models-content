@@ -1,6 +1,6 @@
 ---
-id: parameter/moe
-type: parameter
+id: parameter-calculator/moe
+type: parameter-calculator
 slug: moe
 schema_version: 1.0
 title: "Mixture-of-Experts (MoE) Parameters"

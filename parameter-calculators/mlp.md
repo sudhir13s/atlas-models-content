@@ -1,6 +1,6 @@
 ---
-id: parameter/mlp
-type: parameter
+id: parameter-calculator/mlp
+type: parameter-calculator
 slug: mlp
 schema_version: 1.0
 title: "Multilayer Perceptron (MLP) Parameters"

@@ -29,7 +29,7 @@
         "id": { "$ref": "#/$defs/id" },
         "type": {
           "type": "string",
-          "enum": ["model", "architecture-era", "parameter", "hyperparameter", "fine-tuning-method", "license"]
+          "enum": ["model", "architecture-era", "parameter", "parameter-calculator", "hyperparameter", "fine-tuning-method", "license"]
         },
         "slug": { "$ref": "#/$defs/slug" },
         "schema_version": { "type": ["string", "number"] },

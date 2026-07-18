@@ -1,6 +1,6 @@
 ---
-id: parameter/hybrid
-type: parameter
+id: parameter-calculator/hybrid
+type: parameter-calculator
 slug: hybrid
 schema_version: 1.0
 title: "Hybrid SSM / Attention / MoE Parameters"

@@ -1,6 +1,6 @@
 ---
-id: parameter/llm-transformer
-type: parameter
+id: parameter-calculator/llm-transformer
+type: parameter-calculator
 slug: llm-transformer
 schema_version: 1.0
 title: "LLM / Transformer Parameters"

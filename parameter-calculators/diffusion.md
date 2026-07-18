@@ -1,6 +1,6 @@
 ---
-id: parameter/diffusion
-type: parameter
+id: parameter-calculator/diffusion
+type: parameter-calculator
 slug: diffusion
 schema_version: 1.0
 title: "Diffusion Model (U-Net) Parameters"

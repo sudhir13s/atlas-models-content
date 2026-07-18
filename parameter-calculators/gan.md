@@ -1,6 +1,6 @@
 ---
-id: parameter/gan
-type: parameter
+id: parameter-calculator/gan
+type: parameter-calculator
 slug: gan
 schema_version: 1.0
 title: "Generative Adversarial Network (GAN) Parameters"
