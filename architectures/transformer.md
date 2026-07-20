@@ -32,7 +32,7 @@ narrative:
 
 build_steps:
   - { title: "1. Embed the tokens", detail: "Turn each token into a vector (its learned meaning). This is the residual stream every later layer reads from and writes back to." }
-  - { title: "2. Add position", detail: "Attention is order-blind, so add a positional signal (sinusoidal in the original, RoPE in modern LLMs) so the model knows word 3 came before word 7." }
+  - { title: "2. Add position", detail: "Attention is order-blind, so add a positional signal (sinusoidal in the original, rotary positional embedding (RoPE) in modern LLMs) so the model knows word 3 came before word 7." }
   - { title: "3. Project to Q, K, V", detail: "From each token vector compute three views: a Query (what am I looking for?), a Key (what do I offer?), and a Value (what will I hand over if chosen?)." }
   - { title: "4. Score and mix (self-attention)", detail: "Each Query dot-products with every Key to get relevance scores, softmax turns them into weights, and each token receives a weighted sum of Values. Now every token carries context from the whole sequence." }
   - { title: "5. Use many heads", detail: "Run steps 3–4 several times in parallel with different learned projections, then concatenate. Different heads specialize in different relationships." }

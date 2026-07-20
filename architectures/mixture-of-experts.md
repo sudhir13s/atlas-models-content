@@ -7,7 +7,7 @@ title: "Mixture of Experts (Sparse MoE)"
 name: "Mixture of Experts"
 era: post-transformer
 era_range: "2021–2026"
-year: 2024
+year: 2021
 family: llm
 core_innovation: "Replace the dense feed-forward block with many experts and a router that activates only a few per token — so total capacity grows without growing the cost of any single forward pass."
 description: "Sparse transformers where total parameters greatly exceed the parameters active per token."
