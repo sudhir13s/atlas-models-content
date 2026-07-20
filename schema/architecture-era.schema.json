@@ -22,7 +22,109 @@
     "paper_url": { "type": "string", "format": "uri" },
     "diagram_url": { "type": "string" },
     "influenced_by": { "type": "array", "items": { "type": "string" }, "description": "FKs → architecture-era/<slug>" },
-    "led_to": { "type": "array", "items": { "type": "string" }, "description": "FKs → architecture-era/<slug>" }
+    "led_to": { "type": "array", "items": { "type": "string" }, "description": "FKs → architecture-era/<slug>" },
+
+    "eli5": {
+      "type": "string",
+      "description": "Plain-English explanation, zero jargon, 2-3 lines. The 'anyone can understand' layer."
+    },
+    "analogy": {
+      "type": "object",
+      "description": "One vivid real-world metaphor that makes the mechanism click.",
+      "required": ["title", "body"],
+      "properties": {
+        "title": { "type": "string" },
+        "body": { "type": "string" }
+      }
+    },
+    "narrative": {
+      "type": "object",
+      "description": "The research-story arc, four tight paragraphs.",
+      "properties": {
+        "motivation": { "type": "string" },
+        "approach": { "type": "string" },
+        "solution": { "type": "string" },
+        "outcome": { "type": "string" }
+      }
+    },
+    "build_steps": {
+      "type": "array",
+      "description": "Ordered 'how it is constructed' steps; each a plain-language title + detail.",
+      "items": {
+        "type": "object",
+        "required": ["title", "detail"],
+        "properties": {
+          "title": { "type": "string" },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "key_equation": {
+      "type": "object",
+      "description": "The one defining formula, in plain words.",
+      "required": ["latex", "plain"],
+      "properties": {
+        "latex": { "type": "string", "description": "KaTeX/LaTeX source, no surrounding $ delimiters" },
+        "plain": { "type": "string", "description": "What the equation says, in plain English" },
+        "terms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["symbol", "meaning"],
+            "properties": {
+              "symbol": { "type": "string" },
+              "meaning": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "strengths": { "type": "array", "items": { "type": "string" } },
+    "weaknesses": { "type": "array", "items": { "type": "string" } },
+    "diagram": {
+      "type": "string",
+      "description": "Mermaid diagram source (with or without the ```mermaid fence). Rendered client-side, theme-aware."
+    },
+    "diagram_caption": { "type": "string" },
+    "notable_models": {
+      "type": "array",
+      "description": "Landmark models in this family, each with what it proved.",
+      "items": {
+        "type": "object",
+        "required": ["name", "note"],
+        "properties": {
+          "name": { "type": "string" },
+          "year": { "type": "integer" },
+          "note": { "type": "string", "description": "what this model proved / why it matters" }
+        }
+      }
+    },
+    "resources": {
+      "type": "array",
+      "description": "Curated open-access learning links.",
+      "items": {
+        "type": "object",
+        "required": ["kind", "title", "url"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["paper", "blog", "video", "course", "tutorial"] },
+          "title": { "type": "string" },
+          "url": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "learn_first": {
+      "type": "array",
+      "description": "Content-driven prerequisites (replaces the hardcoded PREREQS map).",
+      "items": {
+        "type": "object",
+        "required": ["label", "href"],
+        "properties": {
+          "label": { "type": "string" },
+          "href": { "type": "string" },
+          "tag": { "type": "string" }
+        }
+      }
+    }
   },
   "required": ["name", "era", "year", "family", "core_innovation"]
 }
