@@ -1,14 +1,14 @@
-# ai-models-content
+# atlas-models-content
 
 Portable, reusable reference knowledge about **AI models** — authored as Markdown with structured
 YAML frontmatter, validated by JSON Schema, and readable by both humans and AI agents. This repo is
 **content only**: no code, no build step, no framework lock-in. Any project can vendor it (as a git
 submodule or a plain checkout) and render it however it likes.
 
-It is the `models` domain of a five-repo reference library
-(`ai-models-content`, `ai-hardware-content`, `ai-evaluation-content`, `ai-licenses-content`,
-`ai-frameworks-content`), all following the same
-[content-repo standard](https://github.com/sudhir13s/TheAIAtlas/blob/main/docs/standards/content-repo-standard.md).
+It is the `models` domain of a seven-repo reference library
+(`atlas-models-content`, `atlas-evaluation-content`, `atlas-frameworks-content`,
+`atlas-hardware-content`, `atlas-news-content`, `atlas-practices-content`, `atlas-research-content`), all following the same
+[content-repo standard](https://github.com/sudhir13s/TheAIAtlas/blob/main/docs/content-repo-standard.md).
 
 ## What's inside
 
@@ -25,9 +25,9 @@ It is the `models` domain of a five-repo reference library
 
 ```bash
 # Vendor it
-git clone https://github.com/sudhir13s/ai-models-content.git
+git clone https://github.com/sudhir13s/atlas-models-content.git
 # or as a submodule of your project
-git submodule add https://github.com/sudhir13s/ai-models-content.git content/models-src
+git submodule add https://github.com/sudhir13s/atlas-models-content.git content/models-src
 ```
 
 Every content file is a Markdown file with YAML frontmatter (the structured fields) and a Markdown

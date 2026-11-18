@@ -1,5 +1,5 @@
 {
-  "name": "ai-models-content",
+  "name": "atlas-models-content",
   "domain": "models",
   "title": "AI Models — reference knowledge",
   "schema_version": "1.0",
@@ -22,5 +22,5 @@
     "task"
   ],
   "license": "CC-BY-4.0",
-  "standard": "https://github.com/sudhir13s/TheAIAtlas/blob/main/docs/standards/content-repo-standard.md"
+  "standard": "https://github.com/sudhir13s/TheAIAtlas/blob/main/docs/content-repo-standard.md"
 }

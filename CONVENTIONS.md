@@ -2,7 +2,7 @@
 
 The rules every file follows. Humans and agents follow the identical process. The authoritative
 cross-repo spec is the
-[content-repo standard](https://github.com/sudhir13s/TheAIAtlas/blob/main/docs/standards/content-repo-standard.md);
+[content-repo standard](https://github.com/sudhir13s/TheAIAtlas/blob/main/docs/content-repo-standard.md);
 this file is the `models`-domain instance.
 
 ## Slugs and file names
