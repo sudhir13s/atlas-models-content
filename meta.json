@@ -14,9 +14,12 @@
     "model",
     "architecture-era",
     "parameter",
+    "parameter-calculator",
     "hyperparameter",
     "fine-tuning-method",
-    "license"
+    "license",
+    "task-group",
+    "task"
   ],
   "license": "CC-BY-4.0",
   "standard": "https://github.com/sudhir13s/TheAIAtlas/blob/main/docs/standards/content-repo-standard.md"

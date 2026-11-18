@@ -13,6 +13,12 @@
     "signal_strength": { "type": "string", "enum": ["high", "medium", "low"] },
     "architecture_id": { "type": "string", "description": "FK → architecture-era/<slug>" },
     "model_category": { "type": "string" },
+    "tasks": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^task/[a-z0-9]+(?:-[a-z0-9]+)*$" },
+      "description": "FKs → task/<slug>; the jobs this model does"
+    },
     "parameters_active_b": { "type": "number" },
     "total_parameters": { "type": "integer" },
     "context_window_tokens": { "type": "integer" },
@@ -56,8 +62,18 @@
         "is_quantized": { "type": "boolean" },
         "quant_format": { "type": "string" },
         "is_moe": { "type": "boolean" },
+        "is_gated": { "type": "boolean", "description": "access needs approval on Hugging Face" },
         "pipeline_tag": { "type": "string" },
         "attention_type": { "type": "string" }
+      }
+    },
+    "hub_signals": {
+      "type": "object",
+      "description": "usage signals copied from Hugging Face by code",
+      "properties": {
+        "downloads_30d": { "type": "integer", "minimum": 0 },
+        "likes": { "type": "integer", "minimum": 0 },
+        "observed_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
       }
     },
     "benchmarks": {
@@ -83,5 +99,10 @@
       }
     }
   },
-  "required": ["organization", "license", "fingerprint", "summary"]
+  "required": ["organization", "license", "model_category", "summary"],
+  "if": {
+    "properties": { "model_category": { "const": "language" } },
+    "required": ["model_category"]
+  },
+  "then": { "required": ["fingerprint"] }
 }

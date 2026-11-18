@@ -43,6 +43,18 @@
       "schema": "schema/license.schema.json",
       "id_prefix": "license/",
       "sections": ["Plain-English"]
+    },
+    "task-group": {
+      "folder": "task-groups",
+      "schema": "schema/task-group.schema.json",
+      "id_prefix": "task-group/",
+      "sections": ["Overview"]
+    },
+    "task": {
+      "folder": "tasks",
+      "schema": "schema/task.schema.json",
+      "id_prefix": "task/",
+      "sections": ["What It Is", "When To Use", "How To Choose"]
     }
   }
 }

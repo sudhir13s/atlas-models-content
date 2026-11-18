@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/task.schema.json",
+  "title": "task",
+  "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
+  "$defs": {
+    "modality": {
+      "type": "string",
+      "enum": [
+        "text",
+        "image",
+        "video",
+        "audio",
+        "3d",
+        "document",
+        "tabular",
+        "time-series",
+        "embedding",
+        "label",
+        "score",
+        "bounding-box",
+        "mask",
+        "depth-map",
+        "keypoints",
+        "action"
+      ]
+    }
+  },
+  "properties": {
+    "type": { "const": "task" },
+    "group": {
+      "type": "string",
+      "pattern": "^task-group/[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "FK → task-group/<slug>"
+    },
+    "parent": {
+      "type": "string",
+      "pattern": "^task/[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "FK → task/<slug>; set only on a narrower task that sits under a broader one"
+    },
+    "order": { "type": "integer", "minimum": 1, "description": "display position inside the group, 1 first" },
+    "summary": { "type": "string", "minLength": 1, "description": "one line: the job a model of this task does" },
+    "hf_pipeline_tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "_shared.schema.json#/$defs/slug" },
+      "description": "Hugging Face pipeline tags this task covers; empty when Hugging Face has no tag for it"
+    },
+    "inputs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/modality" } },
+    "outputs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/modality" } },
+    "benchmarks": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^benchmark/[a-z0-9]+(?:-[a-z0-9]+)*$" },
+      "description": "FKs → benchmark/<slug>; the benchmarks that measure quality for this task"
+    }
+  },
+  "required": ["group", "order", "summary", "hf_pipeline_tags", "inputs", "outputs"]
+}
