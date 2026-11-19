@@ -8,7 +8,7 @@ submodule or a plain checkout) and render it however it likes.
 It is the `models` domain of a seven-repo reference library
 (`atlas-models-content`, `atlas-evaluation-content`, `atlas-frameworks-content`,
 `atlas-hardware-content`, `atlas-news-content`, `atlas-practices-content`, `atlas-research-content`), all following the same
-[content-repo standard](https://github.com/sudhir13s/TheAIAtlas/blob/main/docs/content-repo-standard.md).
+[content-repo standard](CONTENT-STANDARD.md).
 
 ## What's inside
 
