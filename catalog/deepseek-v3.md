@@ -12,6 +12,8 @@ license: license/deepseek
 signal_strength: high
 architecture_id: architecture-era/mixture-of-experts
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 37
 total_parameters: 671026419200
 context_window_tokens: 131072

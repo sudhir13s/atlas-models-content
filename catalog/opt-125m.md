@@ -10,6 +10,8 @@ release_year: 2022
 release_month: 5
 license_note: other
 model_category: language
+tasks:
+- task/text-generation
 context_window_tokens: 2048
 fingerprint:
   attention_type: MHA

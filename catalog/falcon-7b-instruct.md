@@ -10,6 +10,8 @@ release_year: 2023
 release_month: 4
 license: license/apache-2-0
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 7.22
 total_parameters: 7217189760
 fingerprint:

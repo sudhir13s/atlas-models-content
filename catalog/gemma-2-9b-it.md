@@ -12,6 +12,8 @@ license: license/gemma
 signal_strength: high
 architecture_id: architecture-era/transformer
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 9.24
 total_parameters: 9241705984
 context_window_tokens: 8192

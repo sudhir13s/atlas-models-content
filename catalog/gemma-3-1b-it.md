@@ -10,6 +10,8 @@ release_year: 2025
 release_month: 3
 license: license/gemma
 model_category: language
+tasks:
+- task/text-generation
 total_parameters: 999885952
 filters:
   size_category: tiny

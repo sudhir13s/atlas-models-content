@@ -12,6 +12,8 @@ license: license/mit
 signal_strength: high
 architecture_id: architecture-era/transformer
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 3.82
 total_parameters: 3821079552
 context_window_tokens: 4096

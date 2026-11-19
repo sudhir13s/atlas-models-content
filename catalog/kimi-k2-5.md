@@ -10,6 +10,8 @@ release_year: 2026
 release_month: 1
 license_note: modified-mit
 model_category: multimodal
+tasks:
+- task/vision-language-models
 total_parameters: 1026879376368
 context_window_tokens: 262144
 fingerprint:

@@ -10,6 +10,8 @@ release_year: 2024
 release_month: 5
 license: license/deepseek
 model_category: language
+tasks:
+- task/text-generation
 total_parameters: 15706484224
 context_window_tokens: 163840
 fingerprint:

@@ -12,6 +12,8 @@ license: license/apache-2-0
 signal_strength: high
 architecture_id: architecture-era/transformer
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 7.61
 total_parameters: 7615616512
 context_window_tokens: 131072

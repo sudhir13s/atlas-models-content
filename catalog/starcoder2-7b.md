@@ -10,6 +10,8 @@ release_year: 2024
 release_month: 2
 license: license/bigcode-openrail-m
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 7.17
 total_parameters: 7173923840
 context_window_tokens: 16384

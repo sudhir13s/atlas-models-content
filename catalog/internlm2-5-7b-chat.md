@@ -10,6 +10,8 @@ release_year: 2024
 release_month: 6
 license_note: other
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 7.74
 total_parameters: 7737708544
 context_window_tokens: 32768

@@ -10,6 +10,8 @@ release_year: 2024
 release_month: 9
 license_note: qwen-research
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 3.09
 total_parameters: 3085938688
 context_window_tokens: 32768

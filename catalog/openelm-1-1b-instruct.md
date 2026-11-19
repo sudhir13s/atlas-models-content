@@ -10,6 +10,8 @@ release_year: 2024
 release_month: 4
 license: license/apple-amlr
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 1.08
 total_parameters: 1079891456
 context_window_tokens: 2048

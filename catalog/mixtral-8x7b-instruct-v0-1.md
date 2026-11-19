@@ -12,6 +12,8 @@ license: license/apache-2-0
 signal_strength: high
 architecture_id: architecture-era/mixture-of-experts
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 12.9
 total_parameters: 46702792704
 context_window_tokens: 32768

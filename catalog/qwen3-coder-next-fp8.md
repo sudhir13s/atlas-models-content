@@ -10,6 +10,8 @@ release_year: 2026
 release_month: 2
 license: license/apache-2-0
 model_category: language
+tasks:
+- task/text-generation
 total_parameters: 79674391296
 context_window_tokens: 262144
 fingerprint:

@@ -10,6 +10,8 @@ release_year: 2023
 release_month: 12
 license: license/mit
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 2.78
 total_parameters: 2779683840
 context_window_tokens: 2048

@@ -10,6 +10,8 @@ release_year: 2023
 release_month: 10
 license: license/deepseek
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 6.74
 total_parameters: 6740512768
 context_window_tokens: 16384

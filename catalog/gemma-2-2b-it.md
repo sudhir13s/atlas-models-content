@@ -10,6 +10,8 @@ release_year: 2024
 release_month: 7
 license: license/gemma
 model_category: language
+tasks:
+- task/text-generation
 total_parameters: 2614341888
 filters:
   size_category: small

@@ -10,6 +10,8 @@ release_year: 2022
 release_month: 5
 license: license/bigscience-bloom-rail-1-0
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 0.56
 total_parameters: 559214592
 fingerprint:

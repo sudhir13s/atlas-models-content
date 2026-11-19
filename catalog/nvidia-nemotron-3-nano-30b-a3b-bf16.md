@@ -10,6 +10,8 @@ release_year: 2025
 release_month: 12
 license_note: nvidia-nemotron-open-model-license
 model_category: language
+tasks:
+- task/text-generation
 total_parameters: 31577937344
 context_window_tokens: 262144
 fingerprint:

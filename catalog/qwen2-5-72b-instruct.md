@@ -12,6 +12,8 @@ license: license/qwen
 signal_strength: high
 architecture_id: architecture-era/transformer
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 72.71
 total_parameters: 72706203648
 context_window_tokens: 131072

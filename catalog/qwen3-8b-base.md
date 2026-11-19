@@ -10,6 +10,8 @@ release_year: 2025
 release_month: 4
 license: license/apache-2-0
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 8.19
 total_parameters: 8190735360
 context_window_tokens: 32768

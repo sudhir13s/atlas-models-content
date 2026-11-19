@@ -12,6 +12,8 @@ license: license/llama-3-1
 signal_strength: high
 architecture_id: architecture-era/transformer
 model_category: language
+tasks:
+- task/text-generation
 parameters_active_b: 8.03
 total_parameters: 8030261248
 context_window_tokens: 131072

@@ -10,6 +10,8 @@ release_year: 2024
 release_month: 4
 license: license/llama-3
 model_category: language
+tasks:
+- task/text-generation
 total_parameters: 8030261248
 filters:
   size_category: medium
