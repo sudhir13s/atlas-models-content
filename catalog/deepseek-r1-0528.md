@@ -9,6 +9,7 @@ release_date: '2025-05-28'
 release_year: 2025
 release_month: 5
 license: license/mit
+architecture_id: architecture-era/mixture-of-experts
 model_category: language
 tasks:
 - task/text-generation

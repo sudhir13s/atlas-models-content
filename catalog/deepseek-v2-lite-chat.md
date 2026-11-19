@@ -9,6 +9,7 @@ release_date: '2024-05-15'
 release_year: 2024
 release_month: 5
 license: license/deepseek
+architecture_id: architecture-era/mixture-of-experts
 model_category: language
 tasks:
 - task/text-generation

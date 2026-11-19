@@ -9,6 +9,7 @@ release_date: '2025-02-19'
 release_year: 2025
 release_month: 2
 license: license/mit
+architecture_id: architecture-era/transformer
 model_category: language
 tasks:
 - task/text-generation

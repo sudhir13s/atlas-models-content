@@ -9,6 +9,7 @@ release_date: '2026-02-01'
 release_year: 2026
 release_month: 2
 license: license/apache-2-0
+architecture_id: architecture-era/mixture-of-experts
 model_category: language
 tasks:
 - task/text-generation

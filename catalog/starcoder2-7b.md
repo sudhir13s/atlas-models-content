@@ -9,6 +9,7 @@ release_date: '2024-02-20'
 release_year: 2024
 release_month: 2
 license: license/bigcode-openrail-m
+architecture_id: architecture-era/transformer
 model_category: language
 tasks:
 - task/text-generation

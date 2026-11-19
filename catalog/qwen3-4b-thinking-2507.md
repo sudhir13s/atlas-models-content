@@ -9,6 +9,7 @@ release_date: '2025-08-05'
 release_year: 2025
 release_month: 8
 license: license/apache-2-0
+architecture_id: architecture-era/transformer
 model_category: language
 tasks:
 - task/text-generation

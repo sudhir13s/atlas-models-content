@@ -9,6 +9,7 @@ release_date: '2026-03-10'
 release_year: 2026
 release_month: 3
 license_note: nvidia-nemotron-open-model-license
+architecture_id: architecture-era/mixture-of-experts
 model_category: language
 tasks:
 - task/text-generation

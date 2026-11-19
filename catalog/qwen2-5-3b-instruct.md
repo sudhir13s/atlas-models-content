@@ -9,6 +9,7 @@ release_date: '2024-09-17'
 release_year: 2024
 release_month: 9
 license_note: qwen-research
+architecture_id: architecture-era/transformer
 model_category: language
 tasks:
 - task/text-generation

@@ -9,6 +9,7 @@ release_date: '2022-05-11'
 release_year: 2022
 release_month: 5
 license_note: other
+architecture_id: architecture-era/transformer
 model_category: language
 tasks:
 - task/text-generation
