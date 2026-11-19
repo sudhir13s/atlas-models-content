@@ -53,25 +53,6 @@ hub_signals:
 aliases:
 - meta-llama/Llama-3.1-8B-Instruct
 - llama-3.1-8b-instruct
-benchmarks:
-- name: MMLU
-  score: 0.694
-  score_display: 69.4%
-  method: 5-shot
-  self_reported: true
-  source_url: https://arxiv.org/abs/2407.21783
-- name: HumanEval
-  score: 0.726
-  score_display: 72.6%
-  method: 0-shot
-  self_reported: true
-  source_url: https://arxiv.org/abs/2407.21783
-- name: GSM8K
-  score: 0.845
-  score_display: 84.5%
-  method: 8-shot CoT
-  self_reported: true
-  source_url: https://arxiv.org/abs/2407.21783
 lineage:
   parents: []
   children: []

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/milestone.schema.json",
+  "title": "milestone",
+  "description": "One dated event in the history of AI models. The title is the event as the Evolution page words it; the lists point to the architecture eras and models the event names.",
+  "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
+  "properties": {
+    "type": { "const": "milestone" },
+    "year": { "type": "integer", "minimum": 1940 },
+    "order": { "type": "integer", "minimum": 1, "description": "position of the milestone in the timeline" },
+    "architectures": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^architecture-era/[a-z0-9]+(?:-[a-z0-9]+)*$" },
+      "description": "FKs to architecture-era/<slug> the event names"
+    },
+    "models": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^model/[a-z0-9]+(?:-[a-z0-9]+)*$" },
+      "description": "FKs to model/<slug> the event names"
+    }
+  },
+  "required": ["year", "order", "architectures", "models"],
+  "unevaluatedProperties": false
+}

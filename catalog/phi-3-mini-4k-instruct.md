@@ -52,25 +52,6 @@ hub_signals:
   source: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct
 aliases:
 - microsoft/Phi-3-mini-4k-instruct
-benchmarks:
-- name: MMLU
-  score: 0.688
-  score_display: 68.8%
-  method: 5-shot
-  self_reported: true
-  source_url: https://arxiv.org/abs/2404.14219
-- name: GSM8K
-  score: 0.825
-  score_display: 82.5%
-  method: 8-shot CoT
-  self_reported: true
-  source_url: https://arxiv.org/abs/2404.14219
-- name: HumanEval
-  score: 0.585
-  score_display: 58.5%
-  method: 0-shot
-  self_reported: true
-  source_url: https://arxiv.org/abs/2404.14219
 lineage:
   parents: []
   children: []

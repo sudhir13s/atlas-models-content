@@ -112,6 +112,20 @@
         }
       }
     },
+    "variants": {
+      "type": "array",
+      "description": "Named structural variants of the architecture, each with the model families built that way.",
+      "items": {
+        "type": "object",
+        "required": ["name", "subtitle", "models"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "subtitle": { "type": "string", "minLength": 1 },
+          "models": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+        }
+      }
+    },
     "learn_first": {
       "type": "array",
       "description": "Content-driven prerequisites (replaces the hardcoded PREREQS map).",

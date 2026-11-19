@@ -168,21 +168,6 @@
         "source": { "type": "string", "format": "uri" }
       }
     },
-    "benchmarks": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["name", "score"],
-        "properties": {
-          "name": { "type": "string" },
-          "score": { "type": "number" },
-          "score_display": { "type": "string" },
-          "method": { "type": "string" },
-          "self_reported": { "type": "boolean" },
-          "source_url": { "type": "string" }
-        }
-      }
-    },
     "lineage": {
       "type": "object",
       "properties": {

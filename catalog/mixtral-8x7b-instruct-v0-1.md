@@ -57,25 +57,6 @@ hub_signals:
 aliases:
 - mistralai/Mixtral-8x7B-Instruct-v0.1
 - mixtral-8x7b-instruct-v0.1
-benchmarks:
-- name: MMLU
-  score: 0.706
-  score_display: 70.6%
-  method: 5-shot (Mixtral base, arXiv 2401.04088)
-  self_reported: true
-  source_url: https://arxiv.org/abs/2401.04088
-- name: GSM8K
-  score: 0.584
-  score_display: 58.4%
-  method: 5-shot maj@1 (Mixtral base, arXiv 2401.04088)
-  self_reported: true
-  source_url: https://arxiv.org/abs/2401.04088
-- name: HumanEval
-  score: 0.402
-  score_display: 40.2%
-  method: pass@1 (Mixtral base, arXiv 2401.04088)
-  self_reported: true
-  source_url: https://arxiv.org/abs/2401.04088
 lineage:
   parents: []
   children: []

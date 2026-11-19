@@ -53,8 +53,6 @@ hub_signals:                     # owned by the jobs; numbers that change
 variants:                        # quantised or repackaged copies, one entry each
   - { name: "<owner/repo>", format: awq, address: "https://huggingface.co/<owner/repo>", publisher: <hf-handle> }
 aliases: ["<owner/repo>"]
-benchmarks:
-  - { name: MMLU, score: 0.0, score_display: "0.0%", method: "5-shot", self_reported: true, source_url: "<url>" }
 lineage:
   parents: [model/<base-slug>]
   children: []

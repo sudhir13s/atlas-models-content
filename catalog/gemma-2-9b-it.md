@@ -52,31 +52,6 @@ hub_signals:
   source: https://huggingface.co/google/gemma-2-9b-it
 aliases:
 - google/gemma-2-9b-it
-benchmarks:
-- name: MMLU
-  score: 0.713
-  score_display: 71.3%
-  method: 5-shot (Gemma 2 9B pretrained-base report)
-  self_reported: true
-  source_url: https://arxiv.org/abs/2408.00118
-- name: GSM8K
-  score: 0.686
-  score_display: 68.6%
-  method: 5-shot (Gemma 2 9B pretrained-base report)
-  self_reported: true
-  source_url: https://arxiv.org/abs/2408.00118
-- name: HumanEval
-  score: 0.402
-  score_display: 40.2%
-  method: pass@1 (Gemma 2 9B pretrained-base report)
-  self_reported: true
-  source_url: https://arxiv.org/abs/2408.00118
-- name: MATH
-  score: 0.366
-  score_display: 36.6%
-  method: 4-shot (Gemma 2 9B pretrained-base report)
-  self_reported: true
-  source_url: https://arxiv.org/abs/2408.00118
 lineage:
   parents: []
   children: []

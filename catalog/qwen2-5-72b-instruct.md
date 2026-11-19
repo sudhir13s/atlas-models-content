@@ -53,31 +53,6 @@ hub_signals:
 aliases:
 - Qwen/Qwen2.5-72B-Instruct
 - qwen2.5-72b-instruct
-benchmarks:
-- name: MMLU-Pro
-  score: 0.711
-  score_display: 71.1%
-  method: 5-shot
-  self_reported: true
-  source_url: https://qwenlm.github.io/blog/qwen2.5-llm/
-- name: GSM8K
-  score: 0.958
-  score_display: 95.8%
-  method: vendor-reported
-  self_reported: true
-  source_url: https://qwenlm.github.io/blog/qwen2.5-llm/
-- name: HumanEval
-  score: 0.866
-  score_display: 86.6%
-  method: 0-shot
-  self_reported: true
-  source_url: https://qwenlm.github.io/blog/qwen2.5-llm/
-- name: MATH
-  score: 0.831
-  score_display: 83.1%
-  method: vendor-reported
-  self_reported: true
-  source_url: https://qwenlm.github.io/blog/qwen2.5-llm/
 lineage:
   parents: []
   children: []

@@ -14,7 +14,7 @@ It is the `models` domain of a seven-repo reference library
 
 | Type | Folder | What it captures |
 |------|--------|------------------|
-| `model` | `catalog/` | A base model: architecture fingerprint, parameters, license, lineage, benchmarks, and its quantised or repackaged copies as `variants`; prose is optional |
+| `model` | `catalog/` | A base model: architecture fingerprint, parameters, license, lineage, and its quantised or repackaged copies as `variants`; prose is optional |
 | `organization` | `organizations/` | Who creates models: name, kind, website, Hugging Face handles, aliases |
 | `architecture-era` | `architectures/` | A rung on the 1950s→now evolution ladder: key innovation, representative models, lineage |
 | `parameter` | `parameters/` | Structural knobs (layers, d_model, heads, vocab, context) per architecture family, with formulas |

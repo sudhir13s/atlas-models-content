@@ -92,11 +92,44 @@ learn_first:
   - { label: "Softmax & dot products", href: "/learn/concepts/softmax", tag: "Math" }
 
 tags: [transformer, attention, self-attention, foundational, llm]
-updated: 2026-07-20
+updated: 2026-11-19
 sources:
   - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.98 }
   - { url: "https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer (Jay Alammar)", trust: 0.9 }
   - { url: "https://nlp.seas.harvard.edu/annotated-transformer/", title: "The Annotated Transformer (Harvard NLP)", trust: 0.9 }
+variants:
+- name: Decoder-only (Autoregressive)
+  subtitle: Causal attention · next-token prediction
+  models:
+  - GPT-2/3/4/4o
+  - Claude
+  - Gemini
+  - Llama 1-4
+  - Mistral/Mixtral
+  - Qwen
+  - DeepSeek
+  - Phi
+  - Gemma
+  - Command R+
+- name: Encoder-only (Understanding)
+  subtitle: Bidirectional · masked LM · embeddings
+  models:
+  - BERT
+  - RoBERTa
+  - DeBERTa
+  - ELECTRA
+  - BGE
+  - E5
+  - GTE
+- name: Encoder-Decoder (Seq2Seq)
+  subtitle: Bi-encoder + causal decoder · translation
+  models:
+  - T5
+  - Flan-T5
+  - BART
+  - mBART
+  - NLLB
+  - UL2
 ---
 
 ## What Changed

@@ -5,6 +5,31 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Schema 2.0 for `model` (scores leave the model record; breaking)
+
+- **Removed** `model.benchmarks[]`. Benchmark values now live only in `score-sheet` records of
+  `atlas-evaluation-content` (`score-sheet/<model-slug>`), one entry per benchmark and source, and
+  the database reads them from there (`benchmark_scores`). A `model` file that still carries
+  `benchmarks` is a schema violation.
+- **Converted** the seven records that held it (DeepSeek-V3, Gemma 2 9B, Llama 3.1 8B, Mixtral 8x7B,
+  Phi-3 mini, Qwen2.5 7B, Qwen2.5 72B); every value had already been moved to a score sheet.
+- The `task.benchmarks` list (benchmark IDs a task is ranked on) is unchanged.
+
+### Schema 1.2 (architecture content leaves the frontend; additive)
+
+- **Added** the `concept` type (`concepts/`, `concept/<slug>`): `category` (attention,
+  positional-encoding, normalization, activation), `code` (the fingerprint value), `aliases`,
+  `order`, `short_description`, `example_models`; body sections What It Is, Why It Matters,
+  Trade-off. 11 records, copied word for word from `lib/architecture-concepts.ts`.
+- **Added** the `milestone` type (`milestones/`, `milestone/<year>-<slug>`): `year`, `order`,
+  `architectures[]` (`architecture-era/<slug>`), `models[]` (`model/<slug>`); optional body section
+  Summary. 10 records, copied from the Evolution page's Key Milestones card; a name with no record
+  is left out of the lists, never invented.
+- **Added** to `architecture-era`: `variants[]` (`name`, `subtitle`, `models`), set on
+  `architecture-era/transformer` from the LLM fingerprints page's sub-architecture list.
+- **Added** `concept` and `milestone` to the shared `type` enum, their templates, and
+  `meta.json` / `registry.json` entries; both schemas reject unknown fields.
+
 ### Schema 1.1 (migration of the Hugging Face model snapshot)
 
 - **Added** the `organization` type (`organizations/`, `organization/<slug>`): `name`, `kind`
@@ -51,3 +76,5 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 - **1.0** — initial schema for all six model content types.
 - **1.1** — `organization` type, model `variants`/`aliases`/`license_note`, IDs for `organization`
   and `license`, optional prose, shared `locked`.
+- **1.2** — `concept` and `milestone` types, `architecture-era.variants`.
+- **2.0** — `model.benchmarks` removed; scores live in `score-sheet` records.

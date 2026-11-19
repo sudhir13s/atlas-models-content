@@ -46,37 +46,6 @@ filters:
   is_moe: true
   pipeline_tag: text-generation
   attention_type: MLA
-benchmarks:
-- name: MMLU
-  score: 0.885
-  score_display: 88.5%
-  method: EM
-  self_reported: true
-  source_url: https://huggingface.co/deepseek-ai/DeepSeek-V3
-- name: MMLU-Pro
-  score: 0.759
-  score_display: 75.9%
-  method: EM
-  self_reported: true
-  source_url: https://huggingface.co/deepseek-ai/DeepSeek-V3
-- name: GSM8K
-  score: 0.893
-  score_display: 89.3%
-  method: vendor-reported
-  self_reported: true
-  source_url: https://huggingface.co/deepseek-ai/DeepSeek-V3
-- name: HumanEval-Mul
-  score: 0.826
-  score_display: 82.6%
-  method: pass@1
-  self_reported: true
-  source_url: https://huggingface.co/deepseek-ai/DeepSeek-V3
-- name: MATH-500
-  score: 0.902
-  score_display: 90.2%
-  method: EM
-  self_reported: true
-  source_url: https://huggingface.co/deepseek-ai/DeepSeek-V3
 lineage:
   parents: []
   children: []

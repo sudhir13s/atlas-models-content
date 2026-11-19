@@ -54,7 +54,8 @@ numeric config) so it stays machine-parseable.
   plus `era`, `year`, `family`. Body sections: What Changed → Key Ideas.
 - **model** — one record per base model. Carries the `fingerprint`, `organization` and `license`
   (IDs; `license_note` names a licence with no record), `variants[]` (quantised or repackaged copies:
-  name, format, address, publisher), `aliases[]`, `hub_signals`, `benchmarks[]` and lineage. Prose is
+  name, format, address, publisher), `aliases[]`, `hub_signals` and lineage (benchmark values live in `score-sheet` records of
+  `atlas-evaluation-content`). Prose is
   optional: a record without `summary` has none yet. Body sections, all optional: Summary → Why It
   Matters → Notes. A field with no source is absent, never `0` or `Unknown`.
 - **organization** — `name`, `kind` (lab, company, foundation, community), `website`, `hf_handles[]`,
