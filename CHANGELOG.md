@@ -25,6 +25,10 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
   `organization` records they point to; the eight curated records were merged, not rewritten.
 - **Changed** `model.fingerprint`: only `num_layers` and `hidden_size` are required, and a gated
   repository whose `config.json` cannot be read may have no fingerprint.
+- **Added** to `model` (still schema 1.1, additive): `quote`, `review` and `generated_by`, the
+  provenance of prose the prose queue (`backfill` job) writes, in the shape a feed item records its
+  own. `summary` and `why_it_matters` are written by the same job; `why_it_matters` stays absent
+  when the model card states no reason.
 
 ### Added
 - Repository scaffold to the content-repo standard: `meta.json`, `schema/registry.json`, the seven

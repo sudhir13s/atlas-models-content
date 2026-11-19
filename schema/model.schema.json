@@ -65,7 +65,52 @@
     "total_parameters": { "type": "integer" },
     "context_window_tokens": { "type": "integer" },
     "summary": { "type": "string", "description": "absent means the record has no prose yet; the prose queue writes it" },
-    "why_it_matters": { "type": "string" },
+    "why_it_matters": { "type": "string", "description": "absent when the source states no reason the model matters" },
+    "quote": {
+      "type": "string",
+      "minLength": 1,
+      "description": "the passage of the source text the written prose rests on; set by the prose queue"
+    },
+    "review": {
+      "type": "object",
+      "description": "what the Critic concluded about the written prose; set by the prose queue",
+      "required": ["score", "reviewed_by", "prompt_versions"],
+      "additionalProperties": false,
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 10 },
+        "reviewed_by": {
+          "type": "object",
+          "required": ["provider", "model"],
+          "additionalProperties": false,
+          "properties": {
+            "provider": { "type": "string", "minLength": 1 },
+            "model": { "type": "string", "minLength": 1 }
+          }
+        },
+        "prompt_versions": {
+          "type": "object",
+          "required": ["writer", "critic"],
+          "additionalProperties": false,
+          "properties": {
+            "writer": { "type": "string", "minLength": 1 },
+            "critic": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "generated_by": {
+      "type": "object",
+      "description": "which job run wrote the prose, with which model and prompt; set by the prose queue",
+      "required": ["job", "run_id", "provider", "model", "prompt_version"],
+      "additionalProperties": false,
+      "properties": {
+        "job": { "type": "string", "minLength": 1 },
+        "run_id": { "type": "integer", "minimum": 0 },
+        "provider": { "type": "string", "minLength": 1 },
+        "model": { "type": "string", "minLength": 1 },
+        "prompt_version": { "type": "string", "minLength": 1 }
+      }
+    },
     "fingerprint": {
       "type": "object",
       "description": "values a source gives; one it lacks stays absent. Depth and width are the least a fingerprint says.",
