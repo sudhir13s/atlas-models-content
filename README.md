@@ -14,7 +14,8 @@ It is the `models` domain of a seven-repo reference library
 
 | Type | Folder | What it captures |
 |------|--------|------------------|
-| `model` | `catalog/` | A released checkpoint: architecture fingerprint, parameters, license, lineage, benchmarks |
+| `model` | `catalog/` | A base model: architecture fingerprint, parameters, license, lineage, benchmarks, and its quantised or repackaged copies as `variants`; prose is optional |
+| `organization` | `organizations/` | Who creates models: name, kind, website, Hugging Face handles, aliases |
 | `architecture-era` | `architectures/` | A rung on the 1950s→now evolution ladder: key innovation, representative models, lineage |
 | `parameter` | `parameters/` | Structural knobs (layers, d_model, heads, vocab, context) per architecture family, with formulas |
 | `hyperparameter` | `hyperparameters/` | Training + inference knobs, ranked by criticality, each with definition / calculation / example |
@@ -42,7 +43,7 @@ meta.json                 # repo descriptor (machine entrypoint 1)
 schema/registry.json      # type → folder/schema/sections map (machine entrypoint 2)
 schema/*.schema.json      # JSON Schema per content type
 templates/*.template.md   # copy these to author new content
-catalog/ architectures/ parameters/ hyperparameters/ fine-tuning-methods/ licenses/
+catalog/ organizations/ architectures/ parameters/ hyperparameters/ fine-tuning-methods/ licenses/
 assets/                   # SVG diagrams
 ```
 

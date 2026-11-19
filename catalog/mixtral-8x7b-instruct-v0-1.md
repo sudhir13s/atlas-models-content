@@ -2,10 +2,10 @@
 id: model/mixtral-8x7b-instruct-v0-1
 type: model
 slug: mixtral-8x7b-instruct-v0-1
-schema_version: 1.0
-title: "Mixtral 8x7B Instruct v0.1"
-organization: "Mistral AI"
-release_date: "2023-12-11"
+schema_version: 1.1
+title: Mixtral 8x7B Instruct v0.1
+organization: organization/mistral-ai
+release_date: '2023-12-11'
 release_year: 2023
 release_month: 12
 license: license/apache-2-0
@@ -15,8 +15,8 @@ model_category: language
 parameters_active_b: 12.9
 total_parameters: 46702792704
 context_window_tokens: 32768
-summary: "Sparse mixture-of-experts transformer, ~46.7B total / ~12.9B active parameters, 8 experts top-2, 32K context, using GQA, SwiGLU, RMSNorm and RoPE."
-why_it_matters: "The first open sparse-MoE model to reach GPT-3.5-class quality, proving MoE could ship at a practical size under a permissive license."
+summary: Sparse mixture-of-experts transformer, ~46.7B total / ~12.9B active parameters, 8 experts top-2, 32K context, using GQA, SwiGLU, RMSNorm and RoPE.
+why_it_matters: The first open sparse-MoE model to reach GPT-3.5-class quality, proving MoE could ship at a practical size under a permissive license.
 fingerprint:
   attention_type: GQA
   num_layers: 32
@@ -33,12 +33,12 @@ fingerprint:
   rope_theta: 1000000
   parameters_active_b: 12.9
   kv_cache_rating: medium
-  key_detail: "Every FFN is replaced by 8 experts; a per-token router selects top-2 experts (intermediate_size 14336 per expert); ~46.7B total but only ~12.9B active per token"
+  key_detail: Every FFN is replaced by 8 experts; a per-token router selects top-2 experts (intermediate_size 14336 per expert); ~46.7B total but only ~12.9B active per token
 moe_config:
   expert_count: 8
   active_experts: 2
   shared_expert: false
-  notes: "Top-2 routing over 8 experts per layer; router is a linear gate over the 4096-dim hidden state; no shared/always-on expert"
+  notes: Top-2 routing over 8 experts per layer; router is a linear gate over the 4096-dim hidden state; no shared/always-on expert
 filters:
   size_category: large
   is_quantized: false
@@ -46,22 +46,105 @@ filters:
   is_moe: true
   pipeline_tag: text-generation
   attention_type: GQA
+  is_gated: false
+  library: vllm
+hub_signals:
+  downloads_30d: 320281
+  likes: 4781
+  last_modified: '2025-07-24'
+  observed_at: '2026-11-19'
+  source: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
+aliases:
+- mistralai/Mixtral-8x7B-Instruct-v0.1
+- mixtral-8x7b-instruct-v0.1
 benchmarks:
-  - { name: MMLU, score: 0.706, score_display: "70.6%", method: "5-shot (Mixtral base, arXiv 2401.04088)", self_reported: true, source_url: "https://arxiv.org/abs/2401.04088" }
-  - { name: GSM8K, score: 0.584, score_display: "58.4%", method: "5-shot maj@1 (Mixtral base, arXiv 2401.04088)", self_reported: true, source_url: "https://arxiv.org/abs/2401.04088" }
-  - { name: HumanEval, score: 0.402, score_display: "40.2%", method: "pass@1 (Mixtral base, arXiv 2401.04088)", self_reported: true, source_url: "https://arxiv.org/abs/2401.04088" }
+- name: MMLU
+  score: 0.706
+  score_display: 70.6%
+  method: 5-shot (Mixtral base, arXiv 2401.04088)
+  self_reported: true
+  source_url: https://arxiv.org/abs/2401.04088
+- name: GSM8K
+  score: 0.584
+  score_display: 58.4%
+  method: 5-shot maj@1 (Mixtral base, arXiv 2401.04088)
+  self_reported: true
+  source_url: https://arxiv.org/abs/2401.04088
+- name: HumanEval
+  score: 0.402
+  score_display: 40.2%
+  method: pass@1 (Mixtral base, arXiv 2401.04088)
+  self_reported: true
+  source_url: https://arxiv.org/abs/2401.04088
 lineage:
   parents: []
   children: []
-tags: [llm, mistral, moe, sparse, gqa, instruct, apache-2-0]
-updated: 2026-07-17
+locked:
+- title
+- organization
+- release_date
+- release_year
+- release_month
+- license
+- signal_strength
+- architecture_id
+- model_category
+- parameters_active_b
+- total_parameters
+- context_window_tokens
+- summary
+- why_it_matters
+- fingerprint.attention_type
+- fingerprint.num_layers
+- fingerprint.attention_heads
+- fingerprint.kv_heads
+- fingerprint.head_size
+- fingerprint.hidden_size
+- fingerprint.intermediate_size
+- fingerprint.context_window_tokens
+- fingerprint.vocabulary_size
+- fingerprint.activation_function
+- fingerprint.normalization
+- fingerprint.positional_encoding
+- fingerprint.rope_theta
+- fingerprint.parameters_active_b
+- fingerprint.kv_cache_rating
+- fingerprint.key_detail
+- moe_config
+- filters.size_category
+- filters.is_quantized
+- filters.quant_format
+- filters.is_moe
+- filters.pipeline_tag
+- filters.attention_type
+- benchmarks
+- body
+tags:
+- llm
+- mistral
+- moe
+- sparse
+- gqa
+- instruct
+- apache-2-0
+updated: '2026-11-19'
 sources:
-  - { url: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1", title: "Mixtral-8x7B-Instruct-v0.1 — model card + config.json", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2401.04088", title: "Mixtral of Experts (Jiang et al., 2024)", trust: 0.95 }
-related: [architecture-era/mixture-of-experts, license/apache-2-0]
+- url: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
+  title: Mixtral-8x7B-Instruct-v0.1 — model card + config.json
+  trust: 0.9
+- url: https://arxiv.org/abs/2401.04088
+  title: Mixtral of Experts (Jiang et al., 2024)
+  trust: 0.95
+- url: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json
+  title: mistralai/Mixtral-8x7B-Instruct-v0.1 — config.json
+  trust: 0.9
+related:
+- architecture-era/mixture-of-experts
+- license/apache-2-0
 ---
 
 ## Summary
+
 Mixtral 8x7B Instruct is a sparse mixture-of-experts transformer with 32 layers and a 4096-dimensional
 residual stream. The attention path is identical to Mistral 7B — grouped-query attention with 32 query
 heads sharing 8 key/value heads, RMSNorm, and RoPE (base frequency 1000000) — but every feed-forward
@@ -71,6 +154,7 @@ are combined by the router's softmax weights. The result is ~46.7B total paramet
 ~12.9B are active for any given token.
 
 ## Why It Matters
+
 Mixtral was the model that brought sparse mixture-of-experts into the open-weight mainstream. It
 matched or beat Llama 2 70B and GPT-3.5 on most benchmarks while activating roughly a fifth of its
 parameters per token, demonstrating the core MoE bargain: pay 70B-class training and memory cost, but
@@ -79,6 +163,7 @@ and embeddings, so the total is 46.7B rather than 8×7B=56B. It made the memory-
 MoE concrete for practitioners and seeded an entire generation of open MoE work.
 
 ## Notes
+
 MoE serving has a distinctive cost profile: all 46.7B parameters must be resident in memory (roughly
 90GB+ in bf16) even though only ~12.9B are used per token, so Mixtral is memory-bound rather than
 compute-bound — quantization and expert-offloading are the usual levers to fit it on smaller hardware.

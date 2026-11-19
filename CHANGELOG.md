@@ -5,6 +5,27 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Schema 1.1 (migration of the Hugging Face model snapshot)
+
+- **Added** the `organization` type (`organizations/`, `organization/<slug>`): `name`, `kind`
+  (lab, company, foundation, community), `website`, `hf_handles`, `aliases`; body section Overview.
+- **Added** to `model`: `variants[]` (`name`, `format`, `address`, `publisher`), `aliases[]`,
+  `license_note`, `filters.library`, `hub_signals.last_modified` and `hub_signals.source`
+  (`hub_signals` now requires `observed_at` and `source`).
+- **Added** the shared optional `locked` field (field paths no job may change) to every type.
+- **Changed** `model.organization` and `model.license` to IDs (`organization/<slug>`,
+  `license/<slug>`); the eight curated records were converted.
+- **Changed** `model.summary` to optional (absent means the record has no prose yet) and every
+  `model` body section to optional (registry `optional_sections`); `model` needs `license` or
+  `license_note`.
+- **Added** six licence records: Llama 3.2, Llama 3, Llama 2, BigScience BLOOM RAIL 1.0, Apple AMLR,
+  BigCode OpenRAIL-M.
+- **Added** 71 `model` records (one per Hugging Face base model of the snapshot, built by code from
+  Hugging Face facts, 16 quantised or repackaged copies listed as `variants`) and the 19
+  `organization` records they point to; the eight curated records were merged, not rewritten.
+- **Changed** `model.fingerprint`: only `num_layers` and `hidden_size` are required, and a gated
+  repository whose `config.json` cannot be read may have no fingerprint.
+
 ### Added
 - Repository scaffold to the content-repo standard: `meta.json`, `schema/registry.json`, the seven
   JSON Schemas (`_shared`, `model`, `architecture-era`, `parameter`, `hyperparameter`,
@@ -24,3 +45,5 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 ## Schema versions
 
 - **1.0** — initial schema for all six model content types.
+- **1.1** — `organization` type, model `variants`/`aliases`/`license_note`, IDs for `organization`
+  and `license`, optional prose, shared `locked`.

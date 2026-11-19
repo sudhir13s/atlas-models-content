@@ -2,19 +2,20 @@
 id: model/<slug>
 type: model
 slug: <slug>
-schema_version: 1.0
+schema_version: 1.1
 title: "<Human Readable Model Name>"
-organization: "<org>"
+organization: organization/<organization-slug>
 release_date: "<YYYY-MM-DD>"
 release_year: <YYYY>
-license: license/<license-slug>
+release_month: <M>
+license: license/<license-slug>   # or `license_note: "<licence name as the source gives it>"` when no license record exists
 signal_strength: medium          # high | medium | low
 architecture_id: architecture-era/<slug>
 model_category: language
 parameters_active_b: <number>
 total_parameters: <int>
 context_window_tokens: <int>
-summary: "<one-sentence architecture summary>"
+summary: "<one-sentence architecture summary>"   # omit summary, why_it_matters and the body for a record with no prose yet
 why_it_matters: "<one sentence on why this model matters>"
 fingerprint:
   attention_type: <MHA | GQA | MQA | MLA>
@@ -39,13 +40,25 @@ filters:
   is_quantized: false
   quant_format: original
   is_moe: false
+  is_gated: false
   pipeline_tag: text-generation
+  library: transformers
   attention_type: <...>
+hub_signals:                     # owned by the jobs; numbers that change
+  downloads_30d: <int>
+  likes: <int>
+  last_modified: <YYYY-MM-DD>
+  observed_at: <YYYY-MM-DD>
+  source: "<url>"
+variants:                        # quantised or repackaged copies, one entry each
+  - { name: "<owner/repo>", format: awq, address: "https://huggingface.co/<owner/repo>", publisher: <hf-handle> }
+aliases: ["<owner/repo>"]
 benchmarks:
   - { name: MMLU, score: 0.0, score_display: "0.0%", method: "5-shot", self_reported: true, source_url: "<url>" }
 lineage:
   parents: [model/<base-slug>]
   children: []
+locked: [summary, why_it_matters]  # field paths no job may change
 tags: [<tag>, <tag>]
 updated: <YYYY-MM-DD>
 sources:

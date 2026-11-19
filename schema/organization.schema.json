@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/organization.schema.json",
+  "title": "organization",
+  "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
+  "properties": {
+    "type": { "const": "organization" },
+    "name": { "type": "string", "minLength": 1 },
+    "kind": { "type": "string", "enum": ["lab", "company", "foundation", "community"] },
+    "website": { "type": "string", "format": "uri" },
+    "hf_handles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Hugging Face owner handles the organization publishes its models under"
+    },
+    "aliases": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "other names the organization is written as"
+    }
+  },
+  "required": ["name", "kind", "hf_handles"]
+}

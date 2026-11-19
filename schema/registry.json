@@ -1,12 +1,19 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "shared": "schema/_shared.schema.json",
   "types": {
     "model": {
       "folder": "catalog",
       "schema": "schema/model.schema.json",
       "id_prefix": "model/",
-      "sections": ["Summary", "Why It Matters", "Notes"]
+      "sections": [],
+      "optional_sections": ["Summary", "Why It Matters", "Notes"]
+    },
+    "organization": {
+      "folder": "organizations",
+      "schema": "schema/organization.schema.json",
+      "id_prefix": "organization/",
+      "sections": ["Overview"]
     },
     "architecture-era": {
       "folder": "architectures",

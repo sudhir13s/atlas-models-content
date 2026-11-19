@@ -21,6 +21,8 @@ this file is the `models`-domain instance.
 
 ## Frontmatter
 
+Optional on every file: `locked` — field paths no job may change.
+
 Base fields on **every** file: `id`, `type`, `slug`, `schema_version`, `title`, `tags`, `updated`,
 `sources`. Optional base field: `related`. Each type adds its own fields — see
 `schema/<type>.schema.json`. Put **structured/reference data in frontmatter** (arrays, matrices,
@@ -29,12 +31,13 @@ numeric config) so it stays machine-parseable.
 - `tags`: lowercase, hyphen-separated.
 - `updated`: ISO date (`YYYY-MM-DD`).
 - `sources[]`: `{ url, title, trust }` — `trust` in `[0,1]`. Open-source-first; cite, do not copy.
-- `schema_version`: the `major.minor` the file was authored against (currently `1.0`).
+- `schema_version`: the `major.minor` the file was authored against (currently `1.1`).
 
 ## Body sections
 
 - Prose lives under `##` headings. The **required sections** and their order per type are declared
-  in `schema/registry.json → types.<type>.sections`.
+  in `schema/registry.json → types.<type>.sections`; `optional_sections` may be absent and, when
+  present, follow the required ones in that order.
 - Formulas may use LaTeX (`$...$` / `$$...$$`) — consumers render with KaTeX/MathJax.
 - Code examples use fenced blocks with a language tag (```python).
 - The `Example` section is **mandatory** wherever the type declares it — a worked, concrete example
@@ -49,8 +52,13 @@ numeric config) so it stays machine-parseable.
   `worked_example.config` the consumer live-computes. Body explains each component + the master formula.
 - **architecture-era** — carries `led_to[]` / `influenced_by[]` (IDs) forming the evolution DAG,
   plus `era`, `year`, `family`. Body sections: What Changed → Key Ideas.
-- **model** — carries the full `fingerprint`, `license` (ID), `benchmarks[]` (with method + caveat),
-  and lineage. Body sections: Summary → Why It Matters → Notes.
+- **model** — one record per base model. Carries the `fingerprint`, `organization` and `license`
+  (IDs; `license_note` names a licence with no record), `variants[]` (quantised or repackaged copies:
+  name, format, address, publisher), `aliases[]`, `hub_signals`, `benchmarks[]` and lineage. Prose is
+  optional: a record without `summary` has none yet. Body sections, all optional: Summary → Why It
+  Matters → Notes. A field with no source is absent, never `0` or `Unknown`.
+- **organization** — `name`, `kind` (lab, company, foundation, community), `website`, `hf_handles[]`,
+  `aliases[]`. Body section: Overview.
 - **fine-tuning-method** — `method_type`, `memory_profile`, `related_hyperparameters[]` (IDs).
   Body sections: Definition → What to look for → Calculation → Example.
 - **license** — `spdx_id`, `category`, a boolean `permissions` matrix, `conditions[]`,
