@@ -64,12 +64,28 @@
     "parameters_active_b": { "type": "number" },
     "total_parameters": { "type": "integer" },
     "context_window_tokens": { "type": "integer" },
-    "summary": { "type": "string", "description": "absent means the record has no prose yet; the prose queue writes it" },
-    "why_it_matters": { "type": "string", "description": "absent when the source states no reason the model matters" },
+    "summary": { "type": "string", "description": "what the model is: its kind, its family or base model, what it was built to do; absent means the record has no prose yet, the prose queue writes it" },
+    "intended_use": { "type": "string", "description": "the tasks and users the source names, and uses it puts out of scope; absent when the source names none" },
+    "what_sets_it_apart": { "type": "string", "description": "the design choice, training approach, capability or reported result that separates it from its siblings, base model or predecessors; a result the authors claim is worded as their claim; absent when the source says none" },
+    "running_it": { "type": "string", "description": "what the source tells someone about to run it: settings, prompt format, hardware, anything that must or must not be done; absent when the source says none" },
+    "limitations": { "type": "string", "description": "what the source itself says the model does badly, does not cover, or risks; absent when the source says none" },
+    "why_it_matters": { "type": "string", "description": "hand-written reason the model matters; the prose queue no longer writes it, and it stays absent when the source states none" },
+    "quotes": {
+      "type": "object",
+      "description": "one span of the source text for each passage the prose queue wrote, keyed by the passage's field name; a passage that is absent has no quote",
+      "additionalProperties": false,
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "intended_use": { "type": "string", "minLength": 1 },
+        "what_sets_it_apart": { "type": "string", "minLength": 1 },
+        "running_it": { "type": "string", "minLength": 1 },
+        "limitations": { "type": "string", "minLength": 1 }
+      }
+    },
     "quote": {
       "type": "string",
       "minLength": 1,
-      "description": "the passage of the source text the written prose rests on; set by the prose queue"
+      "description": "legacy: the single passage behind the summary and why_it_matters written by writer prompt 1.0.0; new prose uses `quotes`"
     },
     "review": {
       "type": "object",

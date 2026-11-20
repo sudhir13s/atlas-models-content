@@ -15,8 +15,18 @@ model_category: language
 parameters_active_b: <number>
 total_parameters: <int>
 context_window_tokens: <int>
-summary: "<one-sentence architecture summary>"   # omit summary, why_it_matters and the body for a record with no prose yet
-why_it_matters: "<one sentence on why this model matters>"
+summary: "<2-3 sentences: what the model is, its family or base model, what it was built to do>"   # omit the five passages, quotes and the body for a record with no prose yet
+intended_use: "<1-3 sentences: the tasks and users the source names, and uses it rules out>"   # a passage the source cannot support is omitted, never written as "unknown"
+what_sets_it_apart: "<1-3 sentences: the design choice, training approach or reported result that separates it from its siblings or predecessors>"
+running_it: "<1-2 sentences: recommended settings, prompt format, hardware, what must or must not be done>"
+limitations: "<1-2 sentences: what the source says the model does badly, does not cover, or risks>"
+why_it_matters: "<one sentence on why this model matters>"   # hand-written records only; the prose queue does not write it
+quotes:                          # set by the prose queue: one span of the source per written passage
+  summary: "<span of the source text>"
+  intended_use: "<span of the source text>"
+  what_sets_it_apart: "<span of the source text>"
+  running_it: "<span of the source text>"
+  limitations: "<span of the source text>"
 fingerprint:
   attention_type: <MHA | GQA | MQA | MLA>
   num_layers: <int>
@@ -56,7 +66,7 @@ aliases: ["<owner/repo>"]
 lineage:
   parents: [model/<base-slug>]
   children: []
-locked: [summary, why_it_matters]  # field paths no job may change
+locked: [summary, why_it_matters]  # field paths no job may change (any passage field, or `body`)
 tags: [<tag>, <tag>]
 updated: <YYYY-MM-DD>
 sources:
@@ -65,10 +75,22 @@ related: [architecture-era/<slug>]
 ---
 
 ## Summary
-<2-3 sentence description of the architecture.>
+<2-3 sentences: what the model is.>
+
+## Intended Use
+<1-3 sentences: tasks and users, and uses ruled out.>
+
+## What Sets It Apart
+<1-3 sentences: what separates it from its siblings, base model or predecessors.>
+
+## Running It
+<1-2 sentences: settings, prompt format, hardware.>
+
+## Limitations
+<1-2 sentences: what it does badly, does not cover, or risks.>
 
 ## Why It Matters
-<1-2 paragraphs on the model's significance.>
+<1-2 paragraphs on the model's significance; hand-written records only.>
 
 ## Notes
 <Notable configuration details, gotchas, deployment notes.>

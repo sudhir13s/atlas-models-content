@@ -28,7 +28,7 @@ It is the `models` domain of a seven-repo reference library
 # Vendor it
 git clone https://github.com/sudhir13s/atlas-models-content.git
 # or as a submodule of your project
-git submodule add https://github.com/sudhir13s/atlas-models-content.git content/models-src
+git submodule add https://github.com/sudhir13s/atlas-models-content.git content/atlas-models-content
 ```
 
 Every content file is a Markdown file with YAML frontmatter (the structured fields) and a Markdown
