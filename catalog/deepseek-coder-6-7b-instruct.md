@@ -16,6 +16,7 @@ tasks:
 parameters_active_b: 6.74
 total_parameters: 6740512768
 context_window_tokens: 16384
+summary: deepseek-coder-6.7b-instruct is a 6.7B parameter model initialized from deepseek-coder-6.7b-base and fine-tuned on 2B tokens of instruction data by DeepSeek.
 fingerprint:
   attention_type: MHA
   num_layers: 32
@@ -50,13 +51,29 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: deepseek-coder-6.7b-instruct is a 6.7B parameter model initialized from deepseek-coder-6.7b-base and fine-tuned on 2B tokens of instruction data.
+review:
+  score: 10.0
+  reviewed_by:
+    provider: nvidia-gemma-4-31b
+    model: nvidia_nim/google/gemma-4-31b-it
+  prompt_versions:
+    writer: 2.0.0
+    critic: 1.2.0
+generated_by:
+  job: backfill
+  run_id: 7
+  provider: gemini-flash-lite
+  model: gemini/gemini-3.5-flash-lite
+  prompt_version: 2.0.0
 tags:
 - llm
 - text-generation
 - llama
 - dense
 - mha
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct
   title: deepseek-ai/deepseek-coder-6.7b-instruct — model page (Hugging Face)
@@ -66,4 +83,6 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+deepseek-coder-6.7b-instruct is a 6.7B parameter model initialized from deepseek-coder-6.7b-base and fine-tuned on 2B tokens of instruction data by DeepSeek.

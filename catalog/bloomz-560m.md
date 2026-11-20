@@ -16,6 +16,11 @@ tasks:
 parameters_active_b: 0.56
 total_parameters: 559214592
 context_window_tokens: 2048
+summary: bloomz-560m is a member of the BLOOMZ and mT0 family created by BigScience, built by multitask finetuning the pretrained bloom-560m multilingual language model on the xP3 crosslingual task mixture.
+intended_use: It is intended to perform tasks expressed in natural language, and its authors recommend prompting it in English.
+what_sets_it_apart: Unlike the original pretrained bloom-560m model, bloomz-560m is capable of following human instructions in dozens of languages zero-shot and generalizing to unseen tasks and languages.
+running_it: The authors recommend making it very clear where the input stops to prevent continuation, and providing as much context as possible.
+limitations: Its performance may vary depending on the prompt used.
 fingerprint:
   attention_type: MHA
   num_layers: 24
@@ -46,13 +51,33 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: We finetune BLOOM & mT5 pretrained multilingual language models on our crosslingual task mixture (xP3) and find the resulting models capable of crosslingual generalization to unseen tasks & languages.
+  intended_use: We recommend using the model to perform tasks expressed in natural language.
+  what_sets_it_apart: We present BLOOMZ & mT0, a family of models capable of following human instructions in dozens of languages zero-shot.
+  running_it: For BLOOMZ models, we recommend making it very clear when the input stops to avoid the model trying to continue it.
+  limitations: 'Prompt Engineering: The performance may vary depending on the prompt.'
+review:
+  score: 10.0
+  reviewed_by:
+    provider: nvidia-gemma-4-31b
+    model: nvidia_nim/google/gemma-4-31b-it
+  prompt_versions:
+    writer: 2.0.0
+    critic: 1.2.0
+generated_by:
+  job: backfill
+  run_id: 7
+  provider: gemini-flash-lite
+  model: gemini/gemini-3.5-flash-lite
+  prompt_version: 2.0.0
 tags:
 - llm
 - text-generation
 - bloom
 - dense
 - mha
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/bigscience/bloomz-560m
   title: bigscience/bloomz-560m — model page (Hugging Face)
@@ -65,4 +90,22 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+bloomz-560m is a member of the BLOOMZ and mT0 family created by BigScience, built by multitask finetuning the pretrained bloom-560m multilingual language model on the xP3 crosslingual task mixture.
+
+## Intended Use
+
+It is intended to perform tasks expressed in natural language, and its authors recommend prompting it in English.
+
+## What Sets It Apart
+
+Unlike the original pretrained bloom-560m model, bloomz-560m is capable of following human instructions in dozens of languages zero-shot and generalizing to unseen tasks and languages.
+
+## Running It
+
+The authors recommend making it very clear where the input stops to prevent continuation, and providing as much context as possible.
+
+## Limitations
+
+Its performance may vary depending on the prompt used.
