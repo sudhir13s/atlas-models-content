@@ -15,6 +15,8 @@ tasks:
 - task/text-generation
 total_parameters: 684531386000
 context_window_tokens: 163840
+summary: DeepSeek-R1-0528 is a language model released by DeepSeek on May 28, 2025, with 685 billion parameters and a 163840 token context window. It is a mixture of experts model that improves its depth of reasoning and inference capabilities through increased computational resources and algorithmic optimization mechanisms during post-training.
+why_it_matters: The DeepSeek-R1 series supports commercial use and distillation under the MIT License.
 fingerprint:
   attention_type: MLA
   num_layers: 61
@@ -53,13 +55,28 @@ aliases:
 lineage:
   parents: []
   children: []
+quote: DeepSeek-R1 series (including Base and Chat) supports commercial use and distillation.
+review:
+  score: 10.0
+  reviewed_by:
+    provider: nvidia-gemma-4-31b
+    model: nvidia_nim/google/gemma-4-31b-it
+  prompt_versions:
+    writer: 1.0.0
+    critic: 1.2.0
+generated_by:
+  job: backfill
+  run_id: 6
+  provider: gemini-flash-lite
+  model: gemini/gemini-3.5-flash-lite
+  prompt_version: 1.0.0
 tags:
 - llm
 - text-generation
 - deepseek-v3
 - moe
 - mla
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-R1-0528
   title: deepseek-ai/DeepSeek-R1-0528 — model page (Hugging Face)
@@ -72,4 +89,10 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+DeepSeek-R1-0528 is a language model released by DeepSeek on May 28, 2025, with 685 billion parameters and a 163840 token context window. It is a mixture of experts model that improves its depth of reasoning and inference capabilities through increased computational resources and algorithmic optimization mechanisms during post-training.
+
+## Why It Matters
+
+The DeepSeek-R1 series supports commercial use and distillation under the MIT License.

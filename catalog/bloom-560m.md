@@ -15,6 +15,8 @@ tasks:
 - task/text-generation
 parameters_active_b: 0.56
 total_parameters: 559214592
+summary: Bloom-560m is a transformer-based language model developed by BigScience. It uses a decoder-only architecture with 559,214,592 parameters, 24 layers, and 16 attention heads. The model supports a sequence length of 2048 tokens and was trained on text including 45 natural languages and 12 programming languages.
+why_it_matters: This model is being created in order to enable public research on large language models (LLMs).
 fingerprint:
   attention_type: MHA
   num_layers: 24
@@ -44,13 +46,28 @@ aliases:
 lineage:
   parents: []
   children: []
+quote: This model is being created in order to enable public research on large language models (LLMs).
+review:
+  score: 10.0
+  reviewed_by:
+    provider: nvidia-gemma-4-31b
+    model: nvidia_nim/google/gemma-4-31b-it
+  prompt_versions:
+    writer: 1.0.0
+    critic: 1.2.0
+generated_by:
+  job: backfill
+  run_id: 6
+  provider: gemini-flash-lite
+  model: gemini/gemini-3.5-flash-lite
+  prompt_version: 1.0.0
 tags:
 - llm
 - text-generation
 - bloom
 - dense
 - mha
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/bigscience/bloom-560m
   title: bigscience/bloom-560m — model page (Hugging Face)
@@ -69,4 +86,10 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Bloom-560m is a transformer-based language model developed by BigScience. It uses a decoder-only architecture with 559,214,592 parameters, 24 layers, and 16 attention heads. The model supports a sequence length of 2048 tokens and was trained on text including 45 natural languages and 12 programming languages.
+
+## Why It Matters
+
+This model is being created in order to enable public research on large language models (LLMs).
