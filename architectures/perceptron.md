@@ -79,7 +79,7 @@ resources:
   - { kind: paper, title: "The Perceptron: A Probabilistic Model (Rosenblatt, 1958)", url: "https://doi.org/10.1037/h0042519" }
   - { kind: blog, title: "The Perceptron — a visual introduction (Google ML crash course)", url: "https://developers.google.com/machine-learning/crash-course/linear-regression" }
   - { kind: video, title: "But what is a neural network? (3Blue1Brown)", url: "https://www.youtube.com/watch?v=aircAruvnKk" }
-  - { kind: tutorial, title: "Single-Layer Neural Networks and the Perceptron (Sebastian Raschka)", url: "https://sebastianraschka.com/blog/2015/singlelayer-neural-networks.html" }
+  - { kind: tutorial, title: "Single-Layer Neural Networks and the Perceptron (Sebastian Raschka)", url: "https://sebastianraschka.com/Articles/2015_singlelayer_neurons.html" }
 
 learn_first:
   - { label: "Vectors & dot products", href: "/learn/concepts/dot-product", tag: "Math" }
