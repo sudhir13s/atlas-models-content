@@ -32,10 +32,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 916
+  downloads_30d: 866
   likes: 78
   last_modified: '2025-02-28'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/apple/OpenELM-1_1B-Instruct
 aliases:
 - apple/OpenELM-1_1B-Instruct
@@ -47,7 +47,7 @@ tags:
 - text-generation
 - openelm
 - dense
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/apple/OpenELM-1_1B-Instruct
   title: apple/OpenELM-1_1B-Instruct — model page (Hugging Face)

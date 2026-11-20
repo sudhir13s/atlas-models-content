@@ -19,10 +19,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 47406
+  downloads_30d: 47363
   likes: 5
   last_modified: '2025-07-09'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/google/t5gemma-s-s-prefixlm
 aliases:
 - google/t5gemma-s-s-prefixlm
@@ -32,7 +32,7 @@ lineage:
 tags:
 - llm
 - text-generation
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/google/t5gemma-s-s-prefixlm
   title: google/t5gemma-s-s-prefixlm — model page (Hugging Face)

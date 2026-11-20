@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 301098
-  likes: 891
+  downloads_30d: 304616
+  likes: 892
   last_modified: '2025-12-10'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/microsoft/Phi-4-mini-instruct
 aliases:
 - microsoft/Phi-4-mini-instruct
@@ -55,7 +55,7 @@ tags:
 - phi3
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/microsoft/Phi-4-mini-instruct
   title: microsoft/Phi-4-mini-instruct — model page (Hugging Face)

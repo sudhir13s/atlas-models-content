@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 20022
+  downloads_30d: 17279
   likes: 227
   last_modified: '2024-06-11'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/bigcode/starcoder2-7b
 aliases:
 - bigcode/starcoder2-7b
@@ -55,7 +55,7 @@ tags:
 - starcoder2
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/bigcode/starcoder2-7b
   title: bigcode/starcoder2-7b — model page (Hugging Face)

@@ -51,10 +51,10 @@ filters:
   is_gated: false
   library: vllm
 hub_signals:
-  downloads_30d: 320281
+  downloads_30d: 316000
   likes: 4781
   last_modified: '2025-07-24'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
 aliases:
 - mistralai/Mixtral-8x7B-Instruct-v0.1
@@ -110,7 +110,7 @@ tags:
 - gqa
 - instruct
 - apache-2-0
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
   title: Mixtral-8x7B-Instruct-v0.1 — model card + config.json

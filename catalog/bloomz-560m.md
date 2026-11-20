@@ -41,10 +41,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 767239
+  downloads_30d: 789128
   likes: 149
   last_modified: '2023-05-27'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/bigscience/bloomz-560m
 aliases:
 - bigscience/bloomz-560m

@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 521117
+  downloads_30d: 506459
   likes: 39
   last_modified: '2023-07-09'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/EleutherAI/pythia-70m-deduped
 aliases:
 - EleutherAI/pythia-70m-deduped
@@ -55,7 +55,7 @@ tags:
 - gpt-neox
 - dense
 - mha
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/EleutherAI/pythia-70m-deduped
   title: EleutherAI/pythia-70m-deduped — model page (Hugging Face)

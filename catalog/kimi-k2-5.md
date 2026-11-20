@@ -41,10 +41,10 @@ filters:
   pipeline_tag: image-text-to-text
   library: transformers
 hub_signals:
-  downloads_30d: 394729
+  downloads_30d: 392853
   likes: 2902
-  last_modified: '2026-04-30'
-  observed_at: '2026-11-19'
+  last_modified: '2026-11-20'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/moonshotai/Kimi-K2.5
 variants:
 - name: nvidia/Kimi-K2.5-NVFP4
@@ -63,7 +63,7 @@ tags:
 - kimi-k25
 - moe
 - mla
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/moonshotai/Kimi-K2.5
   title: moonshotai/Kimi-K2.5 — model page (Hugging Face)

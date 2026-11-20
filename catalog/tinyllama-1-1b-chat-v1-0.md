@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 981187
+  downloads_30d: 986357
   likes: 1917
   last_modified: '2024-03-17'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0
 aliases:
 - TinyLlama/TinyLlama-1.1B-Chat-v1.0
@@ -56,7 +56,7 @@ tags:
 - llama
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0
   title: TinyLlama/TinyLlama-1.1B-Chat-v1.0 — model page (Hugging Face)

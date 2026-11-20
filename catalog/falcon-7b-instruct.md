@@ -34,10 +34,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 45635
+  downloads_30d: 49420
   likes: 1042
   last_modified: '2024-10-12'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/tiiuae/falcon-7b-instruct
 aliases:
 - tiiuae/falcon-7b-instruct
@@ -50,7 +50,7 @@ tags:
 - falcon
 - dense
 - mqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/tiiuae/falcon-7b-instruct
   title: tiiuae/falcon-7b-instruct — model page (Hugging Face)

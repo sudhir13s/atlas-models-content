@@ -43,10 +43,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 1662310
-  likes: 14467
+  downloads_30d: 1634572
+  likes: 14470
   last_modified: '2025-03-27'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/deepseek-ai/DeepSeek-R1
 aliases:
 - deepseek-ai/DeepSeek-R1
@@ -59,7 +59,7 @@ tags:
 - deepseek-v3
 - moe
 - mla
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-R1
   title: deepseek-ai/DeepSeek-R1 — model page (Hugging Face)

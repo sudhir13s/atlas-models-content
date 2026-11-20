@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 2926497
+  downloads_30d: 2815994
   likes: 67
   last_modified: '2023-07-09'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/EleutherAI/pythia-160m
 aliases:
 - EleutherAI/pythia-160m
@@ -55,7 +55,7 @@ tags:
 - gpt-neox
 - dense
 - mha
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/EleutherAI/pythia-160m
   title: EleutherAI/pythia-160m — model page (Hugging Face)

@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 471401
+  downloads_30d: 497363
   likes: 249
   last_modified: '2024-10-08'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/Qwen/Qwen2.5-1.5B
 variants:
 - name: RedHatAI/Qwen2.5-1.5B-quantized.w8a8
@@ -62,7 +62,7 @@ tags:
 - qwen2
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-1.5B
   title: Qwen/Qwen2.5-1.5B — model page (Hugging Face)

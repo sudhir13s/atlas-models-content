@@ -43,10 +43,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 27809
+  downloads_30d: 27344
   likes: 293
   last_modified: '2026-08-24'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
 aliases:
 - nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
@@ -59,7 +59,7 @@ tags:
 - nemotron-h
 - moe
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8
   title: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8 — model page (Hugging Face)

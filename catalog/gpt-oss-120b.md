@@ -42,10 +42,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 2417172
-  likes: 5543
+  downloads_30d: 2395705
+  likes: 5546
   last_modified: '2025-08-26'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/openai/gpt-oss-120b
 aliases:
 - openai/gpt-oss-120b
@@ -58,7 +58,7 @@ tags:
 - gpt-oss
 - moe
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/openai/gpt-oss-120b
   title: openai/gpt-oss-120b — model page (Hugging Face)

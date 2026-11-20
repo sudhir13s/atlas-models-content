@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 47584
+  downloads_30d: 46472
   likes: 1868
   last_modified: '2024-10-16'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/HuggingFaceH4/zephyr-7b-beta
 aliases:
 - HuggingFaceH4/zephyr-7b-beta
@@ -56,7 +56,7 @@ tags:
 - mistral
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/HuggingFaceH4/zephyr-7b-beta
   title: HuggingFaceH4/zephyr-7b-beta — model page (Hugging Face)

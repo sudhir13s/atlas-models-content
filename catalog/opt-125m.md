@@ -34,10 +34,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 4615524
+  downloads_30d: 4497895
   likes: 334
   last_modified: '2023-09-15'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/facebook/opt-125m
 aliases:
 - facebook/opt-125m
@@ -50,7 +50,7 @@ tags:
 - opt
 - dense
 - mha
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/facebook/opt-125m
   title: facebook/opt-125m — model page (Hugging Face)

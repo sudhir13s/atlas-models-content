@@ -47,10 +47,10 @@ filters:
   is_gated: true
   library: transformers
 hub_signals:
-  downloads_30d: 155805
-  likes: 1170
+  downloads_30d: 170370
+  likes: 1171
   last_modified: '2024-08-27'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/google/gemma-2-9b-it
 aliases:
 - google/gemma-2-9b-it
@@ -105,7 +105,7 @@ tags:
 - gqa
 - instruct
 - sliding-window
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/google/gemma-2-9b-it
   title: Gemma 2 9B IT — model card

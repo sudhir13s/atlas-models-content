@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 251144
+  downloads_30d: 245570
   likes: 772
   last_modified: '2025-04-21'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct
 aliases:
 - HuggingFaceTB/SmolLM2-1.7B-Instruct
@@ -56,7 +56,7 @@ tags:
 - llama
 - dense
 - mha
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct
   title: HuggingFaceTB/SmolLM2-1.7B-Instruct — model page (Hugging Face)

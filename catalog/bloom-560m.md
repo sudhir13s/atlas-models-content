@@ -38,10 +38,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 387269
+  downloads_30d: 393661
   likes: 376
   last_modified: '2023-09-26'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/bigscience/bloom-560m
 aliases:
 - bigscience/bloom-560m

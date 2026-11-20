@@ -42,10 +42,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 1320546
+  downloads_30d: 1213579
   likes: 840
   last_modified: '2026-08-24'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16
 variants:
 - name: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8
@@ -64,7 +64,7 @@ tags:
 - nemotron-h
 - moe
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16
   title: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16 — model page (Hugging Face)

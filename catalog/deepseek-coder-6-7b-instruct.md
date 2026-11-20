@@ -40,10 +40,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 38286
+  downloads_30d: 42227
   likes: 540
   last_modified: '2024-02-02'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct
 aliases:
 - deepseek-ai/deepseek-coder-6.7b-instruct

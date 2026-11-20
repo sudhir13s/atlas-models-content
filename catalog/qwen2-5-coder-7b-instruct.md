@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 1504750
+  downloads_30d: 1524077
   likes: 875
   last_modified: '2025-01-12'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct
 variants:
 - name: Qwen/Qwen2.5-Coder-7B-Instruct-GPTQ-Int4
@@ -62,7 +62,7 @@ tags:
 - qwen2
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct
   title: Qwen/Qwen2.5-Coder-7B-Instruct — model page (Hugging Face)

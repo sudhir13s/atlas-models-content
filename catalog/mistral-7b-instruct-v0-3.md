@@ -47,10 +47,10 @@ filters:
   is_gated: false
   library: vllm
 hub_signals:
-  downloads_30d: 1814238
+  downloads_30d: 1808627
   likes: 3844
   last_modified: '2025-12-03'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3
 aliases:
 - mistralai/Mistral-7B-Instruct-v0.3
@@ -104,7 +104,7 @@ tags:
 - gqa
 - instruct
 - apache-2-0
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3
   title: Mistral 7B Instruct v0.3 — model card + config.json

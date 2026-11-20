@@ -47,10 +47,10 @@ filters:
   is_gated: false
   library: transformers
 hub_signals:
-  downloads_30d: 157310
-  likes: 1048
+  downloads_30d: 157177
+  likes: 1050
   last_modified: '2025-01-12'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/Qwen/Qwen2.5-72B-Instruct
 aliases:
 - Qwen/Qwen2.5-72B-Instruct
@@ -107,7 +107,7 @@ tags:
 - instruct
 - multilingual
 - frontier
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-72B-Instruct
   title: Qwen2.5-72B-Instruct — model card + config.json

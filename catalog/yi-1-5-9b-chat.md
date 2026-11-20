@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 18273
+  downloads_30d: 18464
   likes: 149
   last_modified: '2024-06-26'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/01-ai/Yi-1.5-9B-Chat
 aliases:
 - 01-ai/Yi-1.5-9B-Chat
@@ -56,7 +56,7 @@ tags:
 - llama
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/01-ai/Yi-1.5-9B-Chat
   title: 01-ai/Yi-1.5-9B-Chat — model page (Hugging Face)

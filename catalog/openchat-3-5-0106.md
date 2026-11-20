@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 12379
+  downloads_30d: 12413
   likes: 357
   last_modified: '2024-05-18'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/openchat/openchat-3.5-0106
 aliases:
 - openchat/openchat-3.5-0106
@@ -57,7 +57,7 @@ tags:
 - mistral
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/openchat/openchat-3.5-0106
   title: openchat/openchat-3.5-0106 — model page (Hugging Face)

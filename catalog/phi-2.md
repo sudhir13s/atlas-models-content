@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 174836
+  downloads_30d: 185045
   likes: 3538
   last_modified: '2025-12-08'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/microsoft/phi-2
 aliases:
 - microsoft/phi-2
@@ -55,7 +55,7 @@ tags:
 - phi
 - dense
 - mha
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/microsoft/phi-2
   title: microsoft/phi-2 — model page (Hugging Face)

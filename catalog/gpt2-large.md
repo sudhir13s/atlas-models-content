@@ -37,10 +37,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 1040933
+  downloads_30d: 1096089
   likes: 375
   last_modified: '2024-02-19'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/openai-community/gpt2-large
 aliases:
 - openai-community/gpt2-large
@@ -53,7 +53,7 @@ tags:
 - gpt2
 - dense
 - mha
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/openai-community/gpt2-large
   title: openai-community/gpt2-large — model page (Hugging Face)

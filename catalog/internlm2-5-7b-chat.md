@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 20780
+  downloads_30d: 21574
   likes: 202
   last_modified: '2025-03-13'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/internlm/internlm2_5-7b-chat
 aliases:
 - internlm/internlm2_5-7b-chat
@@ -55,7 +55,7 @@ tags:
 - internlm2
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/internlm/internlm2_5-7b-chat
   title: internlm/internlm2_5-7b-chat — model page (Hugging Face)

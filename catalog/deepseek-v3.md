@@ -48,6 +48,14 @@ filters:
   is_moe: true
   pipeline_tag: text-generation
   attention_type: MLA
+  is_gated: false
+  library: transformers
+hub_signals:
+  downloads_30d: 1371109
+  likes: 4463
+  last_modified: '2025-03-27'
+  observed_at: '2026-11-20'
+  source: https://huggingface.co/deepseek-ai/DeepSeek-V3
 lineage:
   parents: []
   children: []
@@ -99,7 +107,7 @@ tags:
 - mla
 - frontier
 - fp8
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-V3
   title: DeepSeek-V3 — model card + config.json

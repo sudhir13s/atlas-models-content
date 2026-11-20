@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 4991225
-  likes: 947
+  downloads_30d: 4885950
+  likes: 949
   last_modified: '2024-09-25'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct
 variants:
 - name: Qwen/Qwen2.5-1.5B-Instruct-AWQ
@@ -63,7 +63,7 @@ tags:
 - qwen2
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct
   title: Qwen/Qwen2.5-1.5B-Instruct — model page (Hugging Face)

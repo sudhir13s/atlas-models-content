@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 185277
+  downloads_30d: 161445
   likes: 1083
   last_modified: '2025-09-10'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
 aliases:
 - HuggingFaceTB/SmolLM3-3B
@@ -55,7 +55,7 @@ tags:
 - smollm3
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
   title: HuggingFaceTB/SmolLM3-3B — model page (Hugging Face)

@@ -19,10 +19,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 200795
+  downloads_30d: 197069
   likes: 1326
   last_modified: '2025-04-04'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/google/gemma-3-1b-it
 aliases:
 - google/gemma-3-1b-it
@@ -32,7 +32,7 @@ lineage:
 tags:
 - llm
 - text-generation
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/google/gemma-3-1b-it
   title: google/gemma-3-1b-it — model page (Hugging Face)

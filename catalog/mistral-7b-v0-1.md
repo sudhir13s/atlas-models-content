@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 432062
+  downloads_30d: 422765
   likes: 4234
   last_modified: '2025-07-24'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/mistralai/Mistral-7B-v0.1
 aliases:
 - mistralai/Mistral-7B-v0.1
@@ -58,7 +58,7 @@ tags:
 - mistral
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/mistralai/Mistral-7B-v0.1
   title: mistralai/Mistral-7B-v0.1 — model page (Hugging Face)

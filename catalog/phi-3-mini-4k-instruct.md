@@ -47,10 +47,10 @@ filters:
   is_gated: false
   library: transformers
 hub_signals:
-  downloads_30d: 317278
+  downloads_30d: 317555
   likes: 1492
   last_modified: '2025-12-10'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct
 aliases:
 - microsoft/Phi-3-mini-4k-instruct
@@ -106,7 +106,7 @@ tags:
 - instruct
 - small
 - mit
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct
   title: Phi-3-mini-4k-instruct — model card + config.json

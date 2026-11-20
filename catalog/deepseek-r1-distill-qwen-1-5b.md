@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 434311
-  likes: 1671
+  downloads_30d: 424192
+  likes: 1672
   last_modified: '2025-02-24'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
 aliases:
 - deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
@@ -56,7 +56,7 @@ tags:
 - qwen2
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
   title: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B — model page (Hugging Face)

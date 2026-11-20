@@ -47,10 +47,10 @@ filters:
   is_gated: true
   library: transformers
 hub_signals:
-  downloads_30d: 4149614
-  likes: 9035
+  downloads_30d: 4097176
+  likes: 9047
   last_modified: '2024-09-25'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
 aliases:
 - meta-llama/Llama-3.1-8B-Instruct
@@ -105,7 +105,7 @@ tags:
 - dense
 - gqa
 - instruct
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
   title: Llama 3.1 8B Instruct — model card + config.json

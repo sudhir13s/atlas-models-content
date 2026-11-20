@@ -42,10 +42,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 64363
+  downloads_30d: 67508
   likes: 173
   last_modified: '2024-06-25'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat
 aliases:
 - deepseek-ai/DeepSeek-V2-Lite-Chat
@@ -58,7 +58,7 @@ tags:
 - deepseek-v2
 - moe
 - mla
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat
   title: deepseek-ai/DeepSeek-V2-Lite-Chat — model page (Hugging Face)

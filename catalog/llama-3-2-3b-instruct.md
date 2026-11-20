@@ -19,10 +19,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 823833
-  likes: 3043
+  downloads_30d: 795292
+  likes: 3054
   last_modified: '2024-10-24'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct
 aliases:
 - meta-llama/Llama-3.2-3B-Instruct
@@ -33,7 +33,7 @@ lineage:
 tags:
 - llm
 - text-generation
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct
   title: meta-llama/Llama-3.2-3B-Instruct — model page (Hugging Face)

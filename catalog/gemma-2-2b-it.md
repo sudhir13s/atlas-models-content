@@ -19,10 +19,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 196749
-  likes: 1622
+  downloads_30d: 199893
+  likes: 1623
   last_modified: '2024-08-27'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/google/gemma-2-2b-it
 variants:
 - name: bartowski/gemma-2-2b-it-GGUF
@@ -38,7 +38,7 @@ lineage:
 tags:
 - llm
 - text-generation
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/google/gemma-2-2b-it
   title: google/gemma-2-2b-it — model page (Hugging Face)

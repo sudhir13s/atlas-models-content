@@ -41,10 +41,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 1940236
-  likes: 1345
+  downloads_30d: 1956579
+  likes: 1347
   last_modified: '2025-12-03'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct
 aliases:
 - Qwen/Qwen3-Coder-30B-A3B-Instruct
@@ -57,7 +57,7 @@ tags:
 - qwen3-moe
 - moe
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct
   title: Qwen/Qwen3-Coder-30B-A3B-Instruct — model page (Hugging Face)

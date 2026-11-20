@@ -39,10 +39,10 @@ filters:
   pipeline_tag: text-generation
   library: transformers
 hub_signals:
-  downloads_30d: 6060361
-  likes: 2201
+  downloads_30d: 6141295
+  likes: 2204
   last_modified: '2025-07-26'
-  observed_at: '2026-11-19'
+  observed_at: '2026-11-20'
   source: https://huggingface.co/Qwen/Qwen3-8B
 variants:
 - name: Qwen/Qwen3-8B-AWQ
@@ -67,7 +67,7 @@ tags:
 - qwen3
 - dense
 - gqa
-updated: '2026-11-19'
+updated: '2026-11-20'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-8B
   title: Qwen/Qwen3-8B — model page (Hugging Face)
