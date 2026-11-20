@@ -16,8 +16,6 @@ tasks:
 parameters_active_b: 6.74
 total_parameters: 6740512768
 context_window_tokens: 16384
-summary: deepseek-coder-6.7b-instruct is a 6.74 billion parameter language model from DeepSeek. It was initialized from deepseek-coder-6.7b-base and fine-tuned on 2 billion tokens of instruction data.
-why_it_matters: It supports commercial use under the conditions of the DeepSeek Model License.
 fingerprint:
   attention_type: MHA
   num_layers: 32
@@ -52,28 +50,13 @@ aliases:
 lineage:
   parents: []
   children: []
-quote: DeepSeek Coder supports commercial use.
-review:
-  score: 10.0
-  reviewed_by:
-    provider: nvidia-gemma-4-31b
-    model: nvidia_nim/google/gemma-4-31b-it
-  prompt_versions:
-    writer: 1.0.0
-    critic: 1.2.0
-generated_by:
-  job: backfill
-  run_id: 6
-  provider: gemini-flash-lite
-  model: gemini/gemini-3.5-flash-lite
-  prompt_version: 1.0.0
 tags:
 - llm
 - text-generation
 - llama
 - dense
 - mha
-updated: '2026-11-20'
+updated: '2026-11-19'
 sources:
 - url: https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct
   title: deepseek-ai/deepseek-coder-6.7b-instruct — model page (Hugging Face)
@@ -83,10 +66,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-deepseek-coder-6.7b-instruct is a 6.74 billion parameter language model from DeepSeek. It was initialized from deepseek-coder-6.7b-base and fine-tuned on 2 billion tokens of instruction data.
-
-## Why It Matters
-
-It supports commercial use under the conditions of the DeepSeek Model License.

@@ -16,8 +16,6 @@ tasks:
 parameters_active_b: 0.56
 total_parameters: 559214592
 context_window_tokens: 2048
-summary: bloomz-560m is a multitask finetuned model from BigScience created by finetuning bloom-560m pretrained multilingual language models on the xP3 crosslingual task mixture. Released on 2022-10-08 with 0.559 billion parameters and a 2048 token context window under the BigScience RAIL License v1.0, it is part of a family of models capable of following human instructions in dozens of languages zero-shot.
-why_it_matters: The resulting models are capable of crosslingual generalization to unseen tasks and languages.
 fingerprint:
   attention_type: MHA
   num_layers: 24
@@ -48,28 +46,13 @@ aliases:
 lineage:
   parents: []
   children: []
-quote: We finetune BLOOM & mT5 pretrained multilingual language models on our crosslingual task mixture (xP3) and find the resulting models capable of crosslingual generalization to unseen tasks & languages.
-review:
-  score: 10.0
-  reviewed_by:
-    provider: nvidia-gemma-4-31b
-    model: nvidia_nim/google/gemma-4-31b-it
-  prompt_versions:
-    writer: 1.0.0
-    critic: 1.2.0
-generated_by:
-  job: backfill
-  run_id: 6
-  provider: gemini-flash-lite
-  model: gemini/gemini-3.5-flash-lite
-  prompt_version: 1.0.0
 tags:
 - llm
 - text-generation
 - bloom
 - dense
 - mha
-updated: '2026-11-20'
+updated: '2026-11-19'
 sources:
 - url: https://huggingface.co/bigscience/bloomz-560m
   title: bigscience/bloomz-560m — model page (Hugging Face)
@@ -82,10 +65,4 @@ sources:
   trust: 0.95
 ---
 
-## Summary
 
-bloomz-560m is a multitask finetuned model from BigScience created by finetuning bloom-560m pretrained multilingual language models on the xP3 crosslingual task mixture. Released on 2022-10-08 with 0.559 billion parameters and a 2048 token context window under the BigScience RAIL License v1.0, it is part of a family of models capable of following human instructions in dozens of languages zero-shot.
-
-## Why It Matters
-
-The resulting models are capable of crosslingual generalization to unseen tasks and languages.

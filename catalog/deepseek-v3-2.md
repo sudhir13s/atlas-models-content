@@ -15,8 +15,6 @@ tasks:
 - task/text-generation
 total_parameters: 685355329792
 context_window_tokens: 163840
-summary: DeepSeek-V3.2 is a 685 billion parameter language model from DeepSeek released under the MIT License, featuring a 163840 token context window, a mixture of experts design, and DeepSeek Sparse Attention for computational efficiency in long-context scenarios.
-why_it_matters: By implementing a robust reinforcement learning protocol and scaling post-training compute, it performs comparably to GPT-5, while its high-compute variant DeepSeek-V3.2-Speciale surpasses GPT-5 and achieves reasoning proficiency on par with Gemini-3.0-Pro.
 fingerprint:
   attention_type: MLA
   num_layers: 61
@@ -56,28 +54,13 @@ aliases:
 lineage:
   parents: []
   children: []
-quote: By implementing a robust RL protocol and scaling post-training compute, *DeepSeek-V3.2* performs comparably to GPT-5.
-review:
-  score: 10.0
-  reviewed_by:
-    provider: nvidia-gemma-4-31b
-    model: nvidia_nim/google/gemma-4-31b-it
-  prompt_versions:
-    writer: 1.0.0
-    critic: 1.2.0
-generated_by:
-  job: backfill
-  run_id: 6
-  provider: gemini-flash-lite
-  model: gemini/gemini-3.5-flash-lite
-  prompt_version: 1.0.0
 tags:
 - llm
 - text-generation
 - deepseek-v32
 - moe
 - mla
-updated: '2026-11-20'
+updated: '2026-11-19'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-V3.2
   title: deepseek-ai/DeepSeek-V3.2 — model page (Hugging Face)
@@ -87,10 +70,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-DeepSeek-V3.2 is a 685 billion parameter language model from DeepSeek released under the MIT License, featuring a 163840 token context window, a mixture of experts design, and DeepSeek Sparse Attention for computational efficiency in long-context scenarios.
-
-## Why It Matters
-
-By implementing a robust reinforcement learning protocol and scaling post-training compute, it performs comparably to GPT-5, while its high-compute variant DeepSeek-V3.2-Speciale surpasses GPT-5 and achieves reasoning proficiency on par with Gemini-3.0-Pro.

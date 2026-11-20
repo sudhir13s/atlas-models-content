@@ -15,8 +15,6 @@ tasks:
 - task/text-generation
 total_parameters: 684489845504
 context_window_tokens: 163840
-summary: DeepSeek-R1 is a first-generation reasoning model from DeepSeek that incorporates cold-start data before reinforcement learning to address issues like endless repetition and poor readability. It achieves performance comparable to OpenAI-o1 across math, code, and reasoning tasks.
-why_it_matters: DeepSeek-R1 achieves performance comparable to OpenAI-o1 across math, code, and reasoning tasks, and its open-source release supports the research community.
 fingerprint:
   attention_type: MLA
   num_layers: 61
@@ -55,28 +53,13 @@ aliases:
 lineage:
   parents: []
   children: []
-quote: DeepSeek-R1 achieves performance comparable to OpenAI-o1 across math, code, and reasoning tasks.
-review:
-  score: 10.0
-  reviewed_by:
-    provider: nvidia-gemma-4-31b
-    model: nvidia_nim/google/gemma-4-31b-it
-  prompt_versions:
-    writer: 1.0.0
-    critic: 1.2.0
-generated_by:
-  job: backfill
-  run_id: 6
-  provider: gemini-flash-lite
-  model: gemini/gemini-3.5-flash-lite
-  prompt_version: 1.0.0
 tags:
 - llm
 - text-generation
 - deepseek-v3
 - moe
 - mla
-updated: '2026-11-20'
+updated: '2026-11-19'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-R1
   title: deepseek-ai/DeepSeek-R1 — model page (Hugging Face)
@@ -89,10 +72,4 @@ sources:
   trust: 0.95
 ---
 
-## Summary
 
-DeepSeek-R1 is a first-generation reasoning model from DeepSeek that incorporates cold-start data before reinforcement learning to address issues like endless repetition and poor readability. It achieves performance comparable to OpenAI-o1 across math, code, and reasoning tasks.
-
-## Why It Matters
-
-DeepSeek-R1 achieves performance comparable to OpenAI-o1 across math, code, and reasoning tasks, and its open-source release supports the research community.
