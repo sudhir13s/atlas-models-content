@@ -56,8 +56,12 @@ numeric config) so it stays machine-parseable.
   (IDs; `license_note` names a licence with no record), `variants[]` (quantised or repackaged copies:
   name, format, address, publisher), `aliases[]`, `hub_signals` and lineage (benchmark values live in `score-sheet` records of
   `atlas-evaluation-content`). Prose is
-  optional: a record without `summary` has none yet. Body sections, all optional: Summary → Why It
-  Matters → Notes. A field with no source is absent, never `0` or `Unknown`.
+  optional: a record without `summary` has none yet. The prose queue writes up to five passages,
+  each a field and a body section (`summary`, `intended_use`, `what_sets_it_apart`, `running_it`,
+  `limitations`), with the span of the source behind each in `quotes`. Body sections, all optional:
+  Summary → Intended Use → What Sets It Apart → Running It → Limitations → Why It Matters → Notes.
+  A field with no source is absent, never `0` or `Unknown`; a passage the source cannot support has
+  neither field nor section.
 - **organization** — `name`, `kind` (lab, company, foundation, community), `website`, `hf_handles[]`,
   `aliases[]`. Body section: Overview.
 - **fine-tuning-method** — `method_type`, `memory_profile`, `related_hyperparameters[]` (IDs).

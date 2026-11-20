@@ -5,6 +5,20 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Schema 2.1 for `model` (a fuller entry written by the prose queue; additive)
+
+- **Added** four prose fields beside `summary`: `intended_use`, `what_sets_it_apart`,
+  `running_it`, `limitations`. Each is absent when the model card does not support it; the word
+  `unknown` is never stored.
+- **Added** `quotes`, a mapping from each written passage's field name to the one span of the
+  model card it rests on. It replaces the single `quote`, which stays in the schema for the
+  records written under writer prompt 1.0.0.
+- **Added** the body sections Intended Use, What Sets It Apart, Running It and Limitations to the
+  model's `optional_sections`, in the order Summary, Intended Use, What Sets It Apart, Running It,
+  Limitations, Why It Matters, Notes. Summary and the four new sections are written by code from
+  the passages; Why It Matters and Notes stay for hand-written records.
+- **Changed** `why_it_matters`: the prose queue no longer writes it; records that have it keep it.
+
 ### Schema 2.0 for `model` (scores leave the model record; breaking)
 
 - **Removed** `model.benchmarks[]`. Benchmark values now live only in `score-sheet` records of

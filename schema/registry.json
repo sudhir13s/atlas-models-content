@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "2.1",
   "shared": "schema/_shared.schema.json",
   "types": {
     "model": {
@@ -7,7 +7,15 @@
       "schema": "schema/model.schema.json",
       "id_prefix": "model/",
       "sections": [],
-      "optional_sections": ["Summary", "Why It Matters", "Notes"]
+      "optional_sections": [
+        "Summary",
+        "Intended Use",
+        "What Sets It Apart",
+        "Running It",
+        "Limitations",
+        "Why It Matters",
+        "Notes"
+      ]
     },
     "organization": {
       "folder": "organizations",
