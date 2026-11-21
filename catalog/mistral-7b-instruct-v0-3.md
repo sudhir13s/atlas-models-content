@@ -14,6 +14,7 @@ architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
+- task/tool-calling-models
 parameters_active_b: 7.25
 total_parameters: 7248023552
 context_window_tokens: 32768
@@ -104,7 +105,7 @@ tags:
 - gqa
 - instruct
 - apache-2-0
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3
   title: Mistral 7B Instruct v0.3 — model card + config.json

@@ -13,6 +13,7 @@ architecture_id: architecture-era/mixture-of-experts
 model_category: language
 tasks:
 - task/text-generation
+- task/reasoning-models
 total_parameters: 684489845504
 context_window_tokens: 163840
 fingerprint:
@@ -59,7 +60,7 @@ tags:
 - deepseek-v3
 - moe
 - mla
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-R1
   title: deepseek-ai/DeepSeek-R1 — model page (Hugging Face)

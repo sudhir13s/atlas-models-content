@@ -13,6 +13,7 @@ architecture_id: architecture-era/transformer
 model_category: language
 tasks:
 - task/text-generation
+- task/code-models
 parameters_active_b: 7.17
 total_parameters: 7173923840
 context_window_tokens: 16384
@@ -55,7 +56,7 @@ tags:
 - starcoder2
 - dense
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/bigcode/starcoder2-7b
   title: bigcode/starcoder2-7b — model page (Hugging Face)

@@ -13,6 +13,8 @@ architecture_id: architecture-era/mixture-of-experts
 model_category: language
 tasks:
 - task/text-generation
+- task/code-models
+- task/tool-calling-models
 total_parameters: 79674391296
 context_window_tokens: 262144
 fingerprint:
@@ -59,7 +61,7 @@ tags:
 - qwen3-next
 - moe
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-Coder-Next-FP8
   title: Qwen/Qwen3-Coder-Next-FP8 — model page (Hugging Face)

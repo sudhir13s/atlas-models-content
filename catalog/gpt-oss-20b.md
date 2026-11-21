@@ -13,6 +13,8 @@ architecture_id: architecture-era/mixture-of-experts
 model_category: language
 tasks:
 - task/text-generation
+- task/reasoning-models
+- task/tool-calling-models
 total_parameters: 20914757184
 context_window_tokens: 131072
 fingerprint:
@@ -58,7 +60,7 @@ tags:
 - gpt-oss
 - moe
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/openai/gpt-oss-20b
   title: openai/gpt-oss-20b — model page (Hugging Face)

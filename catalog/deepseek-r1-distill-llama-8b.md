@@ -13,6 +13,7 @@ architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
+- task/reasoning-models
 parameters_active_b: 8.03
 total_parameters: 8030261248
 context_window_tokens: 131072

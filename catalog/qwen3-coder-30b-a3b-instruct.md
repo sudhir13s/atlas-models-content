@@ -13,6 +13,8 @@ architecture_id: architecture-era/mixture-of-experts
 model_category: language
 tasks:
 - task/text-generation
+- task/code-models
+- task/tool-calling-models
 total_parameters: 30532122624
 context_window_tokens: 262144
 fingerprint:
@@ -57,7 +59,7 @@ tags:
 - qwen3-moe
 - moe
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct
   title: Qwen/Qwen3-Coder-30B-A3B-Instruct — model page (Hugging Face)
