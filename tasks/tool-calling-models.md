@@ -9,6 +9,7 @@ parent: task/text-generation
 order: 5
 summary: "Emit structured function calls so a program can run tools and drive an agent loop."
 hf_pipeline_tags: []
+hf_tags: []
 inputs: [text]
 outputs: [text]
 benchmarks: [benchmark/bfcl-v4, benchmark/tau2-bench]

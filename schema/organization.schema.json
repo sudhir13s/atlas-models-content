@@ -6,7 +6,11 @@
   "properties": {
     "type": { "const": "organization" },
     "name": { "type": "string", "minLength": 1 },
-    "kind": { "type": "string", "enum": ["lab", "company", "foundation", "community"] },
+    "kind": {
+      "type": "string",
+      "enum": ["lab", "company", "foundation", "community"],
+      "description": "absent when the source does not say; never guessed"
+    },
     "website": { "type": "string", "format": "uri" },
     "hf_handles": {
       "type": "array",
@@ -22,5 +26,5 @@
       "description": "other names the organization is written as"
     }
   },
-  "required": ["name", "kind", "hf_handles"]
+  "required": ["name", "hf_handles"]
 }

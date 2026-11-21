@@ -5,9 +5,6 @@ slug: gpt2-large
 schema_version: 1.1
 title: gpt2-large
 organization: organization/openai
-release_date: '2022-03-02'
-release_year: 2022
-release_month: 3
 license: license/mit
 architecture_id: architecture-era/gpt
 model_category: language

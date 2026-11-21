@@ -8,6 +8,7 @@ group: task-group/documents
 order: 1
 summary: "Convert a page image or scanned document into text or Markdown, including tables and formulas."
 hf_pipeline_tags: []
+hf_tags: [ocr]
 inputs: [document, image]
 outputs: [text]
 tags: [ocr, documents, text-extraction]

@@ -46,6 +46,18 @@
       "items": { "$ref": "_shared.schema.json#/$defs/slug" },
       "description": "Hugging Face pipeline tags this task covers; empty when Hugging Face has no tag for it"
     },
+    "not_with": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^task/[a-z0-9]+(?:-[a-z0-9]+)*$" },
+      "description": "FKs → task/<slug>; a model that also has one of these tasks is not given this one, even when a Hugging Face tag means it"
+    },
+    "hf_tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "_shared.schema.json#/$defs/slug" },
+      "description": "Hugging Face free-form tags that mean this task, for a task with no pipeline tag; empty or absent when no tag returns clean results"
+    },
     "inputs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/modality" } },
     "outputs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/modality" } },
     "benchmarks": {

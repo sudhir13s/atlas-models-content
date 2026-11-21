@@ -9,6 +9,7 @@ parent: task/text-generation
 order: 4
 summary: "Write, complete, explain and repair source code."
 hf_pipeline_tags: []
+hf_tags: []
 inputs: [text]
 outputs: [text]
 benchmarks: [benchmark/humaneval, benchmark/livecodebench, benchmark/swe-bench]

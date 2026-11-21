@@ -9,6 +9,8 @@ parent: task/text-generation
 order: 2
 summary: "Hold a multi-turn conversation and act as a general-purpose assistant."
 hf_pipeline_tags: []
+hf_tags: [conversational]
+not_with: [task/ocr, task/safety-and-guard-models]
 inputs: [text]
 outputs: [text]
 benchmarks: [benchmark/mmlu-pro, benchmark/ifeval]

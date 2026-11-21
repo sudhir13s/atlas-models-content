@@ -9,6 +9,7 @@ parent: task/text-generation
 order: 3
 summary: "Work through a problem step by step before giving a final answer."
 hf_pipeline_tags: []
+hf_tags: []
 inputs: [text]
 outputs: [text]
 benchmarks: [benchmark/gpqa-diamond, benchmark/aime, benchmark/math]

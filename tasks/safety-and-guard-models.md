@@ -9,6 +9,7 @@ parent: task/text-classification
 order: 7
 summary: "Screen prompts and responses for unsafe content, prompt injection and personal data."
 hf_pipeline_tags: []
+hf_tags: [safety, guardrail]
 inputs: [text]
 outputs: [label]
 tags: [safety, guardrails, moderation]
