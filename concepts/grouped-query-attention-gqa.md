@@ -19,13 +19,16 @@ example_models:
 tags:
 - attention
 - gqa
-updated: '2026-11-19'
-sources: []
+updated: '2026-11-21'
+sources:
+- url: https://arxiv.org/abs/2305.13245
+  title: 'GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints (arXiv:2305.13245)'
+  trust: 0.95
 ---
 
 ## What It Is
 
-A middle ground introduced in the Llama 2 paper. Query heads are grouped, and each group shares one set of Key-Value heads. For example, 32 query heads with 8 KV heads means 4 query heads share each KV head. This reduces KV cache size by 4x while retaining most of MHA's quality.
+A middle ground introduced in 2023 by Joshua Ainslie, James Lee-Thorp, Michiel de Jong, Yury Zemlyanskiy, Federico Lebrón and Sumit Sanghai in the GQA paper (accepted at EMNLP 2023). Query heads are grouped, and each group shares one set of Key-Value heads. For example, 32 query heads with 8 KV heads means 4 query heads share each KV head. This reduces KV cache size by 4x while retaining most of MHA's quality.
 
 ## Why It Matters
 
