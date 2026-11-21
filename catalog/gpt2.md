@@ -9,7 +9,7 @@ release_date: '2022-03-02'
 release_year: 2022
 release_month: 3
 license: license/mit
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/gpt
 model_category: language
 tasks:
 - task/text-generation
@@ -53,7 +53,7 @@ tags:
 - gpt2
 - dense
 - mha
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/openai-community/gpt2
   title: openai-community/gpt2 — model page (Hugging Face)

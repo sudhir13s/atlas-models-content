@@ -9,7 +9,7 @@ release_date: '2023-10-29'
 release_year: 2023
 release_month: 10
 license: license/deepseek
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -73,7 +73,7 @@ tags:
 - llama
 - dense
 - mha
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct
   title: deepseek-ai/deepseek-coder-6.7b-instruct — model page (Hugging Face)

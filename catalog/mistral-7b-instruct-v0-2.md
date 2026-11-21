@@ -9,7 +9,7 @@ release_date: '2023-12-11'
 release_year: 2023
 release_month: 12
 license: license/apache-2-0
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -56,7 +56,7 @@ tags:
 - mistral
 - dense
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2
   title: mistralai/Mistral-7B-Instruct-v0.2 — model page (Hugging Face)

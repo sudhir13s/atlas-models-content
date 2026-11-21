@@ -9,7 +9,7 @@ release_date: '2025-01-20'
 release_year: 2025
 release_month: 1
 license: license/mit
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -55,7 +55,7 @@ tags:
 - llama
 - dense
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B
   title: deepseek-ai/DeepSeek-R1-Distill-Llama-8B — model page (Hugging Face)

@@ -9,7 +9,7 @@ release_date: '2025-04-28'
 release_year: 2025
 release_month: 4
 license: license/apache-2-0
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -56,7 +56,7 @@ tags:
 - qwen3
 - dense
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-8B-Base
   title: Qwen/Qwen3-8B-Base — model page (Hugging Face)

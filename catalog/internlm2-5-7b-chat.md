@@ -9,7 +9,7 @@ release_date: '2024-06-27'
 release_year: 2024
 release_month: 6
 license_note: other
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -55,7 +55,7 @@ tags:
 - internlm2
 - dense
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/internlm/internlm2_5-7b-chat
   title: internlm/internlm2_5-7b-chat — model page (Hugging Face)

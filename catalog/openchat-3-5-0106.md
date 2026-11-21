@@ -9,7 +9,7 @@ release_date: '2024-01-07'
 release_year: 2024
 release_month: 1
 license: license/apache-2-0
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -57,7 +57,7 @@ tags:
 - mistral
 - dense
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/openchat/openchat-3.5-0106
   title: openchat/openchat-3.5-0106 — model page (Hugging Face)

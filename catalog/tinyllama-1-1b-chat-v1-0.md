@@ -9,7 +9,7 @@ release_date: '2023-12-30'
 release_year: 2023
 release_month: 12
 license: license/apache-2-0
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -56,7 +56,7 @@ tags:
 - llama
 - dense
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0
   title: TinyLlama/TinyLlama-1.1B-Chat-v1.0 — model page (Hugging Face)

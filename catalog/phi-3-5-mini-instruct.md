@@ -9,7 +9,7 @@ release_date: '2024-08-16'
 release_year: 2024
 release_month: 8
 license: license/mit
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -56,7 +56,7 @@ tags:
 - phi3
 - dense
 - mha
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/microsoft/Phi-3.5-mini-instruct
   title: microsoft/Phi-3.5-mini-instruct — model page (Hugging Face)

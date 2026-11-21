@@ -9,7 +9,7 @@ release_date: '2024-10-31'
 release_year: 2024
 release_month: 10
 license: license/apache-2-0
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -55,7 +55,7 @@ tags:
 - llama
 - dense
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/HuggingFaceTB/SmolLM2-135M
   title: HuggingFaceTB/SmolLM2-135M — model page (Hugging Face)

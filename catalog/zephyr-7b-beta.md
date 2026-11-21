@@ -9,7 +9,7 @@ release_date: '2023-10-26'
 release_year: 2023
 release_month: 10
 license: license/mit
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -56,7 +56,7 @@ tags:
 - mistral
 - dense
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/HuggingFaceH4/zephyr-7b-beta
   title: HuggingFaceH4/zephyr-7b-beta — model page (Hugging Face)

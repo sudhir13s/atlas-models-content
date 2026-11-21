@@ -9,7 +9,7 @@ release_date: '2024-09-17'
 release_year: 2024
 release_month: 9
 license: license/apache-2-0
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
@@ -63,7 +63,7 @@ tags:
 - qwen2
 - dense
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-21'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct
   title: Qwen/Qwen2.5-1.5B-Instruct — model page (Hugging Face)
