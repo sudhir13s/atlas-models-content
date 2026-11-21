@@ -10,7 +10,7 @@ release_year: 2024
 release_month: 7
 license: license/llama-3-1
 signal_strength: high
-architecture_id: architecture-era/transformer
+architecture_id: architecture-era/llama-recipe
 model_category: language
 tasks:
 - task/text-generation
