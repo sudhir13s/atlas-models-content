@@ -12,8 +12,14 @@ architectures:
 models: []
 tags:
 - model-history
-updated: '2026-11-19'
-sources: []
+updated: '2026-11-21'
+sources:
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (arXiv:1810.04805)'
+  trust: 0.95
+- url: https://openai.com/index/language-unsupervised/
+  title: Improving language understanding with unsupervised learning (OpenAI, 11 June 2018)
+  trust: 0.9
 ---
 
 

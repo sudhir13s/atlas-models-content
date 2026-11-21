@@ -10,33 +10,33 @@ era_range: "2015–2018"
 year: 2015
 family: vision
 core_innovation: "Residual skip connections let layers learn a correction to the identity, making networks of 100+ layers trainable."
-description: "The skip-connection idea that broke the depth barrier and became a universal deep-learning building block."
-key_features: ["Identity skip connections", "Residual (delta) learning", "Very deep networks (50–1000+ layers)", "Improved gradient flow", "Batch normalization"]
+description: "Residual learning with identity shortcuts, which eased the training of networks much deeper than before."
+key_features: ["Identity skip connections", "Residual (delta) learning", "Very deep networks (up to 152 layers on ImageNet)"]
 key_models: ["ResNet-50/101/152 (2015)", "ResNeXt (2016)", "Wide ResNet (2016)"]
 paper_title: "Deep Residual Learning for Image Recognition"
 paper_url: "https://arxiv.org/abs/1512.03385"
 influenced_by: [architecture-era/cnn]
 led_to: [architecture-era/transformer, architecture-era/vision-transformer]
 
-eli5: "Very deep networks were surprisingly hard to train — piling on layers made them worse, not better. ResNet added a shortcut that lets each layer just tweak what came before instead of rebuilding it from scratch. That one shortcut made networks hundreds of layers deep suddenly easy to train."
+eli5: "Very deep networks were hard to train: piling on layers made them worse, not better. ResNet added a shortcut that lets each block just tweak what came before instead of rebuilding it from scratch. With that shortcut, networks of more than a hundred layers became trainable."
 
 analogy:
   title: "Edits on a draft, not a rewrite from scratch"
   body: "Imagine passing a document down a line of editors. If each editor must rewrite the whole page from memory, errors pile up and by the tenth editor the text is garbled — that was a plain deep network. Now give each editor the *original page* plus a red pen: they only mark the changes, and their edits are added on top of the original. If an editor has nothing to improve, they hand the page along untouched. That 'original page carried forward' is the skip connection, and 'only mark the changes' is residual learning — the network learns a small correction, not a full rebuild."
 
 narrative:
-  motivation: "By 2015 depth was the frontier: deeper convolutional networks kept winning, so surely deeper still would win more. In theory a deep network can never be worse than a shallow one — it could set the extra layers to do nothing (the identity) and match it. But experiments showed the opposite: past a point, adding layers made *both* training and test error rise. This was not overfitting — training error itself got worse. Something about optimization was breaking."
+  motivation: "A deeper network should be no worse than a shallower one: it could set the extra layers to the identity and match it. Yet He et al. observed that a 34-layer plain network has higher training error than an 18-layer one. This degradation is not overfitting, since training error itself gets worse; the authors argue it is unlikely to be caused by vanishing gradients, because the plain networks are trained with batch normalization and their gradients have healthy norms."
   approach: "He et al. reframed the problem. If the ideal behaviour of a block is close to 'pass the input through unchanged', then a plain stack of layers has to laboriously learn the identity function — and it turns out that is hard for them. So instead of asking a block to output the desired mapping H(x), ask it to output only the *difference* from the input: the residual F(x) = H(x) − x. Then wire the input straight to the output with a shortcut."
-  solution: "The residual block computes F(x) with a couple of convolutional layers, then *adds the untouched input back*: output = F(x) + x. Learning 'do nothing' is now trivial — just drive F toward zero. The shortcut has a second, crucial benefit: during backpropagation, gradients flow straight through the addition unchanged, giving them an uninterrupted highway back to early layers and defeating the vanishing-gradient problem that had capped depth."
-  outcome: "ResNet trained networks 100+ (even 1000+) layers deep, won the ImageNet 2015 competition by a wide margin, and set new records across vision tasks. But its real legacy is the primitive: the residual connection is now in almost every deep architecture. Every sublayer of every Transformer — and therefore every large language model and the Vision Transformer — is wrapped in a residual connection inherited directly from this paper."
+  solution: "The residual block computes F(x) with a couple of convolutional layers, then *adds the untouched input back*: output = F(x) + x. Learning 'do nothing' now means driving F toward zero. A follow-up analysis (He et al., 2016) shows that with identity shortcuts the forward and backward signals can be propagated directly from one block to any other."
+  outcome: "The authors trained residual nets of up to 152 layers on ImageNet and analysed 100- and 1000-layer nets on CIFAR-10. An ensemble reached 3.57% top-5 error on the ImageNet test set and won 1st place in the ILSVRC 2015 classification task. The Transformer (2017) wraps each of its sub-layers in a residual connection, citing this paper."
 
 build_steps:
   - { title: "1. Take the block's input x", detail: "A residual block receives the feature map produced by the previous block. Call it x — this is the signal we want to refine, not replace." }
   - { title: "2. Compute a residual F(x)", detail: "Pass x through a couple of weight layers (convolution → batch normalization → ReLU, then convolution → batch normalization; the second ReLU waits until after the addition). This branch learns F(x), the correction to apply — the 'red-pen edits'." }
-  - { title: "3. Carry x along the shortcut", detail: "In parallel, route the original x straight past those layers untouched. If the shapes match this is a plain identity wire; if channels or resolution change, a 1×1 convolution reshapes it." }
+  - { title: "3. Carry x along the shortcut", detail: "In parallel, route the original x straight past those layers untouched. If the shapes match this is a plain identity wire; if channels or resolution change, the paper either zero-pads the extra channels or uses a 1×1 projection." }
   - { title: "4. Add them: F(x) + x", detail: "Element-wise add the residual branch and the shortcut. The block outputs the input plus its learned correction, so 'do nothing' means simply learning F ≈ 0." }
-  - { title: "5. Apply the final nonlinearity", detail: "A ReLU after the addition keeps the network nonlinear while preserving the additive shortcut that carries gradients backward cleanly." }
-  - { title: "6. Stack dozens of blocks", detail: "Chain these blocks into very deep networks. ResNet-18 and -34 stack this two-layer block; ResNet-50, -101 and -152 use a three-layer bottleneck version (1×1, 3×3, 1×1 convolutions) around the same shortcut. Because each addition is a gradient highway, even 100+ layers train stably." }
+  - { title: "5. Apply the final nonlinearity", detail: "A ReLU after the addition keeps the network nonlinear." }
+  - { title: "6. Stack dozens of blocks", detail: "Chain these blocks into very deep networks. ResNet-18 and -34 stack this two-layer block; ResNet-50, -101 and -152 use a three-layer bottleneck version (1×1, 3×3, 1×1 convolutions) around the same shortcut." }
 
 key_equation:
   latex: "\\mathbf{y} = \\mathcal{F}(\\mathbf{x}, \\{W_i\\}) + \\mathbf{x}"
@@ -48,16 +48,16 @@ key_equation:
     - { symbol: "{Wᵢ}", meaning: "the learnable weights inside the residual branch" }
 
 strengths:
-  - "Makes very deep networks (100–1000+ layers) trainable, breaking the depth barrier that stalled plain CNNs."
-  - "The additive shortcut is a gradient highway — backprop reaches early layers undiminished, defeating vanishing gradients."
-  - "Learning 'do nothing' is trivial (F → 0), so extra depth never hurts and often helps."
-  - "The residual block is a drop-in primitive reused across nearly all modern architectures, including every Transformer."
+  - "The authors report that residual nets are easier to optimize and gain accuracy from considerably increased depth."
+  - "With identity shortcuts, forward and backward signals can propagate directly from one block to any other (He et al., 2016)."
+  - "Learning 'do nothing' only requires driving F toward zero."
+  - "The Transformer wraps each sub-layer in a residual connection."
 
 weaknesses:
   - "More depth means more compute and memory; the deepest variants are expensive to train and run."
-  - "Beyond a point, extra layers give diminishing returns — depth alone is not free accuracy."
-  - "Skip connections that change shape need extra projection layers, adding design complexity."
-  - "Residual blocks were tuned for convolutional vision; naive reuse elsewhere still needs careful normalization choices."
+  - "Zagoruyko and Komodakis report diminishing returns: each fraction of a percent of accuracy costs nearly doubling the number of layers."
+  - "In the authors' CIFAR-10 runs a 1202-layer net tested worse than a 110-layer one, which they attribute to overfitting."
+  - "Skip connections that change shape need zero-padding or 1×1 projection shortcuts."
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 880 500" role="img" aria-label="A residual block: the input x passes through two 3 by 3 convolution layers with batch normalization to give F(x), while an identity shortcut carries x around both layers to an addition, and a ReLU follows the sum F(x) + x. Beside it, ResNet-34 stacks 3, 4, 6 and 3 such blocks in stages of 64, 128, 256 and 512 channels, halving the spatial size between stages.">
@@ -170,10 +170,10 @@ diagram_svg: |
   </svg>
 diagram_caption: "A residual block adds its input x back to what two 3×3 conv layers compute, so they learn only the correction F(x); ResNet-34 stacks 3, 4, 6 and 3 such blocks at 64 to 512 channels, halving the map size between stages."
 notable_models:
-  - { name: "ResNet-50/101/152", year: 2015, note: "Proved that with skip connections, deeper is genuinely better — won ImageNet 2015 with networks an order of magnitude deeper than before." }
-  - { name: "Wide ResNet", year: 2016, note: "Showed that widening residual blocks can beat making them deeper, trading depth for width." }
-  - { name: "ResNeXt", year: 2016, note: "Added parallel 'cardinality' paths inside each block, boosting accuracy without more depth or width." }
-  - { name: "DenseNet", year: 2017, note: "Pushed skip connections to the limit — every layer connects to every later one — confirming shortcuts as a core idea." }
+  - { name: "ResNet-50/101/152", year: 2015, note: "Bottleneck residual nets up to 152 layers, 8 times deeper than VGG nets; an ensemble won 1st place in ILSVRC 2015 classification." }
+  - { name: "Wide ResNet", year: 2016, note: "Decreases depth and increases width; the authors report a 16-layer wide residual net outperforming earlier deep residual nets, including thousand-layer ones." }
+  - { name: "ResNeXt", year: 2016, note: "Aggregates a set of same-topology transformations in each block; the authors report that increasing this 'cardinality' improves accuracy at the same complexity." }
+  - { name: "DenseNet", year: 2017, note: "Connects each layer to every other layer in a feed-forward fashion, so each layer receives the feature maps of all preceding layers." }
 
 resources:
   - { kind: paper, title: "Deep Residual Learning for Image Recognition (He et al., 2015)", url: "https://arxiv.org/abs/1512.03385" }
@@ -187,31 +187,34 @@ learn_first:
   - { label: "Batch normalization", href: "/learn/concepts/batch-normalization", tag: "Concept" }
 
 tags: [resnet, vision, residual, skip-connection, deep-networks]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/1512.03385", title: "Deep Residual Learning for Image Recognition (He et al., 2015)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1603.05027", title: "Identity Mappings in Deep Residual Networks (He et al., arXiv:1603.05027)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1605.07146", title: "Wide Residual Networks (Zagoruyko & Komodakis, arXiv:1605.07146)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1611.05431", title: "Aggregated Residual Transformations for Deep Neural Networks (Xie et al., arXiv:1611.05431)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1608.06993", title: "Densely Connected Convolutional Networks (Huang et al., arXiv:1608.06993)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., arXiv:1706.03762)", trust: 0.95 }
   - { url: "https://cs231n.github.io/convolutional-networks/#architectures", title: "CS231n Architectures (Stanford)", trust: 0.9 }
 ---
 
 ## What Changed
-Deeper networks should be at least as good as shallower ones — a deep net can always set extra layers
-to identity — yet in practice, past a point, adding layers made both training *and* test error worse.
-This "degradation" problem, not overfitting, capped useful depth. He et al. fixed it with a tiny
-structural change: the **residual block**, where a layer computes $\mathcal{F}(x)$ and the block
-outputs $\mathcal{F}(x) + x$ via a skip connection. Now a layer only has to learn the *residual* (the
-correction to the identity), and if the best thing to do is nothing, driving $\mathcal{F}$ toward zero
-is easy. Practically, the skip is also a gradient highway: backprop flows through the identity path
-undiminished, defeating the vanishing-gradient problem. ResNet trained networks of 100+ (even 1000+)
-layers, won ImageNet 2015, and its skip connection became one of the most reused primitives in all of
-deep learning — the transformer's residual-around-every-sublayer design (and thus ViT) inherits it
-directly.
+A deeper network should be at least as good as a shallower one, yet He et al. found that deeper plain
+networks reach higher *training* error. They argue this degradation is an optimization difficulty, not
+overfitting, and unlikely to be caused by vanishing gradients.
+
+Their fix is the **residual block**: a few layers compute $\mathcal{F}(x)$ and the block outputs
+$\mathcal{F}(x) + x$ via a skip connection. The layers learn only the *residual*, the correction to the
+identity.
+
+Residual nets of up to 152 layers trained on ImageNet, and an ensemble won ILSVRC 2015 classification.
+The Transformer (2017) wraps each sub-layer in a residual connection, citing this work.
 
 ## Key Ideas
 - **Residual learning** — parameterise a block as identity plus a learned delta $\mathcal{F}(x)+x$, so
   layers refine rather than replace the signal.
-- **Degradation, not overfitting** — the pre-ResNet failure of deep nets was an optimization problem;
-  skip connections make the identity easy to represent and recover trainability.
-- **Gradient highway** — the additive shortcut passes gradients backward unattenuated, so very deep
-  stacks stay trainable.
-- **A universal primitive** — residual connections now appear in nearly every deep architecture,
-  including every transformer sublayer.
+- **Degradation, not overfitting** — deeper plain nets had higher training error; the authors argue
+  this is an optimization difficulty and that residual nets are easier to optimize.
+- **Direct signal propagation** — with identity shortcuts, forward and backward signals can pass
+  directly from one block to any other (He et al., 2016).
+- **Reuse in the Transformer** — each Transformer sub-layer sits inside a residual connection.

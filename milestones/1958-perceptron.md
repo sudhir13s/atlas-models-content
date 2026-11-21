@@ -11,8 +11,11 @@ architectures:
 models: []
 tags:
 - model-history
-updated: '2026-11-19'
-sources: []
+updated: '2026-11-21'
+sources:
+- url: https://doi.org/10.1037/h0042519
+  title: 'The Perceptron: A Probabilistic Model for Information Storage and Organization in the Brain (Rosenblatt, 1958, Psychological Review 65(6))'
+  trust: 0.9
 ---
 
 

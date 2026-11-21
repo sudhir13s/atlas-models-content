@@ -10,9 +10,9 @@ era_range: "1986–2011"
 year: 1986
 family: classical-nn
 core_innovation: "Stacked non-linear layers trained end-to-end by propagating error gradients backward through the network."
-description: "Hidden layers plus the backpropagation algorithm — the recipe that made deep networks trainable."
+description: "Hidden layers trained by backpropagating error gradients through the network."
 key_features: ["Hidden layers with non-linear activations", "Backpropagation via the chain rule", "Universal function approximation", "Gradient-descent training"]
-key_models: ["NETtalk (1987)", "LeCun handwritten-digit nets (1989)"]
+key_models: ["NETtalk (Sejnowski & Rosenberg)", "LeCun et al. zip-code network (1989)"]
 paper_title: "Learning Representations by Back-Propagating Errors"
 paper_url: "https://doi.org/10.1038/323533a0"
 influenced_by: [architecture-era/perceptron]
@@ -25,10 +25,10 @@ analogy:
   body: "Picture a restaurant kitchen: prep cooks chop, line cooks assemble, the head chef plates — each stage feeds the next, and only the final plate is judged by the diner. When a dish comes back too salty, the head chef doesn't shrug; the complaint travels *backward* — the chef tells the line cook how much the saltiness was their doing, the line cook tells the prep cook how much was theirs, and each adjusts their own step in proportion to their share of the blame. Backpropagation is exactly this: the final error is measured once, then the chain rule hands each hidden neuron precisely how much it contributed, so every layer — not just the last — knows which way to adjust."
 
 narrative:
-  motivation: "The perceptron could only carve a single straight boundary, so it famously couldn't even learn XOR. Everyone knew the fix in principle — stack neurons into hidden layers to build curved, compositional boundaries — but stacking created a new problem: the inner neurons have no label to aim at. You know what the network *should* output, but not what any hidden unit should output. Without a target, how do you train the middle?"
+  motivation: "The perceptron carves a single straight boundary, so it cannot learn XOR. Stacking neurons into hidden layers builds curved, compositional boundaries, but the inner neurons have no label to aim at. You know what the network *should* output, but not what any hidden unit should output."
   approach: "Two changes unlock it. First, swap the perceptron's hard step for a smooth activation (sigmoid or tanh) so the whole network becomes a differentiable function — small weight changes produce small, measurable output changes. Second, treat the whole network as one big composed function and ask calculus for the gradient of the error with respect to every weight."
-  solution: "Backpropagation computes that gradient efficiently by running the chain rule backward. A forward pass produces a prediction and an error; then, starting from the output, the algorithm sweeps backward layer by layer, reusing each layer's computed error signal to get the previous layer's — so all the gradients for the entire network cost about as much as a single forward pass. Feed those gradients to gradient descent and every weight, hidden or not, moves to shrink the error."
-  outcome: "This turned a pile of neurons into a trainable, differentiable machine. It solved XOR, and — because a single wide hidden layer is a universal approximator — it could in principle fit any continuous function. The forward-pass → loss → backward-pass → update loop became the template that every deep network since, from convolutional nets to transformers, still runs unchanged."
+  solution: "Backpropagation computes that gradient by running the chain rule backward. A forward pass produces a prediction and an error; then, starting from the output, the algorithm sweeps backward layer by layer, reusing each layer's error signal to get the previous layer's. Feed those gradients to gradient descent and every weight, hidden or not, moves to shrink the error."
+  outcome: "The network becomes a trainable, differentiable function. Cybenko (1989) showed that a single hidden layer with a continuous sigmoidal non-linearity can approximate any continuous function on the unit hypercube. The forward pass, loss, backward pass and update loop is also how the convolutional networks and transformers of later eras are trained."
 
 build_steps:
   - { title: "1. Stack the layers", detail: "Wire neurons into layers: an input layer, one or more hidden layers, and an output layer. Every neuron in a layer connects to every neuron in the next — a fully-connected (dense) network." }
@@ -49,13 +49,13 @@ key_equation:
     - { symbol: "∂ / ∂", meaning: "a partial derivative — the local sensitivity of one quantity to another" }
 
 strengths:
-  - "Universal approximation — a wide enough hidden layer can represent any continuous function."
-  - "Backprop computes all gradients in one backward pass, roughly as cheap as the forward pass."
+  - "Universal approximation — one hidden layer with a sigmoidal non-linearity can approximate any continuous function on the unit hypercube (Cybenko, 1989)."
+  - "Backprop computes all gradients in one backward pass."
   - "End-to-end and differentiable, so the whole network trains jointly by gradient descent."
-  - "General-purpose — the same recipe applies to any differentiable architecture built since."
+  - "General-purpose — the same recipe applies to any differentiable architecture."
 
 weaknesses:
-  - "Sigmoid/tanh activations squash gradients, so deep stacks suffer vanishing gradients and train slowly."
+  - "Glorot and Bengio (2010) report that the logistic sigmoid is unsuited to deep networks with random initialization: it can saturate the top hidden layer and slow training."
   - "Universal approximation is an existence result — it says a fitting network exists, not that training will find it."
   - "Fully-connected layers ignore structure (spatial, sequential), needing huge parameter counts for images or sequences."
   - "Prone to overfitting and sensitive to initialization and learning rate without careful tuning."
@@ -170,9 +170,9 @@ diagram_svg: |
   </svg>
 diagram_caption: "A multilayer perceptron with two hidden layers: every neuron feeds every neuron of the next layer. The forward pass computes a prediction and its loss; backpropagation carries the loss gradient back to update every weight."
 notable_models:
-  - { name: "Rumelhart–Hinton–Williams net", year: 1986, note: "The Nature paper that popularized backprop and showed hidden layers learn useful internal representations." }
-  - { name: "NETtalk", year: 1987, note: "Learned to pronounce English text from examples — a striking early demo that hidden layers capture structure." }
-  - { name: "LeNet (LeCun digit nets)", year: 1989, note: "Backprop-trained networks that read handwritten digits, the seed of modern convolutional nets." }
+  - { name: "Rumelhart–Hinton–Williams net", year: 1986, note: "Described in the Nature paper 'Learning representations by back-propagating errors'." }
+  - { name: "NETtalk", note: "Sejnowski and Rosenberg's parallel networks that learn to pronounce English text (Complex Systems, volume 1)." }
+  - { name: "LeCun et al. zip-code network", year: 1989, note: "Backpropagation applied to handwritten zip code recognition (Neural Computation)." }
 
 resources:
   - { kind: paper, title: "Learning Representations by Back-Propagating Errors (Rumelhart, Hinton & Williams, 1986)", url: "https://doi.org/10.1038/323533a0" }
@@ -187,28 +187,34 @@ learn_first:
   - { label: "Activation functions", href: "/learn/concepts/activation-functions", tag: "Concept" }
 
 tags: [mlp, backpropagation, classical-nn, foundational]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
-  - { url: "https://doi.org/10.1038/323533a0", title: "Learning Representations by Back-Propagating Errors (Rumelhart, Hinton & Williams, 1986, Nature)", trust: 0.9 }
+  - { url: "https://doi.org/10.1038/323533a0", title: "Learning Representations by Back-Propagating Errors (Rumelhart, Hinton & Williams, 1986, Nature 323)", trust: 0.9 }
+  - { url: "https://hal.science/hal-03753170", title: "Approximation by Superpositions of a Sigmoidal Function (Cybenko, 1989, Mathematics of Control, Signals and Systems)", trust: 0.9 }
+  - { url: "https://proceedings.mlr.press/v9/glorot10a.html", title: "Understanding the Difficulty of Training Deep Feedforward Neural Networks (Glorot & Bengio, AISTATS 2010)", trust: 0.9 }
+  - { url: "https://www.complex-systems.com/abstracts/v01_i01_a10/", title: "Parallel Networks that Learn to Pronounce English Text (Sejnowski & Rosenberg, Complex Systems 1(1))", trust: 0.85 }
+  - { url: "https://doi.org/10.1162/neco.1989.1.4.541", title: "Backpropagation Applied to Handwritten Zip Code Recognition (LeCun et al., 1989, Neural Computation)", trust: 0.9 }
 ---
 
 ## What Changed
-The perceptron could only draw straight lines. Stacking neurons into hidden layers gives a network the
-power to represent curved, compositional decision surfaces — a two-layer network with a non-linear
-activation is a *universal approximator*. The missing piece was how to train the inner weights, which
-have no direct target to compare against. Rumelhart, Hinton, and Williams popularised the answer:
-**backpropagation**, the systematic application of the chain rule to compute the gradient of a scalar
-loss with respect to every weight in one backward sweep. Crucially, a hidden unit needs a *smooth*
-activation (sigmoid, tanh) rather than the perceptron's hard step so that gradients can flow. This
-turned a network of neurons into a differentiable function optimisable by gradient descent, solved XOR,
-and set the template — forward pass, loss, backward pass, update — that every deep model since follows.
+The perceptron draws only straight lines. Stacking neurons into hidden layers lets a network represent
+curved, compositional decision surfaces; one hidden layer with a sigmoidal non-linearity is a
+*universal approximator* (Cybenko, 1989).
+
+The inner weights have no direct target to compare against. Rumelhart, Hinton and Williams (Nature,
+1986) trained them with **backpropagation**: the chain rule computes the gradient of a scalar loss with
+respect to every weight in one backward sweep.
+
+A hidden unit needs a *smooth* activation (sigmoid, tanh) rather than the perceptron's hard step so that
+gradients exist. The network becomes a differentiable function optimised by gradient descent: forward
+pass, loss, backward pass, update.
 
 ## Key Ideas
 - **Hidden layers** — intermediate non-linear representations let the network compose features and fit
   functions no single linear unit can.
-- **Backpropagation** — reuse the chain rule to compute all weight gradients in a single backward pass,
-  cost comparable to the forward pass; this efficiency is what makes deep training feasible.
-- **Universal approximation** — a sufficiently wide one-hidden-layer network can approximate any
-  continuous function on a compact domain (an existence result, not a training guarantee).
+- **Backpropagation** — reuse the chain rule to compute all weight gradients in a single backward pass.
+- **Universal approximation** — one hidden layer with a continuous sigmoidal non-linearity can
+  approximate any continuous function on the unit hypercube (an existence result, not a training
+  guarantee).
 - **Differentiable activations** — replacing the step with sigmoid/tanh is what lets error signals
   propagate; the choice of activation shapes gradient flow and vanishing-gradient behaviour.

@@ -9,55 +9,53 @@ era: post-transformer
 era_range: "2021–2026"
 year: 2021
 family: llm
-core_innovation: "Replace the dense feed-forward block with many experts and a router that activates only a few per token — so total capacity grows without growing the cost of any single forward pass."
+core_innovation: "Replace a dense feed-forward block with many expert feed-forward networks and a learned router that activates only a few per token, so total parameters grow without a matching growth in computation per token."
 description: "Sparse transformers where total parameters greatly exceed the parameters active per token."
-key_features: ["Expert feed-forward blocks", "Top-k token routing", "Sparse activation", "Total ≫ active parameters"]
-key_models: ["Switch Transformer (2021)", "Mixtral 8x7B (2024)", "DeepSeek-V3 (2024)"]
-paper_title: "Mixtral of Experts"
-paper_url: "https://arxiv.org/abs/2401.04088"
+key_features: ["Several expert feed-forward networks per MoE layer", "A learned router selects a few experts per token", "Sparse activation", "Total parameters far exceed active parameters"]
+key_models: ["Switch Transformer (2021)", "Mixtral 8x7B (2023)", "DeepSeek-V3 (2024)"]
+paper_title: "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer"
+paper_url: "https://arxiv.org/abs/1701.06538"
 influenced_by: [architecture-era/transformer]
 led_to: [architecture-era/reasoning-models]
 
-eli5: "Instead of every part of the model working on every word, the model keeps a team of specialists. For each word a little router picks the two specialists most likely to help, and only they do the work. You get the knowledge of a huge model while paying for a small one."
+eli5: "Instead of every part of the model working on every word, the model keeps a team of specialists. For each word a small router picks a few of them, and only those do the work. The model holds many parameters but uses only some of them for each word."
 
 analogy:
   title: "A hospital with specialists and a triage nurse"
-  body: "A dense model is one exhausted general doctor who personally handles every patient. A mixture-of-experts is a hospital: dozens of specialists — cardiology, orthopedics, neurology — sit ready, and a triage nurse at the door reads each patient and sends them to the two most relevant specialists. The hospital collectively knows far more than any one doctor, but each patient only occupies two specialists, not all of them. The router is the nurse; the experts are the specialists; 'top-k' is how many specialists each patient sees."
+  body: "A dense model is one doctor who handles every patient. A mixture-of-experts is a hospital: many specialists sit ready, and a triage nurse at the door sends each patient to one or two of them. The hospital holds far more expertise than one doctor, but each patient occupies only a few specialists. The router is the nurse, the experts are the specialists, and 'top-k' is how many specialists each patient sees."
 
 narrative:
-  motivation: "Scaling a transformer means making its feed-forward layers bigger, but in a dense model every parameter fires for every token — so doubling capacity doubles the compute of every forward pass. That coupling is the wall: quality wants more parameters, budgets want fewer FLOPs per token, and dense models force you to pay for both at once."
-  approach: "Break the coupling. Replace the single feed-forward block with N parallel expert blocks and a tiny router. For each token the router scores the experts and sends the token to only the top-k (often k=2). Capacity now scales with the number of experts; cost scales only with k. Total parameters and active parameters become two different numbers you can tune independently."
-  solution: "The router is a small learned gate: it produces a score per expert, keeps the top-k, softmax-normalizes those into weights, and the layer's output is the weighted sum of just those experts' outputs. Because routing is discrete, experts can specialize and none of the others run. A load-balancing auxiliary loss nudges the router to spread tokens evenly so experts don't collapse into one favorite or starve unused."
-  outcome: "Mixture-of-experts decouples what a model knows from what it costs to run. Mixtral 8x7B carries ~47B total parameters but activates only ~13B per token, matching much larger dense models at a fraction of the inference cost. DeepSeek-V3 pushed this to hundreds of billions of total parameters with a small active fraction. Sparse routing is now the default way frontier labs buy capacity cheaply."
+  motivation: "In a dense model every parameter is used for every token, so adding parameters adds computation to every forward pass. Conditional computation, where only parts of the network are active per example, had been proposed to grow capacity without a proportional growth in computation."
+  approach: "Shazeer et al. (2017) introduced the sparsely-gated mixture-of-experts layer: many feed-forward sub-networks (experts) and a trainable gating network that picks a sparse combination of them for each example. GShard (2020) and Switch Transformer (2021) applied such layers inside Transformers."
+  solution: "The router is a learned linear layer that scores every expert for a token. Mixtral keeps the top two scores and applies a softmax over them; the layer's output is the weighted sum of those experts' outputs. Switch Transformer routes each token to a single expert and adds an auxiliary load-balancing loss; DeepSeek-V3 uses an auxiliary-loss-free balancing strategy."
+  outcome: "Mixtral 8x7B has 47B parameters but uses 13B active parameters per token, and its authors report it outperforming or matching Llama 2 70B and GPT-3.5 on the benchmarks they evaluated. DeepSeek-V3 has 671B total parameters with 37B activated per token."
 
 build_steps:
-  - { title: "1. Start from a transformer block", detail: "Keep attention exactly as it is. The only thing that changes is the feed-forward sublayer that follows attention." }
-  - { title: "2. Clone the feed-forward into N experts", detail: "Instead of one feed-forward network (FFN), place N independent FFNs side by side. Each can become a specialist. Total parameters jump by roughly N×." }
-  - { title: "3. Add a router (gate)", detail: "A small linear layer reads each token vector and outputs one score per expert — a guess at which experts will help this particular token." }
-  - { title: "4. Keep only the top-k", detail: "Sort the scores, keep the best k experts (often k=2), and softmax those k scores into mixing weights. The other N−k experts are skipped entirely for this token." }
-  - { title: "5. Mix the chosen experts", detail: "Run the token through only its k experts and combine their outputs as a weighted sum using the router's weights. That blend is the layer's output." }
-  - { title: "6. Balance the load", detail: "Add an auxiliary loss that rewards even usage across experts, so the router doesn't send every token to the same one (collapse) or leave experts untrained (starvation)." }
+  - { title: "1. Start from a transformer block", detail: "Attention stays as it is. The feed-forward sub-layer after attention is what changes." }
+  - { title: "2. Replace the feed-forward with N experts", detail: "Place N independent feed-forward networks side by side in that layer. Mixtral uses 8 per layer." }
+  - { title: "3. Add a router (gate)", detail: "A small linear layer reads each token vector and outputs one score per expert." }
+  - { title: "4. Keep only the top-k", detail: "Keep the k highest-scoring experts (Switch Transformer uses k = 1, Mixtral k = 2) and turn their scores into mixing weights. The other experts are not computed for this token." }
+  - { title: "5. Mix the chosen experts", detail: "Run the token through its k experts and combine their outputs as a weighted sum using the router's weights." }
+  - { title: "6. Balance the load", detail: "Keep tokens spread across experts: Switch Transformer adds an auxiliary load-balancing loss; DeepSeek-V3 uses an auxiliary-loss-free strategy." }
 
 key_equation:
   latex: "y = \\sum_{i \\in \\mathrm{TopK}(x)} g_i(x)\\, E_i(x)"
-  plain: "The output is a weighted sum over only the top-k experts the router picked. Each chosen expert Eᵢ processes the token, the router weight gᵢ says how much to trust it, and everything outside the top-k contributes exactly zero — that's what makes it sparse."
+  plain: "The output is a weighted sum over only the top-k experts the router picked. Each chosen expert Eᵢ processes the token, the router weight gᵢ sets its share, and experts outside the top-k contribute nothing, which is what makes the layer sparse."
   terms:
     - { symbol: "x", meaning: "the input token vector arriving at the layer" }
     - { symbol: "E_i(x)", meaning: "the output of expert i (an independent feed-forward network)" }
-    - { symbol: "g_i(x)", meaning: "the router's gating weight for expert i — nonzero only if i is in the top-k, and the weights over the top-k sum to 1" }
+    - { symbol: "g_i(x)", meaning: "the router's gating weight for expert i; nonzero only if i is in the top-k (in Mixtral, a softmax over the top-k scores)" }
     - { symbol: "TopK(x)", meaning: "the set of the k highest-scoring experts for this token; every other expert is skipped" }
 
 strengths:
-  - "Decouples capacity from cost — total parameters (knowledge) can grow far faster than active parameters (FLOPs per token)."
-  - "Experts specialize, so the model can hold more distinct skills than a same-cost dense network."
-  - "Matches much larger dense models at a fraction of the inference and training compute."
-  - "Drops into the transformer with only the feed-forward block changed — attention and the rest are untouched."
+  - "Total parameters can grow much faster than the computation per token."
+  - "GLaM's authors report better zero-shot and one-shot results than GPT-3 at one third of its training energy and half its inference FLOPs."
+  - "Only the feed-forward sub-layers change; attention is untouched."
 
 weaknesses:
-  - "High memory footprint: all experts must be loaded even though only a few run, straining VRAM."
-  - "Routing is unstable — without a load-balancing loss experts collapse or starve, and the discrete top-k complicates training."
-  - "Uneven expert usage causes load imbalance across GPUs, hurting throughput at serving time."
-  - "Fine-tuning and distillation are trickier than for a plain dense model."
+  - "Memory cost follows the total parameter count: serving Mixtral needs memory for all 47B parameters, not the 13B active."
+  - "Routing adds overhead, and uneven expert assignment complicates load balancing across devices (Mixtral paper)."
+  - "Switch Transformer's authors cite complexity, communication costs and training instability as obstacles to adoption."
 
 diagram: |
   flowchart TD
@@ -70,15 +68,16 @@ diagram: |
     E2 --> S["Weighted sum"]
     E5 --> S
     S --> OUT["Layer output"]
-diagram_caption: "The router scores all experts but only the top-k (here 2 of 5) actually run; their outputs are blended by the router's weights. The rest are skipped, which is where the compute savings come from."
+diagram_caption: "The router scores all experts but only the top-k (here 2 of 5) run; their outputs are combined with the router's weights. The skipped experts are not computed for this token."
 
 notable_models:
-  - { name: "Switch Transformer", year: 2021, note: "Simplified routing to a single expert (top-1) and scaled to over a trillion parameters, proving sparse routing trains stably at scale." }
-  - { name: "GLaM", year: 2021, note: "Showed a sparse MoE could match dense GPT-3 quality using far less energy per token." }
-  - { name: "Mixtral 8x7B", year: 2024, note: "Open-weight MoE with ~47B total but ~13B active parameters, rivaling much larger dense models — the model that mainstreamed MoE openly." }
-  - { name: "DeepSeek-V3", year: 2024, note: "Scaled fine-grained experts to hundreds of billions of total parameters with a small active fraction and strong load balancing." }
+  - { name: "Switch Transformer", year: 2021, note: "Routes each token to a single expert; trained models of up to a trillion parameters." }
+  - { name: "GLaM", year: 2021, note: "A 1.2-trillion-parameter sparse model; its authors report better zero-shot and one-shot results than GPT-3 with one third of the training energy." }
+  - { name: "Mixtral 8x7B", year: 2023, note: "Open-weight model with 8 experts per layer and 2 active per token: 47B total, 13B active parameters." }
+  - { name: "DeepSeek-V3", year: 2024, note: "671B total, 37B active parameters per token, with DeepSeekMoE experts and an auxiliary-loss-free load-balancing strategy." }
 
 resources:
+  - { kind: paper, title: "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer (Shazeer et al., 2017)", url: "https://arxiv.org/abs/1701.06538" }
   - { kind: paper, title: "Mixtral of Experts (Jiang et al., 2024)", url: "https://arxiv.org/abs/2401.04088" }
   - { kind: paper, title: "Switch Transformers (Fedus et al., 2021)", url: "https://arxiv.org/abs/2101.03961" }
   - { kind: blog, title: "Mixture of Experts Explained (Hugging Face)", url: "https://huggingface.co/blog/moe" }
@@ -90,24 +89,31 @@ learn_first:
   - { label: "Scaling laws — why capacity vs. cost is the whole game", href: "/models/architecture/scaling-laws", tag: "Concept" }
 
 tags: [moe, sparse, routing, llm]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
-  - { url: "https://arxiv.org/abs/2401.04088", title: "Mixtral of Experts (Jiang et al.)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1701.06538", title: "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer (Shazeer et al., 2017)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2006.16668", title: "GShard: Scaling Giant Models with Conditional Computation and Automatic Sharding (Lepikhin et al., 2020)", trust: 0.95 }
   - { url: "https://arxiv.org/abs/2101.03961", title: "Switch Transformers (Fedus et al.)", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/2112.06905", title: "GLaM: Efficient Scaling of Language Models with Mixture-of-Experts (Du et al., 2021)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2401.04088", title: "Mixtral of Experts (Jiang et al.)", trust: 0.95 }
+  - { url: "https://mistral.ai/news/mixtral-of-experts", title: "Mixtral of experts (Mistral AI announcement, 11 December 2023)", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/2412.19437", title: "DeepSeek-V3 Technical Report (DeepSeek-AI, 2024)", trust: 0.95 }
   - { url: "https://huggingface.co/blog/moe", title: "Mixture of Experts Explained (Hugging Face)", trust: 0.9 }
 ---
 
 ## What Changed
-Mixture-of-experts (MoE) keeps the transformer backbone but replaces each dense feed-forward block with a
-set of N expert feed-forward networks (FFNs) plus a lightweight router. For every token the router selects
-the top-k experts (often k=2), so only a fraction of the network's parameters are active per token. This
-decouples model capacity (total parameters) from inference cost (active parameters): Mixtral 8x7B has ~47B
-total parameters but activates ~13B per token. It descends from the dense transformer and the Switch
-Transformer's routing, and underpins several modern frontier models.
+Mixture-of-experts (MoE) replaces a dense feed-forward block with a set of expert feed-forward networks
+plus a small router.
+
+- The sparsely-gated MoE layer comes from **Shazeer et al. (2017)**; GShard and Switch Transformer
+  applied it inside Transformers.
+- For every token the router selects a few experts (Switch Transformer one, Mixtral two), so only part
+  of the parameters are active per token.
+- Mixtral 8x7B has 47B total parameters and uses 13B per token.
 
 ## Key Ideas
-- **Experts** — multiple parallel FFNs; capacity scales with expert count.
-- **Router** — a small gating network scores experts per token and picks the top-k.
-- **Sparse activation** — compute stays close to a dense model of the *active* size, while quality
-  tracks the much larger *total* size.
-- **Load balancing** — an auxiliary loss spreads tokens across experts so none collapse or starve.
+- **Experts**: several parallel feed-forward networks; capacity grows with the number of experts.
+- **Router**: a small gating network scores experts per token and keeps the top-k.
+- **Sparse activation**: computation per token follows the active parameters; memory follows the total.
+- **Load balancing**: Switch Transformer uses an auxiliary loss to spread tokens across experts;
+  DeepSeek-V3 balances load without an auxiliary loss.

@@ -10,25 +10,25 @@ era_range: "2020–2022"
 year: 2020
 family: llm
 core_innovation: "Loss falls as a predictable power law in parameters, data, and compute — enabling compute-optimal model sizing."
-description: "The empirical power laws (Kaplan; Chinchilla) that turned model scaling from guesswork into budgeting."
-key_features: ["Power-law loss vs. compute/params/data", "Predictable extrapolation", "Compute-optimal frontier", "~20 tokens per parameter (Chinchilla)"]
+description: "The empirical power laws (Kaplan et al.; Hoffmann et al., 'Chinchilla') relating language-model loss to model size, data and compute, used to allocate a fixed compute budget."
+key_features: ["Power-law loss vs. compute/params/data", "Predictable extrapolation", "Compute-optimal allocation of a fixed budget", "Model size and training tokens scaled equally (Chinchilla)"]
 key_models: ["Kaplan et al. study (2020)", "Chinchilla 70B (2022)"]
 paper_title: "Scaling Laws for Neural Language Models"
 paper_url: "https://arxiv.org/abs/2001.08361"
 influenced_by: [architecture-era/gpt]
 led_to: []
 
-eli5: "If you plot how good a language model gets against how big it is, you get a shockingly smooth line. That means you can measure a few small models and predict how good a giant one will be before spending millions to build it. Scaling stopped being a guess and became arithmetic."
+eli5: "If you plot a language model's error against its size on log-log axes, you get a smooth straight line. That means you can measure a few small models and predict how a much larger one will do before building it."
 
 analogy:
   title: "A recipe that scales predictably"
-  body: "Imagine baking where doubling the ingredients reliably makes the cake a fixed amount better — and the improvement follows a known curve, so from two small test bakes you can predict how a huge cake will taste. Scaling laws are that curve for language models. Chinchilla then found the recipe was unbalanced: earlier giant models were all 'flour' (parameters) and too little 'water' (training data). Rebalance to roughly 20 parts data per part model, and a smaller cake beats a bigger, drier one made with the same oven time."
+  body: "Imagine baking where doubling the ingredients reliably makes the cake a fixed amount better — and the improvement follows a known curve, so from two small test bakes you can predict how a huge cake will taste. Scaling laws are that curve for language models. Chinchilla then found the recipe was unbalanced: earlier large models had too much 'flour' (parameters) and too little 'water' (training data). Grow both in equal proportion, and a smaller cake beats a bigger, drier one made with the same oven time."
 
 narrative:
-  motivation: "GPT had shown bigger models are better, but that left the expensive question unanswered: how much better, and given a fixed compute budget, should you spend it on a bigger model or more training data? Teams were sizing multi-million-dollar runs on intuition."
-  approach: "Kaplan et al. (2020) trained many language models across orders of magnitude in size, data, and compute, and simply plotted the test loss against each. Rather than a messy scatter, the points fell on clean straight lines on log-log axes — the signature of a power law."
-  solution: "Test loss decreases as a smooth power law in model size, dataset size, and compute, with stable exponents. Because the curve is predictable, you can fit it on cheap small runs and extrapolate the loss of a far larger model before building it. Hoffmann et al. (2022, 'Chinchilla') then corrected the recipe: earlier large models (including GPT-3) were badly undertrained on too little data."
-  outcome: "For a fixed compute budget, parameters and training tokens should scale together — roughly 20 tokens per parameter — so a smaller model trained on far more data (Chinchilla-70B) beat much larger ones. This reframed scaling from folklore into a budgeting discipline: given a FLOP budget, solve for the optimal (model size, token count) pair. Every serious pretraining run since is planned around these curves."
+  motivation: "Larger language models performed better, but that left the expensive question open: how much better, and, given a fixed compute budget, should it go to a bigger model or to more training data?"
+  approach: "Kaplan et al. (2020) trained many language models across orders of magnitude in size, data and compute, and plotted the test loss against each. The points fell on straight lines on log-log axes, the signature of a power law."
+  solution: "Cross-entropy loss scales as a power law in model size, dataset size and compute, with some trends spanning more than seven orders of magnitude. Fitting the curve on small runs lets you extrapolate the loss of a larger model. Kaplan et al. concluded that compute-efficient training uses very large models on relatively modest data, stopping well before convergence."
+  outcome: "Hoffmann et al. (2022), training over 400 models, found current large language models significantly undertrained: for compute-optimal training, model size and training tokens should be scaled equally. Their Chinchilla (70B parameters, 1.4 trillion tokens) used the same compute as Gopher (280B) and outperformed Gopher, GPT-3 (175B), Jurassic-1 and Megatron-Turing NLG on a large range of tasks."
 
 build_steps:
   - { title: "1. Pick an axis to scale", detail: "Choose what to vary — number of parameters N, dataset size D (tokens), or total compute C — holding the others generous so the chosen axis is the bottleneck." }
@@ -36,7 +36,7 @@ build_steps:
   - { title: "3. Plot loss on log-log axes", detail: "Plot loss against the scaled quantity with both axes logarithmic. A power law shows up as a straight line — that straight line is the whole finding." }
   - { title: "4. Fit the power law", detail: "Read off the slope (the exponent) and intercept. This gives an equation like L(N) = (Nc / N)^alpha that summarizes the trend." }
   - { title: "5. Extrapolate before you build", detail: "Use the fitted curve to forecast the loss of a much larger run, turning a blind bet into a budgeted prediction." }
-  - { title: "6. Solve for compute-optimal", detail: "Given a fixed compute budget C, use the joint law to pick the best (N, D) pair — Chinchilla's answer is to grow parameters and tokens together, ~20 tokens per parameter." }
+  - { title: "6. Solve for compute-optimal", detail: "Given a fixed compute budget C, use the joint law to pick the best (N, D) pair. Chinchilla's answer is to grow parameters and tokens equally: for every doubling of model size, double the training tokens." }
 
 key_equation:
   latex: "L(N)=\\left(\\frac{N_c}{N}\\right)^{\\alpha_N}"
@@ -48,16 +48,14 @@ key_equation:
     - { symbol: "\\alpha_N", meaning: "the power-law exponent — the slope on log-log axes; larger means faster gains from scaling" }
 
 strengths:
-  - "Turns scaling into a prediction: fit on cheap small runs, forecast a giant model's loss before committing budget."
-  - "Compute-optimal sizing — given a FLOP budget, solve for the best (parameters, tokens) split instead of guessing."
-  - "Remarkably robust — the power-law form holds across many orders of magnitude and across modalities."
-  - "De-risks huge investments by making the loss curve a plannable line, not a gamble."
+  - "Turns scaling into a prediction: fit on small runs, forecast a larger model's loss before training it."
+  - "Compute-optimal sizing: given a compute budget, solve for the best (parameters, tokens) split."
+  - "Some trends span more than seven orders of magnitude, per Kaplan et al."
 
 weaknesses:
-  - "Power laws describe pretraining loss, not downstream usefulness — lower loss doesn't guarantee a better product."
-  - "Exponents are empirical fits, not derived from theory; they can shift with architecture, data quality, or objective."
-  - "The extrapolation eventually breaks — data runs out, and irreducible-error floors bend the curve."
-  - "Emergent capabilities and safety behaviors aren't captured by a smooth loss law, so it under-predicts qualitative jumps."
+  - "The laws are fitted to cross-entropy loss, not to downstream task scores."
+  - "They are empirical fits; Kaplan et al. note that the constants N_c and D_c have no fundamental meaning."
+  - "Kaplan et al. (2020) and Hoffmann et al. (2022) reach different compute-optimal allocations: very large models on modest data versus model size and tokens scaled equally."
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 860 428" role="img" aria-label="Schematic of Kaplan et al.'s scaling laws: three log-log plots in which test loss falls along a straight line as model parameters N, dataset size D and compute C grow, each a power law with a small fitted exponent (0.076, 0.095 and 0.050).">
@@ -193,11 +191,10 @@ diagram_svg: |
   </svg>
 diagram_caption: "Schematic of Kaplan et al. (2020): on log–log axes, test loss falls along a straight power-law line as parameters N, data D and compute C grow (exponents 0.076, 0.095, 0.050), so gains from scale are predictable."
 notable_models:
-  - { name: "Kaplan et al. scaling study", year: 2020, note: "The original — showed test loss follows clean power laws in parameters, data, and compute, enabling extrapolation." }
-  - { name: "GPT-3 175B", year: 2020, note: "Scaled aggressively on parameters and, in hindsight, was undertrained on data — the case Chinchilla later corrected." }
-  - { name: "Chinchilla 70B", year: 2022, note: "Proved compute-optimal balance (~20 tokens/param): a smaller, data-richer model beat much larger, data-starved ones." }
-  - { name: "PaLM 540B", year: 2022, note: "A very large pre-Chinchilla model whose results retrospectively highlighted how much data undertraining left on the table." }
-  - { name: "LLaMA", year: 2023, note: "Applied Chinchilla-style, data-heavy training to smaller models, showing compute-optimal recipes yield efficient open models." }
+  - { name: "Kaplan et al. scaling study", year: 2020, note: "The original: test loss follows power laws in parameters, data and compute, enabling extrapolation." }
+  - { name: "GPT-3 175B", year: 2020, note: "One of the large models Chinchilla outperformed at a fraction of the parameter count, in Hoffmann et al.'s evaluation." }
+  - { name: "Chinchilla 70B", year: 2022, note: "A predicted compute-optimal model: same compute as Gopher (280B), 70B parameters on 1.4 trillion tokens, and better on a large range of downstream tasks." }
+  - { name: "LLaMA", year: 2023, note: "7B–65B models trained on 1.0–1.4 trillion tokens; LLaMA-13B outperforms GPT-3 (175B) on most benchmarks, per the authors." }
 
 resources:
   - { kind: paper, title: "Scaling Laws for Neural Language Models (Kaplan et al., 2020)", url: "https://arxiv.org/abs/2001.08361" }
@@ -212,34 +209,26 @@ learn_first:
   - { label: "Training compute (FLOPs) budgeting", href: "/learn/concepts/compute-flops", tag: "Hardware" }
 
 tags: [scaling-laws, compute-optimal, chinchilla, llm]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/2001.08361", title: "Scaling Laws for Neural Language Models (Kaplan et al., 2020)", trust: 0.95 }
   - { url: "https://arxiv.org/abs/2203.15556", title: "Training Compute-Optimal Large Language Models (Chinchilla; Hoffmann et al., 2022)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.95 }
   - { url: "https://www.lesswrong.com/posts/6Fpvch8RR29qLEWNH/chinchilla-s-wild-implications", title: "chinchilla's wild implications (nostalgebraist)", trust: 0.75 }
 ---
 
 ## What Changed
-Once GPT showed that bigger models were better, the open question was *how much* better, and where to
-spend a fixed compute budget. Scaling laws answered it empirically. Kaplan et al. (2020) found that
-test loss falls as a smooth **power law** in model size, dataset size, and compute over many orders of
-magnitude — meaning you can train small models and *extrapolate* the loss of a much larger one before
-building it.
+Kaplan et al. (2020) found that language-model test loss falls as a **power law** in model size,
+dataset size and compute, with some trends spanning more than seven orders of magnitude. You can
+train small models and *extrapolate* the loss of a much larger one.
 
-Hoffmann et al. (2022, "Chinchilla") then corrected the recipe: earlier large models (including
-GPT-3) were badly *undertrained* on too little data. For a compute budget, parameters and training
-tokens should scale together — roughly **20 tokens per parameter** — so a smaller model trained on far
-more data (Chinchilla-70B) beat much larger ones.
-
-This reframed scaling from folklore into a budgeting discipline: given FLOPs, solve for the optimal
-(model size, token count) pair. Every serious pretraining run since is planned around these curves.
+Hoffmann et al. (2022, "Chinchilla") found large models of the time **significantly undertrained**.
+For compute-optimal training, model size and training tokens should be **scaled equally**; their
+70B-parameter Chinchilla, trained on 1.4 trillion tokens with Gopher's compute budget, outperformed
+much larger models.
 
 ## Key Ideas
-- **Power-law loss** — $L$ decreases predictably as a power of parameters $N$, data $D$, and compute
-  $C$; the exponents are stable enough to extrapolate.
-- **Predictable extrapolation** — fit the curve on cheap small runs, forecast the loss of an expensive
-  large run, and de-risk the budget before committing.
-- **Compute-optimal frontier** — for fixed compute there is a best (size, tokens) trade-off; too big a
-  model on too few tokens wastes compute.
-- **Chinchilla correction** — ~20 tokens/parameter; prior frontier models were oversized and
-  data-starved, so a smaller-but-longer-trained model won at equal compute.
+- **Power-law loss**: $L$ decreases as a power of parameters $N$, data $D$ and compute $C$.
+- **Predictable extrapolation**: fit the curve on small runs, forecast the loss of a large run.
+- **Compute-optimal allocation**: for fixed compute there is a best (size, tokens) trade-off.
+- **Chinchilla's revision**: for every doubling of model size, double the training tokens.

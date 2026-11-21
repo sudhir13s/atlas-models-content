@@ -10,30 +10,30 @@ era_range: "2018–2020"
 year: 2018
 family: llm
 core_innovation: "Encoder-only bidirectional pretraining via masked language modeling, producing reusable contextual representations for fine-tuning."
-description: "The encoder-only transformer whose masked-LM pretraining set the pretrain-then-fine-tune paradigm for NLP."
-key_features: ["Encoder-only transformer", "Masked language modeling", "Next-sentence prediction", "Bidirectional context", "Fine-tune per downstream task"]
+description: "The encoder-only transformer pretrained with masked language modeling on unlabeled text, then fine-tuned with one additional output layer per task."
+key_features: ["Encoder-only transformer", "Masked language modeling", "Bidirectional context", "Fine-tune per downstream task"]
 key_models: ["BERT-base/large (2018)", "RoBERTa (2019)", "DeBERTa (2020)"]
 paper_title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding"
 paper_url: "https://arxiv.org/abs/1810.04805"
 influenced_by: [architecture-era/transformer]
 led_to: []
 
-eli5: "BERT learns language by playing fill-in-the-blank. Hide a few words in a sentence and make the model guess them using the words on both sides. Do that billions of times and it builds a deep sense of what words mean in context — which you can then reuse for almost any language task."
+eli5: "BERT learns language by playing fill-in-the-blank. Hide a few words in a sentence and make the model guess them using the words on both sides. Do that across a large body of text and it learns what words mean in context, which you can then reuse for many language tasks."
 
 analogy:
   title: "Cloze-test study, both sides visible"
   body: "Think of the fill-in-the-blank exercises from school: 'The ___ chased the ball into the street.' To answer, you read what comes before AND after the blank — 'chased', 'ball', 'street' all hint at 'dog'. BERT studies by turning huge amounts of text into millions of these blanks and getting graded on its guesses. A left-to-right model only sees the words before the blank, like reading with a card covering the rest of the line; BERT lifts the card and reads both sides. That two-sided reading is what makes its understanding deep."
 
 narrative:
-  motivation: "The transformer was a powerful architecture, but the language models built on it still read text left-to-right, so a word's representation could only depend on what came before it. For understanding tasks — is this review positive? does sentence A entail sentence B? where's the answer in this passage? — that's a real handicap, because meaning depends on the whole context, not just the left half."
-  approach: "Keep only the transformer's encoder (the part designed to build representations, not generate text) and change the training game. Instead of predicting the next word, randomly hide about 15% of the tokens and train the model to reconstruct them from everything around them — a masked language model (MLM). Add a secondary next-sentence-prediction task to teach sentence-pair relationships."
-  solution: "Masking is the key trick. Because the model never sees the answer and must recover it from both directions at once, each token's encoding is shaped by its full left-and-right context — genuinely bidirectional. Pretrain this once on a huge unlabeled corpus (Wikipedia + BookCorpus), then attach a small task-specific head and fine-tune on each downstream dataset, which is cheap by comparison."
-  outcome: "BERT swept the language-understanding benchmarks of its day (GLUE, SQuAD) and made 'download a pretrained encoder, fine-tune a light head' the default NLP workflow. It became the understanding-first, encoder-only complement to the generation-first, decoder-only GPT line — two branches off the same transformer trunk. Follow-ups (RoBERTa, DeBERTa) showed the pretraining recipe mattered even more than the extra objectives."
+  motivation: "Pretrained language models such as GPT read text left-to-right, so a word's representation could only depend on what came before it. For understanding tasks (classifying a review, deciding whether sentence A entails sentence B, finding an answer span in a passage) meaning depends on the whole context, not just the left half."
+  approach: "Keep only the transformer's encoder and change the training objective. Instead of predicting the next word, choose 15% of the WordPiece tokens at random and train the model to predict them from everything around them: a masked language model (MLM). A second next-sentence-prediction task teaches sentence-pair relationships."
+  solution: "Because the model must recover each masked token from both directions at once, each token's encoding is conditioned on both left and right context in all layers. Pretrain once on unlabeled text (BooksCorpus, 800M words, and English Wikipedia, 2,500M words), then add one output layer and fine-tune on each downstream dataset."
+  outcome: "The authors report new state-of-the-art results on eleven tasks, including GLUE (80.5) and SQuAD v1.1 (test F1 93.2). It is the encoder-only counterpart to the decoder-only GPT line. RoBERTa (Liu et al., 2019) found BERT significantly undertrained and matched or exceeded later models by training longer on more data and removing next-sentence prediction."
 
 build_steps:
   - { title: "1. Tokenize and add special tokens", detail: "Split text into WordPiece subword tokens and prepend a [CLS] token (its final vector summarizes the whole input) with [SEP] separating sentence pairs." }
   - { title: "2. Embed tokens, positions, and segments", detail: "Each token gets a learned embedding plus a positional embedding (order) plus a segment embedding (sentence A vs B). These three are summed into the input vectors." }
-  - { title: "3. Mask about 15% of tokens", detail: "Randomly replace chosen tokens with a [MASK] placeholder (most of the time) so the model has something to reconstruct — this is the fill-in-the-blank signal." }
+  - { title: "3. Mask 15% of tokens", detail: "Choose 15% of token positions at random; replace a chosen token with [MASK] 80% of the time, a random token 10% of the time, and leave it unchanged 10% of the time. This is the fill-in-the-blank signal." }
   - { title: "4. Encode with a bidirectional stack", detail: "Run the sequence through N transformer-encoder blocks. With no causal mask, every token attends to every other token, left and right — the source of bidirectional context." }
   - { title: "5. Predict the masked words", detail: "At each masked position, project the final vector over the vocabulary and train with cross-entropy against the true token. A next-sentence-prediction head trains the [CLS] vector too." }
   - { title: "6. Fine-tune per task", detail: "Throw away the pretraining heads, attach a small task head (classification on [CLS], span prediction on token outputs), and fine-tune the whole model briefly on labeled data." }
@@ -49,16 +49,15 @@ key_equation:
     - { symbol: "P(x_i \\mid x_{\\setminus M})", meaning: "the model's predicted probability of the correct token given that context" }
 
 strengths:
-  - "Deeply bidirectional — each token is encoded using both left and right context, ideal for understanding tasks."
-  - "One expensive pretraining amortizes across many cheap fine-tunes, transferring general language knowledge widely."
+  - "Bidirectional: each token is encoded using both left and right context in all layers."
+  - "One pretraining run serves many tasks, each fine-tuned with just one additional output layer."
   - "The [CLS] and per-token outputs plug into lightweight heads for classification, tagging, and span extraction."
-  - "Self-supervised: learns from raw unlabeled text, so pretraining data is essentially unlimited."
+  - "Self-supervised: pretrains on unlabeled text."
 
 weaknesses:
-  - "Not a generator — the bidirectional, masked objective makes BERT poor at free-form text generation."
-  - "The [MASK] token appears only in pretraining, not at inference, creating a train/test mismatch the model must paper over."
-  - "Only ~15% of tokens contribute loss per example, so pretraining is sample-inefficient versus next-token prediction."
-  - "Next-sentence prediction turned out to add little; RoBERTa dropped it and improved by simply training longer on more data."
+  - "The [MASK] token does not appear during fine-tuning, a pretraining/fine-tuning mismatch the authors mitigate with the 80/10/10 replacement rule."
+  - "Only 15% of tokens are predicted in each batch; the authors report masked-LM pretraining converges slightly slower than left-to-right training."
+  - "RoBERTa (Liu et al., 2019) found BERT significantly undertrained; its recipe removed next-sentence prediction and trained longer on more data."
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 880 545" role="img" aria-label="BERT pre-training: each input token of [CLS] sentence A [SEP] sentence B [SEP] is the sum of a token, a segment and a position embedding; a stack of bidirectional encoder blocks lets every token attend to every other token; a masked-language-model head predicts the hidden word at the [MASK] position and a next-sentence head classifies the [CLS] output.">
@@ -333,11 +332,11 @@ diagram_svg: |
   </svg>
 diagram_caption: "BERT sums token, segment and position embeddings for a sentence pair, runs them through bidirectional encoder blocks where every token attends to every token, and pre-trains two heads: masked-word prediction and next-sentence prediction on [CLS]."
 notable_models:
-  - { name: "BERT-base / BERT-large", year: 2018, note: "The original — proved masked, bidirectional pretraining sets a new state of the art across NLP understanding benchmarks." }
-  - { name: "RoBERTa", year: 2019, note: "Same architecture, better recipe — dropped next-sentence prediction and trained longer on more data; showed pretraining setup dominates." }
-  - { name: "DistilBERT", year: 2019, note: "Distilled BERT to ~40% fewer parameters while keeping ~97% of performance — proved these encoders compress well." }
-  - { name: "DeBERTa", year: 2020, note: "Disentangled content/position attention and a better mask decoder pushed the encoder line past human GLUE baselines." }
-  - { name: "Sentence-BERT", year: 2019, note: "Adapted BERT to produce comparable sentence embeddings, making it practical for semantic search and clustering." }
+  - { name: "BERT-base / BERT-large", year: 2018, note: "The original (110M and 340M parameters): new state-of-the-art results on eleven NLP tasks." }
+  - { name: "RoBERTa", year: 2019, note: "A replication study: training longer, with bigger batches, over more data and without next-sentence prediction, matching or exceeding models published after BERT." }
+  - { name: "DistilBERT", year: 2019, note: "Knowledge distillation during pretraining: 40% smaller and 60% faster while retaining 97% of BERT's language understanding, per the authors." }
+  - { name: "DeBERTa", year: 2020, note: "Disentangled content and position attention plus an enhanced mask decoder; a 1.5B-parameter single model surpassed the human baseline on SuperGLUE (89.9 vs 89.8)." }
+  - { name: "Sentence-BERT", year: 2019, note: "Siamese and triplet BERT networks that produce sentence embeddings comparable by cosine similarity, for semantic search and clustering." }
 
 resources:
   - { kind: paper, title: "BERT: Pre-training of Deep Bidirectional Transformers (Devlin et al., 2018)", url: "https://arxiv.org/abs/1810.04805" }
@@ -352,35 +351,30 @@ learn_first:
   - { label: "Subword tokenization (WordPiece/BPE)", href: "/learn/concepts/tokenization", tag: "Concept" }
 
 tags: [bert, encoder, masked-lm, pretraining, llm]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.95 }
   - { url: "https://jalammar.github.io/illustrated-bert/", title: "The Illustrated BERT (Jay Alammar)", trust: 0.9 }
   - { url: "https://arxiv.org/abs/1907.11692", title: "RoBERTa: A Robustly Optimized BERT Pretraining Approach (Liu et al., 2019)", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/1910.01108", title: "DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter (Sanh et al., 2019)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2006.03654", title: "DeBERTa: Decoding-enhanced BERT with Disentangled Attention (He et al., 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1908.10084", title: "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks (Reimers and Gurevych, 2019)", trust: 0.95 }
 ---
 
 ## What Changed
-The transformer gave a powerful architecture, but early language models still read text left-to-right,
-so a word's representation could only depend on what came before it. BERT keeps just the transformer's
-**encoder** and trains it with **masked language modeling (MLM)**: randomly hide ~15% of tokens and ask
-the model to reconstruct them from context on *both* sides.
+Earlier pretrained language models read text left-to-right, so a word's representation could only
+depend on what came before it. BERT (Devlin et al., 2018) keeps just the transformer's **encoder**
+and trains it with **masked language modeling (MLM)**: 15% of tokens are chosen at random and the
+model predicts them from context on *both* sides.
 
-This forces genuinely bidirectional representations — each token is encoded in light of its full
-surroundings — which is exactly what understanding tasks (classification, entailment, question
-answering) need. Just as important was the recipe it cemented: pretrain once on a huge unlabeled
-corpus, then **fine-tune** a small task-specific head on each downstream dataset.
-
-BERT swept the NLP benchmarks of its day and made "download a pretrained encoder and fine-tune" the
-default workflow. It sits on the transformer branch; its encoder-only, understanding-first design is
-the complement to the decoder-only, generation-first GPT line.
+The recipe is **pretrain once, then fine-tune**: one additional output layer per downstream task.
+The authors report new state-of-the-art results on eleven NLP tasks.
 
 ## Key Ideas
-- **Encoder-only** — no autoregressive decoder; the goal is rich representations, not left-to-right
+- **Encoder-only**: no autoregressive decoder; the goal is representations, not left-to-right
   generation.
-- **Masked language modeling** — predicting hidden tokens from two-sided context yields deeply
-  bidirectional embeddings, unlike causal LMs.
-- **Pretrain then fine-tune** — one expensive unsupervised pretraining amortises across many cheap
-  supervised fine-tunes, transferring general language knowledge.
-- **Task heads** — `[CLS]`/token representations feed lightweight heads for classification, tagging,
-  and span prediction; later work (RoBERTa) showed the pretraining recipe mattered more than the
-  auxiliary next-sentence objective.
+- **Masked language modeling**: predicting hidden tokens from two-sided context gives representations
+  conditioned on both left and right context.
+- **Pretrain then fine-tune**: one unsupervised pretraining run serves many supervised fine-tunes.
+- **Task heads**: `[CLS]` and token representations feed lightweight heads for classification,
+  tagging and span prediction.

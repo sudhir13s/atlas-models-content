@@ -10,8 +10,8 @@ era_range: "2022–2024"
 year: 2022
 family: llm
 core_innovation: "An IO-aware, tiled attention kernel that computes exact attention without ever materializing the full N×N score matrix in slow memory."
-description: "The GPU-memory-aware attention kernel that made long-context transformers fast and memory-cheap."
-key_features: ["IO-aware tiling", "Online softmax (no full score matrix)", "Fused kernel, fewer HBM reads/writes", "Exact (not approximate) attention", "Linear memory in sequence length"]
+description: "An IO-aware GPU attention algorithm that computes exact attention with fewer slow-memory reads and writes and linear extra memory."
+key_features: ["IO-aware tiling", "Online softmax (no full score matrix)", "Fused kernel, fewer HBM reads/writes", "Exact (not approximate) attention", "Extra memory linear in sequence length"]
 key_models: ["FlashAttention (2022)", "FlashAttention-2 (2023)", "FlashAttention-3 (2024)"]
 paper_title: "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness"
 paper_url: "https://arxiv.org/abs/2205.14135"
@@ -25,22 +25,22 @@ analogy:
   body: "Imagine adding up a huge ledger. The slow way: copy every intermediate subtotal into a giant spreadsheet stored in a filing cabinet across the room, then walk back and forth fetching pages — the walking, not the adding, is what kills you. FlashAttention keeps a tiny running total on a sticky note right in front of you: it reads one small block of numbers, updates the running total, and moves on, never storing the full spreadsheet. The filing cabinet is the GPU's slow high-bandwidth memory (HBM); the sticky note is the fast on-chip SRAM; the running total is the online softmax."
 
 narrative:
-  motivation: "Attention's textbook recipe builds an N×N matrix of scores between every pair of tokens, softmaxes it, and multiplies by the values. Everyone assumed the cost was the arithmetic. It isn't — the real bottleneck is memory traffic: that giant intermediate matrix gets written to, and read back from, the GPU's slow high-bandwidth memory (HBM), and its O(N²) size caps how long a sequence you can even fit."
-  approach: "Be IO-aware: minimize slow-memory traffic instead of counting arithmetic operations. GPUs have a small pool of extremely fast on-chip memory (SRAM) and a large pool of slow HBM. The winning move is to keep the working data in SRAM and never write the full score matrix to HBM at all — computing attention in blocks small enough to fit on-chip."
-  solution: "FlashAttention tiles the queries, keys, and values into blocks that fit in SRAM and streams through them. An online softmax keeps a running maximum and running sum so it can accumulate the correct softmax-weighted output block by block, rescaling as it goes — without ever holding the whole N×N matrix. The whole thing is fused into a single GPU kernel, so intermediates stay on-chip and HBM reads/writes plummet."
-  outcome: "The output is exact attention (no approximation; only the order of floating-point operations differs), but faster and with memory that grows linearly, not quadratically, in sequence length. That single kernel is a big part of why context windows jumped from a couple thousand tokens to tens or hundreds of thousands. FlashAttention-2 and -3 pushed GPU utilization further; the kernel is now standard infrastructure inside virtually every large model's training and inference stack."
+  motivation: "Standard attention builds an N×N matrix of scores between every pair of tokens, applies softmax and multiplies by the values. Its time and memory grow quadratically with sequence length. Approximate methods cut the arithmetic but, the authors note, often give no wall-clock speedup because they ignore memory access."
+  approach: "Be IO-aware: account for reads and writes between the GPU's small, fast on-chip memory (SRAM) and its large, slower high-bandwidth memory (HBM). Compute attention in blocks small enough to fit on-chip and never write the full score matrix to HBM."
+  solution: "FlashAttention tiles the queries, keys and values into blocks that fit in SRAM. A running maximum and running sum let it accumulate the correct softmax-weighted output block by block, rescaling as it goes. All attention operations are fused into one GPU kernel, and the backward pass recomputes attention on-chip from stored softmax statistics."
+  outcome: "The output is exact attention, using O(N) extra memory beyond inputs and output and fewer HBM accesses than standard attention. The authors report a 3× training speedup on GPT-2 (sequence length 1K) and longer usable context. FlashAttention-2 and FlashAttention-3 raised GPU utilisation further."
 
 build_steps:
-  - { title: "1. See the real cost", detail: "Profile attention and notice the FLOPs are cheap; the time goes to writing and reading the N×N score matrix in slow HBM. The problem is memory movement, not math." }
+  - { title: "1. See the real cost", detail: "In standard attention much of the time goes to writing and reading the N×N score and probability matrices in slow HBM, not to the matrix multiplications." }
   - { title: "2. Split Q, K, V into blocks", detail: "Tile the queries, keys, and values into blocks small enough that a working set fits inside the GPU's fast on-chip SRAM." }
   - { title: "3. Visit every pair of blocks", detail: "Load one key/value block into SRAM, then pass each query block by it, computing that tile's partial scores and partial output entirely in SRAM. The 2022 paper loops over key/value blocks on the outside and query blocks inside; FlashAttention-2 swaps the two loops." }
   - { title: "4. Keep an online softmax", detail: "Maintain a running maximum and running normalizer so each new block's contribution is correctly rescaled into the accumulating output. The full softmax is computed without ever storing the full score row." }
   - { title: "5. Fuse into one kernel", detail: "Do scoring, softmax, and the value-weighting inside a single fused GPU kernel so intermediates never touch HBM. Only the final output is written out." }
-  - { title: "6. Recompute in the backward pass", detail: "During training, don't store the giant attention matrix for the gradient — recompute blocks on the fly. Extra arithmetic is far cheaper than the memory traffic it avoids." }
+  - { title: "6. Recompute in the backward pass", detail: "During training, store only the output and the softmax statistics, and recompute attention blocks on-chip for the gradient. The authors report this speeds up the backward pass despite the extra FLOPs." }
 
 key_equation:
   latex: "m_i = \\max(m_{i-1}, \\tilde{m}_i), \\quad \\ell_i = e^{m_{i-1}-m_i}\\,\\ell_{i-1} + e^{\\tilde{m}_i - m_i}\\,\\tilde{\\ell}_i, \\quad O_i = e^{m_{i-1}-m_i}\\,O_{i-1} + p_i V_i"
-  plain: "The online-softmax recurrence: as each new block arrives, update the running maximum m, rescale the running normalizer ℓ and running output O so they stay consistent with the new maximum, then add the new block's contribution. This lets the exact softmax-weighted output be built incrementally, so the full N×N score matrix never has to exist in memory."
+  plain: "The online-softmax recurrence: as each new block arrives, update the running maximum m, rescale the running normaliser ℓ and running output O to the new maximum, then add the new block's contribution. The exact softmax-weighted output is built incrementally, so the full N×N score matrix is never stored."
   terms:
     - { symbol: "m_i", meaning: "running maximum score after processing block i — used to keep the exponentials numerically stable" }
     - { symbol: "ℓ_i", meaning: "running softmax normalizer (sum of exponentials) after block i" }
@@ -49,16 +49,14 @@ key_equation:
     - { symbol: "e^{m_{i-1}-m_i}", meaning: "the rescale factor that corrects earlier partial results when a larger maximum appears" }
 
 strengths:
-  - "Exact attention — the same mathematical result, so it's a drop-in replacement, not an approximation."
-  - "Memory grows linearly in sequence length instead of quadratically, unlocking very long contexts."
-  - "Large real-world speedups on GPUs by slashing slow-memory (HBM) traffic and fusing the kernel."
-  - "Benefits both training and inference, and composes with other efficiency tricks."
+  - "Exact attention: the same result as standard attention, not an approximation."
+  - "Extra memory grows linearly in sequence length instead of quadratically."
+  - "Fewer HBM accesses than standard attention; the authors report wall-clock training speedups (15% on BERT-large, 3× on GPT-2)."
 
 weaknesses:
-  - "It's a hand-written, hardware-specific kernel — tuned per GPU generation, hard to port and maintain."
-  - "It optimizes exact attention, so it can't beat the asymptotic wins of genuinely sub-quadratic methods on extreme lengths."
-  - "Correctness hinges on subtle numerics (the online-softmax rescaling); bugs are easy and painful."
-  - "Best speedups need specific hardware features (e.g. tensor cores, newer memory hierarchies)."
+  - "Arithmetic is still O(N²d) in sequence length N; only memory traffic and extra memory are reduced."
+  - "The first version reached only 25-40% of the A100's theoretical maximum FLOPs/s, per the FlashAttention-2 paper."
+  - "Kernels are tied to GPU generations: FlashAttention-3 targets Hopper GPUs."
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 860 548" role="img" aria-label="Standard attention writes the N by N matrices S and P to slow GPU memory (HBM); FlashAttention instead loops over blocks of Q, K and V, computes one tile of the N by N score matrix at a time in fast on-chip SRAM with running softmax statistics, and writes back only the output and two length-N statistics, giving the exact same output with memory linear in N.">
@@ -295,9 +293,9 @@ diagram_svg: |
   </svg>
 diagram_caption: "Standard attention stores the N×N matrices S and P in slow HBM; FlashAttention computes one tile of S at a time in on-chip SRAM with running softmax statistics and writes back only O, ℓ and m: exact output, O(N) extra memory."
 notable_models:
-  - { name: "FlashAttention", year: 2022, note: "Reframed attention as an IO-bound problem and delivered exact attention with linear memory via tiling plus online softmax." }
-  - { name: "FlashAttention-2", year: 2023, note: "Reworked the parallelism and work partitioning to reach a much higher fraction of the GPU's peak throughput." }
-  - { name: "FlashAttention-3", year: 2024, note: "Exploited newer GPU features (asynchrony and low-precision) to push utilization higher on Hopper-class hardware." }
+  - { name: "FlashAttention", year: 2022, note: "Treated attention as an IO problem and computed exact attention with linear extra memory via tiling, an online softmax and recomputation." }
+  - { name: "FlashAttention-2", year: 2023, note: "Better parallelism and work partitioning; the author reports about 2× speedup over FlashAttention and 50-73% of theoretical peak FLOPs/s on A100." }
+  - { name: "FlashAttention-3", year: 2024, note: "Uses Hopper GPU asynchrony and FP8 low precision; the authors report 1.5-2.0× speedup on H100 and up to 740 TFLOPs/s in FP16." }
 
 resources:
   - { kind: paper, title: "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (Dao et al., 2022)", url: "https://arxiv.org/abs/2205.14135" }
@@ -311,32 +309,27 @@ learn_first:
   - { label: "GPU memory hierarchy — SRAM vs. HBM", href: "/learn/concepts/gpu-memory", tag: "Hardware" }
 
 tags: [flashattention, attention, gpu, systems, long-context]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/2205.14135", title: "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (Dao et al., 2022)", trust: 0.95 }
   - { url: "https://arxiv.org/abs/2307.08691", title: "FlashAttention-2 (Dao, 2023)", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/2407.08608", title: "FlashAttention-3: Fast and Accurate Attention with Asynchrony and Low-precision (Shah et al., 2024)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1805.02867", title: "Online normalizer calculation for softmax (Milakov and Gimelshein, 2018)", trust: 0.9 }
 ---
 
 ## What Changed
-This entry is a *systems* advance, not a new model architecture — but it reshaped what transformers can
-do, so it belongs in the timeline. Standard attention computes an $N \times N$ score matrix, applies
-softmax, and multiplies by values. The bottleneck is not the arithmetic but the **memory traffic**:
-that giant intermediate matrix is written to and read from the GPU's slow high-bandwidth memory (HBM),
-and its $O(N^2)$ size caps how long a sequence you can process. FlashAttention makes attention
-**IO-aware**. It tiles the computation into blocks that fit in fast on-chip SRAM, uses an **online
-softmax** to accumulate the result block by block without ever storing the full score matrix, and
-fuses everything into one kernel — dramatically cutting HBM reads/writes. The result is the *exact*
-same attention output (no approximation), but faster and with memory that grows *linearly*, not
-quadratically, in sequence length. That single kernel is a big part of why context windows jumped from
-a couple thousand tokens to tens or hundreds of thousands. It sits on the transformer branch as
-critical enabling infrastructure rather than a change to the model itself.
+FlashAttention (Dao et al., 2022) is a GPU algorithm for attention, not a new model architecture.
+
+- Standard attention writes the $N \times N$ score and probability matrices to the GPU's slow
+  high-bandwidth memory (HBM) and reads them back.
+- FlashAttention is **IO-aware**: it computes attention in blocks that fit in fast on-chip SRAM, with an
+  **online softmax**, fused into one kernel, so the $N \times N$ matrices are never stored in HBM.
+- The output is **exact** attention, with extra memory linear in sequence length.
 
 ## Key Ideas
-- **IO-awareness** — the true cost of attention on a GPU is memory movement, not FLOPs; optimising
-  HBM traffic is what wins, an insight from hardware, not model design.
-- **Tiling + online softmax** — process attention in SRAM-sized blocks and update a running softmax so
-  the full $N\times N$ matrix never needs to exist.
-- **Exact, not approximate** — unlike sparse/linear attention variants, FlashAttention returns the
-  identical result to standard attention, so it is a drop-in speed/memory win.
-- **Enables long context** — linear memory in sequence length is a primary reason modern LLMs handle
-  very long inputs; the advance is infrastructure, not architecture.
+- **IO-awareness**: count reads and writes between HBM and SRAM, not only floating-point operations.
+- **Tiling + online softmax**: process attention in SRAM-sized blocks and update a running softmax so
+  the full $N\times N$ matrix is never stored.
+- **Exact, not approximate**: unlike sparse or low-rank approximations, the result equals standard attention.
+- **Longer context**: the authors report that the memory savings let Transformers use longer context,
+  with better perplexity on GPT-2.

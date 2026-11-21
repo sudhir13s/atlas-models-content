@@ -9,28 +9,35 @@ code: gelu
 aliases:
 - gelu_new
 order: 2
-short_description: Probabilistic activation — the BERT-era default.
+short_description: Weights each input by the standard Gaussian CDF of its value, x·Φ(x).
 example_models:
 - BERT
 - GPT-2
 - Pythia
-- OPT
-- BLOOM
 tags:
 - activation
 - gelu
-updated: '2026-11-19'
-sources: []
+updated: '2026-11-21'
+sources:
+- url: https://arxiv.org/abs/1606.08415
+  title: Gaussian Error Linear Units (GELUs) (arXiv:1606.08415)
+  trust: 0.95
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (arXiv:1810.04805)'
+  trust: 0.95
+- url: https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf
+  title: Improving Language Understanding by Generative Pre-Training (Radford et al., 2018)
+  trust: 0.9
 ---
 
 ## What It Is
 
-GELU multiplies the input by the probability that a standard Gaussian would be less than the input: x * Phi(x). It is smooth and handles negative values more gracefully than ReLU.
+GELU is x·Φ(x), where Φ is the standard Gaussian cumulative distribution function. Introduced by Dan Hendrycks and Kevin Gimpel in 2016. The authors contrast it with ReLU: GELU weights inputs by their value, while ReLU gates inputs by their sign.
 
 ## Why It Matters
 
-Was the dominant activation for BERT-era models. Still used in some architectures. Slightly less popular than SiLU in modern decoder-only LLMs.
+The authors report improvements over ReLU and ELU on all the computer vision, language and speech tasks they tested. GPT used GELU, and BERT adopted it in place of ReLU, following GPT.
 
 ## Trade-off
 
-Similar compute cost to SiLU. Both outperform ReLU. The choice between GELU and SiLU is often empirical and model-specific.
+Φ has no closed form, so the authors give two approximations: 0.5x(1 + tanh[√(2/π)(x + 0.044715x³)]) and x·σ(1.702x).

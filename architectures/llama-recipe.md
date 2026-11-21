@@ -9,61 +9,61 @@ era: post-transformer
 era_range: "2023–2026"
 year: 2023
 family: llm
-core_innovation: "A consolidated, efficient decoder-only recipe — RMSNorm, SwiGLU, RoPE, GQA — trained data-optimally and released openly."
-description: "The reference open-weights transformer recipe that standardized modern LLM design and catalyzed the open ecosystem."
-key_features: ["Pre-norm with RMSNorm", "SwiGLU feed-forward", "Rotary position embeddings (RoPE)", "Grouped-query attention (Llama-2)", "Chinchilla-informed data scaling", "Open weights"]
-key_models: ["LLaMA (2023)", "Llama-2 (2023)", "Llama-3 (2024)"]
+core_innovation: "A decoder-only transformer with pre-normalisation (RMSNorm), SwiGLU activations and rotary position embeddings (RoPE), trained on more tokens than compute-optimal and released to the research community."
+description: "The decoder-only transformer recipe of Meta's LLaMA paper (2023) and its Llama 2 and Llama 3 successors."
+key_features: ["Pre-normalisation with RMSNorm", "SwiGLU activation in the feed-forward layer", "Rotary position embeddings (RoPE) instead of absolute position embeddings", "Grouped-query attention from Llama 2 70B onward", "Smaller models trained on more tokens, for cheaper inference", "Weights released"]
+key_models: ["LLaMA (2023)", "Llama 2 (2023)", "Llama 3 (2024)"]
 paper_title: "LLaMA: Open and Efficient Foundation Language Models"
 paper_url: "https://arxiv.org/abs/2302.13971"
 influenced_by: [architecture-era/transformer, architecture-era/scaling-laws]
 led_to: [architecture-era/mixture-of-experts, architecture-era/mamba-ssm]
 
-eli5: "By 2023 all the good tricks for building a language model were scattered across dozens of papers. LLaMA gathered the best ones into one clean cookbook, trained the models on lots of data instead of just making them big, and gave the weights away — so anyone could cook the same dish and start improving it."
+eli5: "LLaMA took the standard text-predicting transformer and swapped in three improvements that other papers had proposed. It trained fairly small models on a very large amount of text, so they are cheap to run, and shared the weights with researchers."
 
 analogy:
-  title: "The definitive open-source cookbook"
-  body: "For years, the best recipe for a great dish lived in a hundred different chefs' private notebooks — one had the perfect dough, another the ideal oven temperature, a third the trick for the sauce. LLaMA is the chef who tested them all, wrote down the single best combination in a clean, reproducible cookbook, and published it for free. RMSNorm, SwiGLU, RoPE, and grouped-query attention are the chosen ingredients; 'train longer on more data' is the technique; open weights are the free cookbook that let a whole community start cooking and remixing."
+  title: "A cookbook of tested ingredients"
+  body: "Several cooks had each found one improvement: a better dough, a better oven setting, a better sauce. LLaMA combined three of them in one recipe (RMSNorm, SwiGLU and RoPE), cooked smaller portions for longer instead of bigger ones, and handed the recipe and the result to other researchers."
 
 narrative:
-  motivation: "By 2023 the transformer's best-practice details were scattered: normalization choices in one paper, better activations in another, position encodings in a third. There was no single, clean, reproducible template for a strong decoder-only model — and the best models were closed, so the open community couldn't build on them."
-  approach: "Consolidate, don't invent. LLaMA picked the refinements that consistently helped and assembled them into one efficient decoder-only recipe — then took the Chinchilla scaling lesson seriously by training relatively small models on far more tokens than was fashionable, buying quality through data rather than sheer size."
-  solution: "The recipe swaps four blocks into the standard transformer: RMSNorm (a cheaper normalization) applied pre-norm for stable deep training; SwiGLU gated feed-forward layers that beat plain ReLU MLPs at equal compute; RoPE (rotary position embeddings) that encode relative position by rotating query/key vectors and generalize better to longer contexts; and, from Llama-2, grouped-query attention (GQA), which shares key/value heads across groups of query heads to shrink the KV-cache and speed inference. Then it trained data-optimally and, crucially, released the weights."
-  outcome: "A 13B LLaMA rivaled the 175B GPT-3, proving data-optimal training beats raw size. More importantly, open weights ignited the open-model ecosystem — a wave of fine-tunes, quantizations, and derivatives. This exact block set became the de facto template most open-weight LLMs now follow, and its efficient backbone is what later MoE and state-space variants extend."
+  motivation: "Chinchilla's scaling laws say how to split a fixed training budget between model size and data, but the LLaMA authors note this ignores the cost of running the model. For a target quality, a smaller model trained longer is cheaper at inference."
+  approach: "Train models from 7B to 65B parameters on 1 to 1.4 trillion tokens of publicly available data only, using a transformer with changes taken from earlier models: pre-normalisation from GPT-3, SwiGLU from PaLM and rotary embeddings from GPT-Neo."
+  solution: "Each sub-layer's input is normalised with RMSNorm, the feed-forward ReLU is replaced by SwiGLU with a hidden size of 2/3·4d, and absolute position embeddings are replaced by RoPE at every layer. Llama 2 added grouped-query attention to its 70B model; Llama 3 uses it in all sizes, with a 128K-token vocabulary."
+  outcome: "The authors report that LLaMA-13B outperforms GPT-3 (175B) on most benchmarks and that LLaMA-65B is competitive with Chinchilla-70B and PaLM-540B. The models were released to the research community."
 
 build_steps:
-  - { title: "1. Start decoder-only", detail: "Use the GPT-style decoder-only transformer: stacked blocks of causal self-attention and a feed-forward network, trained to predict the next token." }
-  - { title: "2. Normalize with RMSNorm, pre-norm", detail: "Replace LayerNorm with RMSNorm (scale by root-mean-square, skip mean subtraction) and apply it before each sublayer. Cheaper to compute and more stable for deep stacks." }
-  - { title: "3. Swap in SwiGLU feed-forward", detail: "Replace the ReLU MLP with a gated SwiGLU layer — a Swish-gated projection that reliably improves quality per parameter at the same compute." }
-  - { title: "4. Encode position with RoPE", detail: "Instead of adding absolute position embeddings, rotate the query and key vectors by an angle that depends on position. Attention scores then depend on relative offset, which generalizes better to longer contexts." }
-  - { title: "5. Add grouped-query attention (Llama-2 onward)", detail: "Let groups of query heads share one set of key/value heads. This shrinks the KV-cache and speeds up inference with minimal quality loss." }
-  - { title: "6. Train data-optimally and release", detail: "Follow the Chinchilla lesson: train smaller models on far more tokens rather than chasing parameter count — then publish the weights so the community can fine-tune and extend." }
+  - { title: "1. Start decoder-only", detail: "Use a decoder-only transformer: stacked blocks of causal self-attention and a feed-forward network, trained to predict the next token." }
+  - { title: "2. Pre-normalise with RMSNorm", detail: "Normalise the input of each sub-layer instead of its output, for training stability, using RMSNorm (Zhang and Sennrich, 2019), which rescales by the root mean square without re-centring." }
+  - { title: "3. Use SwiGLU in the feed-forward layer", detail: "Replace the ReLU non-linearity with the SwiGLU activation (Shazeer, 2020), with a hidden dimension of 2/3·4d instead of 4d." }
+  - { title: "4. Encode position with RoPE", detail: "Remove absolute position embeddings and apply rotary position embeddings (Su et al., 2021) at each layer, so attention scores depend on relative position." }
+  - { title: "5. Grouped-query attention (Llama 2 70B, Llama 3)", detail: "Groups of query heads share one key/value head, which shrinks the key-value cache at inference." }
+  - { title: "6. Train past compute-optimal and release", detail: "Train smaller models on more tokens than Chinchilla recommends (the authors note a 7B model still improves after 1T tokens), then release the weights." }
 
 key_equation:
   latex: "\\mathcal{L}(\\theta) = -\\sum_{t=1}^{T} \\log P_\\theta\\big(x_t \\mid x_{<t}\\big)"
-  plain: "LLaMA keeps the standard next-token objective — maximize the probability of each real token given everything before it — unchanged. Its innovation isn't the loss; it's the efficient architecture blocks (RMSNorm, SwiGLU, RoPE, GQA) and the data-optimal training that make this same objective produce a far stronger model per unit of compute. This equation is the objective every LLaMA-style model optimizes."
+  plain: "LLaMA keeps the standard next-token objective: maximise the probability of each token given the tokens before it. The changes are in the architecture blocks and the amount of training data, not in the loss."
   terms:
-    - { symbol: "𝓛(θ)", meaning: "the training loss (negative log-likelihood) minimized over the model parameters θ" }
+    - { symbol: "𝓛(θ)", meaning: "the training loss (negative log-likelihood) minimised over the model parameters θ" }
     - { symbol: "x_t", meaning: "the actual token at position t in the training text" }
-    - { symbol: "x_{<t}", meaning: "all tokens before position t — the context the model conditions on" }
+    - { symbol: "x_{<t}", meaning: "all tokens before position t, the context the model conditions on" }
     - { symbol: "P_θ(x_t | x_{<t})", meaning: "the model's predicted probability of the correct next token given the context" }
     - { symbol: "T", meaning: "the sequence length (number of tokens the loss is summed over)" }
 
 strengths:
-  - "Efficient by design — RMSNorm, SwiGLU, RoPE, and GQA give more quality per parameter and per FLOP."
-  - "Open weights catalyzed a huge ecosystem of fine-tunes, quantizations, and derivatives."
-  - "Data-optimal training: a 13B model rivaling a 175B one proves smaller-but-longer-trained wins."
-  - "A clean, reproducible template that became the shared standard for open-weight LLMs."
+  - "Built for cheap inference: smaller models trained on more tokens."
+  - "Trained only on publicly available data."
+  - "The authors report LLaMA-13B outperforming GPT-3 (175B) on most benchmarks while being ten times smaller."
+  - "Grouped-query attention (Llama 2 70B, Llama 3) reduces key-value cache size at inference."
 
 weaknesses:
-  - "Architecturally a consolidation, not a fundamental breakthrough — it refines the transformer rather than replacing it."
-  - "Still a dense transformer: attention remains quadratic in sequence length."
-  - "Early open-weight releases carried restrictive licenses and required careful safety tuning for chat use."
-  - "Data-optimal training costs more tokens, so pretraining compute is high even for modest parameter counts."
+  - "A combination of existing techniques rather than a new architecture."
+  - "Still a dense transformer: attention cost grows quadratically with sequence length."
+  - "Weights ship under Meta's own licences rather than a standard open-source licence."
+  - "Training past the compute-optimal point spends more training compute for a given model size."
 
 diagram: |
   flowchart TD
-    IN["Token + RoPE position"] --> N1["RMSNorm (pre-norm)"]
-    N1 --> ATT["Grouped-query self-attention"]
+    IN["Token embedding"] --> N1["RMSNorm (pre-norm)"]
+    N1 --> ATT["Causal self-attention with RoPE<br/>(grouped-query from Llama 2 70B)"]
     ATT --> A1["Add (residual)"]
     IN --> A1
     A1 --> N2["RMSNorm (pre-norm)"]
@@ -73,54 +73,54 @@ diagram: |
     A2 --> REP{"Repeat × N"}
     REP -->|"next block"| N1
     REP -->|"final"| OUT["Next-token prediction"]
-diagram_caption: "One LLaMA block: pre-norm RMSNorm, grouped-query attention with RoPE positions, and a SwiGLU feed-forward, wrapped in residuals and repeated N times. The four swaps over the vanilla transformer are what make it efficient."
+diagram_caption: "One LLaMA block: RMSNorm before each sub-layer, causal self-attention with rotary position embeddings, and a SwiGLU feed-forward layer, wrapped in residual connections and repeated N times."
 
 notable_models:
-  - { name: "LLaMA", year: 2023, note: "Consolidated the modern recipe and showed a 13B model rivaling 175B GPT-3, proving data-optimal training over raw scale." }
-  - { name: "Llama-2", year: 2023, note: "Added grouped-query attention and a full open chat pipeline, cementing the recipe as the community default." }
-  - { name: "Llama-3", year: 2024, note: "Scaled the same recipe with far more training tokens and a larger vocabulary, pushing open models near frontier quality." }
-  - { name: "Mistral 7B", year: 2023, note: "Showed the recipe plus sliding-window attention could beat larger models, spreading the template beyond Meta." }
+  - { name: "LLaMA", year: 2023, note: "7B to 65B models trained on public data; the authors report the 13B model outperforming GPT-3 (175B) on most benchmarks." }
+  - { name: "Llama 2", year: 2023, note: "7B to 70B models with fine-tuned chat versions; the 70B model uses grouped-query attention." }
+  - { name: "Llama 3", year: 2024, note: "Pretrained on over 15 trillion tokens, with a 128K-token vocabulary and grouped-query attention in all sizes." }
+  - { name: "Mistral 7B", year: 2023, note: "Uses grouped-query attention and sliding-window attention; its authors report it outperforming Llama 2 13B on all evaluated benchmarks." }
 
 resources:
   - { kind: paper, title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", url: "https://arxiv.org/abs/2302.13971" }
   - { kind: paper, title: "Llama 2: Open Foundation and Fine-Tuned Chat Models (Touvron et al., 2023)", url: "https://arxiv.org/abs/2307.09288" }
-  - { kind: blog, title: "The Llama 3 Herd of Models (Meta AI)", url: "https://ai.meta.com/research/publications/the-llama-3-herd-of-models/" }
-  - { kind: video, title: "Let's reproduce GPT-2 / build the modern LLM stack (Andrej Karpathy)", url: "https://www.youtube.com/watch?v=l8pRSuU81PU" }
+  - { kind: paper, title: "The Llama 3 Herd of Models (Grattafiori et al., 2024)", url: "https://arxiv.org/abs/2407.21783" }
 
 learn_first:
   - { label: "The Transformer block (what the recipe modifies)", href: "/models/architecture/transformer", tag: "Architecture" }
   - { label: "GPT & decoder-only autoregressive training", href: "/models/architecture/gpt", tag: "Architecture" }
-  - { label: "Scaling laws & the Chinchilla data-optimal lesson", href: "/models/architecture/scaling-laws", tag: "Concept" }
+  - { label: "Scaling laws and compute-optimal training (Chinchilla)", href: "/models/architecture/scaling-laws", tag: "Concept" }
 
 tags: [llama, open-weights, rope, rmsnorm, swiglu, gqa, llm]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.95 }
   - { url: "https://arxiv.org/abs/2307.09288", title: "Llama 2: Open Foundation and Fine-Tuned Chat Models (Touvron et al., 2023)", trust: 0.9 }
+  - { url: "https://github.com/meta-llama/llama/blob/main/MODEL_CARD.md", title: "Llama 2 model card (Meta)", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (Grattafiori et al., 2024)", trust: 0.95 }
+  - { url: "https://github.com/meta-llama/llama3/blob/main/MODEL_CARD.md", title: "Llama 3 model card (Meta)", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/2310.06825", title: "Mistral 7B (Jiang et al., 2023)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1910.07467", title: "Root Mean Square Layer Normalization (Zhang and Sennrich, 2019)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2002.05202", title: "GLU Variants Improve Transformer (Shazeer, 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2104.09864", title: "RoFormer: Enhanced Transformer with Rotary Position Embedding (Su et al., 2021)", trust: 0.95 }
 ---
 
 ## What Changed
-By 2023 the transformer's best-practice details were scattered across many papers. LLaMA bundled them
-into one clean, efficient, *reproducible* decoder-only recipe and — crucially — released the weights,
-igniting the open-model ecosystem. The recipe is a set of well-chosen refinements over the original
-transformer block: **RMSNorm** (a cheaper normalization) applied **pre-norm** for training stability;
-**SwiGLU** gated feed-forward layers that outperform plain ReLU MLPs; **RoPE** (rotary position
-embeddings) that encode relative position by rotating query/key vectors and generalise better to
-longer contexts than learned absolute embeddings; and, in Llama-2, **grouped-query attention (GQA)**,
-which shares key/value heads across groups of query heads to shrink the KV-cache and speed up
-inference. It also took the Chinchilla lesson seriously, training smaller models on far more tokens so
-that a 13B model could rival a 175B one. This combination became the de facto template that most
-open-weight LLMs now follow, and its efficient backbone is what later MoE and state-space variants
-extend.
+LLaMA (Touvron et al., 2023) changed the original transformer in three places, each taken from an
+earlier model:
+
+- **Pre-normalisation with RMSNorm** (from GPT-3): each sub-layer's input is normalised, for training stability.
+- **SwiGLU** (from PaLM) replaces the ReLU in the feed-forward layer.
+- **Rotary position embeddings** (from GPT-Neo) replace absolute position embeddings.
+
+The authors trained smaller models on more tokens than Chinchilla recommends, because such models are
+cheaper at inference. Llama 2 added **grouped-query attention** to its 70B model; Llama 3 uses it in all sizes.
 
 ## Key Ideas
-- **RMSNorm, pre-norm** — normalise by root-mean-square (no mean subtraction) before each sublayer;
-  cheaper and more stable for deep stacks than post-norm LayerNorm.
-- **SwiGLU FFN** — a gated activation ($\text{Swish}(xW)\odot xV$) that consistently beats ReLU MLPs at
-  equal compute, improving quality per parameter.
-- **RoPE** — rotate query/key vectors by position so attention scores depend on *relative* offset,
-  giving better length behaviour than absolute position embeddings.
-- **Grouped-query attention** — share K/V projections across query-head groups to cut KV-cache memory
-  and boost inference throughput with minimal quality loss.
-- **Data-optimal + open** — train longer on more tokens per Chinchilla, and release weights so the
-  community can fine-tune and extend the recipe.
+- **RMSNorm, pre-norm**: normalise by root mean square (no mean subtraction) before each sub-layer;
+  its authors report comparable quality to LayerNorm with 7% to 64% lower running time.
+- **SwiGLU feed-forward**: a gated unit, $\text{Swish}(xW)\odot xV$; Shazeer (2020) reports quality
+  gains over ReLU and GELU in the transformer feed-forward layer.
+- **RoPE**: rotate query and key vectors by position so attention scores depend on relative offset.
+- **Grouped-query attention**: groups of query heads share key/value heads, reducing key-value cache memory.
+- **Inference-oriented training**: a smaller model trained on more tokens, released to researchers.

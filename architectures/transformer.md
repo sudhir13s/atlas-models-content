@@ -9,9 +9,9 @@ era: scaling
 era_range: "2017–present"
 year: 2017
 family: llm
-core_innovation: "Replace recurrence with self-attention so every token can look at every other token in one parallel step — enabling scale, long-range context, and the entire modern LLM era."
-description: "The attention-only architecture that replaced RNNs and became the substrate for BERT, GPT, and virtually every modern large model."
-key_features: ["Self-attention", "Multi-head attention", "Positional encoding", "Fully parallel training", "Encoder-decoder stack"]
+core_innovation: "Replace recurrence and convolution with attention, so every position can attend to every other position and computation within a sequence runs in parallel."
+description: "A sequence model built solely on attention mechanisms, with no recurrence or convolution; BERT and GPT are built from its encoder and decoder."
+key_features: ["Self-attention", "Multi-head attention", "Positional encoding", "Position-wise feed-forward sub-layer", "Parallel computation across positions"]
 key_models: ["Transformer (2017)", "BERT (2018)", "GPT (2018)", "T5 (2019)"]
 paper_title: "Attention Is All You Need (Vaswani et al., 2017)"
 paper_url: "https://arxiv.org/abs/1706.03762"
@@ -25,19 +25,19 @@ analogy:
   body: "Imagine every word in a sentence is a person in a room holding a note. Instead of whispering down a line — slow, and the message decays; that was the RNN — everyone raises their note at once. Each person looks around, decides whose notes are most relevant to them, and copies a weighted blend into their own. After a few rounds, every note carries the context of the whole room. That simultaneous 'everyone looks at everyone' step is self-attention."
 
 narrative:
-  motivation: "By 2017 the best sequence models were recurrent networks (RNNs/LSTMs) that processed a sentence one token at a time. That sequential dependency made training slow — you cannot parallelize across time — and made long-range links fragile: information from token 1 had to survive being passed through 50 steps to reach token 50. Attention had already been bolted onto these models as a helper; the open question was whether attention alone could do the whole job."
-  approach: "The bet was radical: throw away recurrence and convolution entirely and build the model out of nothing but attention plus ordinary feed-forward layers. If every token can directly attend to every other token, distance stops mattering and the whole sequence can be processed in parallel."
-  solution: "Self-attention lets each token compute a relevance score against every other token and pull in a weighted mix of their values. Multiple 'heads' run in parallel so the model can attend to different relationships at once (syntax, coreference, topic). Because attention alone has no sense of order, a positional encoding is added to the inputs. Blocks of attention + feed-forward, wrapped in residual connections and layer normalization, are stacked into an encoder and a decoder."
-  outcome: "The Transformer matched or beat recurrent translation systems at a fraction of the training cost — and, more importantly, it scaled. Because it parallelizes and its capacity grows smoothly with depth and width, it became the universal backbone: BERT (understanding), GPT (generation), ViT (vision), and every frontier LLM since are transformers. It is the single most consequential architecture of the modern era."
+  motivation: "By 2017 the leading sequence models were recurrent networks (RNNs, LSTMs) that processed a sentence one token at a time. That sequential dependency precluded parallelization within a training example, and information between distant tokens had to pass through many steps. Attention was already used alongside these recurrent networks; the open question was whether attention alone could do the whole job."
+  approach: "Remove recurrence and convolution entirely and build the model from attention plus position-wise feed-forward layers. If every token can attend directly to every other token, the path between any two positions has constant length and the whole sequence can be processed in parallel."
+  solution: "Self-attention lets each token compute a relevance score against every other token and pull in a weighted mix of their values. Multiple 'heads' run in parallel so the model can attend to information from different representation subspaces at once. Because attention alone has no sense of order, a positional encoding is added to the inputs. Blocks of attention + feed-forward, wrapped in residual connections and layer normalization, are stacked into an encoder and a decoder."
+  outcome: "On WMT 2014 translation the authors report 28.4 BLEU (English–German) and 41.8 BLEU (English–French), the latter after 3.5 days on eight GPUs, a small fraction of the training cost of earlier models. BERT (encoder), GPT (decoder) and the Vision Transformer (images) are built from it."
 
 build_steps:
   - { title: "1. Embed the tokens", detail: "Turn each token into a vector (its learned meaning). This is the residual stream every later layer reads from and writes back to." }
-  - { title: "2. Add position", detail: "Attention is order-blind, so add a positional signal (sinusoidal in the original, rotary positional embedding (RoPE) in modern LLMs) so the model knows word 3 came before word 7." }
+  - { title: "2. Add position", detail: "Attention is order-blind, so add a positional signal (sine and cosine functions in the original; rotary positional embeddings (RoPE) in LLaMA, for example) so the model knows word 3 came before word 7." }
   - { title: "3. Project to Q, K, V", detail: "From each token vector compute three views: a Query (what am I looking for?), a Key (what do I offer?), and a Value (what will I hand over if chosen?)." }
   - { title: "4. Score and mix (self-attention)", detail: "Each Query dot-products with every Key to get relevance scores, softmax turns them into weights, and each token receives a weighted sum of Values. Now every token carries context from the whole sequence." }
-  - { title: "5. Use many heads", detail: "Run steps 3–4 several times in parallel with different learned projections, then concatenate. Different heads specialize in different relationships." }
-  - { title: "6. Feed-forward + residual + norm", detail: "Each token passes through a small multi-layer perceptron (MLP) for extra nonlinear processing; residual connections and layer normalization keep gradients stable so the stack can go deep." }
-  - { title: "7. Stack N blocks", detail: "Repeat the attention + feed-forward block: six times in the encoder and six in the decoder of the original, dozens of times in modern models. Each decoder block also masks its self-attention so a position sees only earlier ones, and attends over the encoder's output. Depth is what turns 'mixing context' into genuine understanding." }
+  - { title: "5. Use many heads", detail: "Run steps 3–4 several times in parallel with different learned projections (eight heads in the original), then concatenate, so the model can attend to information from different representation subspaces." }
+  - { title: "6. Feed-forward + residual + norm", detail: "Each position passes through the same feed-forward network; in the original it is two linear transformations with a ReLU in between (512 → 2048 → 512). Each sub-layer is wrapped in a residual connection followed by layer normalization." }
+  - { title: "7. Stack N blocks", detail: "Repeat the attention + feed-forward block: six times in the encoder and six in the decoder of the original. Each decoder block also masks its self-attention so a position sees only earlier ones, and attends over the encoder's output." }
 
 key_equation:
   latex: "\\mathrm{Attention}(Q,K,V)=\\mathrm{softmax}\\!\\left(\\frac{QK^{\\top}}{\\sqrt{d_k}}\\right)V"
@@ -49,15 +49,15 @@ key_equation:
     - { symbol: "d_k", meaning: "key dimension; dividing by its square root keeps the scores in a stable range" }
 
 strengths:
-  - "Fully parallel across the sequence — trains far faster than RNNs on modern GPUs/TPUs."
-  - "Direct token-to-token paths, so long-range dependencies are as easy to learn as short ones."
-  - "Scales smoothly and predictably with depth, width, data, and compute."
-  - "One architecture generalizes across text, vision, audio, and code."
+  - "More parallelizable than recurrent models; the authors report significantly less training time."
+  - "A constant number of sequential operations connects any two positions, against O(n) for a recurrent layer."
+  - "For Transformer language models, Kaplan et al. (2020) report loss falling as a power law in model size, data and compute."
+  - "The same architecture applies to images when patches are treated as tokens (Vision Transformer)."
 
 weaknesses:
-  - "Attention cost grows quadratically with sequence length (O(n²)), making very long contexts expensive."
-  - "No built-in notion of order — position must be injected, and getting it right (e.g. RoPE) matters."
-  - "Data- and compute-hungry; small-data regimes often still favor convolutional or recurrent priors."
+  - "Self-attention costs O(n²·d) per layer, quadratic in sequence length n, making very long contexts expensive."
+  - "No built-in notion of order: position information must be injected."
+  - "In vision, the Vision Transformer authors report it trails comparable ResNets when trained on mid-sized datasets such as ImageNet without strong regularization."
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 860 562" role="img" aria-label="The original Transformer: on the left an encoder layer, multi-head self-attention then feed-forward, each followed by Add and Norm, repeated six times; on the right a decoder layer, masked self-attention, attention over the encoder output, and feed-forward, each followed by Add and Norm, repeated six times, then a linear layer and softmax. Embeddings plus positional encoding enter at the bottom and dashed lines are residual connections.">
@@ -154,11 +154,11 @@ diagram_svg: |
   </svg>
 diagram_caption: "The original Transformer: six encoder layers (self-attention, feed-forward) and six decoder layers (masked self-attention, attention over the encoder output, feed-forward), each sub-layer wrapped in a residual and LayerNorm."
 notable_models:
-  - { name: "Transformer", year: 2017, note: "The original — proved attention alone beats recurrence at machine translation, in less training time." }
-  - { name: "BERT", year: 2018, note: "Took the encoder half and showed bidirectional pretraining gives state-of-the-art language understanding." }
-  - { name: "GPT", year: 2018, note: "Took the decoder half and showed autoregressive pretraining scales into a general-purpose generator." }
+  - { name: "Transformer", year: 2017, note: "The original: an attention-only model that outperformed earlier translation systems on WMT 2014 with less training time." }
+  - { name: "BERT", year: 2018, note: "Took the encoder and pretrained it bidirectionally, reporting new state-of-the-art results on eleven language tasks." }
+  - { name: "GPT", year: 2018, note: "Took the decoder (12 layers, masked self-attention) for generative pretraining followed by fine-tuning on each task." }
   - { name: "T5", year: 2019, note: "Kept the full encoder-decoder and cast every NLP task as text-to-text." }
-  - { name: "Vision Transformer (ViT)", year: 2020, note: "Proved the same architecture works on images by treating patches as tokens." }
+  - { name: "Vision Transformer (ViT)", year: 2020, note: "Applied the same architecture to images by treating patches as tokens." }
 
 resources:
   - { kind: blog, title: "The Illustrated Transformer (Jay Alammar)", url: "https://jalammar.github.io/illustrated-transformer/" }
@@ -172,25 +172,48 @@ learn_first:
   - { label: "Softmax & dot products", href: "/learn/concepts/softmax", tag: "Math" }
 
 tags: [transformer, attention, self-attention, foundational, llm]
-updated: 2026-11-19
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.98 }
   - { url: "https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer (Jay Alammar)", trust: 0.9 }
   - { url: "https://nlp.seas.harvard.edu/annotated-transformer/", title: "The Annotated Transformer (Harvard NLP)", trust: 0.9 }
+  - { url: "https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf", title: "Improving Language Understanding by Generative Pre-Training (Radford et al., 2018)", trust: 0.95 }
+  - { url: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf", title: "Language Models are Unsupervised Multitask Learners (Radford et al., 2019)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2005.14165", title: "Language Models are Few-Shot Learners (Brown et al., 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2010.11929", title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2001.08361", title: "Scaling Laws for Neural Language Models (Kaplan et al., 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1910.10683", title: "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer (Raffel et al., 2019)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2401.04088", title: "Mixtral of Experts (Jiang et al., 2024)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2403.08295", title: "Gemma: Open Models Based on Gemini Research and Technology (Gemma Team, 2024)", trust: 0.95 }
+  - { url: "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3/blob/main/config.json", title: "mistralai/Mistral-7B-Instruct-v0.3 — config.json", trust: 0.9 }
+  - { url: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/config.json", title: "Qwen/Qwen2.5-7B-Instruct — config.json", trust: 0.9 }
+  - { url: "https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json", title: "deepseek-ai/DeepSeek-V3 — config.json", trust: 0.9 }
+  - { url: "https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/blob/main/config.json", title: "microsoft/Phi-3-mini-4k-instruct — config.json", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/1907.11692", title: "RoBERTa: A Robustly Optimized BERT Pretraining Approach (Liu et al., 2019)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2006.03654", title: "DeBERTa: Decoding-enhanced BERT with Disentangled Attention (He et al., 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2003.10555", title: "ELECTRA: Pre-training Text Encoders as Discriminators Rather Than Generators (Clark et al., 2020)", trust: 0.95 }
+  - { url: "https://huggingface.co/BAAI/bge-large-en-v1.5/blob/main/config.json", title: "BAAI/bge-large-en-v1.5 — config.json", trust: 0.9 }
+  - { url: "https://huggingface.co/intfloat/e5-large-v2/blob/main/config.json", title: "intfloat/e5-large-v2 — config.json", trust: 0.9 }
+  - { url: "https://huggingface.co/thenlper/gte-large/blob/main/config.json", title: "thenlper/gte-large — config.json", trust: 0.9 }
+  - { url: "https://huggingface.co/google-t5/t5-base/blob/main/config.json", title: "google-t5/t5-base — config.json", trust: 0.9 }
+  - { url: "https://huggingface.co/google/flan-t5-base/blob/main/config.json", title: "google/flan-t5-base — config.json", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/1910.13461", title: "BART: Denoising Sequence-to-Sequence Pre-training for Natural Language Generation, Translation, and Comprehension (Lewis et al., 2019)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2001.08210", title: "Multilingual Denoising Pre-training for Neural Machine Translation (Liu et al., 2020)", trust: 0.95 }
+  - { url: "https://huggingface.co/facebook/nllb-200-distilled-600M/blob/main/config.json", title: "facebook/nllb-200-distilled-600M — config.json", trust: 0.9 }
+  - { url: "https://huggingface.co/google/ul2/blob/main/config.json", title: "google/ul2 — config.json", trust: 0.9 }
 variants:
 - name: Decoder-only (Autoregressive)
   subtitle: Causal attention · next-token prediction
   models:
-  - GPT-2/3/4/4o
-  - Claude
-  - Gemini
-  - Llama 1-4
+  - GPT-2/3
+  - Llama
   - Mistral/Mixtral
   - Qwen
   - DeepSeek
   - Phi
   - Gemma
-  - Command R+
 - name: Encoder-only (Understanding)
   subtitle: Bidirectional · masked LM · embeddings
   models:
@@ -213,20 +236,20 @@ variants:
 ---
 
 ## What Changed
-Recurrent models read a sentence the way you read aloud — one word at a time, carrying a memory
-forward. That memory is a bottleneck: it blurs over long distances and forbids parallelism, because
-step 50 cannot start until step 49 finishes. The Transformer discards recurrence entirely. Every
-token is compared against every other token directly, in one parallel operation, so *distance no
-longer costs anything* and the whole sequence trains at once. This is why the architecture scaled
-where its predecessors stalled.
+Recurrent models read a sentence one token at a time, carrying a hidden state forward. That
+sequential dependency **forbids parallelism within a sequence**: step 50 cannot start until step 49
+finishes.
+
+The Transformer (Vaswani et al., 2017) **discards recurrence and convolution**. Every token is
+compared against every other token directly, so any two positions are connected by a constant number
+of operations and the whole sequence is processed in parallel.
 
 ## Key Ideas
 - **Self-attention is a soft lookup.** Each token issues a query, matches it against every key, and
-  retrieves a weighted blend of values — a differentiable, learned "search" over the sequence.
-- **Multiple heads see multiple relationships.** One head might track subject–verb agreement, another
-  long-range coreference; concatenating them gives a richer mix than any single attention pattern.
-- **Position is added, not assumed.** Because attention is a set operation, order is injected via
-  positional encodings — the one thing self-attention cannot infer on its own.
-- **Depth plus residuals is the engine.** Stacking many attention + feed-forward blocks, kept stable
-  by residual connections and normalization, is what converts context-mixing into understanding — and
-  what keeps paying off as models grow.
+  retrieves a weighted blend of values.
+- **Multiple heads attend to different subspaces.** The authors report that individual heads learn
+  different tasks, many related to the syntactic and semantic structure of sentences.
+- **Position is added, not assumed.** Self-attention has no notion of order, so positional encodings
+  are added to the input embeddings.
+- **Attention plus feed-forward, stacked.** Each layer pairs attention with a position-wise
+  feed-forward network, both wrapped in residual connections and normalization.

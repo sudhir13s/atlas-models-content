@@ -12,8 +12,17 @@ architectures:
 models: []
 tags:
 - model-history
-updated: '2026-11-19'
-sources: []
+updated: '2026-11-21'
+sources:
+- url: https://openai.com/index/chatgpt/
+  title: Introducing ChatGPT (OpenAI, 30 November 2022)
+  trust: 0.85
+- url: https://arxiv.org/abs/2203.02155
+  title: Training language models to follow instructions with human feedback (arXiv:2203.02155)
+  trust: 0.95
+- url: https://arxiv.org/abs/2205.14135
+  title: 'FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness (arXiv:2205.14135)'
+  trust: 0.95
 ---
 
 

@@ -8,28 +8,35 @@ category: activation
 code: swiglu
 aliases: []
 order: 3
-short_description: Gated SiLU — splits the FFN into two paths and multiplies them.
+short_description: A gated feed-forward layer, multiplying a Swish-activated projection by a linear one.
 example_models:
-- Llama 2/3
+- Llama
 - Mistral
-- Gemma 2
 - PaLM
-- Command R
 tags:
 - activation
 - swiglu
-updated: '2026-11-19'
-sources: []
+updated: '2026-11-21'
+sources:
+- url: https://arxiv.org/abs/2002.05202
+  title: GLU Variants Improve Transformer (arXiv:2002.05202)
+  trust: 0.95
+- url: https://arxiv.org/abs/2204.02311
+  title: 'PaLM: Scaling Language Modeling with Pathways (arXiv:2204.02311)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (arXiv:2302.13971)'
+  trust: 0.95
 ---
 
 ## What It Is
 
-Combines SiLU with a gating mechanism: the feed-forward layer is split into two parallel projections. One goes through SiLU, the other stays linear, and they are multiplied together. This 'gated' approach gives the network more control over information flow.
+A variant of the gated linear unit (GLU), introduced by Noam Shazeer in 2020. The feed-forward layer computes two linear projections of the input, passes one through Swish, multiplies them element by element, and projects the result back: (Swish(xW) ⊗ xV)W₂.
 
 ## Why It Matters
 
-The most popular FFN activation in modern LLMs. The gating adds expressive power with only marginal extra compute. Introduced by Shazeer (2020) and widely adopted after PaLM and Llama showed strong results.
+Shazeer reports that GLU variants in the Transformer's feed-forward sub-layers improve quality over ReLU or GELU, with SwiGLU and GEGLU giving the best perplexities. PaLM and LLaMA both replace the ReLU feed-forward layer with SwiGLU.
 
 ## Trade-off
 
-Requires ~33% more FFN parameters (three projections instead of two). Most architectures reduce the hidden dimension to compensate, keeping total params similar.
+The layer has three weight matrices instead of two. To keep parameters and compute constant, Shazeer reduces the hidden size by a factor of 2/3; LLaMA uses a hidden size of 2/3·4d instead of 4d.

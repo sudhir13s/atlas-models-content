@@ -5,6 +5,19 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Accuracy pass over the teaching records (content only; no schema change)
+
+- **Fixed** attributions, definitions, dates and example-model lists in all `concepts/`,
+  `architectures/` and `milestones/` records so each statement rests on a cited primary source
+  (the introducing paper, an official model card or config). Statements no source supports were
+  removed or reduced to what the source states; superlatives and influence claims were removed.
+- **Fixed** origins credited to a model that popularised a technique instead of the paper that
+  introduced it (for example mixture-of-experts now cites Shazeer et al. 2017, diffusion cites
+  Sohl-Dickstein et al. 2015, grouped-query attention cites Ainslie et al. 2023).
+- **Fixed** the 2025 milestone title: Phi-4 was removed because its technical report dates from
+  December 2024.
+- **Added** source links to every milestone and concept record.
+
 ### Schema 2.1 for `model` (a fuller entry written by the prose queue; additive)
 
 - **Added** four prose fields beside `summary`: `intended_use`, `what_sets_it_apart`,

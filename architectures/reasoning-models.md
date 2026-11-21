@@ -9,38 +9,38 @@ era: post-transformer
 era_range: "2024–2026"
 year: 2024
 family: llm
-core_innovation: "RL-trained long chain-of-thought that spends more inference-time compute to reason before answering — scaling test-time, not just training."
-description: "The o1/R1 generation that learns to think in long internal chains, trading inference compute for accuracy on hard problems."
-key_features: ["Long chain-of-thought generation", "RL on verifiable rewards", "Inference-time (test-time) compute scaling", "Self-checking and backtracking", "Emergent reasoning from RL"]
+core_innovation: "A long chain of thought, trained with large-scale reinforcement learning, generated before the answer, so that more inference-time compute buys accuracy."
+description: "Models such as OpenAI o1 and DeepSeek-R1, trained with reinforcement learning to reason at length before answering; accuracy improves with more test-time compute."
+key_features: ["Long chain of thought before the answer", "Trained with large-scale reinforcement learning", "Accuracy improves with more test-time compute", "Self-correction within the chain of thought"]
 key_models: ["OpenAI o1 (2024)", "DeepSeek-R1 (2025)", "o3 (2025)"]
 paper_title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"
 paper_url: "https://arxiv.org/abs/2501.12948"
 influenced_by: [architecture-era/rlhf, architecture-era/mixture-of-experts]
 led_to: []
 
-eli5: "Normal chatbots blurt out an answer at the same speed whether the question is easy or a hard math problem. Reasoning models learn to think first — writing out a long private train of thought, checking their own steps, and backing up when they're wrong — before answering. The longer you let them think, the more they get right."
+eli5: "A standard chatbot starts writing its answer straight away. A reasoning model first writes out a long train of thought, checking its own steps and trying another approach when one fails, and only then answers. Letting it think longer tends to give more correct answers on hard problems."
 
 analogy:
   title: "The student who shows their work"
-  body: "Two students take a hard math exam. The first writes the answer instantly from gut feel and often gets it wrong. The second scribbles pages of working — trying an approach, spotting a mistake, crossing it out, trying another — and only then circles a final answer. Reasoning models are the second student, and they were trained the way you'd coach one: not by handing them worked solutions, but by checking whether their final answer is right and rewarding the trains of thought that lead to correct answers. Give them a bigger scratchpad (more thinking tokens) and their scores keep climbing."
+  body: "Two students take a hard maths exam. The first writes an answer straight away. The second fills pages with working, spots a mistake, crosses it out, tries another approach, and only then circles a final answer. Reasoning models are the second student, and they were coached by checking whether the final answer is right rather than by copying worked solutions."
 
 narrative:
-  motivation: "Standard LLMs answer in roughly constant compute: whatever the question, they emit tokens at the same per-token cost, so a hard math or coding problem gets no more 'thinking' than an easy one. Prompting a model to reason step by step helped, but the model wasn't actually trained to reason well — to plan, verify, and recover from wrong turns."
-  approach: "Change the scaling axis from bigger-model to more-thinking. Train the model — largely with reinforcement learning on verifiable rewards, problems whose answers can be automatically checked — to generate a long internal chain of thought before committing. The reward comes from getting the final answer right, so the model is free to discover whatever reasoning strategy works."
-  solution: "The model learns to produce long reasoning traces: working through steps, checking itself, and backtracking when a path fails. DeepSeek-R1 notably showed this behavior can emerge from RL with minimal supervised hand-holding, given only a correctness signal — the model teaches itself to reason. Because the reward is automatic (a checker, not a human), the loop scales cheaply compared to human-preference RLHF."
-  outcome: "The striking result is inference-time scaling: accuracy on hard reasoning benchmarks keeps improving as you let the model spend more tokens — more compute — thinking at test time. That's a new lever, orthogonal to making the model bigger or training it longer. These models reuse the RLHF preference-optimization machinery (swapping human preference for verifiable correctness) and typically run on efficient MoE backbones, placing them at the current frontier."
+  motivation: "Chain-of-thought prompting (Wei et al., 2022) improved reasoning by showing models worked examples. The DeepSeek-R1 authors note that this success depends heavily on human-annotated demonstrations and is still insufficient for complex problems."
+  approach: "Train the model with large-scale reinforcement learning to produce a long chain of thought before its answer. DeepSeek-R1 rewards the model with rule-based checks of answer accuracy and output format on problems whose answers can be verified, without human-labelled reasoning trajectories."
+  solution: "During reinforcement learning the model's chains of thought grow longer, and patterns such as self-reflection, verification and changing strategy appear. OpenAI reports that o1 learns to recognise and correct its mistakes and to try a different approach when one fails."
+  outcome: "OpenAI reports that o1's performance improves with more reinforcement learning (train-time compute) and with more time spent thinking (test-time compute). DeepSeek-R1's authors report strong results on mathematics, coding competitions and STEM tasks, and distilled its reasoning into smaller public models."
 
 build_steps:
-  - { title: "1. Start from a strong base model", detail: "Begin with a capable pretrained (and often instruction-tuned) LLM — usually on an efficient MoE backbone to make long generations affordable to serve." }
-  - { title: "2. Pick tasks with checkable answers", detail: "Focus on problems where correctness can be verified automatically — math with known answers, code that must pass tests. This gives a clean, cheap reward signal." }
-  - { title: "3. Reward correct final answers", detail: "Use reinforcement learning where the reward depends on whether the final answer is right (plus light format rewards), not on imitating a human-written solution." }
-  - { title: "4. Let long reasoning emerge", detail: "Optimizing for correctness, the model learns on its own to generate long chains of thought — planning, self-checking, and backtracking — because those traces earn more reward." }
-  - { title: "5. Optionally distill and polish", detail: "Distill the reasoning behavior into smaller models, and add a light supervised or preference stage to make the traces readable and the model well-behaved." }
-  - { title: "6. Scale compute at inference", detail: "At test time, spend more thinking tokens (or sample several chains and vote) on hard problems. Accuracy rises with the compute you're willing to spend." }
+  - { title: "1. Start from a pretrained base model", detail: "DeepSeek-R1-Zero applies reinforcement learning directly to the DeepSeek-V3 base model." }
+  - { title: "2. Pick tasks with checkable answers", detail: "Use problems whose correctness can be verified automatically, such as maths with known answers or code that must pass tests." }
+  - { title: "3. Reward correct final answers", detail: "Reward the final answer's accuracy plus the output format (reasoning inside <think> tags), with rule-based checks rather than a neural reward model, as DeepSeek-R1 does." }
+  - { title: "4. Let long reasoning develop", detail: "Under this reward, DeepSeek-R1-Zero's thinking time grows steadily through training, with self-reflection and verification in its chains of thought." }
+  - { title: "5. Optionally add cold-start data and distil", detail: "DeepSeek-R1 first fine-tunes on a small set of long chain-of-thought examples before reinforcement learning, and its reasoning is distilled into smaller models." }
+  - { title: "6. Scale compute at inference", detail: "At test time, allow more thinking on hard problems; OpenAI reports o1 and o3 improve the longer they are allowed to think." }
 
 key_equation:
   latex: "P(a \\mid q) = \\sum_{r} P(r \\mid q)\\, P(a \\mid q, r)"
-  plain: "The probability of a correct answer is a sum over all possible reasoning chains: how likely the model is to think of each chain, times how likely that chain leads to the right answer. Training pushes probability toward reasoning chains r that produce correct answers; at inference, sampling more or longer chains explores more of this sum, which is why spending more thinking-time compute buys more accuracy."
+  plain: "The probability of an answer is a sum over possible reasoning chains: how likely the model is to write each chain, times how likely that chain leads to the answer. Rewarding correct final answers pushes probability toward chains that reach them."
   terms:
     - { symbol: "q", meaning: "the question or problem prompt" }
     - { symbol: "a", meaning: "the final answer the model commits to" }
@@ -49,16 +49,15 @@ key_equation:
     - { symbol: "P(a | q, r)", meaning: "how likely that chain leads to answer a — reasoning that reaches the correct answer is what training rewards" }
 
 strengths:
-  - "Large accuracy gains on hard math, coding, and logic where step-by-step reasoning matters."
-  - "Inference-time scaling: a new knob — spend more thinking tokens to get better answers, no retraining needed."
-  - "RL on verifiable rewards is automatic and cheap to scale — no expensive human labels in the core loop."
-  - "Reasoning behavior can emerge from RL alone, and can be distilled into smaller, cheaper models."
+  - "Reported gains on mathematics, coding competitions and STEM tasks."
+  - "More thinking at test time improves results without retraining, per OpenAI's o1 and o3 reports."
+  - "DeepSeek-R1's rewards are rule-based checks, so the reasoning trajectories need no human labels."
+  - "Reasoning can be distilled into smaller models."
 
 weaknesses:
-  - "Long chains of thought make each answer slower and more expensive to generate."
-  - "Verifiable rewards mostly cover math/code; open-ended tasks lack a clean automatic correctness signal."
-  - "Reasoning can overthink easy questions, and the visible trace may not faithfully reflect the real computation."
-  - "Reward hacking risk — the model can learn to satisfy the checker without genuinely solving the problem."
+  - "Every reasoning token is generated before the answer and, in the OpenAI API, billed as an output token."
+  - "Rule-based rewards need problems whose answers can be checked automatically."
+  - "For o1, users see only a model-generated summary of the chain of thought, not the raw reasoning."
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 860 462" role="img" aria-label="A reasoning model's response as a token timeline: after the prompt it generates a long span of reasoning tokens, often hidden from the user but billed and counted as output, then a short final answer; more reasoning tokens cost latency and money and raise accuracy on multi-step problems, and the behaviour is trained with reinforcement learning on problems whose answers can be checked automatically.">
@@ -109,7 +108,7 @@ diagram_svg: |
   <text class="d-title" x="129" y="40" text-anchor="middle">Prompt</text>
   <text class="d-note" x="129" y="53" text-anchor="middle">input tokens</text>
   <path class="d-line-strong" d="M195.5 64 V58 H696.5 V64"/>
-  <text class="d-title" x="446" y="40" text-anchor="middle">Reasoning span: hundreds to thousands of tokens</text>
+  <text class="d-title" x="446" y="40" text-anchor="middle">Reasoning span: a long chain of thought</text>
   <text class="d-note" x="446" y="53" text-anchor="middle">in DeepSeek-R1 written between &lt;think&gt; and &lt;/think&gt;</text>
   <path class="d-line-strong" d="M708.5 64 V58 H785.5 V64"/>
   <text class="d-title" x="747" y="40" text-anchor="middle">Answer</text>
@@ -159,10 +158,10 @@ diagram_svg: |
   </svg>
 diagram_caption: "A reasoning model writes a long, often hidden reasoning span before a short answer; all of it is billed output, so more thinking costs latency and money for accuracy (schematic). RL on automatically checkable answers trains it."
 notable_models:
-  - { name: "OpenAI o1", year: 2024, note: "First mainstream reasoning model — demonstrated inference-time scaling, with accuracy rising as it spent more thinking compute." }
-  - { name: "DeepSeek-R1", year: 2025, note: "Showed strong reasoning can emerge from RL on verifiable rewards with minimal supervised data — and released the recipe openly." }
-  - { name: "DeepSeek-R1-Zero", year: 2025, note: "Pure-RL variant with no supervised fine-tuning first, proving reasoning behavior can bootstrap from a correctness signal alone." }
-  - { name: "o3", year: 2025, note: "Pushed inference-time scaling further, reaching new highs on hard reasoning and coding benchmarks." }
+  - { name: "OpenAI o1", year: 2024, note: "Trained with large-scale reinforcement learning; OpenAI reports performance improving with both train-time and test-time compute." }
+  - { name: "DeepSeek-R1", year: 2025, note: "Cold-start fine-tuning on long chain-of-thought data, then reinforcement learning with rule-based rewards; smaller distilled models were released." }
+  - { name: "DeepSeek-R1-Zero", year: 2025, note: "Reinforcement learning applied directly to the DeepSeek-V3 base model, without human-labelled reasoning trajectories." }
+  - { name: "o3", year: 2025, note: "OpenAI reports an additional order of magnitude in training compute and inference-time reasoning over o1." }
 
 resources:
   - { kind: paper, title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning (DeepSeek-AI, 2025)", url: "https://arxiv.org/abs/2501.12948" }
@@ -172,38 +171,35 @@ resources:
 
 learn_first:
   - { label: "RLHF & preference-optimization machinery", href: "/models/architecture/rlhf", tag: "Concept" }
-  - { label: "Mixture of Experts (the usual efficient backbone)", href: "/models/architecture/mixture-of-experts", tag: "Architecture" }
+  - { label: "Mixture of Experts (DeepSeek-R1's base model)", href: "/models/architecture/mixture-of-experts", tag: "Architecture" }
   - { label: "Chain-of-thought prompting", href: "/learn/concepts/chain-of-thought", tag: "Concept" }
 
 tags: [reasoning, chain-of-thought, rl, test-time-compute, llm]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/2501.12948", title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning (DeepSeek-AI, 2025)", trust: 0.95 }
+  - { url: "https://openai.com/index/introducing-o3-and-o4-mini/", title: "Introducing OpenAI o3 and o4-mini (OpenAI, 16 April 2025)", trust: 0.85 }
   - { url: "https://arxiv.org/abs/2201.11903", title: "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models (Wei et al., 2022)", trust: 0.9 }
   - { url: "https://openai.com/index/learning-to-reason-with-llms/", title: "Learning to reason with LLMs (OpenAI, 2024): accuracy against test-time compute; the raw chain of thought is shown only as a summary", trust: 0.85 }
   - { url: "https://developers.openai.com/api/docs/guides/reasoning", title: "Reasoning models guide (OpenAI API): reasoning tokens are not visible, are billed as output and count against the output limit", trust: 0.85 }
 ---
 
 ## What Changed
-Standard LLMs answer in roughly constant compute: whatever the question, they emit tokens at the same
-per-token cost, so a hard maths or coding problem gets no more "thinking" than an easy one. Reasoning
-models change the scaling axis. They are trained — largely with **reinforcement learning on verifiable
-rewards** (problems where an answer can be automatically checked correct) — to generate a long internal
-**chain of thought** before committing to an answer: working through steps, checking themselves, and
-backtracking when a path fails. DeepSeek-R1 notably showed that this reasoning behaviour can *emerge*
-from RL with minimal supervised hand-holding, given a correctness signal. The striking result is
-**inference-time scaling**: accuracy on hard reasoning benchmarks keeps improving as you let the model
-spend more tokens (more compute) thinking at test time — a new lever orthogonal to making the model
-bigger or training it longer. These models build on the RLHF preference-optimization machinery
-(swapping human preference for verifiable correctness) and typically run on efficient MoE backbones,
-placing them at the current frontier of the timeline.
+Reasoning models are trained with **large-scale reinforcement learning** to write a long **chain of
+thought** before their answer.
+
+- OpenAI reports that o1's performance improves with more reinforcement learning and with more time
+  spent thinking at test time (**inference-time scaling**).
+- DeepSeek-R1 uses rule-based rewards for answer accuracy and format on checkable problems; its
+  authors report self-reflection and verification appearing during training.
+- Smaller models can learn the behaviour by distillation.
 
 ## Key Ideas
-- **Long chain-of-thought** — the model reasons at length internally before answering, exploring and
-  checking intermediate steps rather than replying in one shot.
-- **RL on verifiable rewards** — for tasks with a checkable answer (math, code), correctness provides a
-  clean reward signal, and reasoning strategies emerge from optimizing it.
-- **Inference-time scaling** — spending more test-time compute (more reasoning tokens) buys more
-  accuracy, a scaling knob separate from parameters and training data.
-- **Builds on RLHF + MoE** — it reuses preference-style RL optimization with an automated reward, and
-  commonly rides on sparse MoE models for efficient serving of long reasoning traces.
+- **Long chain of thought**: the model works through, checks and revises intermediate steps before
+  answering.
+- **Reinforcement learning on checkable answers**: in DeepSeek-R1, correctness and format checks
+  provide the reward, with no human-labelled reasoning trajectories.
+- **Inference-time scaling**: more test-time compute (more reasoning tokens) improves accuracy, a
+  lever separate from parameters and training data.
+- **Relation to RLHF**: both fine-tune with reinforcement learning; DeepSeek-R1 replaces a learned
+  preference model with rule-based rewards for reasoning tasks.

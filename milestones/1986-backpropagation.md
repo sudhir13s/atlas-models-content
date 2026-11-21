@@ -11,8 +11,11 @@ architectures:
 models: []
 tags:
 - model-history
-updated: '2026-11-19'
-sources: []
+updated: '2026-11-21'
+sources:
+- url: https://doi.org/10.1038/323533a0
+  title: Learning Representations by Back-Propagating Errors (Rumelhart, Hinton and Williams, 1986, Nature 323)
+  trust: 0.9
 ---
 
 

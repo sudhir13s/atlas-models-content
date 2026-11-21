@@ -10,8 +10,8 @@ era_range: "2022–2024"
 year: 2022
 family: llm
 core_innovation: "Train a reward model on human preference comparisons, then fine-tune the language model with reinforcement learning plus a KL penalty to align it to human intent."
-description: "The alignment recipe (InstructGPT) that turned raw next-token predictors into helpful, instruction-following assistants."
-key_features: ["Supervised instruction fine-tuning", "Preference-trained reward model", "PPO policy optimization", "KL penalty to the reference model", "Helpfulness/harmlessness alignment"]
+description: "Fine-tuning language models with human preference comparisons, as in InstructGPT, to follow instructions and user intent."
+key_features: ["Supervised fine-tuning on human demonstrations", "Reward model trained on human preference comparisons", "Reinforcement learning against the reward model (PPO in InstructGPT)", "KL penalty to the supervised reference model"]
 key_models: ["InstructGPT (2022)", "ChatGPT (2022)", "Llama-2-Chat (2023)"]
 paper_title: "Training Language Models to Follow Instructions with Human Feedback (InstructGPT)"
 paper_url: "https://arxiv.org/abs/2203.02155"
@@ -25,22 +25,22 @@ analogy:
   body: "Picture a hugely well-read intern who can imitate any text but has no idea what you actually want — ask a question and they might reply with more questions, because that's a plausible way text continues. You can't hand-write the perfect answer for every situation, but you can look at two of their drafts and say 'this one's better.' A coach (the reward model) watches enough of these comparisons to internalize your taste, then gives the intern a score on every draft. The intern practices to raise their score — while a leash keeps them writing like themselves so they don't start gaming the coach with weird gibberish. The comparisons are human feedback; the coach is the reward model; the leash is the KL penalty."
 
 narrative:
-  motivation: "A base GPT model is trained to predict likely next tokens — which is not the same as being helpful. Ask it a question and it might continue with more questions, or drift off-topic, because those are plausible text continuations. The gap between 'predict text' and 'do what the user wants' is the alignment problem, and next-token training alone doesn't close it."
-  approach: "Optimize for human preference directly. But humans can't write a perfect answer for every prompt, and can't put an absolute number on quality. What they can do reliably is compare: shown two responses, say which is better. So the recipe learns from comparisons, distills them into an automatic scorer, and then trains the model to score well."
-  solution: "InstructGPT runs three stages. First, supervised fine-tuning on human-written demonstrations teaches the base format of a good answer. Second, a reward model is trained on human comparisons to predict which response people prefer. Third, reinforcement learning (PPO) updates the language model to maximize that reward — with a KL-divergence penalty anchoring it to the original model so it improves preference without drifting into degenerate or off-distribution text."
-  outcome: "The jump in perceived helpfulness was striking — even smaller aligned models were preferred over much larger unaligned ones. This is what made ChatGPT and every modern assistant feel usable rather than merely fluent. RLHF became the standard finishing step for chat models, and its preference-optimization machinery is the exact foundation the later RL-trained reasoning models build on (swapping human preference for verifiable correctness)."
+  motivation: "The InstructGPT authors note that making language models bigger does not by itself make them better at following a user's intent: large models can produce untruthful, toxic or unhelpful outputs."
+  approach: "Learn from human preferences. Christiano et al. (2017) trained reinforcement-learning agents from human comparisons between pairs of behaviours; Ziegler et al. (2019) and Stiennon et al. (2020) applied reward learning from human comparisons to language models."
+  solution: "InstructGPT runs three stages. Supervised fine-tuning of GPT-3 on labeler-written demonstrations; a reward model trained on labeler rankings of model outputs; and reinforcement learning (PPO) against that reward model, with a per-token KL penalty from the supervised model to limit over-optimisation of the reward model."
+  outcome: "In human evaluations, outputs from the 1.3B InstructGPT model were preferred to those of the 175B GPT-3. OpenAI trained ChatGPT with the same methods as InstructGPT, and Llama 2-Chat was tuned with supervised fine-tuning and RLHF."
 
 build_steps:
   - { title: "1. Start from a pretrained base model", detail: "Begin with a raw next-token predictor — knowledgeable and fluent, but not steered toward being helpful or following instructions." }
   - { title: "2. Supervised fine-tuning (SFT)", detail: "Fine-tune on human-written demonstrations of good responses to prompts. This teaches the model the shape of a helpful, instruction-following answer." }
-  - { title: "3. Collect human preference comparisons", detail: "Sample several responses per prompt and have people rank them best-to-worst. Comparisons are cheaper and more consistent than asking humans to score answers absolutely." }
+  - { title: "3. Collect human preference comparisons", detail: "Sample several responses per prompt (4 to 9 in InstructGPT) and have labelers rank them from best to worst." }
   - { title: "4. Train the reward model", detail: "Train a model to predict which response humans prefer, turning the rankings into an automatic scalar reward that stands in for human judgment." }
   - { title: "5. Optimize the policy with PPO", detail: "Use reinforcement learning (PPO) to update the language model so its responses earn higher reward, generating fresh samples and improving against the reward model." }
-  - { title: "6. Leash it with a KL penalty", detail: "Penalize drift from the SFT reference model via a KL-divergence term. This keeps generations fluent and on-distribution and blocks reward hacking — exploiting quirks in the reward model." }
+  - { title: "6. Leash it with a KL penalty", detail: "Penalise drift from the SFT reference model with a per-token KL-divergence term, which InstructGPT adds to mitigate over-optimisation of the reward model." }
 
 key_equation:
   latex: "\\max_{\\pi_\\theta}\\; \\mathbb{E}_{x \\sim D,\\, y \\sim \\pi_\\theta}\\big[\\, r_\\phi(x, y) \\,\\big] \\;-\\; \\beta\\, \\mathrm{KL}\\big(\\pi_\\theta(y\\mid x)\\,\\|\\,\\pi_{\\mathrm{ref}}(y\\mid x)\\big)"
-  plain: "Adjust the model so its answers earn a high reward from the learned reward model, but subtract a penalty for straying too far from the original reference model. The first term chases human preference; the second term is the leash that keeps the model fluent and stops it from gaming the reward with degenerate text."
+  plain: "Adjust the model so its answers earn a high reward from the learned reward model, minus a penalty for straying too far from the reference model. The first term follows human preference; the second limits over-optimisation of the reward model."
   terms:
     - { symbol: "π_θ", meaning: "the policy — the language model being fine-tuned, with parameters θ" }
     - { symbol: "π_ref", meaning: "the frozen reference model (the SFT model) the policy must stay close to" }
@@ -49,16 +49,14 @@ key_equation:
     - { symbol: "β", meaning: "the penalty strength — how tight the leash is; higher β keeps the model closer to the reference" }
 
 strengths:
-  - "Learns from cheap, reliable human comparisons instead of impossible-to-write perfect answers."
-  - "Dramatically improves perceived helpfulness and instruction-following, even at smaller model sizes."
-  - "The KL leash keeps outputs fluent and on-distribution, curbing reward hacking and mode collapse."
-  - "General finishing step: the same recipe steers helpfulness, harmlessness, tone, and format."
+  - "Learns from human comparisons of model outputs rather than only from written demonstrations."
+  - "InstructGPT's 1.3B model was preferred to 175B GPT-3 by labelers, with gains in truthfulness and less toxic output."
+  - "Mixing in pretraining gradients (PPO-ptx) kept performance regressions on public NLP datasets small."
 
 weaknesses:
-  - "The reward model is an imperfect proxy — optimize it too hard and the policy games it (reward hacking)."
-  - "Human preference data is expensive, slow to collect, and can bake in annotator bias."
-  - "The full PPO loop is complex and finicky, motivating simpler alternatives like DPO."
-  - "Mostly elicits and directs existing abilities rather than adding new capability; it can also over-align into sycophancy or excessive refusals."
+  - "The reward model is a proxy: InstructGPT adds a KL penalty because the policy can over-optimise it."
+  - "Fine-tuning on human preferences cost some performance on public NLP tasks, which the InstructGPT authors call an alignment tax."
+  - "The DPO authors describe RLHF as complex and often unstable: a reward model is fitted, then the model is trained with reinforcement learning."
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 870 520" role="img" aria-label="The three stages of RLHF as in InstructGPT: supervised fine-tuning of GPT-3 on labeler-written answers; a reward model trained on labeler rankings of several sampled answers; and a PPO loop in which the policy answers prompts, the reward model scores each answer, a KL penalty to the frozen supervised model is subtracted, and PPO updates the policy.">
@@ -170,10 +168,10 @@ diagram_svg: |
   </svg>
 diagram_caption: "RLHF as in InstructGPT: fine-tune GPT-3 on labeler-written answers, train a reward model on labeler rankings of sampled answers, then improve the policy with PPO against that reward minus a KL penalty to the frozen SFT model."
 notable_models:
-  - { name: "InstructGPT", year: 2022, note: "Introduced the three-stage RLHF recipe and showed a 1.3B aligned model beating 175B GPT-3 on human preference." }
-  - { name: "ChatGPT", year: 2022, note: "Applied RLHF at scale in a chat interface — the product that made aligned assistants mainstream." }
-  - { name: "Llama-2-Chat", year: 2023, note: "Detailed an open RLHF pipeline with separate helpfulness and safety reward models." }
-  - { name: "DPO-tuned models", year: 2023, note: "Direct Preference Optimization — proved you can hit RLHF-like alignment by optimizing preferences directly, skipping the explicit reward model and PPO loop." }
+  - { name: "InstructGPT", year: 2022, note: "Applied supervised fine-tuning, a reward model and PPO to instruction following; labelers preferred its 1.3B model to 175B GPT-3." }
+  - { name: "ChatGPT", year: 2022, note: "Trained with RLHF using the same methods as InstructGPT, for dialogue." }
+  - { name: "Llama-2-Chat", year: 2023, note: "Open weights tuned with supervised fine-tuning and RLHF, using two separate reward models for helpfulness and safety." }
+  - { name: "DPO-tuned models", year: 2023, note: "Direct Preference Optimization solves the RLHF objective with a classification loss, without sampling from the model during fine-tuning; its authors report results matching or exceeding PPO-based RLHF." }
 
 resources:
   - { kind: paper, title: "Training Language Models to Follow Instructions with Human Feedback (Ouyang et al., 2022)", url: "https://arxiv.org/abs/2203.02155" }
@@ -187,32 +185,31 @@ learn_first:
   - { label: "KL divergence — measuring distribution drift", href: "/learn/concepts/kl-divergence", tag: "Math" }
 
 tags: [rlhf, alignment, instruction-tuning, ppo, llm]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/2203.02155", title: "Training Language Models to Follow Instructions with Human Feedback (Ouyang et al., 2022)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1706.03741", title: "Deep reinforcement learning from human preferences (Christiano et al., 2017)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1909.08593", title: "Fine-Tuning Language Models from Human Preferences (Ziegler et al., 2019)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2009.01325", title: "Learning to summarize from human feedback (Stiennon et al., 2020)", trust: 0.95 }
+  - { url: "https://openai.com/index/chatgpt/", title: "Introducing ChatGPT (OpenAI, 30 November 2022)", trust: 0.85 }
+  - { url: "https://arxiv.org/abs/2307.09288", title: "Llama 2: Open Foundation and Fine-Tuned Chat Models (Touvron et al., 2023)", trust: 0.95 }
   - { url: "https://arxiv.org/abs/2305.18290", title: "Direct Preference Optimization (Rafailov et al., 2023)", trust: 0.9 }
 ---
 
 ## What Changed
-A base GPT model predicts likely next tokens — which is not the same as being *helpful*. Ask it a
-question and it might continue with more questions, because that is a plausible continuation of the
-text. Reinforcement learning from human feedback (RLHF) closes the gap between "predict text" and "do
-what the user wants." The InstructGPT recipe has three stages: (1) **supervised fine-tuning** on
-human-written demonstrations of good responses; (2) train a **reward model** on human *comparisons* —
-people rank several model outputs, and the reward model learns to score responses the way humans would;
-(3) **reinforcement learning** (PPO) that updates the language model to maximise that reward, with a
-**KL-divergence penalty** anchoring it to the original model so it improves preference without drifting
-into degenerate or off-distribution text. The result — a striking jump in perceived helpfulness even at
-smaller sizes — is what made ChatGPT and every modern assistant feel usable. RLHF descends from the GPT
-line and its preference-optimization machinery is the foundation the later RL-trained reasoning models
-build on.
+Larger language models are not automatically better at following a user's intent. Reinforcement
+learning from human feedback (RLHF) fine-tunes them on human preferences. Reward learning from human
+comparisons comes from Christiano et al. (2017); InstructGPT (Ouyang et al., 2022) uses three stages:
+
+1. **Supervised fine-tuning** on labeler-written demonstrations.
+2. A **reward model** trained on labeler rankings of several model outputs.
+3. **Reinforcement learning** (PPO) against the reward model, with a per-token **KL penalty** from the
+   supervised model.
 
 ## Key Ideas
-- **Preference learning** — humans compare outputs rather than writing perfect answers; ranking is
-  cheaper and more reliable than absolute scoring, and trains the reward model.
-- **Reward model as proxy** — a learned scorer stands in for expensive human judgement so RL can
-  optimise against it at scale.
-- **PPO with a KL leash** — policy-gradient RL maximises reward while a KL penalty to the frozen
-  reference model prevents reward hacking and keeps generations fluent.
-- **Alignment ≠ capability** — RLHF mostly elicits and directs abilities already present from
-  pretraining; it makes models follow intent, not fundamentally smarter.
+- **Preference learning**: labelers rank model outputs, and the rankings train the reward model.
+- **Reward model as proxy**: a learned scorer stands in for human judgement during reinforcement learning.
+- **PPO with a KL penalty**: the policy maximises reward while the KL term limits over-optimisation
+  of the reward model.
+- **Direct alternatives**: DPO optimises the same preference objective with a classification loss,
+  without a separate reinforcement-learning loop.

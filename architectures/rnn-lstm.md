@@ -11,8 +11,8 @@ year: 1997
 family: classical-dl
 core_innovation: "A gated recurrent cell with an additive memory pathway that preserves gradients across long time steps."
 description: "The gated recurrent architecture that made learning long-range sequence dependencies practical."
-key_features: ["Recurrent hidden state", "Constant-error carousel memory cell", "Input/forget/output gates", "Backpropagation through time"]
-key_models: ["LSTM (1997)", "GRU (2014)", "Seq2seq translation systems (2014–2016)"]
+key_features: ["Recurrent hidden state", "LSTM memory cell with a constant error carousel", "Multiplicative gates controlling the memory cell", "Backpropagation through time"]
+key_models: ["LSTM (1997)", "LSTM with forget gate (2000)", "Gated recurrent unit, GRU (2014)", "Sequence-to-sequence LSTM translation (2014)"]
 paper_title: "Long Short-Term Memory"
 paper_url: "https://doi.org/10.1162/neco.1997.9.8.1735"
 influenced_by: [architecture-era/mlp-backprop]
@@ -26,16 +26,16 @@ analogy:
 
 narrative:
   motivation: "Feed-forward networks treat every input independently — they have no memory and no sense of order, which is fatal for language, speech, and time series where meaning lives in the sequence. A recurrent network fixes the framing by threading a hidden state through time, so each output depends on everything seen so far. But there was a crippling training problem."
-  approach: "Training an RNN means backpropagating through time — unrolling the recurrence into one long chain and applying the chain rule across every step. That chain multiplies many gradient terms together, and long products of numbers either shrink toward zero (vanishing gradients) or blow up (exploding gradients). Hochreiter diagnosed this precisely: plain RNNs simply cannot learn dependencies more than a handful of steps apart."
-  solution: "The LSTM introduces a dedicated memory cell whose state is updated by *addition* rather than repeated multiplication — the 'constant error carousel' — so gradients can travel across hundreds of steps without vanishing. Three learned gates control the flow: a forget gate erases stale memory, an input gate writes new information, and an output gate decides what of the memory to expose at each step. The network learns when to remember and when to forget. The 1997 cell had only the input and output gates; the forget gate was added by Gers, Schmidhuber and Cummins in 2000 and is part of every LSTM used since."
-  outcome: "This made long-range sequence learning practical, and for roughly two decades LSTMs (and the streamlined GRU) were the default for translation, speech recognition, and handwriting. They powered the first neural machine-translation systems via the encoder–decoder (seq2seq) design. Their core idea — a selectively, additively updated recurrent state — even resurfaces in today's linear-time state-space models like Mamba. Their one unfixable flaw, strict step-by-step computation, is what the transformer later removed."
+  approach: "Training an RNN means backpropagating through time — unrolling the recurrence into one long chain and applying the chain rule across every step. The LSTM paper states that error signals flowing backwards in time tend to either blow up or vanish, because the backpropagated error depends exponentially on the size of the weights (Hochreiter, 1991); learning to bridge long time lags then takes a prohibitive amount of time or fails."
+  solution: "The LSTM introduces a dedicated memory cell with constant error flow through it, the 'constant error carousel'. The authors report that LSTM can bridge time lags in excess of 1000 discrete time steps. In the 1997 cell an input gate protects the memory from irrelevant inputs and an output gate decides what of the memory to expose at each step. Gers, Schmidhuber and Cummins (2000) added a forget gate that lets the cell learn to reset its state."
+  outcome: "Stacked LSTMs served as encoder and decoder in Sutskever, Vinyals and Le's 2014 sequence-to-sequence translation model. Mamba (2023) also lets its state selectively propagate or forget information along the sequence. Recurrence computes step by step; the Transformer (2017) dispenses with recurrence and is more parallelizable."
 
 build_steps:
   - { title: "1. Carry a hidden state", detail: "Give the network a hidden state vector h that is passed from one time step to the next. It is the network's running memory of everything read so far." }
   - { title: "2. Update it at every step", detail: "At step t, combine the new input x_t with the previous state h_(t−1) through learned weights, apply a non-linearity, and produce the new state h_t. This recurrence is the whole of a plain RNN." }
   - { title: "3. Spot the gradient problem", detail: "Training unrolls the recurrence and backpropagates through time. Multiplying gradients across many steps makes them vanish or explode, so a plain RNN can't learn long-range links." }
-  - { title: "4. Add a protected memory cell", detail: "The LSTM adds a separate cell state c that is edited mainly by addition, not multiplication. This additive path lets gradients flow far back in time undamaged — the constant error carousel." }
-  - { title: "5. Gate the flow", detail: "Three sigmoid gates (values between 0 and 1) control the cell: the forget gate scales down old memory, the input gate lets new content in, and the output gate decides what to read out as h_t." }
+  - { title: "4. Add a protected memory cell", detail: "The LSTM adds a separate cell state c with constant error flow through it, the constant error carousel, so error signals can reach far back in time." }
+  - { title: "5. Gate the flow", detail: "Multiplicative gates control the cell. The 1997 cell has an input gate that lets new content in and an output gate that decides what to read out as h_t; the forget gate, added in 2000, scales down old memory." }
   - { title: "6. Unroll over the sequence", detail: "Apply the gated cell step by step across the whole sequence, carrying c and h forward, so information written early can survive to influence a decision made much later." }
 
 key_equation:
@@ -50,14 +50,13 @@ key_equation:
 
 strengths:
   - "Naturally handles variable-length sequences with a fixed-size set of weights."
-  - "The LSTM's additive memory cell carries information and gradients across hundreds of steps."
+  - "The authors report that LSTM bridges time lags in excess of 1000 discrete time steps."
   - "Gates let the network learn what to remember and forget rather than hard-coding it."
   - "Processes streams online, updating its state one step at a time as data arrives."
 
 weaknesses:
   - "Strictly sequential — step t must wait for step t−1, so training can't parallelize across time."
-  - "Even LSTMs struggle with very long-range dependencies and lose the earliest context."
-  - "The gated cell is more complex and slower per step than a simple feed-forward layer."
+  - "The gated cell needs extra gate units per memory cell, so it is more complex than a plain recurrent unit."
   - "A fixed-size state is a bottleneck: everything seen must be squeezed into one vector."
 
 diagram_svg: |
@@ -154,10 +153,10 @@ diagram_svg: |
   </svg>
 diagram_caption: "One recurrent cell reused at every time step (left), and inside it the LSTM: the cell state runs straight across, scaled by the forget gate and added to by the input gate, while the output gate reads h_t out through tanh."
 notable_models:
-  - { name: "LSTM", year: 1997, note: "Hochreiter & Schmidhuber's gated cell (input and output gates) — proved recurrent nets can learn dependencies hundreds of steps long." }
-  - { name: "LSTM with forget gate", year: 2000, note: "Gers, Schmidhuber & Cummins added the forget gate, giving the three-gate cell that became the standard LSTM." }
-  - { name: "Seq2seq LSTM translation", year: 2014, note: "Stacked LSTMs as encoder and decoder — proved end-to-end neural machine translation was viable." }
-  - { name: "GRU", year: 2014, note: "Cho et al.'s streamlined two-gate cell — proved you can get LSTM-like memory with fewer parameters." }
+  - { name: "LSTM", year: 1997, note: "Hochreiter & Schmidhuber's gated cell (input and output gates); the authors report bridging time lags in excess of 1000 steps." }
+  - { name: "LSTM with forget gate", year: 2000, note: "Gers, Schmidhuber & Cummins added an adaptive forget gate that lets the cell learn to reset its state." }
+  - { name: "Seq2seq LSTM translation", year: 2014, note: "Sutskever, Vinyals & Le used a multilayered LSTM encoder and a deep LSTM decoder for English-to-French translation." }
+  - { name: "GRU", year: 2014, note: "The gated recurrent unit of Cho et al.; Chung et al. found it comparable to LSTM on music and speech signal modeling." }
 
 resources:
   - { kind: paper, title: "Long Short-Term Memory (Hochreiter & Schmidhuber, 1997)", url: "https://doi.org/10.1162/neco.1997.9.8.1735" }
@@ -171,31 +170,37 @@ learn_first:
   - { label: "Vanishing & exploding gradients", href: "/learn/concepts/vanishing-gradients", tag: "Concept" }
 
 tags: [rnn, lstm, sequence, classical-dl, foundational]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
-  - { url: "https://doi.org/10.1162/neco.1997.9.8.1735", title: "Long Short-Term Memory (Hochreiter & Schmidhuber, 1997, Neural Computation)", trust: 0.9 }
-  - { url: "https://doi.org/10.1162/089976600300015015", title: "Learning to Forget: Continual Prediction with LSTM (Gers, Schmidhuber & Cummins, 2000, Neural Computation)", trust: 0.9 }
+  - { url: "https://doi.org/10.1162/neco.1997.9.8.1735", title: "Long Short-Term Memory (Hochreiter & Schmidhuber, 1997, Neural Computation 9(8))", trust: 0.9 }
+  - { url: "https://doi.org/10.1162/089976600300015015", title: "Learning to Forget: Continual Prediction with LSTM (Gers, Schmidhuber & Cummins, 2000, Neural Computation 12(10))", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/1406.1078", title: "Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation (Cho et al., arXiv:1406.1078)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1412.3555", title: "Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling (Chung et al., arXiv:1412.3555)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1409.3215", title: "Sequence to Sequence Learning with Neural Networks (Sutskever, Vinyals & Le, arXiv:1409.3215)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2312.00752", title: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces (Gu & Dao, arXiv:2312.00752)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., arXiv:1706.03762)", trust: 0.95 }
 ---
 
 ## What Changed
-Feed-forward networks have no notion of order or memory; they process each input independently. A
-recurrent network adds a hidden state that carries forward through time, so the network's output at
-step $t$ depends on everything it has seen so far — the natural fit for language, speech, and time
-series. But plain RNNs are almost untrainable over long spans: repeatedly multiplying gradients
-through the recurrence makes them vanish or explode (Hochreiter's own diagnosis). The **LSTM** fixes
-this with a dedicated memory cell whose state is updated *additively* rather than by repeated
-multiplication — the "constant error carousel" — guarded by learned input, forget, and output gates
-that decide what to write, keep, and read. This let recurrent nets remember information over hundreds
-of steps and, for roughly two decades, made them the default for sequence modelling. The line runs
-forward to encoder–decoder (seq2seq) translation, and its core idea — a selectively updated recurrent
-state — resurfaces in modern linear-time state-space models like Mamba.
+Feed-forward networks process each input independently. A recurrent network adds a hidden state that
+carries forward through time, so the output at step $t$ depends on everything seen so far.
+
+With backpropagation through time, error signals flowing backwards tend to blow up or vanish, so plain
+recurrent networks fail to bridge long time lags (Hochreiter, 1991, as reviewed in the LSTM paper).
+
+The **LSTM** (Hochreiter and Schmidhuber, 1997) adds a memory cell with constant error flow, the
+"constant error carousel", guarded by multiplicative input and output gates. Gers, Schmidhuber and
+Cummins (2000) added the forget gate.
+
+The authors report bridging time lags in excess of 1000 steps. Stacked LSTMs became the encoder and
+decoder of 2014 sequence-to-sequence translation.
 
 ## Key Ideas
 - **Recurrent state** — a hidden vector threads through the sequence, giving the network memory and
   making outputs depend on history.
-- **Vanishing/exploding gradients** — backpropagation through time repeatedly multiplies Jacobians;
-  without care the signal decays or blows up, capping how far back the network can learn.
-- **Gated memory cell** — the LSTM's additive cell state plus forget/input/output gates create a
-  protected gradient highway across time.
+- **Vanishing/exploding gradients** — backpropagated error depends exponentially on the size of the
+  weights, so the signal decays or blows up over long time lags.
+- **Gated memory cell** — the LSTM's constant error carousel plus multiplicative gates protect error
+  flow across time.
 - **Sequential compute** — each step depends on the previous, so training cannot parallelise across
-  the time axis; this bottleneck is precisely what the transformer later removed.
+  the time axis; the Transformer dispenses with recurrence.

@@ -10,8 +10,8 @@ era_range: "2013–2020"
 year: 2013
 family: generation
 core_innovation: "A probabilistic encoder-decoder trained by variational inference with the reparameterization trick, learning a continuous latent space."
-description: "The likelihood-based latent-variable generative model that made deep variational inference practical."
-key_features: ["Probabilistic encoder (approximate posterior)", "Continuous latent space", "Evidence lower bound (ELBO) objective", "Reparameterization trick", "KL-regularized latents"]
+description: "A latent-variable generative model trained by stochastic variational inference that scales to large datasets, with a neural-network encoder approximating the posterior."
+key_features: ["Probabilistic encoder (approximate posterior)", "Evidence lower bound (ELBO) objective", "Reparameterization trick"]
 key_models: ["VAE (2013)", "VQ-VAE (2017)", "NVAE (2020)"]
 paper_title: "Auto-Encoding Variational Bayes (Kingma & Welling, 2013)"
 paper_url: "https://arxiv.org/abs/1312.6114"
@@ -25,10 +25,10 @@ analogy:
   body: "Imagine an artist who learns to describe any face with a short recipe: 'wide jaw, warm skin, slight smile'. That is the encoder compressing an image into a few numbers. A second artist reads a recipe and paints the face back — that is the decoder. A plain autoencoder would let the recipes scatter into isolated islands with empty gaps between them, so a made-up recipe decodes to nonsense. The VAE adds one rule: recipes must fill a smooth, connected space with no gaps, packed neatly around a simple center. Now you can invent a recipe you have never seen — pick any point in that tidy space — and the decoder paints a plausible new face. The 'keep the space tidy' rule is the KL penalty; encoding a *fuzzy region* instead of a single point is what fills the gaps."
 
 narrative:
-  motivation: "Plain autoencoders could compress an image to a small code and reconstruct it, but they were not generative. Their codes scattered into disconnected islands with empty gaps between them, so if you picked a random code and decoded it, you usually got garbage. Meanwhile, the principled tool for this — Bayesian latent-variable models with variational inference — did not scale to deep networks, because you could not backpropagate through the random sampling step at their core."
-  approach: "Kingma and Welling married the two. Keep the encoder-decoder shape of an autoencoder, but make the encoder output a *distribution* over codes rather than a single point, and train the whole thing with variational inference. This forces the latent space to be smooth and gap-free, which makes it generative — and it stays trainable by ordinary backpropagation."
+  motivation: "Kingma and Welling asked how to perform efficient inference and learning in directed probabilistic models with continuous latent variables, intractable posterior distributions and large datasets. Variational inference offered a lower bound on the likelihood, but it needed an estimator that standard stochastic gradient methods could optimize."
+  approach: "Keep the encoder-decoder shape of an autoencoder, but make the encoder (a 'recognition model') output a *distribution* over codes rather than a single point, and train encoder and decoder jointly on a variational lower bound. A reparameterization of the bound makes it optimizable with ordinary stochastic gradients."
   solution: "The encoder maps each input to a small Gaussian in latent space (a mean and a spread). Training maximizes the evidence lower bound (ELBO): a reconstruction term that rewards rebuilding the input, minus a KL term that pulls every encoded Gaussian toward a shared standard-normal prior — the rule that keeps the space tidy. The trick that makes it all differentiable is the reparameterization trick: instead of sampling a code directly (a dead end for gradients), write the code as mean + spread × external noise, so the randomness sits outside the network and gradients flow straight through."
-  outcome: "The result is a smooth, continuous latent space you can sample from and interpolate across — walk a straight line between two codes and the decoded images morph smoothly. VAEs trade some sample sharpness for stable training and excellent distribution coverage — the mirror image of GANs' failure profile, rarely collapsing. Their latent-variable, likelihood view directly underlies diffusion models (which can be read as deep hierarchical VAEs), and their compressed latent space is what latent diffusion runs inside."
+  outcome: "The result is a continuous latent space you can sample from: the paper's appendix shows learned 2D manifolds of MNIST digits and Frey faces, decoded from a grid of latent coordinates. Diffusion models are also latent-variable models trained on a variational bound (Ho et al., 2020), and latent diffusion runs diffusion in the latent space of a pretrained autoencoder (Rombach et al., 2021)."
 
 build_steps:
   - { title: "1. Encode to a distribution", detail: "Pass the input through the encoder, which outputs two vectors: a mean and a spread (standard deviation). Together they define a small Gaussian cloud in latent space — the model's belief about where this input's code lives." }
@@ -49,16 +49,14 @@ key_equation:
     - { symbol: "D_KL", meaning: "Kullback–Leibler (KL) divergence — how far the encoder's distribution is from the prior" }
 
 strengths:
-  - "Stable, well-behaved training — a single likelihood-based objective with no adversarial game to balance."
-  - "Smooth, continuous latent space you can sample and interpolate — meaningful codes, morphing reconstructions."
-  - "Excellent distribution coverage — the model rarely collapses and represents the full data, not just a few modes."
-  - "A principled probabilistic footing — gives a tractable likelihood bound and a reusable compressed representation."
+  - "A single objective, the variational lower bound, optimized with standard stochastic gradient methods."
+  - "A continuous latent space you can sample from and decode into new data."
+  - "Fast sampling and an encoder network that is easy to access, as the NVAE authors note."
+  - "A probabilistic footing: a tractable lower bound on the data likelihood and a reusable compressed representation."
 
 weaknesses:
-  - "Samples are often blurry — the reconstruction objective averages over plausible outputs instead of committing to sharp detail."
-  - "The KL term can 'over-regularize' — if the decoder is too powerful the latent code gets ignored (posterior collapse)."
-  - "Balancing reconstruction against the KL penalty is delicate and needs tuning (e.g. KL warm-up, β-VAE weighting)."
-  - "The simple Gaussian prior/posterior can be too rigid to capture rich, multimodal data on its own."
+  - "Posterior collapse: paired with a powerful autoregressive decoder, the latents can be ignored (noted in the VQ-VAE paper)."
+  - "As of 2020, VAEs were outperformed on likelihood by normalizing flows and autoregressive models, per the NVAE authors."
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 860 470" role="img" aria-label="A variational autoencoder: the encoder maps x to a mean μ and a spread σ, a separate noise sample ε gives the latent z = μ + σ ⊙ ε, and the decoder rebuilds x̂ from the narrow latent; the loss is reconstruction of x̂ against x plus a KL term pulling q(z|x) toward N(0, I).">
@@ -116,10 +114,9 @@ diagram_svg: |
   </svg>
 diagram_caption: "The encoder outputs a mean μ and spread σ; outside noise ε gives the latent z = μ + σ ⊙ ε, so gradients reach μ and σ. The decoder rebuilds x̂; the loss adds reconstruction and a KL pull toward N(0, I)."
 notable_models:
-  - { name: "VAE", year: 2013, note: "The original — proved deep variational inference is trainable end-to-end via the reparameterization trick." }
-  - { name: "β-VAE", year: 2017, note: "Reweighted the KL term to trade reconstruction for disentangled, interpretable latent factors." }
-  - { name: "VQ-VAE", year: 2017, note: "Swapped the continuous latent for a discrete codebook, enabling sharp, high-fidelity generation and powering later image and audio models." }
-  - { name: "NVAE", year: 2020, note: "A deep hierarchical VAE that closed much of the sharpness gap with GANs on face generation." }
+  - { name: "VAE", year: 2013, note: "The original: encoder and decoder trained jointly on a reparameterized variational lower bound with stochastic gradients." }
+  - { name: "VQ-VAE", year: 2017, note: "Discrete rather than continuous codes, via vector quantization, and a learnt prior; generated images, video and speech." }
+  - { name: "NVAE", year: 2020, note: "A deep hierarchical VAE with state-of-the-art results among non-autoregressive likelihood models; the authors report it as the first successful VAE on natural images as large as 256×256." }
 
 resources:
   - { kind: paper, title: "Auto-Encoding Variational Bayes (Kingma & Welling, 2013)", url: "https://arxiv.org/abs/1312.6114" }
@@ -133,29 +130,30 @@ learn_first:
   - { label: "KL divergence", href: "/learn/concepts/kl-divergence", tag: "Math" }
 
 tags: [vae, generation, latent-variable, variational-inference]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/1312.6114", title: "Auto-Encoding Variational Bayes (Kingma & Welling, 2013)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1711.00937", title: "Neural Discrete Representation Learning (van den Oord et al., 2017)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2007.03898", title: "NVAE: A Deep Hierarchical Variational Autoencoder (Vahdat and Kautz, 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2006.11239", title: "Denoising Diffusion Probabilistic Models (Ho et al., 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2112.10752", title: "High-Resolution Image Synthesis with Latent Diffusion Models (Rombach et al., 2021)", trust: 0.95 }
   - { url: "https://lilianweng.github.io/posts/2018-08-12-vae/", title: "From Autoencoder to Beta-VAE (Lilian Weng)", trust: 0.9 }
 ---
 
 ## What Changed
-Kingma and Welling gave deep learning a principled, likelihood-based generative model. A VAE pairs an
-**encoder** that maps a data point to a *distribution* over latent codes with a **decoder** that
-reconstructs data from a sampled code. Training maximizes the **evidence lower bound (ELBO)**, which
-balances two terms: reconstruction quality, and a KL penalty pulling the encoder's posterior toward a
-simple prior (usually a standard Gaussian). The technical unlock is the **reparameterization trick** —
-writing a sampled latent as mean + spread × external noise — which moves the randomness outside the
-network so gradients can flow through the sampling step and the whole thing trains by ordinary
-backpropagation.
+Kingma and Welling (2013) pair an **encoder** that maps a data point to a *distribution* over latent
+codes with a **decoder** that reconstructs data from a sampled code. Training maximizes the **evidence
+lower bound (ELBO)**: reconstruction quality minus a Kullback–Leibler (KL) term pulling the encoder's
+posterior toward the prior (a centered isotropic Gaussian in the paper's example).
+
+The technical step is the **reparameterization trick**: writing a sampled latent as mean + spread ×
+external noise, so gradients flow through the sampling step and the model trains by backpropagation.
 
 ## Key Ideas
-- **Probabilistic encoder** — outputs a posterior *q(z|x)* rather than a point, so nearby inputs map to
-  overlapping latent regions and the space stays continuous.
-- **ELBO objective** — maximize a tractable lower bound on data likelihood: a reconstruction term minus
-  a KL term regularizing the latent toward the prior.
-- **Reparameterization trick** — factor sampling into a deterministic function of the parameters plus
+- **Probabilistic encoder**: outputs a posterior *q(z|x)*, for example a Gaussian, rather than a point.
+- **ELBO objective**: maximize a tractable lower bound on data likelihood, a reconstruction term minus
+  a KL term toward the prior.
+- **Reparameterization trick**: express sampling as a deterministic function of the parameters plus
   external noise, enabling gradient-based training through a stochastic node.
-- **Coverage over sharpness** — VAE samples are often blurrier than GANs' but the model rarely collapses
-  and covers the full data distribution; its latent-variable, likelihood view directly underlies
-  diffusion models.
+- **Related models**: diffusion models are also latent-variable models trained on a variational bound
+  (Ho et al., 2020).

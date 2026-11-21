@@ -10,11 +10,11 @@ era_range: "2020–2026"
 year: 2020
 family: generation
 core_innovation: "Learn to reverse a gradual noising process, generating data by iteratively denoising from pure noise."
-description: "Iterative denoising generative models that displaced GANs for high-fidelity, diverse image synthesis."
-key_features: ["Forward Gaussian noising schedule", "Learned iterative denoiser", "Stable regression-based training", "Classifier-free guidance", "Latent-space diffusion for efficiency"]
+description: "Generative models that learn to reverse a gradual noising process and generate data by iterative denoising."
+key_features: ["Fixed forward process that gradually adds noise", "Learned reverse (denoising) process", "Sampling by many sequential denoising steps"]
 key_models: ["DDPM (2020)", "Stable Diffusion / LDM (2022)", "Imagen (2022)"]
-paper_title: "Denoising Diffusion Probabilistic Models (Ho, Jain & Abbeel, 2020)"
-paper_url: "https://arxiv.org/abs/2006.11239"
+paper_title: "Deep Unsupervised Learning using Nonequilibrium Thermodynamics (Sohl-Dickstein et al., 2015)"
+paper_url: "https://arxiv.org/abs/1503.03585"
 influenced_by: [architecture-era/vae, architecture-era/gan]
 led_to: []
 
@@ -22,25 +22,25 @@ eli5: "A diffusion model learns to un-blur noise into a picture. First you take 
 
 analogy:
   title: "Sculpting a statue out of static"
-  body: "A sculptor starts with a rough block of marble and chips away, a little at a time, until a figure emerges. Diffusion works the same way, but the block is a screen of random TV static and the chisel is a denoiser. Here is the clever part: the model learned to sculpt by watching the reverse — take a clean photo and slowly bury it under static, one thin layer at a time, keeping a record of exactly what static was added at each step. Reverse that recording and you have a step-by-step guide for removing static. To make a new image, hand the model fresh random static and let it 'chip away' the noise step by step. Because each step only has to remove a thin layer, every step is easy — which is why the whole thing trains so reliably."
+  body: "A sculptor starts with a rough block and chips away, a little at a time, until a figure emerges. Diffusion works the same way, but the block is a screen of random static and the chisel is a denoiser. The model learned by watching the reverse: a clean photo buried under static one thin layer at a time, with a record of exactly what static was added at each step. To make a new image, hand the model fresh static and let it remove the noise step by step."
 
 narrative:
-  motivation: "By 2020 the two leading generative families each had a fatal flaw. Generative adversarial networks (GANs) made sharp images but their adversarial game was unstable and prone to mode collapse — covering only a slice of the data. Variational autoencoders (VAEs) trained stably and covered the full distribution but produced blurry samples. Everyone wanted a model with both properties: the fidelity of a GAN and the stability and coverage of a VAE. The obstacle was that generating a realistic image in one shot is a very hard prediction — too hard to do well and reliably at the same time."
-  approach: "The insight was to stop trying to generate an image in one leap and instead break generation into hundreds of tiny, easy steps. Define a fixed forward process that slowly adds a little Gaussian noise to a real image over many steps until nothing but static remains. Then train a single network to reverse just one step of that process — a much gentler task than conjuring an image from nothing."
-  solution: "The forward noising schedule is fixed and parameter-free, so at every step the model knows exactly what noise was added — that noise is the training target. The network learns a simple regression: given a noisy image and the step number, predict the noise that was mixed in (equivalently, a slightly cleaner image). Because each step is an easy least-squares target, training is remarkably stable and the model covers the full distribution. To generate, start from pure noise and apply the learned denoiser repeatedly, walking backward step by step to a clean sample."
-  outcome: "Diffusion got both stability and fidelity, and displaced GANs as the dominant image generator. DDPM (Ho et al., 2020) established the recipe. Latent Diffusion / Stable Diffusion (Rombach et al., 2022) made it practical by running the diffusion inside a compressed VAE latent space instead of on raw pixels, cutting compute enough for high-resolution text-to-image on commodity GPUs. Combined with classifier-free guidance to steer samples toward a text prompt, diffusion became the backbone of modern image, audio, and video generation."
+  motivation: "A generative model must be flexible enough to fit complex data yet tractable to train, sample from and evaluate. Sohl-Dickstein et al. (2015) proposed reaching both by splitting generation into many small steps."
+  approach: "Define a fixed forward diffusion process that slowly destroys structure in the data by adding noise over many steps, then learn a reverse diffusion process that restores it. Each learned step only has to undo a small amount of noise."
+  solution: "DDPM (Ho, Jain and Abbeel, 2020) adds Gaussian noise under a variance schedule over T = 1000 steps and trains a U-Net to predict the noise mixed into a noisy image, with a simple squared-error objective. To generate, start from pure noise and apply the learned denoiser step by step back to a clean sample."
+  outcome: "DDPM reports a Fréchet Inception Distance (FID) of 3.17 on CIFAR-10 and LSUN 256×256 sample quality similar to ProgressiveGAN. Latent diffusion (Rombach et al., 2022) runs the process in the latent space of a pretrained autoencoder to cut compute, and adds cross-attention for conditioning on inputs such as text."
 
 build_steps:
-  - { title: "1. Define the forward noising schedule", detail: "Fix a plan for how much Gaussian noise to add at each of many timesteps. This process is parameter-free — nothing is learned here; it just gradually turns any real image into pure static." }
-  - { title: "2. Make a noisy training example", detail: "Take a real image, pick a random timestep, and jump straight to that noise level in one shot (the math lets you skip the intermediate steps). Remember the exact noise you added — that is the answer key." }
-  - { title: "3. Predict the noise", detail: "Feed the noisy image and the timestep into the network (usually a U-Net). It predicts the noise that was added. This is a plain regression — no adversary, no likelihood to compute." }
-  - { title: "4. Train on the error", detail: "Compare predicted noise to the real noise and minimize the difference. Repeat across many images, timesteps, and noise draws. Every step is an easy target, which is why training is stable." }
-  - { title: "5. Sample by denoising from static", detail: "To generate, start from pure random noise. Use the trained network to estimate and remove a bit of noise, step by step, walking backward through the schedule until a clean image emerges." }
-  - { title: "6. Steer with guidance (optional)", detail: "To follow a text prompt, condition the denoiser on the prompt and use classifier-free guidance — nudge each step toward the prompt-aware prediction and away from the unconditioned one." }
+  - { title: "1. Define the forward noising schedule", detail: "Fix how much Gaussian noise to add at each of many timesteps. Nothing is learned here; the process gradually turns any real image into pure noise." }
+  - { title: "2. Make a noisy training example", detail: "Take a real image, pick a random timestep, and jump straight to that noise level in one step (the Gaussian forward process allows this in closed form). Keep the exact noise that was added: it is the target." }
+  - { title: "3. Predict the noise", detail: "Feed the noisy image and the timestep into the network (a U-Net in DDPM), which predicts the noise that was added." }
+  - { title: "4. Train on the error", detail: "Minimise the squared difference between the predicted and the real noise, across many images, timesteps and noise draws." }
+  - { title: "5. Sample by denoising from noise", detail: "To generate, start from pure random noise and use the trained network to remove a little noise at each step, walking backward through the schedule to a clean image." }
+  - { title: "6. Steer with guidance (optional)", detail: "Classifier-free guidance (Ho and Salimans) trains a conditional and an unconditional model jointly and combines their estimates, trading diversity for sample quality." }
 
 key_equation:
   latex: "L = \\mathbb{E}_{t,\\,x_0,\\,\\epsilon}\\left[\\; \\bigl\\lVert \\epsilon - \\epsilon_\\theta\\!\\left(\\sqrt{\\bar{\\alpha}_t}\\,x_0 + \\sqrt{1-\\bar{\\alpha}_t}\\,\\epsilon,\\; t\\right) \\bigr\\rVert^2 \\;\\right]"
-  plain: "Take a clean image, mix in a known amount of random noise to land at timestep t, and ask the network to guess the noise it sees. The loss is simply the squared difference between the real noise and the network's guess. Minimizing it teaches the network to denoise — and that is all you need to generate images by removing noise step by step."
+  plain: "DDPM's simplified objective: take a clean image, mix in a known amount of random noise to land at timestep t, and ask the network to predict that noise. The loss is the squared difference between the real noise and the prediction."
   terms:
     - { symbol: "x₀", meaning: "a clean training image (before any noise is added)" }
     - { symbol: "ε", meaning: "the random Gaussian noise actually mixed in — the target the network must predict" }
@@ -49,16 +49,15 @@ key_equation:
     - { symbol: "ᾱ_t", meaning: "the schedule's cumulative signal level at step t; √ᾱ_t scales the image and √(1−ᾱ_t) scales the noise" }
 
 strengths:
-  - "Stable, reliable training — a plain noise-prediction regression, no adversarial game to balance."
-  - "Excellent coverage and diversity — models the full data distribution and rarely collapses to a few modes."
-  - "State-of-the-art fidelity — matches or beats GANs on image quality, especially with guidance."
-  - "Flexible conditioning — text, layout, depth, or another image can steer generation cleanly."
+  - "Trained with a simple squared-error objective on the noise, with no adversary."
+  - "High sample quality: DDPM reports FID 3.17 on CIFAR-10 and LSUN quality similar to ProgressiveGAN."
+  - "Conditioning on inputs such as text or bounding boxes through cross-attention (latent diffusion)."
+  - "Guidance can be applied without retraining the model, per the latent diffusion paper."
 
 weaknesses:
-  - "Slow sampling — generating one image needs many sequential denoising steps (though fast samplers and distillation help)."
-  - "Compute-heavy on raw pixels — the reason latent diffusion moves the process into a compressed space."
-  - "Guidance is a balancing act — too much sharpens prompt-following but hurts diversity and can over-saturate."
-  - "Reproducing fine text or exact structure in images remains hard without extra conditioning."
+  - "Slow sampling: generating one image needs many sequential network evaluations."
+  - "Expensive in pixel space: the latent diffusion authors note training can take hundreds of GPU days."
+  - "Guidance trades sample diversity for quality."
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 860 520" role="img" aria-label="A denoising diffusion model: the fixed forward process adds Gaussian noise step by step, turning a ring of dots x₀ into pure noise x_T, and the learned reverse process removes it step by step; below, one training step: a U-Net takes the noisy xₜ and t and predicts the added noise, trained with the squared error to the true noise.">
@@ -139,10 +138,10 @@ diagram_svg: |
   </svg>
 diagram_caption: "The fixed forward process adds Gaussian noise step by step until x₀ becomes pure noise x_T; the learned reverse process removes it. In training, a U-Net sees xₜ and t and predicts the added noise ε, scored by ‖ε − ε̂‖²."
 notable_models:
-  - { name: "DDPM", year: 2020, note: "The breakthrough recipe — showed simple noise-prediction denoising rivals GANs on image quality with stable training." }
-  - { name: "Latent Diffusion / Stable Diffusion", year: 2022, note: "Ran diffusion in a compressed VAE latent space, making high-resolution text-to-image cheap enough for commodity GPUs and open release." }
-  - { name: "Imagen", year: 2022, note: "Showed a large frozen text encoder plus diffusion yields strong prompt-following photorealism." }
-  - { name: "DALL·E 2", year: 2022, note: "Popularized diffusion text-to-image at scale and demonstrated CLIP-guided image generation." }
+  - { name: "DDPM", year: 2020, note: "Trained a U-Net to predict added noise with a squared-error objective; reported sample quality on LSUN similar to ProgressiveGAN." }
+  - { name: "Latent Diffusion / Stable Diffusion", year: 2022, note: "Runs diffusion in the latent space of a pretrained autoencoder to reduce compute; Stable Diffusion is a latent text-to-image diffusion model." }
+  - { name: "Imagen", year: 2022, note: "Text-to-image diffusion with a frozen text-only language model (T5) as encoder; its authors found scaling the text encoder helped more than scaling the diffusion model." }
+  - { name: "DALL·E 2", year: 2022, note: "A prior produces a CLIP image embedding from a caption and a diffusion decoder generates the image from it." }
 
 resources:
   - { kind: paper, title: "Denoising Diffusion Probabilistic Models (Ho, Jain & Abbeel, 2020)", url: "https://arxiv.org/abs/2006.11239" }
@@ -156,29 +155,33 @@ learn_first:
   - { label: "U-Net (the denoiser backbone)", href: "/models/architecture/unet", tag: "Architecture" }
 
 tags: [diffusion, generation, denoising, text-to-image]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
+  - { url: "https://arxiv.org/abs/1503.03585", title: "Deep Unsupervised Learning using Nonequilibrium Thermodynamics (Sohl-Dickstein et al., 2015)", trust: 0.95 }
   - { url: "https://arxiv.org/abs/2006.11239", title: "Denoising Diffusion Probabilistic Models (Ho, Jain & Abbeel, 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2207.12598", title: "Classifier-Free Diffusion Guidance (Ho and Salimans, 2022)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2205.11487", title: "Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding (Imagen, Saharia et al., 2022)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2204.06125", title: "Hierarchical Text-Conditional Image Generation with CLIP Latents (DALL·E 2, Ramesh et al., 2022)", trust: 0.95 }
+  - { url: "https://huggingface.co/CompVis/stable-diffusion-v1-4", title: "CompVis/stable-diffusion-v1-4 model card (Hugging Face)", trust: 0.9 }
   - { url: "https://arxiv.org/abs/2112.10752", title: "High-Resolution Image Synthesis with Latent Diffusion Models (Rombach et al., 2022)", trust: 0.95 }
   - { url: "https://lilianweng.github.io/posts/2021-07-11-diffusion-models/", title: "What are Diffusion Models? (Lilian Weng)", trust: 0.9 }
 ---
 
 ## What Changed
-GANs made sharp images but were unstable and prone to mode collapse; VAEs were stable but blurry.
-Diffusion models got both stability *and* fidelity by splitting generation into many easy steps. The
-**forward process** takes a real image and adds Gaussian noise over many steps until it is
-indistinguishable from static — a fixed, parameter-free schedule. A network is then trained to run the
-**reverse process**: at each step, predict the noise (equivalently, a slightly denoised image), so that
-starting from pure noise and denoising repeatedly reconstructs a sample from the data distribution.
-Each step is a simple regression target, which makes training remarkably stable and the model cover the
-full distribution.
+Diffusion models (Sohl-Dickstein et al., 2015) split generation into many small steps.
+
+- The **forward process** adds noise to a real image over many steps until only noise remains; it is
+  fixed, with nothing learned.
+- A network learns the **reverse process**: in DDPM (Ho et al., 2020) it predicts the noise at each
+  step, trained with a squared-error objective.
+- Sampling starts from pure noise and denoises step by step to a new image.
 
 ## Key Ideas
-- **Forward noising** — a fixed schedule gradually corrupts data into Gaussian noise, defining the
+- **Forward noising**: a fixed schedule gradually corrupts data into Gaussian noise, defining the
   targets the model learns to reverse.
-- **Learned denoising** — the network predicts the noise at each timestep; sampling chains many such
+- **Learned denoising**: the network predicts the noise at each timestep; sampling chains many such
   predictions from noise back to a clean sample.
-- **Stable training, full coverage** — per-step regression avoids adversarial instability and mode
-  collapse, trading single-shot speed for many inference steps.
-- **Latent diffusion + guidance** — diffusing in a VAE latent space slashes cost, and classifier-free
-  guidance steers samples toward a text prompt, enabling controllable text-to-image generation.
+- **Many steps at inference**: each step is simple to learn, but sampling needs many sequential
+  network evaluations.
+- **Latent diffusion and guidance**: later work diffuses in an autoencoder's latent space to cut
+  compute, and classifier-free guidance trades diversity for sample quality.

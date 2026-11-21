@@ -8,7 +8,7 @@ category: normalization
 code: RMSNorm
 aliases: []
 order: 1
-short_description: Simpler, faster normalization — skips the mean subtraction step.
+short_description: Normalizes by the root mean square of the inputs, without subtracting the mean.
 example_models:
 - Llama
 - Mistral
@@ -18,18 +18,24 @@ example_models:
 tags:
 - normalization
 - rmsnorm
-updated: '2026-11-19'
-sources: []
+updated: '2026-11-21'
+sources:
+- url: https://arxiv.org/abs/1910.07467
+  title: Root Mean Square Layer Normalization (arXiv:1910.07467)
+  trust: 0.95
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (arXiv:2302.13971)'
+  trust: 0.95
 ---
 
 ## What It Is
 
-Normalizes activations by dividing by the root mean square of the values, without first subtracting the mean (which LayerNorm does). This saves one reduction operation per normalization. Introduced by Zhang and Sennrich (2019).
+Normalizes the summed inputs to a layer's neurons by their root mean square, without first subtracting the mean as LayerNorm does. Introduced by Biao Zhang and Rico Sennrich (NeurIPS 2019). LLaMA uses it to normalize the input of each Transformer sub-layer.
 
 ## Why It Matters
 
-~10-15% faster than LayerNorm in practice because it skips the mean computation. With thousands of normalization operations per forward pass, this adds up. Quality is equivalent or better on modern LLM benchmarks.
+The authors describe RMSNorm as computationally simpler than LayerNorm. They report comparable performance with running time reduced by 7% to 64% across different models.
 
 ## Trade-off
 
-Effectively no downside — RMSNorm is a strict improvement for transformer language models. LayerNorm's mean-centering step turns out to be unnecessary for the LM task.
+RMSNorm keeps re-scaling invariance but gives up LayerNorm's re-centering invariance. The authors hypothesize that re-centering is dispensable.

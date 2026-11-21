@@ -11,8 +11,11 @@ architectures:
 models: []
 tags:
 - model-history
-updated: '2026-11-19'
-sources: []
+updated: '2026-11-21'
+sources:
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (arXiv:1706.03762)
+  trust: 0.95
 ---
 
 

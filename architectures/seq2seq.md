@@ -11,8 +11,8 @@ year: 2014
 family: classical-dl
 core_innovation: "An encoder RNN compresses a whole input sequence into a fixed vector that a decoder RNN unrolls into an output sequence."
 description: "The encoder–decoder framing that turned neural nets into general sequence transducers for translation."
-key_features: ["Encoder–decoder RNN pair", "Fixed-length context vector", "Variable-length input to variable-length output", "End-to-end trained on raw pairs"]
-key_models: ["Google/Sutskever NMT (2014)", "Neural machine translation systems (2015–2016)"]
+key_features: ["Encoder–decoder RNN pair", "Fixed-length context vector", "Variable-length input to variable-length output", "End-to-end training on sentence pairs"]
+key_models: ["RNN Encoder–Decoder (Cho et al., 2014)", "Sutskever, Vinyals & Le LSTM (2014)"]
 paper_title: "Sequence to Sequence Learning with Neural Networks"
 paper_url: "https://arxiv.org/abs/1409.3215"
 influenced_by: [architecture-era/rnn-lstm]
@@ -22,13 +22,13 @@ eli5: "To translate a sentence, one network reads the whole English sentence and
 
 analogy:
   title: "An interpreter who listens fully, then speaks"
-  body: "Think of a human interpreter at a conference. They don't translate word-for-word as you speak; they *listen to your entire sentence*, form a compact mental gist of what you meant, and only then turn to the other side and render it in the target language, phrase by phrase. Sequence-to-sequence works the same way: the encoder is the listening half that folds the whole source sentence into one mental gist (the context vector), and the decoder is the speaking half that unrolls that gist into the target sentence, one word at a time, each word informed by the words it just said. And like a real interpreter straining to hold a very long sentence in their head, the model struggles when the sentence is long — the single gist can only hold so much."
+  body: "Think of a human interpreter at a conference. They don't translate word-for-word as you speak; they *listen to your entire sentence*, form a compact mental gist of what you meant, and only then turn to the other side and render it in the target language, phrase by phrase. Sequence-to-sequence works the same way: the encoder is the listening half that folds the whole source sentence into one mental gist (the context vector), and the decoder is the speaking half that unrolls that gist into the target sentence, one word at a time, each word informed by the words it just said. The single gist has a fixed size, whatever the length of the sentence."
 
 narrative:
-  motivation: "Neural nets were great at mapping an input to a same-length output — tag each word, label each frame. But translation isn't length-preserving: a five-word English sentence might become a seven-word French one, and the word order shuffles. There was no clean neural recipe for turning one variable-length sequence into a different variable-length sequence."
-  approach: "Sutskever, Vinyals, and Le split the job in two. One LSTM, the encoder, reads the entire source sequence token by token and ends with a hidden state that summarizes the whole input. A second LSTM, the decoder, starts from that summary and generates the target sequence one token at a time, each new token conditioned on the summary and on the tokens it has already produced."
-  solution: "The encoder's final hidden state becomes a single fixed-length 'context vector' — the entire meaning of the source, compressed. The decoder is autoregressive: it emits a word, feeds that word back as its next input, and repeats until it produces an end-of-sentence marker. The whole thing trains end-to-end on raw sentence pairs by maximizing the probability the decoder assigns to the correct target, using teacher forcing to keep training stable."
-  outcome: "For the first time a single, fully learned network did competitive machine translation with no hand-built alignment models or phrase tables. Two tricks helped a lot — reversing the source sentence and stacking LSTM layers — and their necessity hinted at the weakness: cramming an arbitrarily long sentence through one fixed vector is an information bottleneck that worsens with length. Removing exactly that bottleneck is what additive attention, and ultimately the transformer, were invented to do."
+  motivation: "Sutskever, Vinyals and Le note that deep neural networks, although powerful, could not be used to map sequences to sequences. Translation is not length-preserving: a five-word English sentence might become a seven-word French one, and the word order shuffles."
+  approach: "Cho et al. (RNN Encoder–Decoder) and Sutskever, Vinyals and Le (2014) split the job in two. In Sutskever et al.'s version, one LSTM, the encoder, reads the entire source sequence token by token and ends with a hidden state that summarizes the whole input. A second LSTM, the decoder, starts from that summary and generates the target sequence one token at a time, each new token conditioned on the summary and on the tokens it has already produced."
+  solution: "The encoder's final hidden state becomes a single fixed-length 'context vector' — the entire meaning of the source, compressed. The decoder is autoregressive: it emits a word, feeds that word back as its next input, and repeats until it produces an end-of-sentence marker. The whole thing trains end-to-end on sentence pairs by maximizing the probability the decoder assigns to the correct target given the true previous tokens (teacher forcing)."
+  outcome: "On WMT'14 English-to-French, Sutskever et al. report 34.8 BLEU against 33.3 for a phrase-based statistical system, and that reversing the source sentence markedly improved results; with it, the LSTM did not have difficulty on long sentences. Cho et al. found that their basic encoder–decoder degrades rapidly as sentence length grows, and Bahdanau, Cho and Bengio conjectured that the fixed-length vector is a bottleneck, which additive attention removes."
 
 build_steps:
   - { title: "1. Tokenize both sides", detail: "Turn the source and target sentences into sequences of tokens (words or subwords), each mapped to a learned embedding vector." }
@@ -50,13 +50,13 @@ key_equation:
 
 strengths:
   - "Maps variable-length inputs to variable-length outputs — the missing piece for translation."
-  - "Fully end-to-end: trained on raw sentence pairs, no hand-built alignment or phrase tables."
-  - "One clean, general framing that also fits summarization, dialogue, and speech transcription."
-  - "Autoregressive decoding produces fluent, context-aware output one token at a time."
+  - "End-to-end: trained on sentence pairs, with no hand-built alignment or phrase tables."
+  - "The authors describe it as a general approach that makes minimal assumptions on the sequence structure."
+  - "Autoregressive decoding generates the output one token at a time, each conditioned on those before."
 
 weaknesses:
-  - "The single fixed-length context vector is a bottleneck — long sentences lose information."
-  - "Translation quality degrades as input length grows, needing hacks like reversing the source."
+  - "The single fixed-length context vector must hold the whole source; Bahdanau, Cho and Bengio conjecture it is a bottleneck."
+  - "Cho et al. report that a basic encoder–decoder degrades rapidly as sentence length and the number of unknown words increase."
   - "Inherits the RNN's sequential, non-parallel computation over both encoder and decoder."
   - "Errors compound during decoding, since each generated token feeds the next (exposure bias)."
 
@@ -160,9 +160,10 @@ diagram_svg: |
   </svg>
 diagram_caption: "An encoder LSTM reads A B C <EOS> and keeps only its final state v; that one fixed-size vector is the sole link to a separate decoder LSTM, which emits W X Y Z <EOS>, feeding each output back as its next input."
 notable_models:
-  - { name: "Sutskever seq2seq LSTM", year: 2014, note: "The original — proved a single end-to-end neural net rivals classic phrase-based machine translation." }
-  - { name: "Google Neural Machine Translation (GNMT)", year: 2016, note: "Scaled deep seq2seq with attention to production, proving neural translation beats statistical systems at scale." }
-  - { name: "Bahdanau attention seq2seq", year: 2015, note: "Added attention over encoder states — proved removing the fixed-vector bottleneck sharply improves long-sentence translation." }
+  - { name: "RNN Encoder–Decoder (Cho et al.)", year: 2014, note: "Two recurrent networks, one encoding a sequence into a fixed-length vector and one decoding it, used to score phrase pairs for statistical translation." }
+  - { name: "Sutskever seq2seq LSTM", year: 2014, note: "The authors report 34.8 BLEU on WMT'14 English-to-French against 33.3 for a phrase-based system." }
+  - { name: "Bahdanau attention seq2seq", year: 2015, note: "Added a soft search over encoder states; the authors report that RNNsearch-50 shows no deterioration on sentences of 50 or more words." }
+  - { name: "Google Neural Machine Translation (GNMT)", year: 2016, note: "8-layer LSTM encoder and decoder with attention and residual connections; human evaluation shows 60% fewer translation errors than Google's phrase-based production system on simple sentences." }
 
 resources:
   - { kind: paper, title: "Sequence to Sequence Learning with Neural Networks (Sutskever, Vinyals & Le, 2014)", url: "https://arxiv.org/abs/1409.3215" }
@@ -176,28 +177,33 @@ learn_first:
   - { label: "Autoregressive decoding", href: "/learn/concepts/autoregressive-decoding", tag: "Concept" }
 
 tags: [seq2seq, encoder-decoder, translation, classical-dl, foundational]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/1409.3215", title: "Sequence to Sequence Learning with Neural Networks (Sutskever, Vinyals & Le, 2014)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1406.1078", title: "Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation (Cho et al., arXiv:1406.1078)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1409.1259", title: "On the Properties of Neural Machine Translation: Encoder-Decoder Approaches (Cho et al., arXiv:1409.1259)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1409.0473", title: "Neural Machine Translation by Jointly Learning to Align and Translate (Bahdanau, Cho & Bengio, arXiv:1409.0473)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1609.08144", title: "Google's Neural Machine Translation System (Wu et al., arXiv:1609.08144)", trust: 0.95 }
 ---
 
 ## What Changed
-Earlier neural sequence models mapped an input to a *same-length* output — good for tagging, useless
-for translation, where a five-word English sentence becomes a seven-word French one. Sutskever, Vinyals,
-and Le framed the problem as **sequence-to-sequence**: one LSTM (the encoder) reads the entire source
-sequence and folds it into a single fixed-length vector, and a second LSTM (the decoder) generates the
-target sequence one token at a time, conditioned on that vector and its own previous outputs. This gave
-a fully learned, end-to-end machine-translation system trained on raw sentence pairs — no hand-built
-alignment or phrase tables. Its brilliance was also its flaw: forcing an arbitrarily long input through
-one fixed vector creates an information bottleneck that gets worse as sentences grow. That bottleneck is
-the exact problem the next step — additive attention — was invented to remove.
+Translation maps a sentence to one of a different length. In 2014 Cho et al. (RNN Encoder–Decoder) and
+Sutskever, Vinyals and Le framed this as **sequence-to-sequence**: an encoder reads the source and folds
+it into a single fixed-length vector, and a decoder generates the target one token at a time.
+
+Sutskever et al. used a multilayered LSTM encoder and a deep LSTM decoder, trained end-to-end on
+sentence pairs. They report 34.8 BLEU on WMT'14 English-to-French against 33.3 for a phrase-based
+system, and that reversing the source sentence markedly improved results.
+
+Cho et al. found that a basic encoder–decoder degrades rapidly on long sentences. Bahdanau, Cho and
+Bengio conjectured that the fixed-length vector is the bottleneck; additive attention removes it.
 
 ## Key Ideas
 - **Encoder–decoder split** — one network summarises the input, a separate network generates the output,
   cleanly handling different input and output lengths.
 - **Fixed context vector** — the encoder's final hidden state must carry the whole meaning of the
-  source, an unavoidable bottleneck for long sequences.
+  source, whatever its length.
 - **Autoregressive decoding** — the decoder emits one token at a time, feeding each output back as the
   next input (with teacher forcing during training).
-- **Practical tricks** — reversing the source sequence and stacking LSTM layers materially improved
-  translation quality, hinting that the fixed vector was the weak link.
+- **Reversed source** — Sutskever et al. found that reversing the source words (not the target)
+  introduced many short-term dependencies and made optimisation easier.

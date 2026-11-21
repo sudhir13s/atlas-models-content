@@ -10,8 +10,8 @@ era_range: "2020–2023"
 year: 2020
 family: vision
 core_innovation: "Treat an image as a sequence of patch embeddings and run a plain transformer over them — no convolutions required."
-description: "The architecture that showed a pure transformer, given enough data, matches or beats CNNs on vision."
-key_features: ["Image split into fixed patches", "Linear patch embeddings + position embeddings", "Standard transformer encoder", "[CLS] token for classification", "Scales with data and model size"]
+description: "A pure transformer applied to sequences of image patches; pretrained on enough data, it approaches or beats state-of-the-art convolutional networks on image recognition."
+key_features: ["Image split into fixed patches", "Linear patch embeddings + position embeddings", "Transformer encoder over patch tokens", "Scales with data and model size"]
 key_models: ["ViT-B/L/H (2020)", "DeiT (2021)", "SAM / DINOv2 backbones (2023)"]
 paper_title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale"
 paper_url: "https://arxiv.org/abs/2010.11929"
@@ -25,10 +25,10 @@ analogy:
   body: "Picture a photo cut into a grid of square tiles, like a mosaic. A convolutional network only lets each tile whisper to its immediate neighbours, so it takes many layers for the top-left tile to 'hear' the bottom-right one. The Vision Transformer instead lays all the tiles on a table and lets each one glance at *every* other tile in a single step, deciding which are relevant — the sky tiles group together, the tiles making up a dog's face attend to each other across the whole image. That instant 'every tile sees every tile' is self-attention, borrowed straight from language transformers."
 
 narrative:
-  motivation: "For nearly a decade, vision meant convolution. The convolutional network's built-in assumptions — that useful patterns are local and appear anywhere — were treated as necessary priors for images, and they worked. Meanwhile transformers had taken over language completely by throwing such priors away and letting attention learn structure from data. The natural question: could a *pure* transformer, with none of vision's hand-wired assumptions, work on images too?"
-  approach: "The obstacle is size. Attention compares every element with every other, so running it pixel-by-pixel on even a small image (tens of thousands of pixels) is hopelessly expensive. The fix is disarmingly simple: don't use pixels as the unit — use patches. Cut the image into a grid of fixed squares (say 16×16 pixels), and treat each patch as a single 'token', the way a transformer treats a word."
+  motivation: "In vision, attention was applied together with convolutional networks or used to replace parts of them while keeping their overall structure. Convolutional networks build in locality and translation equivariance. Meanwhile the Transformer had become the de facto standard for natural language processing. The question: could a *pure* transformer, without those image-specific assumptions, work on images too?"
+  approach: "The obstacle is size. Attention compares every element with every other, so applying it pixel by pixel has a cost quadratic in the number of pixels. The fix: use patches, not pixels, as the unit. Cut the image into a grid of fixed squares (for example 16×16 pixels), and treat each patch as a single 'token', the way a transformer treats a word."
   solution: "Flatten each patch and linearly project it into an embedding vector — this is the patch's 'meaning'. Add a position embedding so the model knows where each patch sat in the grid (attention alone is order-blind). Prepend one extra learnable [CLS] token to summarise the whole image. Feed this short sequence into an ordinary transformer encoder — the exact stack of self-attention and feed-forward blocks built for language — and read the classification off the [CLS] token at the end."
-  outcome: "With little vision-specific bias, ViT actually *underperforms* CNNs on small datasets — it has to learn locality that a CNN gets for free. But Dosovitskiy et al. showed that pretrained on enough data (tens to hundreds of millions of images), ViT *matches or beats* the best convolutional networks and keeps improving as data and model size grow. The deeper lesson: the transformer is a domain-agnostic substrate, and hard-wired priors can be *learned* from scale. ViT opened the door to unified multimodal models that treat image patches and text tokens identically."
+  outcome: "Trained on mid-sized datasets such as ImageNet without strong regularization, ViT is a few percentage points below ResNets of comparable size. Pretrained on larger datasets (14M–300M images), Dosovitskiy et al. report that it approaches or beats the state of the art on multiple image recognition benchmarks; in their words, large-scale training trumps inductive bias."
 
 build_steps:
   - { title: "1. Split the image into patches", detail: "Cut the input image into a regular grid of fixed-size squares — for a 224×224 image with 16×16 patches, that is 14×14 = 196 patches. Each patch will become one token." }
@@ -49,16 +49,15 @@ key_equation:
     - { symbol: "E_pos", meaning: "the position embeddings added so the model knows where each patch sat" }
 
 strengths:
-  - "A single global attention step lets any patch relate to any other, capturing long-range structure that a CNN needs many layers to reach."
-  - "Reuses the exact transformer stack from language, so tooling, scaling recipes, and hardware optimisations transfer directly."
-  - "Scales gracefully — accuracy keeps climbing with more data and larger models, unlike CNNs that saturate sooner."
-  - "The same substrate handles image patches and text tokens, enabling unified multimodal models."
+  - "Self-attention layers are global, so any patch can relate to any other in a single layer."
+  - "Reuses the NLP transformer: the authors note scalable NLP Transformer architectures and their efficient implementations can be used almost out of the box."
+  - "Benefits from scale: the full benefit of larger models appears only with the largest pretraining dataset (JFT-300M), per the authors."
 
 weaknesses:
-  - "Data-hungry: with weak vision priors it underperforms CNNs unless pretrained on very large datasets."
+  - "Data-hungry: trained on mid-sized datasets without strong regularization it trails comparable ResNets."
   - "Self-attention cost grows quadratically with the number of patches, making high-resolution images expensive."
-  - "Little built-in translation or locality bias, so it must learn from data what a CNN assumes for free."
-  - "Fixed patch grids can miss fine detail and struggle with objects at very different scales."
+  - "Much less image-specific inductive bias (locality, translation equivariance) than a CNN, so it must learn these from data."
+  - "Swin Transformer's authors point to large variations in the scale of visual entities and high pixel resolution as challenges in adapting the Transformer to vision."
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 900 520" role="img" aria-label="Vision Transformer: an image is cut into 16 by 16 patches, each patch is flattened and linearly projected into a token, a learnable class token is prepended and position embeddings are added; the sequence passes through L pre-norm encoder blocks of LayerNorm, multi-head self-attention, residual add, LayerNorm, MLP and residual add, and an MLP head reads the final class token to predict the class.">
@@ -195,11 +194,11 @@ diagram_svg: |
   </svg>
 diagram_caption: "ViT cuts the image into 16×16 patches, projects each to a token, prepends a [class] token and adds position embeddings; L pre-norm encoder blocks (attention, MLP, residual adds) follow, and a head reads the final [class] token."
 notable_models:
-  - { name: "ViT-B/L/H", year: 2020, note: "The original — proved a pure transformer, pretrained at scale, matches or beats CNNs on ImageNet." }
-  - { name: "DeiT", year: 2021, note: "Showed ViTs can be trained data-efficiently on ImageNet alone using distillation, without giant pretraining sets." }
-  - { name: "Swin Transformer", year: 2021, note: "Reintroduced a locality prior via shifted windows, making ViTs efficient for detection and segmentation." }
-  - { name: "DINOv2", year: 2023, note: "Proved self-supervised ViT backbones learn general-purpose visual features that transfer without labels." }
-  - { name: "SAM (Segment Anything)", year: 2023, note: "Used a ViT backbone to build a promptable, zero-shot image segmentation foundation model." }
+  - { name: "ViT-B/L/H", year: 2020, note: "The original: a pure transformer that, pretrained on ImageNet-21k or JFT-300M, approaches or beats the state of the art on image recognition benchmarks." }
+  - { name: "DeiT", year: 2021, note: "A convolution-free transformer trained on ImageNet only, with a distillation token for teacher-student training." }
+  - { name: "Swin Transformer", year: 2021, note: "Hierarchical transformer that limits self-attention to shifted local windows, with linear cost in image size; a general-purpose backbone for detection and segmentation." }
+  - { name: "DINOv2", year: 2023, note: "Self-supervised pretraining of a 1B-parameter ViT, distilled into smaller models, producing visual features that work without fine-tuning." }
+  - { name: "SAM (Segment Anything)", year: 2023, note: "Promptable segmentation model whose image encoder is an MAE-pretrained ViT; transfers zero-shot to new image distributions and tasks." }
 
 resources:
   - { kind: paper, title: "An Image is Worth 16x16 Words (Dosovitskiy et al., 2020)", url: "https://arxiv.org/abs/2010.11929" }
@@ -213,31 +212,30 @@ learn_first:
   - { label: "Embeddings & token representations", href: "/learn/concepts/embeddings", tag: "Concept" }
 
 tags: [vit, vision, transformer, patches, scaling]
-updated: 2026-07-20
+updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/2010.11929", title: "An Image is Worth 16x16 Words (Dosovitskiy et al., 2020)", trust: 0.95 }
   - { url: "https://huggingface.co/docs/transformers/model_doc/vit", title: "Vision Transformer (ViT) — Hugging Face documentation", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/2012.12877", title: "Training data-efficient image transformers & distillation through attention (Touvron et al., 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2103.14030", title: "Swin Transformer: Hierarchical Vision Transformer using Shifted Windows (Liu et al., 2021)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2304.07193", title: "DINOv2: Learning Robust Visual Features without Supervision (Oquab et al., 2023)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2304.02643", title: "Segment Anything (Kirillov et al., 2023)", trust: 0.95 }
 ---
 
 ## What Changed
-Vision had been convolutional for a decade — locality and weight sharing were assumed necessary priors
-for images. The Vision Transformer discarded them. It cuts an image into a grid of fixed patches (e.g.
-16×16 pixels), linearly projects each patch into a token, adds a positional embedding, and feeds the
-resulting sequence into an ordinary transformer encoder — the exact machinery built for language. With
-little vision-specific inductive bias, ViT *underperforms* CNNs on small datasets, but Dosovitskiy et
-al. showed that with enough pretraining data (tens of millions to hundreds of millions of images) it
-**matches or surpasses** the best convolutional networks, and keeps improving as data and model size
-grow. The lesson generalised the transformer's reach: attention over tokens is a domain-agnostic
-substrate, and the CNN's hard-wired priors can be *learned* from data instead. It descends from both
-the transformer (the engine) and the CNN (the task and benchmarks it had to beat), and it opened the
-door to unified multimodal models that treat image patches and text tokens the same way.
+The Vision Transformer (Dosovitskiy et al., 2020) **removes the reliance on convolutional networks**.
+It cuts an image into fixed patches (for example 16×16 pixels), linearly projects each patch into a
+token, adds a position embedding, and feeds the sequence into a standard transformer encoder.
+
+- **Small data**: trained on ImageNet alone without strong regularization, it is a few points below
+  comparable ResNets.
+- **Large data**: pretrained on 14M–300M images, it **approaches or beats** the state of the art on
+  multiple image recognition benchmarks, per the authors.
 
 ## Key Ideas
-- **Patch tokenization** — an image becomes a short sequence of patch embeddings, making the
-  quadratic cost of attention tractable (hundreds of tokens, not tens of thousands of pixels).
-- **Minimal inductive bias** — no convolutions or pooling; the model must *learn* locality and
-  translation behaviour, which needs more data but generalises further.
-- **Data-hungry crossover** — CNNs win in the low-data regime; ViT overtakes them once pretraining
-  data is large, illustrating the bias-versus-scale trade-off.
-- **Unified substrate** — the same transformer handles patches and words, enabling the multimodal
-  models that jointly process vision and language.
+- **Patch tokenization**: an image becomes a short sequence of patch embeddings (196 for a 224×224
+  image with 16×16 patches), instead of one token per pixel.
+- **Less inductive bias**: no convolutions in the encoder; locality and translation behaviour must be
+  learned from data.
+- **Data-size crossover**: ResNets do better on mid-sized datasets; ViT does better once pretraining
+  data is large.

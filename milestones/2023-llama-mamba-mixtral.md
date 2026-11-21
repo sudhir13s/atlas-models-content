@@ -11,8 +11,17 @@ architectures:
 models: []
 tags:
 - model-history
-updated: '2026-11-19'
-sources: []
+updated: '2026-11-21'
+sources:
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (arXiv:2302.13971)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2312.00752
+  title: 'Mamba: Linear-Time Sequence Modeling with Selective State Spaces (arXiv:2312.00752)'
+  trust: 0.95
+- url: https://mistral.ai/news/mixtral-of-experts
+  title: Mixtral of experts (Mistral AI announcement, 11 December 2023)
+  trust: 0.9
 ---
 
 

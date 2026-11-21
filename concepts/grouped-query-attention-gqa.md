@@ -8,14 +8,13 @@ category: attention
 code: GQA
 aliases: []
 order: 2
-short_description: Multiple query heads share fewer KV heads — balances quality and speed.
+short_description: Query heads are split into groups, and each group shares one key-value head.
 example_models:
-- Llama 2/3
+- Llama 2 70B
+- Llama 3
 - Mistral
 - Qwen 2.5
 - Gemma 2
-- DeepSeek-V2
-- Command R
 tags:
 - attention
 - gqa
@@ -23,6 +22,18 @@ updated: '2026-11-21'
 sources:
 - url: https://arxiv.org/abs/2305.13245
   title: 'GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints (arXiv:2305.13245)'
+  trust: 0.95
+- url: https://github.com/meta-llama/llama/blob/main/MODEL_CARD.md
+  title: Llama 2 model card (Meta)
+  trust: 0.9
+- url: https://github.com/meta-llama/llama3/blob/main/MODEL_CARD.md
+  title: Llama 3 model card (Meta)
+  trust: 0.9
+- url: https://arxiv.org/abs/2310.06825
+  title: Mistral 7B (arXiv:2310.06825)
+  trust: 0.95
+- url: https://arxiv.org/abs/2408.00118
+  title: 'Gemma 2: Improving Open Language Models at a Practical Size (arXiv:2408.00118)'
   trust: 0.95
 ---
 
@@ -32,8 +43,8 @@ A middle ground introduced in 2023 by Joshua Ainslie, James Lee-Thorp, Michiel d
 
 ## Why It Matters
 
-The dominant choice for modern LLMs because it dramatically reduces memory during inference (smaller KV cache) with minimal quality loss. This means longer contexts and higher throughput on the same hardware.
+The key-value (KV) cache holds one key and one value per KV head for every token, so fewer KV heads mean a smaller cache during generation. The Mistral 7B authors use GQA for faster inference; the Llama 3 model card states it is used in all Llama 3 models to improve inference efficiency.
 
 ## Trade-off
 
-Slight quality reduction vs MHA (usually <1% on benchmarks), but 2-8x less KV cache memory. The sweet spot for production deployment.
+GQA sits between multi-head attention (one KV head per query head) and multi-query attention (one KV head in total). The GQA authors report that uptrained GQA reaches quality close to multi-head attention at a speed comparable to multi-query attention.
