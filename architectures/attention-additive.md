@@ -58,22 +58,142 @@ weaknesses:
   - "The additive scoring net is computed for every (output, source) pair, adding cost that grows with sentence length."
   - "Attention here connects decoder to encoder only — the encoder still can't attend within itself, a limit the transformer later removes."
 
-diagram: |
-  flowchart LR
-    subgraph SRC["Encoder states"]
-      H1["h1"]
-      H2["h2"]
-      H3["h3"]
-    end
-    S["Decoder state s(t-1)"] --> SCORE["Additive score + softmax"]
-    H1 --> SCORE
-    H2 --> SCORE
-    H3 --> SCORE
-    SCORE --> W["Attention weights (sum to 1)"]
-    W --> CTX["Context vector = weighted avg"]
-    CTX --> OUT["Predict next word"]
-diagram_caption: "Each decoding step scores the decoder state against every encoder state, softmaxes into weights, and reads a weighted blend — a fresh context vector per output word."
-
+diagram_svg: |
+  <svg class="atlas-figure" viewBox="0 0 880 515" role="img" aria-label="Additive attention for one decoder step: a bidirectional encoder gives one annotation h_j per source word; the previous decoder state s_(i-1) is scored against every h_j by a small network, a softmax turns the scores into weights alpha_ij, and the weighted sum c_i feeds the new decoder state s_i, which emits y_i.">
+  <defs><marker id="attention-additive-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="attention-additive-arrow-strong" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-strong" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="attention-additive-arrow-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-accent" d="M0 0 L8 4 L0 8 Z"/></marker></defs>
+  <text class="d-title" x="40" y="30" text-anchor="start">One decoder step i attends over every source annotation</text>
+  <text class="d-math" x="120" y="455" text-anchor="middle">x₁</text>
+  <path class="d-line-strong" d="M120 443 V406" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="98" y="360" width="44" height="44" rx="4"/>
+  <path class="d-line" d="M98 382 H142"/>
+  <text class="d-note" x="120" y="375" text-anchor="middle">→h₁</text>
+  <text class="d-note" x="120" y="397" text-anchor="middle">←h₁</text>
+  <path class="d-line-strong" d="M142 371 H186" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line-strong" d="M188 393 H144" marker-end="url(#attention-additive-arrow-strong)"/>
+  <text class="d-math" x="210" y="455" text-anchor="middle">x₂</text>
+  <path class="d-line-strong" d="M210 443 V406" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="188" y="360" width="44" height="44" rx="4"/>
+  <path class="d-line" d="M188 382 H232"/>
+  <text class="d-note" x="210" y="375" text-anchor="middle">→h₂</text>
+  <text class="d-note" x="210" y="397" text-anchor="middle">←h₂</text>
+  <path class="d-line-strong" d="M232 371 H276" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line-strong" d="M278 393 H234" marker-end="url(#attention-additive-arrow-strong)"/>
+  <text class="d-math" x="300" y="455" text-anchor="middle">x₃</text>
+  <path class="d-line-strong" d="M300 443 V406" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="278" y="360" width="44" height="44" rx="4"/>
+  <path class="d-line" d="M278 382 H322"/>
+  <text class="d-note" x="300" y="375" text-anchor="middle">→h₃</text>
+  <text class="d-note" x="300" y="397" text-anchor="middle">←h₃</text>
+  <path class="d-line-strong" d="M322 371 H366" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line-strong" d="M368 393 H324" marker-end="url(#attention-additive-arrow-strong)"/>
+  <text class="d-math" x="390" y="455" text-anchor="middle">x₄</text>
+  <path class="d-line-strong" d="M390 443 V406" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="368" y="360" width="44" height="44" rx="4"/>
+  <path class="d-line" d="M368 382 H412"/>
+  <text class="d-note" x="390" y="375" text-anchor="middle">→h₄</text>
+  <text class="d-note" x="390" y="397" text-anchor="middle">←h₄</text>
+  <path class="d-line-strong" d="M412 371 H456" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line-strong" d="M458 393 H414" marker-end="url(#attention-additive-arrow-strong)"/>
+  <text class="d-math" x="480" y="455" text-anchor="middle">x₅</text>
+  <path class="d-line-strong" d="M480 443 V406" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="458" y="360" width="44" height="44" rx="4"/>
+  <path class="d-line" d="M458 382 H502"/>
+  <text class="d-note" x="480" y="375" text-anchor="middle">→h₅</text>
+  <text class="d-note" x="480" y="397" text-anchor="middle">←h₅</text>
+  <text class="d-title" x="545" y="380" text-anchor="start">bidirectional RNN encoder</text>
+  <text class="d-math" x="545" y="397" text-anchor="start">annotation h<tspan class="d-note" dy="3">j</tspan><tspan dy="-3"> = [→h</tspan><tspan class="d-note" dy="3">j</tspan><tspan dy="-3"> ; ←h</tspan><tspan class="d-note" dy="3">j</tspan><tspan dy="-3">]</tspan></text>
+  <rect class="d-box d-role-output" x="732" y="326" width="96" height="30" rx="5"/>
+  <text class="d-math" x="780" y="345" text-anchor="middle">s<tspan class="d-note" dy="3">i−1</tspan><tspan dy="-3"> </tspan></text>
+  <path class="d-line-strong" d="M732 341 H96"/>
+  <text class="d-note" x="545" y="356" text-anchor="start">s<tspan class="d-note" dy="3">i−1</tspan><tspan dy="-3"> is compared with every h</tspan><tspan class="d-note" dy="3">j</tspan><tspan dy="-3"> </tspan></text>
+  <rect class="d-fill-soft" x="86" y="252" width="420" height="22" rx="4"/>
+  <path class="d-line" d="M96 341 V324" marker-end="url(#attention-additive-arrow)"/>
+  <path class="d-line-strong" d="M108 360 V324" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="90" y="298" width="36" height="24" rx="4"/>
+  <text class="d-math" x="108" y="313" text-anchor="middle">e<tspan class="d-note" dy="3">i1</tspan><tspan dy="-3"> </tspan></text>
+  <path class="d-line-strong" d="M108 298 V276" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line-strong" d="M108 252 V240"/>
+  <rect class="d-box d-role-attention" x="100" y="232.3" width="16" height="7.700000000000001" rx="1"/>
+  <text class="d-note" x="108" y="226.3" text-anchor="middle">0.07</text>
+  <path class="d-line-strong" d="M108 214.3 V161" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line" d="M136 360 V150 H119" marker-end="url(#attention-additive-arrow)"/>
+  <circle class="d-node" cx="108" cy="150" r="9"/>
+  <text class="d-label" x="108" y="154" text-anchor="middle">×</text>
+  <path class="d-line-accent" d="M108 141 L283.5 99.0" marker-end="url(#attention-additive-arrow-accent)" opacity="0.31"/>
+  <path class="d-line" d="M186 341 V324" marker-end="url(#attention-additive-arrow)"/>
+  <path class="d-line-strong" d="M198 360 V324" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="180" y="298" width="36" height="24" rx="4"/>
+  <text class="d-math" x="198" y="313" text-anchor="middle">e<tspan class="d-note" dy="3">i2</tspan><tspan dy="-3"> </tspan></text>
+  <path class="d-line-strong" d="M198 298 V276" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line-strong" d="M198 252 V240"/>
+  <rect class="d-box d-role-attention" x="190" y="226.8" width="16" height="13.2" rx="1"/>
+  <text class="d-note" x="198" y="220.8" text-anchor="middle">0.12</text>
+  <path class="d-line-strong" d="M198 208.8 V161" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line" d="M226 360 V150 H209" marker-end="url(#attention-additive-arrow)"/>
+  <circle class="d-node" cx="198" cy="150" r="9"/>
+  <text class="d-label" x="198" y="154" text-anchor="middle">×</text>
+  <path class="d-line-accent" d="M198 141 L284.5 102.0" marker-end="url(#attention-additive-arrow-accent)" opacity="0.39"/>
+  <path class="d-line" d="M276 341 V324" marker-end="url(#attention-additive-arrow)"/>
+  <path class="d-line-strong" d="M288 360 V324" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="270" y="298" width="36" height="24" rx="4"/>
+  <text class="d-math" x="288" y="313" text-anchor="middle">e<tspan class="d-note" dy="3">i3</tspan><tspan dy="-3"> </tspan></text>
+  <path class="d-line-strong" d="M288 298 V276" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line-strong" d="M288 252 V240"/>
+  <rect class="d-box d-role-attention" x="280" y="185" width="16" height="55" rx="1"/>
+  <text class="d-note" x="288" y="179" text-anchor="middle">0.50</text>
+  <path class="d-line-strong" d="M288 167 V161" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line" d="M316 360 V150 H299" marker-end="url(#attention-additive-arrow)"/>
+  <circle class="d-node" cx="288" cy="150" r="9"/>
+  <text class="d-label" x="288" y="154" text-anchor="middle">×</text>
+  <path class="d-line-accent" d="M288 141 L295.7 111.4" marker-end="url(#attention-additive-arrow-accent)" opacity="1.00"/>
+  <path class="d-line" d="M366 341 V324" marker-end="url(#attention-additive-arrow)"/>
+  <path class="d-line-strong" d="M378 360 V324" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="360" y="298" width="36" height="24" rx="4"/>
+  <text class="d-math" x="378" y="313" text-anchor="middle">e<tspan class="d-note" dy="3">i4</tspan><tspan dy="-3"> </tspan></text>
+  <path class="d-line-strong" d="M378 298 V276" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line-strong" d="M378 252 V240"/>
+  <rect class="d-box d-role-attention" x="370" y="214.7" width="16" height="25.3" rx="1"/>
+  <text class="d-note" x="378" y="208.7" text-anchor="middle">0.23</text>
+  <path class="d-line-strong" d="M378 196.7 V161" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line" d="M406 360 V150 H389" marker-end="url(#attention-additive-arrow)"/>
+  <circle class="d-node" cx="378" cy="150" r="9"/>
+  <text class="d-label" x="378" y="154" text-anchor="middle">×</text>
+  <path class="d-line-accent" d="M378 141 L314.6 103.6" marker-end="url(#attention-additive-arrow-accent)" opacity="0.57"/>
+  <path class="d-line" d="M456 341 V324" marker-end="url(#attention-additive-arrow)"/>
+  <path class="d-line-strong" d="M468 360 V324" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="450" y="298" width="36" height="24" rx="4"/>
+  <text class="d-math" x="468" y="313" text-anchor="middle">e<tspan class="d-note" dy="3">i5</tspan><tspan dy="-3"> </tspan></text>
+  <path class="d-line-strong" d="M468 298 V276" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line-strong" d="M468 252 V240"/>
+  <rect class="d-box d-role-attention" x="460" y="231.2" width="16" height="8.8" rx="1"/>
+  <text class="d-note" x="468" y="225.2" text-anchor="middle">0.08</text>
+  <path class="d-line-strong" d="M468 213.2 V161" marker-end="url(#attention-additive-arrow-strong)"/>
+  <path class="d-line" d="M496 360 V150 H479" marker-end="url(#attention-additive-arrow)"/>
+  <circle class="d-node" cx="468" cy="150" r="9"/>
+  <text class="d-label" x="468" y="154" text-anchor="middle">×</text>
+  <path class="d-line-accent" d="M468 141 L316.4 99.5" marker-end="url(#attention-additive-arrow-accent)" opacity="0.33"/>
+  <text class="d-math" x="545" y="314" text-anchor="start">e<tspan class="d-note" dy="3">ij</tspan><tspan dy="-3"> = v</tspan><tspan class="d-note" dy="3">a</tspan><tspan dy="-3">ᵀ tanh(W</tspan><tspan class="d-note" dy="3">a</tspan><tspan dy="-3"> s</tspan><tspan class="d-note" dy="3">i−1</tspan><tspan dy="-3"> + U</tspan><tspan class="d-note" dy="3">a</tspan><tspan dy="-3"> h</tspan><tspan class="d-note" dy="3">j</tspan><tspan dy="-3">)</tspan></text>
+  <text class="d-math" x="545" y="267" text-anchor="start">α<tspan class="d-note" dy="3">ij</tspan><tspan dy="-3"> = softmax</tspan><tspan class="d-note" dy="3">j</tspan><tspan dy="-3">(e</tspan><tspan class="d-note" dy="3">ij</tspan><tspan dy="-3">),  Σ</tspan><tspan class="d-note" dy="3">j</tspan><tspan dy="-3"> α</tspan><tspan class="d-note" dy="3">ij</tspan><tspan dy="-3"> = 1</tspan></text>
+  <text class="d-note" x="545" y="205" text-anchor="start">bar height and line strength = α<tspan class="d-note" dy="3">ij</tspan><tspan dy="-3"> </tspan></text>
+  <circle class="d-node" cx="300" cy="95" r="14"/>
+  <text class="d-label" x="300" y="99" text-anchor="middle">Σ</text>
+  <text class="d-math" x="300" y="69" text-anchor="middle">c<tspan class="d-note" dy="3">i</tspan><tspan dy="-3"> = Σ</tspan><tspan class="d-note" dy="3">j</tspan><tspan dy="-3"> α</tspan><tspan class="d-note" dy="3">ij</tspan><tspan dy="-3"> h</tspan><tspan class="d-note" dy="3">j</tspan><tspan dy="-3"> </tspan></text>
+  <path class="d-line-accent" d="M314 95 H730" marker-end="url(#attention-additive-arrow-accent)"/>
+  <text class="d-math" x="520" y="86" text-anchor="middle">c<tspan class="d-note" dy="3">i</tspan><tspan dy="-3"> </tspan></text>
+  <rect class="d-box d-role-output" x="732" y="80" width="96" height="30" rx="5"/>
+  <text class="d-math" x="780" y="98" text-anchor="middle">s<tspan class="d-note" dy="3">i</tspan><tspan dy="-3"> </tspan></text>
+  <path class="d-line-strong" d="M780 326 V112" marker-end="url(#attention-additive-arrow-strong)"/>
+  <text class="d-math" x="768" y="160" text-anchor="end">s<tspan class="d-note" dy="3">i</tspan><tspan dy="-3"> = f(s</tspan><tspan class="d-note" dy="3">i−1</tspan><tspan dy="-3">, y</tspan><tspan class="d-note" dy="3">i−1</tspan><tspan dy="-3">, c</tspan><tspan class="d-note" dy="3">i</tspan><tspan dy="-3">)</tspan></text>
+  <path class="d-line-strong" d="M866 95 H830" marker-end="url(#attention-additive-arrow-strong)"/>
+  <text class="d-math" x="854" y="85" text-anchor="middle">y<tspan class="d-note" dy="3">i−1</tspan><tspan dy="-3"> </tspan></text>
+  <path class="d-line-strong" d="M780 80 V53" marker-end="url(#attention-additive-arrow-strong)"/>
+  <rect class="d-box d-role-output" x="758" y="29" width="44" height="22" rx="4"/>
+  <text class="d-math" x="780" y="43" text-anchor="middle">y<tspan class="d-note" dy="3">i</tspan><tspan dy="-3"> </tspan></text>
+  <text class="d-math" x="746" y="44" text-anchor="end">p(y<tspan class="d-note" dy="3">i</tspan><tspan dy="-3"> | …) = g(y</tspan><tspan class="d-note" dy="3">i−1</tspan><tspan dy="-3">, s</tspan><tspan class="d-note" dy="3">i</tspan><tspan dy="-3">, c</tspan><tspan class="d-note" dy="3">i</tspan><tspan dy="-3">)</tspan></text>
+  <text class="d-note" x="40" y="488" text-anchor="start">Bahdanau, Cho &amp; Bengio 2014 (RNNsearch): gated recurrent units, 1000 per direction in the encoder and 1000 in the decoder;</text>
+  <text class="d-note" x="40" y="503" text-anchor="start">the score a(s<tspan class="d-note" dy="3">i−1</tspan><tspan dy="-3">, h</tspan><tspan class="d-note" dy="3">j</tspan><tspan dy="-3">) is a one-hidden-layer network trained jointly with the translator. The α values shown are illustrative.</tspan></text>
+  </svg>
+diagram_caption: "For one decoder step, the previous state s_(i−1) is scored against every bidirectional annotation h_j; a softmax turns the scores into weights α_ij, and their weighted sum c_i feeds the new state s_i, which emits y_i."
 notable_models:
   - { name: "Bahdanau NMT", year: 2015, note: "The original — proved a learned soft alignment fixes the seq2seq long-sentence bottleneck and beats fixed-vector encoders." }
   - { name: "Luong attention", year: 2015, note: "Simplified scoring to a dot-product/bilinear form (global vs local attention), showing the mechanism generalizes beyond the additive net." }

@@ -59,16 +59,139 @@ weaknesses:
   - "The extrapolation eventually breaks — data runs out, and irreducible-error floors bend the curve."
   - "Emergent capabilities and safety behaviors aren't captured by a smooth loss law, so it under-predicts qualitative jumps."
 
-diagram: |
-  flowchart TD
-    LADDER["Train a ladder of models (vary N, D, C)"] --> MEASURE["Measure converged test loss"]
-    MEASURE --> PLOT["Plot loss on log-log axes"]
-    PLOT --> FIT["Straight line -> fit power law"]
-    FIT --> EXTRAP["Extrapolate loss of a bigger run"]
-    FIT --> OPT["Solve for compute-optimal (N, D)"]
-    OPT --> CHIN["Chinchilla rule: ~20 tokens per parameter"]
-diagram_caption: "Scaling laws in one loop: train a range of models, plot loss log-log, fit the straight-line power law, then extrapolate and pick the compute-optimal size."
-
+diagram_svg: |
+  <svg class="atlas-figure" viewBox="0 0 860 428" role="img" aria-label="Schematic of Kaplan et al.'s scaling laws: three log-log plots in which test loss falls along a straight line as model parameters N, dataset size D and compute C grow, each a power law with a small fitted exponent (0.076, 0.095 and 0.050).">
+  <text class="d-title" x="430" y="22" text-anchor="middle">Test loss falls as a power law in each of model size, data and compute</text>
+  <text class="d-note" x="430" y="38" text-anchor="middle">same loss scale in all three panels; each law holds when the other two factors are not the bottleneck</text>
+  <text class="d-label" x="0" y="0" text-anchor="middle" transform="translate(24 192) rotate(-90)">test loss (log scale)</text>
+  <text class="d-title" x="182" y="60" text-anchor="middle">Model size</text>
+  <text class="d-math" x="182" y="78" text-anchor="middle">L(N) = (N<tspan class="d-note" dy="3">c</tspan><tspan dy="-3">​</tspan> / N)<tspan class="d-note" dy="-5">α</tspan><tspan class="d-note" dy="3">N</tspan><tspan dy="2">,  α</tspan><tspan class="d-note" dy="3">N</tspan><tspan dy="-3">​</tspan> ≈ 0.076</text>
+  <path class="d-line" d="M84 277.8733387597771 H280" opacity="0.35"/>
+  <path class="d-line-strong" d="M80 277.8733387597771 H84"/>
+  <text class="d-note" x="76" y="281.3733387597771" text-anchor="end">2</text>
+  <path class="d-line" d="M84 223.50887223062222 H280" opacity="0.35"/>
+  <path class="d-line-strong" d="M80 223.50887223062222 H84"/>
+  <text class="d-note" x="76" y="227.00887223062222" text-anchor="end">3</text>
+  <path class="d-line" d="M84 184.93666937988854 H280" opacity="0.35"/>
+  <path class="d-line-strong" d="M80 184.93666937988854 H84"/>
+  <text class="d-note" x="76" y="188.43666937988854" text-anchor="end">4</text>
+  <path class="d-line" d="M84 130.57220285073362 H280" opacity="0.35"/>
+  <path class="d-line-strong" d="M80 130.57220285073362 H84"/>
+  <text class="d-note" x="76" y="134.07220285073362" text-anchor="end">6</text>
+  <path class="d-line" d="M84 92 H280" opacity="0.35"/>
+  <path class="d-line-strong" d="M80 92 H84"/>
+  <text class="d-note" x="76" y="95.5" text-anchor="end">8</text>
+  <path class="d-line" d="M84 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M84 292 V296"/>
+  <text class="d-note" x="84" y="309" text-anchor="middle">10³</text>
+  <path class="d-line" d="M112 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M112 292 V296"/>
+  <path class="d-line" d="M140 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M140 292 V296"/>
+  <text class="d-note" x="140" y="309" text-anchor="middle">10⁵</text>
+  <path class="d-line" d="M168 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M168 292 V296"/>
+  <path class="d-line" d="M196 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M196 292 V296"/>
+  <text class="d-note" x="196" y="309" text-anchor="middle">10⁷</text>
+  <path class="d-line" d="M224 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M224 292 V296"/>
+  <path class="d-line" d="M252 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M252 292 V296"/>
+  <text class="d-note" x="252" y="309" text-anchor="middle">10⁹</text>
+  <path class="d-line" d="M280 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M280 292 V296"/>
+  <path class="d-line-strong" d="M84 92 V292 H280"/>
+  <text class="d-label" x="182" y="328" text-anchor="middle">parameters N, non-embedding (log)</text>
+  <path class="d-line-accent" d="M84.0 114.0 L252.0 254.8"/>
+  <path class="d-line-accent" d="M252.0 254.8 L280.0 278.3" stroke-dasharray="4 4" opacity="0.7"/>
+  <path class="d-line" d="M126.0 149.2 V198.5 H184.8" stroke-dasharray="3 3"/>
+  <text class="d-math" x="120" y="177.8469125395119" text-anchor="end">slope −α</text>
+  <text class="d-title" x="460" y="60" text-anchor="middle">Dataset size</text>
+  <text class="d-math" x="460" y="78" text-anchor="middle">L(D) = (D<tspan class="d-note" dy="3">c</tspan><tspan dy="-3">​</tspan> / D)<tspan class="d-note" dy="-5">α</tspan><tspan class="d-note" dy="3">D</tspan><tspan dy="2">,  α</tspan><tspan class="d-note" dy="3">D</tspan><tspan dy="-3">​</tspan> ≈ 0.095</text>
+  <path class="d-line" d="M362 277.8733387597771 H558" opacity="0.35"/>
+  <path class="d-line-strong" d="M358 277.8733387597771 H362"/>
+  <path class="d-line" d="M362 223.50887223062222 H558" opacity="0.35"/>
+  <path class="d-line-strong" d="M358 223.50887223062222 H362"/>
+  <path class="d-line" d="M362 184.93666937988854 H558" opacity="0.35"/>
+  <path class="d-line-strong" d="M358 184.93666937988854 H362"/>
+  <path class="d-line" d="M362 130.57220285073362 H558" opacity="0.35"/>
+  <path class="d-line-strong" d="M358 130.57220285073362 H362"/>
+  <path class="d-line" d="M362 92 H558" opacity="0.35"/>
+  <path class="d-line-strong" d="M358 92 H362"/>
+  <path class="d-line" d="M362 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M362 292 V296"/>
+  <text class="d-note" x="362" y="309" text-anchor="middle">10⁷</text>
+  <path class="d-line" d="M411 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M411 292 V296"/>
+  <text class="d-note" x="411" y="309" text-anchor="middle">10⁸</text>
+  <path class="d-line" d="M460 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M460 292 V296"/>
+  <text class="d-note" x="460" y="309" text-anchor="middle">10⁹</text>
+  <path class="d-line" d="M509 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M509 292 V296"/>
+  <text class="d-note" x="509" y="309" text-anchor="middle">10¹⁰</text>
+  <path class="d-line" d="M558 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M558 292 V296"/>
+  <text class="d-note" x="558" y="309" text-anchor="middle">10¹¹</text>
+  <path class="d-line-strong" d="M362 92 V292 H558"/>
+  <text class="d-label" x="460" y="328" text-anchor="middle">dataset size D, tokens (log)</text>
+  <path class="d-line-accent" d="M411.0 202.7 L509.0 261.3"/>
+  <path class="d-line-accent" d="M509.0 261.3 L558.0 290.7" stroke-dasharray="4 4" opacity="0.7"/>
+  <path class="d-line" d="M435.5 217.3 V237.9 H469.8" stroke-dasharray="3 3"/>
+  <text class="d-math" x="429.5" y="231.6130675967996" text-anchor="end">slope −α</text>
+  <text class="d-title" x="738" y="60" text-anchor="middle">Compute</text>
+  <text class="d-math" x="738" y="78" text-anchor="middle">L(C) = (C<tspan class="d-note" dy="3">c</tspan><tspan dy="-3">​</tspan> / C)<tspan class="d-note" dy="-5">α</tspan><tspan class="d-note" dy="3">C</tspan><tspan dy="2">,  α</tspan><tspan class="d-note" dy="3">C</tspan><tspan dy="-3">​</tspan> ≈ 0.050</text>
+  <path class="d-line" d="M640 277.8733387597771 H836" opacity="0.35"/>
+  <path class="d-line-strong" d="M636 277.8733387597771 H640"/>
+  <path class="d-line" d="M640 223.50887223062222 H836" opacity="0.35"/>
+  <path class="d-line-strong" d="M636 223.50887223062222 H640"/>
+  <path class="d-line" d="M640 184.93666937988854 H836" opacity="0.35"/>
+  <path class="d-line-strong" d="M636 184.93666937988854 H640"/>
+  <path class="d-line" d="M640 130.57220285073362 H836" opacity="0.35"/>
+  <path class="d-line-strong" d="M636 130.57220285073362 H640"/>
+  <path class="d-line" d="M640 92 H836" opacity="0.35"/>
+  <path class="d-line-strong" d="M636 92 H640"/>
+  <path class="d-line" d="M640 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M640 292 V296"/>
+  <text class="d-note" x="640" y="309" text-anchor="middle">10⁻⁸</text>
+  <path class="d-line" d="M659.6 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M659.6 292 V296"/>
+  <path class="d-line" d="M679.2 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M679.2 292 V296"/>
+  <text class="d-note" x="679.2" y="309" text-anchor="middle">10⁻⁶</text>
+  <path class="d-line" d="M698.8 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M698.8 292 V296"/>
+  <path class="d-line" d="M718.4 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M718.4 292 V296"/>
+  <text class="d-note" x="718.4" y="309" text-anchor="middle">10⁻⁴</text>
+  <path class="d-line" d="M738 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M738 292 V296"/>
+  <path class="d-line" d="M757.6 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M757.6 292 V296"/>
+  <text class="d-note" x="757.6" y="309" text-anchor="middle">10⁻²</text>
+  <path class="d-line" d="M777.2 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M777.2 292 V296"/>
+  <path class="d-line" d="M796.8 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M796.8 292 V296"/>
+  <text class="d-note" x="796.8" y="309" text-anchor="middle">10⁰</text>
+  <path class="d-line" d="M816.4 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M816.4 292 V296"/>
+  <path class="d-line" d="M836 92 V292" opacity="0.35"/>
+  <path class="d-line-strong" d="M836 292 V296"/>
+  <text class="d-note" x="836" y="309" text-anchor="middle">10²</text>
+  <path class="d-line-strong" d="M640 92 V292 H836"/>
+  <text class="d-label" x="738" y="328" text-anchor="middle">compute C, PF-days (log)</text>
+  <path class="d-line-accent" d="M640.0 116.2 L796.8 239.7"/>
+  <path class="d-line-accent" d="M796.8 239.7 L836.0 270.6" stroke-dasharray="4 4" opacity="0.7"/>
+  <path class="d-line" d="M679.2 147.1 V190.3 H734.1" stroke-dasharray="3 3"/>
+  <text class="d-math" x="673.2" y="172.72590173877148" text-anchor="end">slope −α</text>
+  <path class="d-line" d="M16 358 H844" opacity="0.6"/>
+  <text class="d-label" x="430" y="378" text-anchor="middle">A straight line on log–log axes is a power law, L ∝ N⁻ᵅ: doubling N multiplies the loss by 2⁻⁰·⁰⁷⁶ ≈ 0.95, every time.</text>
+  <text class="d-label" x="430" y="396" text-anchor="middle">So a bigger model, more data and more compute, grown together, give predictable gains that can be forecast from small runs.</text>
+  <text class="d-note" x="430" y="416" text-anchor="middle">Lines drawn from the paper's fitted laws (WebText2; C is the compute-efficient C<tspan class="d-note" dy="3">min</tspan><tspan dy="-3">​</tspan>); solid = fitted span, dashed = extrapolation; data points omitted.</text>
+  </svg>
+diagram_caption: "Schematic of Kaplan et al. (2020): on log–log axes, test loss falls along a straight power-law line as parameters N, data D and compute C grow (exponents 0.076, 0.095, 0.050), so gains from scale are predictable."
 notable_models:
   - { name: "Kaplan et al. scaling study", year: 2020, note: "The original — showed test loss follows clean power laws in parameters, data, and compute, enabling extrapolation." }
   - { name: "GPT-3 175B", year: 2020, note: "Scaled aggressively on parameters and, in hindsight, was undertrained on data — the case Chinchilla later corrected." }

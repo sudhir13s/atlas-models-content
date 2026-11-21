@@ -60,18 +60,61 @@ weaknesses:
   - "Balancing reconstruction against the KL penalty is delicate and needs tuning (e.g. KL warm-up, β-VAE weighting)."
   - "The simple Gaussian prior/posterior can be too rigid to capture rich, multimodal data on its own."
 
-diagram: |
-  flowchart LR
-    X["Input x"] --> ENC["Encoder"]
-    ENC --> M["Mean μ"]
-    ENC --> S["Spread σ"]
-    M --> Z["Sample code z"]
-    S --> Z
-    N["Noise ε"] --> Z
-    Z --> DEC["Decoder"]
-    DEC --> XR["Reconstruction x̂"]
-diagram_caption: "The encoder outputs a mean and spread; a code is sampled with external noise (reparameterization); the decoder rebuilds the input."
-
+diagram_svg: |
+  <svg class="atlas-figure" viewBox="0 0 860 470" role="img" aria-label="A variational autoencoder: the encoder maps x to a mean μ and a spread σ, a separate noise sample ε gives the latent z = μ + σ ⊙ ε, and the decoder rebuilds x̂ from the narrow latent; the loss is reconstruction of x̂ against x plus a KL term pulling q(z|x) toward N(0, I).">
+  <defs><marker id="vae-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-strong" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="vae-arrow-thin" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="vae-arrow-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-accent" d="M0 0 L8 4 L0 8 Z"/></marker></defs>
+  <rect class="d-box d-role-input" x="46" y="140" width="20" height="20"/><rect class="d-box d-role-input" x="46" y="160" width="20" height="20"/><rect class="d-box d-role-input" x="46" y="180" width="20" height="20"/><rect class="d-box d-role-input" x="46" y="200" width="20" height="20"/><rect class="d-box d-role-input" x="46" y="220" width="20" height="20"/><rect class="d-box d-role-input" x="46" y="240" width="20" height="20"/><rect class="d-box d-role-input" x="46" y="260" width="20" height="20"/>
+  <text class="d-math" x="56" y="302" text-anchor="middle">x</text>
+  <text class="d-note" x="56" y="316" text-anchor="middle">input</text>
+  <rect class="d-box d-role-output" x="794" y="140" width="20" height="20"/><rect class="d-box d-role-output" x="794" y="160" width="20" height="20"/><rect class="d-box d-role-output" x="794" y="180" width="20" height="20"/><rect class="d-box d-role-output" x="794" y="200" width="20" height="20"/><rect class="d-box d-role-output" x="794" y="220" width="20" height="20"/><rect class="d-box d-role-output" x="794" y="240" width="20" height="20"/><rect class="d-box d-role-output" x="794" y="260" width="20" height="20"/>
+  <text class="d-math" x="804" y="302" text-anchor="middle">x̂</text>
+  <text class="d-note" x="804" y="316" text-anchor="middle">reconstruction</text>
+  <path class="d-line-strong" d="M70 210 H102" marker-end="url(#vae-arrow)"/>
+  <polygon class="d-box d-role-feedforward" points="106,136 256,174 256,246 106,284"/>
+  <text class="d-title" x="176" y="207" text-anchor="middle">Encoder</text>
+  <text class="d-math" x="176" y="223" text-anchor="middle">q<tspan dy="3">φ</tspan><tspan dy="-3">(z | x)</tspan></text>
+  <path class="d-line-strong" d="M256 190 L284 182" marker-end="url(#vae-arrow)"/>
+  <path class="d-line-strong" d="M256 230 L284 242" marker-end="url(#vae-arrow)"/>
+  <rect class="d-box d-role-attention" x="288" y="168" width="48" height="28" rx="5"/>
+  <text class="d-math" x="312" y="186" text-anchor="middle">μ</text>
+  <rect class="d-box d-role-attention" x="288" y="232" width="48" height="28" rx="5"/>
+  <text class="d-math" x="312" y="250" text-anchor="middle">σ</text>
+  <rect class="d-frame" x="370" y="128" width="136" height="196" rx="6"/>
+  <text class="d-note" x="438" y="144" text-anchor="middle">reparameterisation</text>
+  <circle class="d-node" cx="420" cy="246" r="12"/>
+  <text class="d-label" x="420" y="250" text-anchor="middle">⊙</text>
+  <circle class="d-node" cx="470" cy="210" r="12"/>
+  <text class="d-label" x="470" y="214" text-anchor="middle">+</text>
+  <path class="d-line-accent" d="M336 246 H405" marker-end="url(#vae-arrow-accent)"/>
+  <path class="d-line-accent" d="M336 182 H470 V195" marker-end="url(#vae-arrow-accent)"/>
+  <path class="d-line-accent" d="M432 246 L462 219" marker-end="url(#vae-arrow-accent)"/>
+  <rect class="d-box d-role-router" x="380" y="282" width="80" height="28" rx="5"/>
+  <text class="d-math" x="420" y="300" text-anchor="middle">ε ~ N(0, I)</text>
+  <path class="d-line" d="M420 282 V261" marker-end="url(#vae-arrow-thin)"/>
+  <text class="d-math" x="438" y="342" text-anchor="middle">z = μ + σ ⊙ ε</text>
+  <text class="d-note" x="438" y="357" text-anchor="middle">noise sits outside the network,</text>
+  <text class="d-note" x="438" y="370" text-anchor="middle">so ∂L/∂μ and ∂L/∂σ exist</text>
+  <path class="d-line-accent" d="M482 210 H524" marker-end="url(#vae-arrow-accent)"/>
+  <rect class="d-box d-role-attention" x="528" y="180" width="30" height="60" rx="5"/>
+  <text class="d-math" x="543" y="214" text-anchor="middle">z</text>
+  <text class="d-note" x="543" y="256" text-anchor="middle">latent</text>
+  <text class="d-note" x="543" y="269" text-anchor="middle">bottleneck</text>
+  <path class="d-line-strong" d="M558 210 H586" marker-end="url(#vae-arrow)"/>
+  <polygon class="d-box d-role-feedforward" points="590,174 740,136 740,284 590,246"/>
+  <text class="d-title" x="670" y="207" text-anchor="middle">Decoder</text>
+  <text class="d-math" x="670" y="223" text-anchor="middle">p<tspan dy="3">θ</tspan><tspan dy="-3">(x | z)</tspan></text>
+  <path class="d-line-strong" d="M740 210 H790" marker-end="url(#vae-arrow)"/>
+  <rect class="d-box d-role-router" x="236" y="30" width="196" height="46" rx="5"/>
+  <text class="d-title" x="334" y="50" text-anchor="middle">KL( q<tspan dy="3">φ</tspan><tspan dy="-3">(z | x) ‖ N(0, I) )</tspan></text>
+  <text class="d-note" x="334" y="66" text-anchor="middle">pulls every q(z|x) toward the prior</text>
+  <rect class="d-frame" x="280" y="160" width="64" height="108" rx="5"/>
+  <path class="d-line" d="M312 160 V80" marker-end="url(#vae-arrow-thin)"/>
+  <path class="d-line-back" d="M56 322 V408 H804 V322"/>
+  <rect class="d-box d-role-router" x="300" y="392" width="260" height="32" rx="5"/>
+  <text class="d-title" x="430" y="412" text-anchor="middle">Reconstruction  −log p<tspan dy="3">θ</tspan><tspan dy="-3">(x | z)</tspan></text>
+  <text class="d-note" x="430" y="444" text-anchor="middle">Loss = reconstruction + KL, the negative evidence lower bound (ELBO), minimised over φ and θ</text>
+  </svg>
+diagram_caption: "The encoder outputs a mean μ and spread σ; outside noise ε gives the latent z = μ + σ ⊙ ε, so gradients reach μ and σ. The decoder rebuilds x̂; the loss adds reconstruction and a KL pull toward N(0, I)."
 notable_models:
   - { name: "VAE", year: 2013, note: "The original — proved deep variational inference is trainable end-to-end via the reparameterization trick." }
   - { name: "β-VAE", year: 2017, note: "Reweighted the KL term to trade reconstruction for disentangled, interpretable latent factors." }

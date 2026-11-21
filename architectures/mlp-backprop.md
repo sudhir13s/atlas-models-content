@@ -60,18 +60,115 @@ weaknesses:
   - "Fully-connected layers ignore structure (spatial, sequential), needing huge parameter counts for images or sequences."
   - "Prone to overfitting and sensitive to initialization and learning rate without careful tuning."
 
-diagram: |
-  flowchart LR
-    X["Input layer"] --> H1["Hidden layer 1"]
-    H1 --> H2["Hidden layer 2"]
-    H2 --> O["Output layer"]
-    O --> L["Loss vs true label"]
-    L -.->|"gradients flow back"| O
-    O -.-> H2
-    H2 -.-> H1
-    H1 -.-> X
-diagram_caption: "Solid arrows are the forward pass computing a prediction; dashed arrows are backpropagation carrying gradients backward to update every layer."
-
+diagram_svg: |
+  <svg class="atlas-figure" viewBox="0 0 860 420" role="img" aria-label="A multilayer perceptron: four inputs, two hidden layers of five neurons and three outputs, every neuron connected to every neuron of the next layer; the forward pass runs left to right to a loss, and backpropagation carries the loss gradient right to left.">
+  <defs><marker id="mlp-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-strong" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="mlp-arrow-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-accent" d="M0 0 L8 4 L0 8 Z"/></marker></defs>
+  <path class="d-line-strong" d="M90 38 H760" marker-end="url(#mlp-arrow)"/>
+  <text class="d-label" x="425" y="28" text-anchor="middle">Forward pass: each layer computes a weighted sum, then a non-linearity σ</text>
+  <path class="d-line" d="M103 136 L267 113"/>
+  <path class="d-line" d="M103 136 L267 159"/>
+  <path class="d-line" d="M103 136 L267 205"/>
+  <path class="d-line" d="M103 136 L267 251"/>
+  <path class="d-line" d="M103 136 L267 297"/>
+  <path class="d-line" d="M103 182 L267 113"/>
+  <path class="d-line" d="M103 182 L267 159"/>
+  <path class="d-line" d="M103 182 L267 205"/>
+  <path class="d-line" d="M103 182 L267 251"/>
+  <path class="d-line" d="M103 182 L267 297"/>
+  <path class="d-line" d="M103 228 L267 113"/>
+  <path class="d-line" d="M103 228 L267 159"/>
+  <path class="d-line" d="M103 228 L267 205"/>
+  <path class="d-line" d="M103 228 L267 251"/>
+  <path class="d-line" d="M103 228 L267 297"/>
+  <path class="d-line" d="M103 274 L267 113"/>
+  <path class="d-line" d="M103 274 L267 159"/>
+  <path class="d-line" d="M103 274 L267 205"/>
+  <path class="d-line" d="M103 274 L267 251"/>
+  <path class="d-line" d="M103 274 L267 297"/>
+  <text class="d-math" x="185" y="86" text-anchor="middle">W¹</text>
+  <path class="d-line" d="M293 113 L457 113"/>
+  <path class="d-line" d="M293 113 L457 159"/>
+  <path class="d-line" d="M293 113 L457 205"/>
+  <path class="d-line" d="M293 113 L457 251"/>
+  <path class="d-line" d="M293 113 L457 297"/>
+  <path class="d-line" d="M293 159 L457 113"/>
+  <path class="d-line" d="M293 159 L457 159"/>
+  <path class="d-line" d="M293 159 L457 205"/>
+  <path class="d-line" d="M293 159 L457 251"/>
+  <path class="d-line" d="M293 159 L457 297"/>
+  <path class="d-line" d="M293 205 L457 113"/>
+  <path class="d-line" d="M293 205 L457 159"/>
+  <path class="d-line" d="M293 205 L457 205"/>
+  <path class="d-line" d="M293 205 L457 251"/>
+  <path class="d-line" d="M293 205 L457 297"/>
+  <path class="d-line" d="M293 251 L457 113"/>
+  <path class="d-line" d="M293 251 L457 159"/>
+  <path class="d-line" d="M293 251 L457 205"/>
+  <path class="d-line" d="M293 251 L457 251"/>
+  <path class="d-line" d="M293 251 L457 297"/>
+  <path class="d-line" d="M293 297 L457 113"/>
+  <path class="d-line" d="M293 297 L457 159"/>
+  <path class="d-line" d="M293 297 L457 205"/>
+  <path class="d-line" d="M293 297 L457 251"/>
+  <path class="d-line" d="M293 297 L457 297"/>
+  <text class="d-math" x="375" y="86" text-anchor="middle">W²</text>
+  <path class="d-line" d="M483 113 L647 159"/>
+  <path class="d-line" d="M483 113 L647 205"/>
+  <path class="d-line" d="M483 113 L647 251"/>
+  <path class="d-line" d="M483 159 L647 159"/>
+  <path class="d-line" d="M483 159 L647 205"/>
+  <path class="d-line" d="M483 159 L647 251"/>
+  <path class="d-line" d="M483 205 L647 159"/>
+  <path class="d-line" d="M483 205 L647 205"/>
+  <path class="d-line" d="M483 205 L647 251"/>
+  <path class="d-line" d="M483 251 L647 159"/>
+  <path class="d-line" d="M483 251 L647 205"/>
+  <path class="d-line" d="M483 251 L647 251"/>
+  <path class="d-line" d="M483 297 L647 159"/>
+  <path class="d-line" d="M483 297 L647 205"/>
+  <path class="d-line" d="M483 297 L647 251"/>
+  <text class="d-math" x="565" y="86" text-anchor="middle">W³</text>
+  <circle class="d-node d-role-input" cx="90" cy="136" r="13"/>
+  <text class="d-note" x="90" y="139.5" text-anchor="middle">x₁</text>
+  <circle class="d-node d-role-input" cx="90" cy="182" r="13"/>
+  <text class="d-note" x="90" y="185.5" text-anchor="middle">x₂</text>
+  <circle class="d-node d-role-input" cx="90" cy="228" r="13"/>
+  <text class="d-note" x="90" y="231.5" text-anchor="middle">x₃</text>
+  <circle class="d-node d-role-input" cx="90" cy="274" r="13"/>
+  <text class="d-note" x="90" y="277.5" text-anchor="middle">x₄</text>
+  <text class="d-title" x="90" y="346" text-anchor="middle">Input layer</text>
+  <text class="d-note" x="90" y="362" text-anchor="middle">features x</text>
+  <circle class="d-node d-role-feedforward" cx="280" cy="113" r="13"/>
+  <circle class="d-node d-role-feedforward" cx="280" cy="159" r="13"/>
+  <circle class="d-node d-role-feedforward" cx="280" cy="205" r="13"/>
+  <circle class="d-node d-role-feedforward" cx="280" cy="251" r="13"/>
+  <circle class="d-node d-role-feedforward" cx="280" cy="297" r="13"/>
+  <text class="d-title" x="280" y="346" text-anchor="middle">Hidden layer 1</text>
+  <text class="d-note" x="280" y="362" text-anchor="middle">h¹ = σ(W¹x + b¹)</text>
+  <circle class="d-node d-role-feedforward" cx="470" cy="113" r="13"/>
+  <circle class="d-node d-role-feedforward" cx="470" cy="159" r="13"/>
+  <circle class="d-node d-role-feedforward" cx="470" cy="205" r="13"/>
+  <circle class="d-node d-role-feedforward" cx="470" cy="251" r="13"/>
+  <circle class="d-node d-role-feedforward" cx="470" cy="297" r="13"/>
+  <text class="d-title" x="470" y="346" text-anchor="middle">Hidden layer 2</text>
+  <text class="d-note" x="470" y="362" text-anchor="middle">h² = σ(W²h¹ + b²)</text>
+  <circle class="d-node d-role-output" cx="660" cy="159" r="13"/>
+  <text class="d-note" x="660" y="162.5" text-anchor="middle">ŷ₁</text>
+  <circle class="d-node d-role-output" cx="660" cy="205" r="13"/>
+  <text class="d-note" x="660" y="208.5" text-anchor="middle">ŷ₂</text>
+  <circle class="d-node d-role-output" cx="660" cy="251" r="13"/>
+  <text class="d-note" x="660" y="254.5" text-anchor="middle">ŷ₃</text>
+  <text class="d-title" x="660" y="346" text-anchor="middle">Output layer</text>
+  <text class="d-note" x="660" y="362" text-anchor="middle">ŷ = softmax(W³h² + b³)</text>
+  <path class="d-line-strong" d="M676 159 L708 205 M676 251 L708 205"/>
+  <path class="d-line-strong" d="M676 205 H742" marker-end="url(#mlp-arrow)"/>
+  <rect class="d-box d-role-attention" x="746" y="179" width="98" height="52" rx="5"/>
+  <text class="d-title" x="795" y="201" text-anchor="middle">Loss L(ŷ, y)</text>
+  <text class="d-note" x="795" y="217" text-anchor="middle">error vs true label y</text>
+  <path class="d-line-accent" stroke-dasharray="5 4" d="M795 231 V392 H90" marker-end="url(#mlp-arrow-accent)"/>
+  <text class="d-label" x="425" y="384" text-anchor="middle">Backward pass: the chain rule carries ∂L/∂W back layer by layer; every weight moves against its gradient</text>
+  </svg>
+diagram_caption: "A multilayer perceptron with two hidden layers: every neuron feeds every neuron of the next layer. The forward pass computes a prediction and its loss; backpropagation carries the loss gradient back to update every weight."
 notable_models:
   - { name: "Rumelhart–Hinton–Williams net", year: 1986, note: "The Nature paper that popularized backprop and showed hidden layers learn useful internal representations." }
   - { name: "NETtalk", year: 1987, note: "Learned to pronounce English text from examples — a striking early demo that hidden layers capture structure." }

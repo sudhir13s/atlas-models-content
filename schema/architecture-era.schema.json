@@ -85,6 +85,10 @@
       "type": "string",
       "description": "Mermaid diagram source (with or without the ```mermaid fence). Rendered client-side, theme-aware."
     },
+    "diagram_svg": {
+      "type": "string",
+      "description": "Hand-authored SVG figure (one <svg class=\"atlas-figure\"> element) using the d-* classes; preferred over `diagram`."
+    },
     "diagram_caption": { "type": "string" },
     "notable_models": {
       "type": "array",

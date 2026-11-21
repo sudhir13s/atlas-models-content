@@ -60,15 +60,105 @@ weaknesses:
   - "Inherits the RNN's sequential, non-parallel computation over both encoder and decoder."
   - "Errors compound during decoding, since each generated token feeds the next (exposure bias)."
 
-diagram: |
-  flowchart LR
-    S["Source tokens"] --> ENC["Encoder RNN"]
-    ENC --> C["Context vector c"]
-    C --> DEC["Decoder RNN"]
-    DEC --> T["Target tokens"]
-    T -.->|"feed each output back"| DEC
-diagram_caption: "The encoder folds the whole source into one context vector; the decoder unrolls it into the target, feeding each generated token back as the next input."
-
+diagram_svg: |
+  <svg class="atlas-figure" viewBox="0 0 870 480" role="img" aria-label="An encoder LSTM reads the source tokens A, B, C, end-of-sentence one step at a time; its final state, a single fixed-size vector v, is the only link to a separate decoder LSTM, which emits W, X, Y, Z, end-of-sentence, feeding each output back as its next input.">
+  <defs><marker id="seq2seq-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="seq2seq-arrow-strong" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-strong" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="seq2seq-arrow-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-accent" d="M0 0 L8 4 L0 8 Z"/></marker></defs>
+  <rect class="d-frame" x="30" y="60" width="310" height="315" rx="8"/>
+  <rect class="d-frame" x="440" y="60" width="400" height="315" rx="8"/>
+  <text class="d-title" x="185" y="82" text-anchor="middle">Encoder LSTM: reads the source</text>
+  <text class="d-title" x="640" y="82" text-anchor="middle">Decoder LSTM: writes the target</text>
+  <text class="d-note" x="185" y="165" text-anchor="middle">per-step outputs are discarded;</text>
+  <text class="d-note" x="185" y="179" text-anchor="middle">only the final state is kept</text>
+  <rect class="d-box d-role-input" x="47" y="319" width="46" height="22" rx="4"/>
+  <text class="d-label" x="70" y="334" text-anchor="middle">A</text>
+  <path class="d-line-strong" d="M70 319 V264" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="45" y="218" width="50" height="44" rx="5"/>
+  <text class="d-label" x="70" y="244" text-anchor="middle">LSTM</text>
+  <path class="d-line-strong" d="M95 240 H123" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="127" y="319" width="46" height="22" rx="4"/>
+  <text class="d-label" x="150" y="334" text-anchor="middle">B</text>
+  <path class="d-line-strong" d="M150 319 V264" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="125" y="218" width="50" height="44" rx="5"/>
+  <text class="d-label" x="150" y="244" text-anchor="middle">LSTM</text>
+  <path class="d-line-strong" d="M175 240 H203" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="207" y="319" width="46" height="22" rx="4"/>
+  <text class="d-label" x="230" y="334" text-anchor="middle">C</text>
+  <path class="d-line-strong" d="M230 319 V264" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="205" y="218" width="50" height="44" rx="5"/>
+  <text class="d-label" x="230" y="244" text-anchor="middle">LSTM</text>
+  <path class="d-line-strong" d="M255 240 H283" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="287" y="319" width="46" height="22" rx="4"/>
+  <text class="d-label" x="310" y="334" text-anchor="middle">&lt;EOS&gt;</text>
+  <path class="d-line-strong" d="M310 319 V264" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="285" y="218" width="50" height="44" rx="5"/>
+  <text class="d-label" x="310" y="244" text-anchor="middle">LSTM</text>
+  <rect class="d-box d-role-input" x="457" y="319" width="46" height="22" rx="4"/>
+  <text class="d-label" x="480" y="334" text-anchor="middle">&lt;EOS&gt;</text>
+  <path class="d-line-strong" d="M480 319 V264" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="455" y="218" width="50" height="44" rx="5"/>
+  <text class="d-label" x="480" y="244" text-anchor="middle">LSTM</text>
+  <path class="d-line-strong" d="M505 240 H533" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="537" y="319" width="46" height="22" rx="4"/>
+  <text class="d-label" x="560" y="334" text-anchor="middle">W</text>
+  <path class="d-line-strong" d="M560 319 V264" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="535" y="218" width="50" height="44" rx="5"/>
+  <text class="d-label" x="560" y="244" text-anchor="middle">LSTM</text>
+  <path class="d-line-strong" d="M585 240 H613" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="617" y="319" width="46" height="22" rx="4"/>
+  <text class="d-label" x="640" y="334" text-anchor="middle">X</text>
+  <path class="d-line-strong" d="M640 319 V264" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="615" y="218" width="50" height="44" rx="5"/>
+  <text class="d-label" x="640" y="244" text-anchor="middle">LSTM</text>
+  <path class="d-line-strong" d="M665 240 H693" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="697" y="319" width="46" height="22" rx="4"/>
+  <text class="d-label" x="720" y="334" text-anchor="middle">Y</text>
+  <path class="d-line-strong" d="M720 319 V264" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="695" y="218" width="50" height="44" rx="5"/>
+  <text class="d-label" x="720" y="244" text-anchor="middle">LSTM</text>
+  <path class="d-line-strong" d="M745 240 H773" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-input" x="777" y="319" width="46" height="22" rx="4"/>
+  <text class="d-label" x="800" y="334" text-anchor="middle">Z</text>
+  <path class="d-line-strong" d="M800 319 V264" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="775" y="218" width="50" height="44" rx="5"/>
+  <text class="d-label" x="800" y="244" text-anchor="middle">LSTM</text>
+  <path class="d-line-strong" d="M480 218 V123" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-output" x="457" y="99" width="46" height="22" rx="4"/>
+  <text class="d-label" x="480" y="114" text-anchor="middle">W</text>
+  <path class="d-line-back" d="M503 110 H520 V330 H535" marker-end="url(#seq2seq-arrow)"/>
+  <path class="d-line-strong" d="M560 218 V123" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-output" x="537" y="99" width="46" height="22" rx="4"/>
+  <text class="d-label" x="560" y="114" text-anchor="middle">X</text>
+  <path class="d-line-back" d="M583 110 H600 V330 H615" marker-end="url(#seq2seq-arrow)"/>
+  <path class="d-line-strong" d="M640 218 V123" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-output" x="617" y="99" width="46" height="22" rx="4"/>
+  <text class="d-label" x="640" y="114" text-anchor="middle">Y</text>
+  <path class="d-line-back" d="M663 110 H680 V330 H695" marker-end="url(#seq2seq-arrow)"/>
+  <path class="d-line-strong" d="M720 218 V123" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-output" x="697" y="99" width="46" height="22" rx="4"/>
+  <text class="d-label" x="720" y="114" text-anchor="middle">Z</text>
+  <path class="d-line-back" d="M743 110 H760 V330 H775" marker-end="url(#seq2seq-arrow)"/>
+  <path class="d-line-strong" d="M800 218 V123" marker-end="url(#seq2seq-arrow-strong)"/>
+  <rect class="d-box d-role-output" x="777" y="99" width="46" height="22" rx="4"/>
+  <text class="d-label" x="800" y="114" text-anchor="middle">&lt;EOS&gt;</text>
+  <text class="d-note" x="640" y="362" text-anchor="middle">dashed: each emitted token becomes the next input</text>
+  <rect class="d-box d-role-attention" x="385.5" y="194.5" width="13" height="13" rx="1"/>
+  <rect class="d-box d-role-attention" x="385.5" y="207.5" width="13" height="13" rx="1"/>
+  <rect class="d-box d-role-attention" x="385.5" y="220.5" width="13" height="13" rx="1"/>
+  <rect class="d-box d-role-attention" x="385.5" y="233.5" width="13" height="13" rx="1"/>
+  <rect class="d-box d-role-attention" x="385.5" y="246.5" width="13" height="13" rx="1"/>
+  <rect class="d-box d-role-attention" x="385.5" y="259.5" width="13" height="13" rx="1"/>
+  <rect class="d-box d-role-attention" x="385.5" y="272.5" width="13" height="13" rx="1"/>
+  <path class="d-line-accent" d="M335 240 H382.5" marker-end="url(#seq2seq-arrow-accent)"/>
+  <path class="d-line-accent" d="M398.5 240 H453" marker-end="url(#seq2seq-arrow-accent)"/>
+  <text class="d-title" x="392" y="182.5" text-anchor="middle">v</text>
+  <text class="d-note" x="392" y="301.5" text-anchor="middle">fixed-size</text>
+  <text class="d-note" x="392" y="314.5" text-anchor="middle">vector</text>
+  <text class="d-math" x="30" y="412" text-anchor="start">p(y₁ … yₘ | x₁ … xₙ) = ∏ₜ p(yₜ | v, y₁ … yₜ₋₁)</text>
+  <text class="d-note" x="30" y="434" text-anchor="start">v = the encoder's last hidden state: the whole source must fit in this one vector, whatever its length.</text>
+  <text class="d-note" x="30" y="450" text-anchor="start">Paper (Sutskever, Vinyals &amp; Le 2014): 4 stacked LSTM layers of 1000 cells, 1000-d word embeddings; one layer drawn.</text>
+  <text class="d-note" x="30" y="466" text-anchor="start">The paper feeds the source in reverse (C, B, A), which shortens the gap between the first source and first target words.</text>
+  </svg>
+diagram_caption: "An encoder LSTM reads A B C <EOS> and keeps only its final state v; that one fixed-size vector is the sole link to a separate decoder LSTM, which emits W X Y Z <EOS>, feeding each output back as its next input."
 notable_models:
   - { name: "Sutskever seq2seq LSTM", year: 2014, note: "The original — proved a single end-to-end neural net rivals classic phrase-based machine translation." }
   - { name: "Google Neural Machine Translation (GNMT)", year: 2016, note: "Scaled deep seq2seq with attention to production, proving neural translation beats statistical systems at scale." }

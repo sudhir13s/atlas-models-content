@@ -36,7 +36,7 @@ build_steps:
   - { title: "3. Add position embeddings", detail: "Self-attention has no built-in sense of where a patch was, so add a learned position embedding to each patch token — recording that this tile came from, say, the top-left of the grid." }
   - { title: "4. Prepend a [CLS] token", detail: "Add one extra learnable token to the front of the sequence. It attends to every patch and, by the final layer, becomes a summary vector for the whole image used for classification." }
   - { title: "5. Run the transformer encoder", detail: "Feed the sequence through a standard stack of transformer blocks — multi-head self-attention lets every token mix in context from every other, followed by a feed-forward layer, each wrapped in residual connections and normalization." }
-  - { title: "6. Classify from the [CLS] token", detail: "Take the final [CLS] token, pass it through a small classification head (a linear layer + softmax), and read off the predicted class probabilities." }
+  - { title: "6. Classify from the [CLS] token", detail: "Take the final [CLS] token, pass it through a small classification head (one hidden layer during pre-training, a single linear layer when fine-tuning, then softmax), and read off the predicted class probabilities." }
 
 key_equation:
   latex: "\\mathbf{z}_0 = [\\,\\mathbf{x}_{\\text{cls}};\\ \\mathbf{x}_p^1 E;\\ \\mathbf{x}_p^2 E;\\ \\dots;\\ \\mathbf{x}_p^N E\\,] + \\mathbf{E}_{\\text{pos}}"
@@ -60,18 +60,140 @@ weaknesses:
   - "Little built-in translation or locality bias, so it must learn from data what a CNN assumes for free."
   - "Fixed patch grids can miss fine detail and struggle with objects at very different scales."
 
-diagram: |
-  flowchart LR
-    IMG["Input image"] --> SPLIT["Split into fixed patches"]
-    SPLIT --> EMB["Linear patch embeddings"]
-    POS["Position embeddings"] --> ADD["＋"]
-    EMB --> ADD
-    CLS["[CLS] token"] --> ADD
-    ADD --> ENC["Transformer encoder (self-attention)"]
-    ENC --> HEAD["Classification head on [CLS]"]
-    HEAD --> OUT["Class probabilities"]
-diagram_caption: "ViT turns an image into a short sequence of patch tokens plus a class token, then runs the standard transformer encoder and reads the answer off the class token."
-
+diagram_svg: |
+  <svg class="atlas-figure" viewBox="0 0 900 520" role="img" aria-label="Vision Transformer: an image is cut into 16 by 16 patches, each patch is flattened and linearly projected into a token, a learnable class token is prepended and position embeddings are added; the sequence passes through L pre-norm encoder blocks of LayerNorm, multi-head self-attention, residual add, LayerNorm, MLP and residual add, and an MLP head reads the final class token to predict the class.">
+  <defs><marker id="vit-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-strong" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="vit-arrow-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-accent" d="M0 0 L8 4 L0 8 Z"/></marker></defs>
+  <text class="d-title" x="86" y="50" text-anchor="middle">Image</text>
+  <rect class="d-box d-role-input" x="30" y="64" width="112" height="112"/>
+  <path class="d-line" d="M58 64 V176 M30 92 H142"/>
+  <path class="d-line" d="M86 64 V176 M30 120 H142"/>
+  <path class="d-line" d="M114 64 V176 M30 148 H142"/>
+  <rect class="d-box d-role-attention" x="30" y="64" width="28" height="28"/>
+  <text class="d-note" x="86" y="192" text-anchor="middle">224×224 → 14×14 grid</text>
+  <text class="d-note" x="86" y="205" text-anchor="middle">N = 196 patches (4×4 drawn)</text>
+  <text class="d-label" x="420" y="52" text-anchor="middle">16×16 patches, each flattened to 16·16·3 = 768 values</text>
+  <path class="d-line-strong" d="M148 79 H247" marker-end="url(#vit-arrow)"/>
+  <rect class="d-box d-role-attention" x="253" y="66" width="26" height="26"/>
+  <path class="d-line" d="M266 92 V118"/>
+  <rect class="d-box d-role-input" x="297" y="66" width="26" height="26"/>
+  <path class="d-line" d="M310 92 V118"/>
+  <rect class="d-box d-role-input" x="341" y="66" width="26" height="26"/>
+  <path class="d-line" d="M354 92 V118"/>
+  <rect class="d-box d-role-input" x="385" y="66" width="26" height="26"/>
+  <path class="d-line" d="M398 92 V118"/>
+  <rect class="d-box d-role-input" x="429" y="66" width="26" height="26"/>
+  <path class="d-line" d="M442 92 V118"/>
+  <rect class="d-box d-role-input" x="473" y="66" width="26" height="26"/>
+  <path class="d-line" d="M486 92 V118"/>
+  <text class="d-title" x="530" y="83" text-anchor="middle">…</text>
+  <rect class="d-box d-role-input" x="561" y="66" width="26" height="26"/>
+  <path class="d-line" d="M574 92 V118"/>
+  <rect class="d-box d-role-embedding" x="245" y="120" width="350" height="26" rx="4"/>
+  <text class="d-label" x="420" y="137" text-anchor="middle">linear projection E (shared): 768 → D = 768</text>
+  <rect class="d-box d-role-output" x="213" y="162" width="18" height="36" rx="3"/>
+  <text class="d-label" x="222" y="214" text-anchor="middle">+</text>
+  <rect class="d-box d-role-position" x="213" y="224" width="18" height="18" rx="3"/>
+  <text class="d-note" x="222" y="237" text-anchor="middle">0</text>
+  <path class="d-line-strong" d="M266 146 V160" marker-end="url(#vit-arrow)"/>
+  <rect class="d-box d-role-embedding" x="257" y="162" width="18" height="36" rx="3"/>
+  <text class="d-label" x="266" y="214" text-anchor="middle">+</text>
+  <rect class="d-box d-role-position" x="257" y="224" width="18" height="18" rx="3"/>
+  <text class="d-note" x="266" y="237" text-anchor="middle">1</text>
+  <path class="d-line-strong" d="M310 146 V160" marker-end="url(#vit-arrow)"/>
+  <rect class="d-box d-role-embedding" x="301" y="162" width="18" height="36" rx="3"/>
+  <text class="d-label" x="310" y="214" text-anchor="middle">+</text>
+  <rect class="d-box d-role-position" x="301" y="224" width="18" height="18" rx="3"/>
+  <text class="d-note" x="310" y="237" text-anchor="middle">2</text>
+  <path class="d-line-strong" d="M354 146 V160" marker-end="url(#vit-arrow)"/>
+  <rect class="d-box d-role-embedding" x="345" y="162" width="18" height="36" rx="3"/>
+  <text class="d-label" x="354" y="214" text-anchor="middle">+</text>
+  <rect class="d-box d-role-position" x="345" y="224" width="18" height="18" rx="3"/>
+  <text class="d-note" x="354" y="237" text-anchor="middle">3</text>
+  <path class="d-line-strong" d="M398 146 V160" marker-end="url(#vit-arrow)"/>
+  <rect class="d-box d-role-embedding" x="389" y="162" width="18" height="36" rx="3"/>
+  <text class="d-label" x="398" y="214" text-anchor="middle">+</text>
+  <rect class="d-box d-role-position" x="389" y="224" width="18" height="18" rx="3"/>
+  <text class="d-note" x="398" y="237" text-anchor="middle">4</text>
+  <path class="d-line-strong" d="M442 146 V160" marker-end="url(#vit-arrow)"/>
+  <rect class="d-box d-role-embedding" x="433" y="162" width="18" height="36" rx="3"/>
+  <text class="d-label" x="442" y="214" text-anchor="middle">+</text>
+  <rect class="d-box d-role-position" x="433" y="224" width="18" height="18" rx="3"/>
+  <text class="d-note" x="442" y="237" text-anchor="middle">5</text>
+  <path class="d-line-strong" d="M486 146 V160" marker-end="url(#vit-arrow)"/>
+  <rect class="d-box d-role-embedding" x="477" y="162" width="18" height="36" rx="3"/>
+  <text class="d-label" x="486" y="214" text-anchor="middle">+</text>
+  <rect class="d-box d-role-position" x="477" y="224" width="18" height="18" rx="3"/>
+  <text class="d-note" x="486" y="237" text-anchor="middle">6</text>
+  <text class="d-title" x="530" y="184" text-anchor="middle">…</text>
+  <text class="d-title" x="530" y="237" text-anchor="middle">…</text>
+  <path class="d-line-strong" d="M574 146 V160" marker-end="url(#vit-arrow)"/>
+  <rect class="d-box d-role-embedding" x="565" y="162" width="18" height="36" rx="3"/>
+  <text class="d-label" x="574" y="214" text-anchor="middle">+</text>
+  <rect class="d-box d-role-position" x="565" y="224" width="18" height="18" rx="3"/>
+  <text class="d-note" x="574" y="237" text-anchor="middle">N</text>
+  <text class="d-title" x="205" y="177" text-anchor="end">[class]</text>
+  <text class="d-note" x="205" y="191" text-anchor="end">learnable</text>
+  <text class="d-label" x="604" y="184">tokens xₚⁱE, one per patch</text>
+  <text class="d-label" x="604" y="237">+ learned 1-D position embeddings</text>
+  <text class="d-title" x="604" y="52">Encoder input (Eq. 1)</text>
+  <text class="d-math" x="604" y="72">z₀ = [x_class; xₚ¹E; …; xₚᴺE] + E_pos</text>
+  <text class="d-note" x="604" y="90">a sequence of N + 1 = 197 tokens, each D = 768</text>
+  <text class="d-note" x="604" y="116">ViT-Base/16: L = 12 blocks, D = 768,</text>
+  <text class="d-note" x="604" y="129">12 heads, MLP 3072, 86M parameters</text>
+  <path class="d-line-strong" d="M398 242 V272 H12 V392 H50" marker-end="url(#vit-arrow)"/>
+  <text class="d-math" x="408" y="266">z₀</text>
+  <rect class="d-frame" x="24" y="300" width="620" height="146" rx="8"/>
+  <text class="d-title" x="38" y="320">Transformer encoder block (pre-norm)</text>
+  <text class="d-title" x="630" y="320" text-anchor="end">× L (L = 12)</text>
+  <circle class="d-node" cx="64" cy="392" r="2.5"/>
+  <path class="d-line-accent" d="M64 392 V352 Q64 344 72 344 H332 Q340 344 340 352 V379" marker-end="url(#vit-arrow-accent)"/>
+  <circle class="d-node" cx="364" cy="392" r="2.5"/>
+  <path class="d-line-accent" d="M364 392 V352 Q364 344 372 344 H576 Q584 344 584 352 V379" marker-end="url(#vit-arrow-accent)"/>
+  <rect class="d-box" x="82" y="374" width="58" height="36" rx="5"/>
+  <text class="d-title" x="111" y="396" text-anchor="middle">Norm</text>
+  <text class="d-note" x="111" y="426" text-anchor="middle">LayerNorm</text>
+  <rect class="d-box d-role-attention" x="162" y="374" width="150" height="36" rx="5"/>
+  <text class="d-title" x="237" y="396" text-anchor="middle">Multi-head attention</text>
+  <text class="d-note" x="237" y="426" text-anchor="middle">self-attention, 12 heads</text>
+  <rect class="d-box" x="384" y="374" width="58" height="36" rx="5"/>
+  <text class="d-title" x="413" y="396" text-anchor="middle">Norm</text>
+  <text class="d-note" x="413" y="426" text-anchor="middle">LayerNorm</text>
+  <rect class="d-box d-role-feedforward" x="464" y="374" width="92" height="36" rx="5"/>
+  <text class="d-title" x="510" y="396" text-anchor="middle">MLP</text>
+  <text class="d-note" x="510" y="426" text-anchor="middle">768→3072→768, GELU</text>
+  <path class="d-line-strong" d="M140 392 H160" marker-end="url(#vit-arrow)"/>
+  <path class="d-line-strong" d="M312 392 H327" marker-end="url(#vit-arrow)"/>
+  <circle class="d-node d-role-attention" cx="340" cy="392" r="11"/>
+  <path class="d-line-strong" d="M335 392 H345 M340 387 V397"/>
+  <path class="d-line-strong" d="M351 392 H382" marker-end="url(#vit-arrow)"/>
+  <path class="d-line-strong" d="M442 392 H462" marker-end="url(#vit-arrow)"/>
+  <path class="d-line-strong" d="M556 392 H571" marker-end="url(#vit-arrow)"/>
+  <circle class="d-node d-role-attention" cx="584" cy="392" r="11"/>
+  <path class="d-line-strong" d="M579 392 H589 M584 387 V397"/>
+  <path class="d-line-strong" d="M50 392 H80" marker-end="url(#vit-arrow)"/>
+  <text class="d-note" x="202" y="338" text-anchor="middle">residual</text>
+  <text class="d-note" x="474" y="338" text-anchor="middle">residual</text>
+  <text class="d-math" x="38" y="468">z′ₗ = MSA(LN(zₗ₋₁)) + zₗ₋₁</text>
+  <text class="d-math" x="284" y="468">zₗ = MLP(LN(z′ₗ)) + z′ₗ,   ℓ = 1 … L</text>
+  <path class="d-line-strong" d="M595 392 H663" marker-end="url(#vit-arrow)"/>
+  <text class="d-math" x="676" y="326" text-anchor="middle">z_L</text>
+  <rect class="d-box d-role-output" x="669" y="340" width="14" height="14" rx="2"/>
+  <rect class="d-box d-role-embedding" x="669" y="360" width="14" height="14" rx="2"/>
+  <rect class="d-box d-role-embedding" x="669" y="380" width="14" height="14" rx="2"/>
+  <text class="d-title" x="676" y="411" text-anchor="middle">⋮</text>
+  <rect class="d-box d-role-embedding" x="669" y="420" width="14" height="14" rx="2"/>
+  <text class="d-note" x="676" y="452" text-anchor="middle">patch outputs</text>
+  <text class="d-note" x="676" y="465" text-anchor="middle">unused</text>
+  <path class="d-line-accent" d="M683 347 H722" marker-end="url(#vit-arrow-accent)"/>
+  <rect class="d-box d-role-output" x="724" y="332" width="150" height="46" rx="5"/>
+  <text class="d-title" x="799" y="351" text-anchor="middle">LayerNorm → MLP head</text>
+  <text class="d-note" x="799" y="367" text-anchor="middle">reads only z_L⁰ ([class])</text>
+  <path class="d-line-strong" d="M799 378 V406" marker-end="url(#vit-arrow)"/>
+  <text class="d-title" x="799" y="424" text-anchor="middle">class</text>
+  <text class="d-note" x="799" y="440" text-anchor="middle">head: 1 hidden layer (pre-train),</text>
+  <text class="d-note" x="799" y="453" text-anchor="middle">1 linear layer (fine-tune)</text>
+  </svg>
+diagram_caption: "ViT cuts the image into 16×16 patches, projects each to a token, prepends a [class] token and adds position embeddings; L pre-norm encoder blocks (attention, MLP, residual adds) follow, and a head reads the final [class] token."
 notable_models:
   - { name: "ViT-B/L/H", year: 2020, note: "The original — proved a pure transformer, pretrained at scale, matches or beats CNNs on ImageNet." }
   - { name: "DeiT", year: 2021, note: "Showed ViTs can be trained data-efficiently on ImageNet alone using distillation, without giant pretraining sets." }

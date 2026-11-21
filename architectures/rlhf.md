@@ -60,20 +60,115 @@ weaknesses:
   - "The full PPO loop is complex and finicky, motivating simpler alternatives like DPO."
   - "Mostly elicits and directs existing abilities rather than adding new capability; it can also over-align into sycophancy or excessive refusals."
 
-diagram: |
-  flowchart TD
-    BASE["Pretrained base model"] --> SFT["Supervised fine-tuning on demos"]
-    SFT --> GEN["Sample several responses per prompt"]
-    GEN --> HUM["Humans rank responses"]
-    HUM --> RM["Train reward model"]
-    SFT --> POL["Policy (model being trained)"]
-    RM -->|"reward score"| PPO["PPO update"]
-    POL --> PPO
-    SFT -->|"KL penalty (leash)"| PPO
-    PPO --> POL
-    POL --> ALIGNED["Aligned assistant"]
-diagram_caption: "Three stages: fine-tune on demonstrations, train a reward model from human rankings, then use PPO to raise the reward while a KL penalty to the reference model keeps outputs fluent and honest."
-
+diagram_svg: |
+  <svg class="atlas-figure" viewBox="0 0 870 520" role="img" aria-label="The three stages of RLHF as in InstructGPT: supervised fine-tuning of GPT-3 on labeler-written answers; a reward model trained on labeler rankings of several sampled answers; and a PPO loop in which the policy answers prompts, the reward model scores each answer, a KL penalty to the frozen supervised model is subtracted, and PPO updates the policy.">
+  <defs><marker id="rlhf-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-strong" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="rlhf-arrow-light" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="rlhf-arrow-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-accent" d="M0 0 L8 4 L0 8 Z"/></marker></defs>
+  <rect class="d-frame" x="12" y="34" width="274" height="404" rx="8"/>
+  <text class="d-title" x="149" y="24" text-anchor="middle">① Supervised fine-tuning</text>
+  <rect class="d-frame" x="298" y="34" width="274" height="404" rx="8"/>
+  <text class="d-title" x="435" y="24" text-anchor="middle">② Reward model from rankings</text>
+  <rect class="d-frame" x="584" y="34" width="274" height="404" rx="8"/>
+  <text class="d-title" x="721" y="24" text-anchor="middle">③ RL with PPO against the RM</text>
+  <rect class="d-box d-role-input" x="32" y="52" width="234" height="26" rx="5"/>
+  <text class="d-note" x="149" y="69" text-anchor="middle">prompt x: “Summarise this email in one line”</text>
+  <path class="d-line-strong" d="M149 80 V96" marker-end="url(#rlhf-arrow)"/>
+  <circle class="d-node d-role-input" cx="149" cy="105" r="6"/>
+  <path class="d-line-strong" d="M138 122 Q139 112 149 112 Q159 112 160 122"/>
+  <text class="d-note" x="169" y="110" text-anchor="start">a labeler writes</text>
+  <text class="d-note" x="169" y="123" text-anchor="start">the ideal answer</text>
+  <path class="d-line-strong" d="M149 126 V142" marker-end="url(#rlhf-arrow)"/>
+  <rect class="d-box d-role-input" x="32" y="146" width="234" height="26" rx="5"/>
+  <text class="d-note" x="149" y="163" text-anchor="middle">demonstration y*  (prompt + answer pair)</text>
+  <rect class="d-box d-box" x="30" y="224" width="92" height="40" rx="5"/>
+  <text class="d-label" x="76" y="241" text-anchor="middle">GPT-3</text>
+  <text class="d-note" x="76" y="255" text-anchor="middle">pretrained</text>
+  <rect class="d-box d-role-feedforward" x="176" y="224" width="92" height="40" rx="5"/>
+  <text class="d-label" x="222" y="241" text-anchor="middle">SFT model</text>
+  <text class="d-note" x="222" y="255" text-anchor="middle">π<tspan class="d-note" dy="-4">SFT</tspan><tspan dy="4">​</tspan></text>
+  <path class="d-line-strong" d="M124 244 H172" marker-end="url(#rlhf-arrow)"/>
+  <path class="d-line" d="M149 174 V240" marker-end="url(#rlhf-arrow-light)"/>
+  <text class="d-note" x="157" y="196" text-anchor="start">trains on (x, y*)</text>
+  <text class="d-math" x="149" y="296" text-anchor="middle">maximise log π<tspan class="d-note" dy="-4">SFT</tspan><tspan dy="4">​</tspan>(y* | x)</text>
+  <text class="d-note" x="149" y="312" text-anchor="middle">ordinary supervised learning</text>
+  <text class="d-note" x="149" y="356" text-anchor="middle">π<tspan class="d-note" dy="-4">SFT</tspan><tspan dy="4">​</tspan> becomes the starting point of</text>
+  <text class="d-note" x="149" y="370" text-anchor="middle">the reward model (②) and the policy (③)</text>
+  <text class="d-label" x="149" y="424" text-anchor="middle">≈13k training prompts</text>
+  <rect class="d-box d-role-input" x="375" y="52" width="120" height="26" rx="5"/>
+  <text class="d-note" x="435" y="69" text-anchor="middle">prompt x</text>
+  <path class="d-line-strong" d="M435 80 V92" marker-end="url(#rlhf-arrow)"/>
+  <rect class="d-box d-role-feedforward" x="355" y="96" width="160" height="40" rx="5"/>
+  <text class="d-label" x="435" y="113" text-anchor="middle">π<tspan class="d-note" dy="-4">SFT</tspan><tspan dy="4">​</tspan></text>
+  <text class="d-note" x="435" y="127" text-anchor="middle">samples K answers</text>
+  <path class="d-line" d="M435 138 L357 156" marker-end="url(#rlhf-arrow-light)"/>
+  <rect class="d-box d-role-input" x="339" y="160" width="36" height="24" rx="5"/>
+  <text class="d-label" x="357" y="176" text-anchor="middle">A</text>
+  <path class="d-line" d="M435 138 L409 156" marker-end="url(#rlhf-arrow-light)"/>
+  <rect class="d-box d-role-input" x="391" y="160" width="36" height="24" rx="5"/>
+  <text class="d-label" x="409" y="176" text-anchor="middle">B</text>
+  <path class="d-line" d="M435 138 L461 156" marker-end="url(#rlhf-arrow-light)"/>
+  <rect class="d-box d-role-input" x="443" y="160" width="36" height="24" rx="5"/>
+  <text class="d-label" x="461" y="176" text-anchor="middle">C</text>
+  <path class="d-line" d="M435 138 L513 156" marker-end="url(#rlhf-arrow-light)"/>
+  <rect class="d-box d-role-input" x="495" y="160" width="36" height="24" rx="5"/>
+  <text class="d-label" x="513" y="176" text-anchor="middle">D</text>
+  <circle class="d-node d-role-input" cx="338" cy="207" r="6"/>
+  <path class="d-line-strong" d="M327 224 Q328 214 338 214 Q348 214 349 224"/>
+  <text class="d-note" x="358" y="212" text-anchor="start">a labeler ranks them,</text>
+  <text class="d-note" x="358" y="225" text-anchor="start">best to worst</text>
+  <rect class="d-box d-role-input" x="339" y="240" width="36" height="24" rx="5"/>
+  <text class="d-label" x="357" y="256" text-anchor="middle">D</text>
+  <rect class="d-box d-role-input" x="391" y="240" width="36" height="24" rx="5"/>
+  <text class="d-label" x="409" y="256" text-anchor="middle">C</text>
+  <text class="d-label" x="383" y="256" text-anchor="middle">></text>
+  <rect class="d-box d-role-input" x="443" y="240" width="36" height="24" rx="5"/>
+  <text class="d-label" x="461" y="256" text-anchor="middle">A</text>
+  <text class="d-label" x="435" y="256" text-anchor="middle">></text>
+  <rect class="d-box d-role-input" x="495" y="240" width="36" height="24" rx="5"/>
+  <text class="d-label" x="513" y="256" text-anchor="middle">B</text>
+  <text class="d-label" x="487" y="256" text-anchor="middle">></text>
+  <path class="d-line" d="M435 266 V302" marker-end="url(#rlhf-arrow-light)"/>
+  <text class="d-note" x="445" y="279" text-anchor="start">every pair of answers:</text>
+  <text class="d-note" x="445" y="292" text-anchor="start">y<tspan class="d-note" dy="3">w</tspan><tspan dy="-3">​</tspan> ranked above y<tspan class="d-note" dy="3">l</tspan><tspan dy="-3">​</tspan></text>
+  <rect class="d-box d-role-router" x="335" y="306" width="200" height="40" rx="5"/>
+  <text class="d-label" x="435" y="323" text-anchor="middle">reward model r<tspan class="d-note" dy="3">θ</tspan><tspan dy="-3">​</tspan>(x, y)</text>
+  <text class="d-note" x="435" y="337" text-anchor="middle">6B, starts from π<tspan class="d-note" dy="-4">SFT</tspan><tspan dy="4">​</tspan> · scalar score</text>
+  <text class="d-math" x="435" y="372" text-anchor="middle">loss = −log σ(r<tspan class="d-note" dy="3">θ</tspan><tspan dy="-3">​</tspan>(x, y<tspan class="d-note" dy="3">w</tspan><tspan dy="-3">​</tspan>) − r<tspan class="d-note" dy="3">θ</tspan><tspan dy="-3">​</tspan>(x, y<tspan class="d-note" dy="3">l</tspan><tspan dy="-3">​</tspan>))</text>
+  <text class="d-note" x="435" y="390" text-anchor="middle">K = 4 to 9 answers per prompt → every pair</text>
+  <text class="d-label" x="435" y="424" text-anchor="middle">≈33k training prompts</text>
+  <rect class="d-box d-role-input" x="630" y="52" width="152" height="26" rx="5"/>
+  <text class="d-note" x="706" y="69" text-anchor="middle">new prompt x (no labels)</text>
+  <path class="d-line-strong" d="M706 80 V96" marker-end="url(#rlhf-arrow)"/>
+  <rect class="d-box d-role-feedforward" x="638" y="100" width="136" height="40" rx="5"/>
+  <text class="d-label" x="706" y="117" text-anchor="middle">policy π<tspan class="d-note" dy="-4">RL</tspan><tspan dy="4">​</tspan><tspan class="d-note" dy="3">φ</tspan><tspan dy="-3">​</tspan></text>
+  <text class="d-note" x="706" y="131" text-anchor="middle">starts as a copy of π<tspan class="d-note" dy="-4">SFT</tspan><tspan dy="4">​</tspan></text>
+  <path class="d-line-strong" d="M706 142 V160" marker-end="url(#rlhf-arrow)"/>
+  <rect class="d-box d-role-input" x="656" y="164" width="100" height="26" rx="5"/>
+  <text class="d-note" x="706" y="181" text-anchor="middle">answer y</text>
+  <path class="d-line-strong" d="M706 192 V210" marker-end="url(#rlhf-arrow)"/>
+  <rect class="d-box d-role-router" x="638" y="214" width="136" height="40" rx="5"/>
+  <text class="d-label" x="706" y="231" text-anchor="middle">reward model r<tspan class="d-note" dy="3">θ</tspan><tspan dy="-3">​</tspan></text>
+  <text class="d-note" x="706" y="245" text-anchor="middle">frozen, from ②</text>
+  <path class="d-line-strong" d="M706 256 V274" marker-end="url(#rlhf-arrow)"/>
+  <rect class="d-box d-role-attention" x="626" y="278" width="160" height="44" rx="5"/>
+  <text class="d-label" x="706" y="296" text-anchor="middle">reward</text>
+  <text class="d-math" x="706" y="313" text-anchor="middle">r<tspan class="d-note" dy="3">θ</tspan><tspan dy="-3">​</tspan>(x, y) − β·log(π<tspan class="d-note" dy="-4">RL</tspan><tspan dy="4">​</tspan> / π<tspan class="d-note" dy="-4">SFT</tspan><tspan dy="4">​</tspan>)</text>
+  <rect class="d-box d-role-feedforward" x="798" y="160" width="52" height="34" rx="5"/>
+  <text class="d-label" x="824" y="175" text-anchor="middle">π<tspan class="d-note" dy="-4">SFT</tspan><tspan dy="4">​</tspan></text>
+  <text class="d-note" x="824" y="188" text-anchor="middle">frozen</text>
+  <path class="d-line" d="M758 177 H794" marker-end="url(#rlhf-arrow-light)"/>
+  <path class="d-line-back" d="M824 196 V300 H790" marker-end="url(#rlhf-arrow-light)"/>
+  <text class="d-note" x="0" y="0" text-anchor="middle" transform="translate(838 250) rotate(90)">KL penalty</text>
+  <path class="d-line-accent" d="M624 300 H604 V120 H634" marker-end="url(#rlhf-arrow-accent)"/>
+  <text class="d-label" x="0" y="0" text-anchor="middle" transform="translate(598 210) rotate(-90)">PPO update of φ</text>
+  <text class="d-note" x="706" y="348" text-anchor="middle">β sets how tightly π<tspan class="d-note" dy="-4">RL</tspan><tspan dy="4">​</tspan> is held</text>
+  <text class="d-note" x="706" y="362" text-anchor="middle">near π<tspan class="d-note" dy="-4">SFT</tspan><tspan dy="4">​</tspan> (limits reward hacking)</text>
+  <text class="d-label" x="721" y="424" text-anchor="middle">≈31k training prompts</text>
+  <path class="d-line" d="M16 454 H854" opacity="0.6"/>
+  <text class="d-math" x="435" y="474" text-anchor="middle">objective(φ) = E<tspan class="d-note" dy="3">(x, y) ~ π<tspan class="d-note" dy="-4">RL</tspan><tspan dy="4">​</tspan></tspan><tspan dy="-3">​</tspan>[ r<tspan class="d-note" dy="3">θ</tspan><tspan dy="-3">​</tspan>(x, y) − β·log(π<tspan class="d-note" dy="-4">RL</tspan><tspan dy="4">​</tspan><tspan class="d-note" dy="3">φ</tspan><tspan dy="-3">​</tspan>(y | x) / π<tspan class="d-note" dy="-4">SFT</tspan><tspan dy="4">​</tspan>(y | x)) ] + γ·E<tspan class="d-note" dy="3">x ~ pretraining</tspan><tspan dy="-3">​</tspan>[ log π<tspan class="d-note" dy="-4">RL</tspan><tspan dy="4">​</tspan><tspan class="d-note" dy="3">φ</tspan><tspan dy="-3">​</tspan>(x) ]</text>
+  <text class="d-note" x="435" y="494" text-anchor="middle">InstructGPT (Ouyang et al. 2022) keeps γ > 0 (“PPO-ptx”) to limit regressions on public NLP tasks; plain “PPO” sets γ = 0.</text>
+  <text class="d-note" x="435" y="508" text-anchor="middle">Learning a reward model from human comparisons follows Christiano et al. 2017.</text>
+  </svg>
+diagram_caption: "RLHF as in InstructGPT: fine-tune GPT-3 on labeler-written answers, train a reward model on labeler rankings of sampled answers, then improve the policy with PPO against that reward minus a KL penalty to the frozen SFT model."
 notable_models:
   - { name: "InstructGPT", year: 2022, note: "Introduced the three-stage RLHF recipe and showed a 1.3B aligned model beating 175B GPT-3 on human preference." }
   - { name: "ChatGPT", year: 2022, note: "Applied RLHF at scale in a chat interface — the product that made aligned assistants mainstream." }

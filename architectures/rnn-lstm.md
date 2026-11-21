@@ -27,7 +27,7 @@ analogy:
 narrative:
   motivation: "Feed-forward networks treat every input independently — they have no memory and no sense of order, which is fatal for language, speech, and time series where meaning lives in the sequence. A recurrent network fixes the framing by threading a hidden state through time, so each output depends on everything seen so far. But there was a crippling training problem."
   approach: "Training an RNN means backpropagating through time — unrolling the recurrence into one long chain and applying the chain rule across every step. That chain multiplies many gradient terms together, and long products of numbers either shrink toward zero (vanishing gradients) or blow up (exploding gradients). Hochreiter diagnosed this precisely: plain RNNs simply cannot learn dependencies more than a handful of steps apart."
-  solution: "The LSTM introduces a dedicated memory cell whose state is updated by *addition* rather than repeated multiplication — the 'constant error carousel' — so gradients can travel across hundreds of steps without vanishing. Three learned gates control the flow: a forget gate erases stale memory, an input gate writes new information, and an output gate decides what of the memory to expose at each step. The network learns when to remember and when to forget."
+  solution: "The LSTM introduces a dedicated memory cell whose state is updated by *addition* rather than repeated multiplication — the 'constant error carousel' — so gradients can travel across hundreds of steps without vanishing. Three learned gates control the flow: a forget gate erases stale memory, an input gate writes new information, and an output gate decides what of the memory to expose at each step. The network learns when to remember and when to forget. The 1997 cell had only the input and output gates; the forget gate was added by Gers, Schmidhuber and Cummins in 2000 and is part of every LSTM used since."
   outcome: "This made long-range sequence learning practical, and for roughly two decades LSTMs (and the streamlined GRU) were the default for translation, speech recognition, and handwriting. They powered the first neural machine-translation systems via the encoder–decoder (seq2seq) design. Their core idea — a selectively, additively updated recurrent state — even resurfaces in today's linear-time state-space models like Mamba. Their one unfixable flaw, strict step-by-step computation, is what the transformer later removed."
 
 build_steps:
@@ -60,20 +60,102 @@ weaknesses:
   - "The gated cell is more complex and slower per step than a simple feed-forward layer."
   - "A fixed-size state is a bottleneck: everything seen must be squeezed into one vector."
 
-diagram: |
-  flowchart LR
-    X1["Input x1"] --> C1["LSTM cell t=1"]
-    C1 -->|"state h1, c1"| C2["LSTM cell t=2"]
-    X2["Input x2"] --> C2
-    C2 -->|"state h2, c2"| C3["LSTM cell t=3"]
-    X3["Input x3"] --> C3
-    C1 --> Y1["Output y1"]
-    C2 --> Y2["Output y2"]
-    C3 --> Y3["Output y3"]
-diagram_caption: "The same LSTM cell is applied at each step, passing its hidden and memory state forward so later steps see earlier context."
-
+diagram_svg: |
+  <svg class="atlas-figure" viewBox="0 0 900 545" role="img" aria-label="Left: a recurrent network unrolled over three steps, the same cell reading x1, x2, x3 and passing its hidden and cell state forward. Right: inside one LSTM cell, the cell state runs across the top and is changed only by the forget gate's multiplication and the input gate's addition; the output gate reads it out through tanh as h_t.">
+  <defs><marker id="rnn-lstm-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="rnn-lstm-arrow-strong" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-strong" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="rnn-lstm-arrow-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-accent" d="M0 0 L8 4 L0 8 Z"/></marker></defs>
+  <text class="d-title" x="165" y="110" text-anchor="middle">Unrolled over time</text>
+  <path class="d-line-strong" d="M22 250 H50" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <rect class="d-box" x="52" y="228" width="46" height="44" rx="5"/>
+  <text class="d-label" x="75" y="254" text-anchor="middle">LSTM</text>
+  <circle class="d-node d-role-input" cx="75" cy="340" r="13"/>
+  <text class="d-note" x="75" y="343.5" text-anchor="middle">x₁</text>
+  <circle class="d-node d-role-output" cx="75" cy="160" r="13"/>
+  <text class="d-note" x="75" y="163.5" text-anchor="middle">h₁</text>
+  <path class="d-line-strong" d="M75 327 V274" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <path class="d-line-strong" d="M75 228 V175" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <path class="d-line-strong" d="M98 250 H140" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <text class="d-note" x="120" y="242" text-anchor="middle">h₁,c₁</text>
+  <rect class="d-box" x="142" y="228" width="46" height="44" rx="5"/>
+  <text class="d-label" x="165" y="254" text-anchor="middle">LSTM</text>
+  <circle class="d-node d-role-input" cx="165" cy="340" r="13"/>
+  <text class="d-note" x="165" y="343.5" text-anchor="middle">x₂</text>
+  <circle class="d-node d-role-output" cx="165" cy="160" r="13"/>
+  <text class="d-note" x="165" y="163.5" text-anchor="middle">h₂</text>
+  <path class="d-line-strong" d="M165 327 V274" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <path class="d-line-strong" d="M165 228 V175" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <path class="d-line-strong" d="M188 250 H230" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <text class="d-note" x="210" y="242" text-anchor="middle">h₂,c₂</text>
+  <rect class="d-box" x="232" y="228" width="46" height="44" rx="5"/>
+  <text class="d-label" x="255" y="254" text-anchor="middle">LSTM</text>
+  <circle class="d-node d-role-input" cx="255" cy="340" r="13"/>
+  <text class="d-note" x="255" y="343.5" text-anchor="middle">x₃</text>
+  <circle class="d-node d-role-output" cx="255" cy="160" r="13"/>
+  <text class="d-note" x="255" y="163.5" text-anchor="middle">h₃</text>
+  <path class="d-line-strong" d="M255 327 V274" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <path class="d-line-strong" d="M255 228 V175" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <path class="d-line-strong" d="M278 250 H305" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <text class="d-note" x="165" y="385" text-anchor="middle">one cell, the same weights,</text>
+  <text class="d-note" x="165" y="399" text-anchor="middle">applied at every step</text>
+  <rect class="d-frame" x="330" y="60" width="500" height="370" rx="8"/>
+  <text class="d-title" x="580" y="46" text-anchor="middle">Inside one LSTM cell at step t</text>
+  <path class="d-line-accent" d="M330 110 H885" marker-end="url(#rnn-lstm-arrow-accent)"/>
+  <text class="d-math" x="340" y="100" text-anchor="start">cₜ₋₁</text>
+  <text class="d-math" x="879" y="100" text-anchor="end">cₜ</text>
+  <text class="d-note" x="668" y="90" text-anchor="middle">cell state: only scaled (×) and added to (+)</text>
+  <circle class="d-node" cx="420" cy="110" r="11"/>
+  <text class="d-label" x="420" y="114" text-anchor="middle">×</text>
+  <circle class="d-node" cx="555" cy="110" r="11"/>
+  <text class="d-label" x="555" y="114" text-anchor="middle">+</text>
+  <path class="d-line-strong" d="M330 360 H700"/>
+  <text class="d-math" x="340" y="350" text-anchor="start">hₜ₋₁</text>
+  <path class="d-line-strong" d="M380 450 V360"/>
+  <circle class="d-node" cx="380" cy="360" r="3"/>
+  <text class="d-math" x="380" y="466" text-anchor="middle">xₜ</text>
+  <text class="d-math" x="560" y="378" text-anchor="middle">[hₜ₋₁, xₜ]</text>
+  <path class="d-line-strong" d="M420 360 V309" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <rect class="d-box d-role-router" x="384" y="267" width="72" height="40" rx="5"/>
+  <text class="d-title" x="420" y="284" text-anchor="middle">σ</text>
+  <text class="d-note" x="420" y="300" text-anchor="middle">forget fₜ</text>
+  <path class="d-line-strong" d="M510 360 V309" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <rect class="d-box d-role-router" x="474" y="267" width="72" height="40" rx="5"/>
+  <text class="d-title" x="510" y="284" text-anchor="middle">σ</text>
+  <text class="d-note" x="510" y="300" text-anchor="middle">input iₜ</text>
+  <path class="d-line-strong" d="M600 360 V309" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="564" y="267" width="72" height="40" rx="5"/>
+  <text class="d-title" x="600" y="284" text-anchor="middle">tanh</text>
+  <text class="d-note" x="600" y="300" text-anchor="middle">candidate gₜ</text>
+  <path class="d-line-strong" d="M700 360 V309" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <rect class="d-box d-role-router" x="664" y="267" width="72" height="40" rx="5"/>
+  <text class="d-title" x="700" y="284" text-anchor="middle">σ</text>
+  <text class="d-note" x="700" y="300" text-anchor="middle">output oₜ</text>
+  <path class="d-line-strong" d="M420 267 V123" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <path class="d-line-strong" d="M510 267 V200 H542" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <path class="d-line-strong" d="M600 267 V200 H568" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <circle class="d-node" cx="555" cy="200" r="11"/>
+  <text class="d-label" x="555" y="204" text-anchor="middle">×</text>
+  <path class="d-line-strong" d="M555 189 V123" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <path class="d-line-strong" d="M760 110 V176" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <rect class="d-box d-role-feedforward" x="735" y="178" width="50" height="24" rx="5"/>
+  <text class="d-label" x="760" y="194" text-anchor="middle">tanh</text>
+  <path class="d-line-strong" d="M760 202 V274" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <path class="d-line-strong" d="M736 287 H747" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <circle class="d-node" cx="760" cy="287" r="11"/>
+  <text class="d-label" x="760" y="291" text-anchor="middle">×</text>
+  <path class="d-line-strong" d="M760 298 V400 H885" marker-end="url(#rnn-lstm-arrow-strong)"/>
+  <text class="d-math" x="879" y="390" text-anchor="end">hₜ</text>
+  <text class="d-math" x="340" y="492" text-anchor="start">fₜ, iₜ, oₜ = σ(W·[hₜ₋₁, xₜ] + b)</text>
+  <text class="d-math" x="620" y="492" text-anchor="start">gₜ = tanh(W·[hₜ₋₁, xₜ] + b)</text>
+  <text class="d-math" x="340" y="512" text-anchor="start">cₜ = fₜ ⊙ cₜ₋₁ + iₜ ⊙ gₜ</text>
+  <text class="d-math" x="620" y="512" text-anchor="start">hₜ = oₜ ⊙ tanh(cₜ)</text>
+  <text class="d-note" x="340" y="534" text-anchor="start">each gate has its own W and b · ⊙ = element-wise product, drawn as ×</text>
+  <text class="d-note" x="20" y="492" text-anchor="start">LSTM: Hochreiter &amp; Schmidhuber 1997</text>
+  <text class="d-note" x="20" y="507" text-anchor="start">forget gate added by Gers,</text>
+  <text class="d-note" x="20" y="522" text-anchor="start">Schmidhuber &amp; Cummins 2000</text>
+  </svg>
+diagram_caption: "One recurrent cell reused at every time step (left), and inside it the LSTM: the cell state runs straight across, scaled by the forget gate and added to by the input gate, while the output gate reads h_t out through tanh."
 notable_models:
-  - { name: "LSTM", year: 1997, note: "Hochreiter & Schmidhuber's gated cell — proved recurrent nets can learn dependencies hundreds of steps long." }
+  - { name: "LSTM", year: 1997, note: "Hochreiter & Schmidhuber's gated cell (input and output gates) — proved recurrent nets can learn dependencies hundreds of steps long." }
+  - { name: "LSTM with forget gate", year: 2000, note: "Gers, Schmidhuber & Cummins added the forget gate, giving the three-gate cell that became the standard LSTM." }
   - { name: "Seq2seq LSTM translation", year: 2014, note: "Stacked LSTMs as encoder and decoder — proved end-to-end neural machine translation was viable." }
   - { name: "GRU", year: 2014, note: "Cho et al.'s streamlined two-gate cell — proved you can get LSTM-like memory with fewer parameters." }
 
@@ -92,6 +174,7 @@ tags: [rnn, lstm, sequence, classical-dl, foundational]
 updated: 2026-07-20
 sources:
   - { url: "https://doi.org/10.1162/neco.1997.9.8.1735", title: "Long Short-Term Memory (Hochreiter & Schmidhuber, 1997, Neural Computation)", trust: 0.9 }
+  - { url: "https://doi.org/10.1162/089976600300015015", title: "Learning to Forget: Continual Prediction with LSTM (Gers, Schmidhuber & Cummins, 2000, Neural Computation)", trust: 0.9 }
 ---
 
 ## What Changed

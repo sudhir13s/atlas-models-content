@@ -59,17 +59,176 @@ weaknesses:
   - "Pooling and strided convolution discard precise spatial detail, which hurts tasks needing exact localisation."
   - "Fixed grid structure makes it awkward for irregular data (graphs, point clouds, variable-length sequences)."
 
-diagram: |
-  flowchart LR
-    IMG["Input image (H x W x 3)"] --> C1["Conv filters + ReLU"]
-    C1 --> P1["Pooling (downsample)"]
-    P1 --> C2["Conv filters + ReLU"]
-    C2 --> P2["Pooling (downsample)"]
-    P2 --> F["Flatten"]
-    F --> FC["Fully connected + Softmax"]
-    FC --> OUT["Class probabilities"]
-diagram_caption: "A convolutional network alternates convolution and pooling to build ever-higher-level features, then a fully connected head turns them into class scores."
-
+diagram_svg: |
+  <svg class="atlas-figure" viewBox="0 0 900 440" role="img" aria-label="LeNet-5: a 32 by 32 input passes through convolution and subsampling layers whose feature maps shrink from 28 by 28 to 5 by 5 while growing from 6 to 16 maps, then through 120, 84 and 10 units; a 5 by 5 window on the input feeds one unit of the first feature map.">
+  <defs><marker id="cnn-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-strong" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="cnn-arrow-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-accent" d="M0 0 L8 4 L0 8 Z"/></marker></defs>
+  <path class="d-line-strong" d="M133.2 200 H179.2" marker-end="url(#cnn-arrow)"/>
+  <text class="d-label" x="156.2" y="318" text-anchor="middle">convolution 5×5</text>
+  <text class="d-note" x="156.2" y="332" text-anchor="middle">shared weights</text>
+  <path class="d-line" stroke-dasharray="2 3" d="M156.2 210 V304"/>
+  <path class="d-line-strong" d="M308 200 H344" marker-end="url(#cnn-arrow)"/>
+  <text class="d-label" x="326" y="318" text-anchor="middle">subsampling 2×2</text>
+  <text class="d-note" x="326" y="332" text-anchor="middle">average, ×coef + bias</text>
+  <path class="d-line" stroke-dasharray="2 3" d="M326 210 V304"/>
+  <path class="d-line-strong" d="M424.4 200 H460.4" marker-end="url(#cnn-arrow)"/>
+  <text class="d-label" x="442.4" y="318" text-anchor="middle">convolution 5×5</text>
+  <text class="d-note" x="442.4" y="332" text-anchor="middle">sparse map links</text>
+  <path class="d-line" stroke-dasharray="2 3" d="M442.4 210 V304"/>
+  <path class="d-line-strong" d="M548.4 200 H584.4" marker-end="url(#cnn-arrow)"/>
+  <text class="d-label" x="566.4" y="318" text-anchor="middle">subsampling 2×2</text>
+  <text class="d-note" x="566.4" y="332" text-anchor="middle">average, ×coef + bias</text>
+  <path class="d-line" stroke-dasharray="2 3" d="M566.4 210 V304"/>
+  <path class="d-line" d="M650.9 169.8 L712.9 134 M650.9 230.3 L712.9 266"/>
+  <path class="d-line-strong" d="M656.9 200 H706.9" marker-end="url(#cnn-arrow)"/>
+  <text class="d-label" x="681.9" y="318" text-anchor="middle">convolution 5×5</text>
+  <text class="d-note" x="681.9" y="332" text-anchor="middle">5×5 → 1×1</text>
+  <path class="d-line" stroke-dasharray="2 3" d="M681.9 210 V304"/>
+  <path class="d-line" d="M724.9 134 L786.9 154 M724.9 266 L786.9 246"/>
+  <path class="d-line-strong" d="M730.9 200 H780.9" marker-end="url(#cnn-arrow)"/>
+  <text class="d-label" x="755.9" y="318" text-anchor="middle">full</text>
+  <text class="d-note" x="755.9" y="332" text-anchor="middle">connection</text>
+  <path class="d-line" stroke-dasharray="2 3" d="M755.9 210 V304"/>
+  <path class="d-line" d="M798.9 154 L858.9 136.5 M798.9 246 L858.9 263.5"/>
+  <path class="d-line-strong" d="M804.9 200 H852.9" marker-end="url(#cnn-arrow)"/>
+  <text class="d-label" x="828.9" y="318" text-anchor="middle">full connection</text>
+  <text class="d-note" x="828.9" y="332" text-anchor="middle">10 RBF units</text>
+  <path class="d-line" stroke-dasharray="2 3" d="M828.9 210 V304"/>
+  <rect class="d-node" x="28" y="150.4" width="99.2" height="99.2"/>
+  <rect class="d-box d-role-input" x="28" y="150.4" width="99.2" height="99.2"/>
+  <rect class="d-node" x="215.2" y="141.6" width="86.8" height="86.8"/>
+  <rect class="d-box d-role-vision" x="215.2" y="141.6" width="86.8" height="86.8"/>
+  <rect class="d-node" x="209.2" y="147.6" width="86.8" height="86.8"/>
+  <rect class="d-box d-role-vision" x="209.2" y="147.6" width="86.8" height="86.8"/>
+  <rect class="d-node" x="203.2" y="153.6" width="86.8" height="86.8"/>
+  <rect class="d-box d-role-vision" x="203.2" y="153.6" width="86.8" height="86.8"/>
+  <rect class="d-node" x="197.2" y="159.6" width="86.8" height="86.8"/>
+  <rect class="d-box d-role-vision" x="197.2" y="159.6" width="86.8" height="86.8"/>
+  <rect class="d-node" x="191.2" y="165.6" width="86.8" height="86.8"/>
+  <rect class="d-box d-role-vision" x="191.2" y="165.6" width="86.8" height="86.8"/>
+  <rect class="d-node" x="185.2" y="171.6" width="86.8" height="86.8"/>
+  <rect class="d-box d-role-vision" x="185.2" y="171.6" width="86.8" height="86.8"/>
+  <rect class="d-node" x="375" y="165.8" width="43.4" height="43.4"/>
+  <rect class="d-box d-role-router" x="375" y="165.8" width="43.4" height="43.4"/>
+  <rect class="d-node" x="370" y="170.8" width="43.4" height="43.4"/>
+  <rect class="d-box d-role-router" x="370" y="170.8" width="43.4" height="43.4"/>
+  <rect class="d-node" x="365" y="175.8" width="43.4" height="43.4"/>
+  <rect class="d-box d-role-router" x="365" y="175.8" width="43.4" height="43.4"/>
+  <rect class="d-node" x="360" y="180.8" width="43.4" height="43.4"/>
+  <rect class="d-box d-role-router" x="360" y="180.8" width="43.4" height="43.4"/>
+  <rect class="d-node" x="355" y="185.8" width="43.4" height="43.4"/>
+  <rect class="d-box d-role-router" x="355" y="185.8" width="43.4" height="43.4"/>
+  <rect class="d-node" x="350" y="190.8" width="43.4" height="43.4"/>
+  <rect class="d-box d-role-router" x="350" y="190.8" width="43.4" height="43.4"/>
+  <rect class="d-node" x="511.4" y="162" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="511.4" y="162" width="31" height="31"/>
+  <rect class="d-node" x="508.4" y="165" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="508.4" y="165" width="31" height="31"/>
+  <rect class="d-node" x="505.4" y="168" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="505.4" y="168" width="31" height="31"/>
+  <rect class="d-node" x="502.4" y="171" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="502.4" y="171" width="31" height="31"/>
+  <rect class="d-node" x="499.4" y="174" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="499.4" y="174" width="31" height="31"/>
+  <rect class="d-node" x="496.4" y="177" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="496.4" y="177" width="31" height="31"/>
+  <rect class="d-node" x="493.4" y="180" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="493.4" y="180" width="31" height="31"/>
+  <rect class="d-node" x="490.4" y="183" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="490.4" y="183" width="31" height="31"/>
+  <rect class="d-node" x="487.4" y="186" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="487.4" y="186" width="31" height="31"/>
+  <rect class="d-node" x="484.4" y="189" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="484.4" y="189" width="31" height="31"/>
+  <rect class="d-node" x="481.4" y="192" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="481.4" y="192" width="31" height="31"/>
+  <rect class="d-node" x="478.4" y="195" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="478.4" y="195" width="31" height="31"/>
+  <rect class="d-node" x="475.4" y="198" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="475.4" y="198" width="31" height="31"/>
+  <rect class="d-node" x="472.4" y="201" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="472.4" y="201" width="31" height="31"/>
+  <rect class="d-node" x="469.4" y="204" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="469.4" y="204" width="31" height="31"/>
+  <rect class="d-node" x="466.4" y="207" width="31" height="31"/>
+  <rect class="d-box d-role-vision" x="466.4" y="207" width="31" height="31"/>
+  <rect class="d-node" x="635.4" y="169.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="635.4" y="169.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="632.4" y="172.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="632.4" y="172.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="629.4" y="175.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="629.4" y="175.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="626.4" y="178.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="626.4" y="178.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="623.4" y="181.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="623.4" y="181.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="620.4" y="184.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="620.4" y="184.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="617.4" y="187.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="617.4" y="187.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="614.4" y="190.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="614.4" y="190.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="611.4" y="193.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="611.4" y="193.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="608.4" y="196.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="608.4" y="196.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="605.4" y="199.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="605.4" y="199.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="602.4" y="202.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="602.4" y="202.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="599.4" y="205.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="599.4" y="205.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="596.4" y="208.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="596.4" y="208.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="593.4" y="211.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="593.4" y="211.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="590.4" y="214.8" width="15.5" height="15.5"/>
+  <rect class="d-box d-role-router" x="590.4" y="214.8" width="15.5" height="15.5"/>
+  <rect class="d-node" x="712.9" y="134" width="12" height="132"/>
+  <rect class="d-box d-role-vision" x="712.9" y="134" width="12" height="132"/>
+  <rect class="d-node" x="786.9" y="154" width="12" height="92"/>
+  <rect class="d-box d-role-feedforward" x="786.9" y="154" width="12" height="92"/>
+  <circle class="d-node d-role-output" cx="863.9" cy="141.5" r="5"/>
+  <circle class="d-node d-role-output" cx="863.9" cy="154.5" r="5"/>
+  <circle class="d-node d-role-output" cx="863.9" cy="167.5" r="5"/>
+  <circle class="d-node d-role-output" cx="863.9" cy="180.5" r="5"/>
+  <circle class="d-node d-role-output" cx="863.9" cy="193.5" r="5"/>
+  <circle class="d-node d-role-output" cx="863.9" cy="206.5" r="5"/>
+  <circle class="d-node d-role-output" cx="863.9" cy="219.5" r="5"/>
+  <circle class="d-node d-role-output" cx="863.9" cy="232.5" r="5"/>
+  <circle class="d-node d-role-output" cx="863.9" cy="245.5" r="5"/>
+  <circle class="d-node d-role-output" cx="863.9" cy="258.5" r="5"/>
+  <text class="d-title" x="77.6" y="52" text-anchor="middle">Input</text>
+  <text class="d-note" x="77.6" y="67" text-anchor="middle">32×32</text>
+  <text class="d-title" x="243.6" y="52" text-anchor="middle">C1</text>
+  <text class="d-note" x="243.6" y="67" text-anchor="middle">6 @ 28×28</text>
+  <text class="d-title" x="384.2" y="52" text-anchor="middle">S2</text>
+  <text class="d-note" x="384.2" y="67" text-anchor="middle">6 @ 14×14</text>
+  <text class="d-title" x="504.4" y="52" text-anchor="middle">C3</text>
+  <text class="d-note" x="504.4" y="67" text-anchor="middle">16 @ 10×10</text>
+  <text class="d-title" x="620.6" y="52" text-anchor="middle">S4</text>
+  <text class="d-note" x="620.6" y="67" text-anchor="middle">16 @ 5×5</text>
+  <text class="d-title" x="718.9" y="52" text-anchor="middle">C5</text>
+  <text class="d-note" x="718.9" y="67" text-anchor="middle">120</text>
+  <text class="d-title" x="792.9" y="52" text-anchor="middle">F6</text>
+  <text class="d-note" x="792.9" y="67" text-anchor="middle">84</text>
+  <text class="d-title" x="863.9" y="52" text-anchor="middle">Output</text>
+  <text class="d-note" x="863.9" y="67" text-anchor="middle">10</text>
+  <rect class="d-box d-role-attention" x="59" y="169" width="15.5" height="15.5" stroke-dasharray="2 2"/>
+  <rect class="d-box d-role-attention" x="55.9" y="169" width="15.5" height="15.5"/>
+  <path class="d-line-accent" d="M71.4 169 L213.1 190.2 M71.4 184.5 L213.1 193.3"/>
+  <rect class="d-box d-role-attention" x="213.1" y="190.2" width="4.34" height="4.34"/>
+  <path class="d-line-accent" d="M55.9 194.5 H85.4" marker-end="url(#cnn-arrow-accent)"/>
+  <text class="d-note" x="77.6" y="267.6" text-anchor="middle">5×5 window slides</text>
+  <text class="d-note" x="77.6" y="280.6" text-anchor="middle">one step at a time</text>
+  <text class="d-note" x="228.6" y="276.4" text-anchor="middle">each window gives</text>
+  <text class="d-note" x="228.6" y="289.4" text-anchor="middle">one unit of a map</text>
+  <path class="d-line" d="M28 362 V368 H650.9 V362"/>
+  <text class="d-label" x="339.4" y="384" text-anchor="middle">feature extraction: maps shrink in size, grow in number</text>
+  <path class="d-line" d="M712.9 362 V368 H868.9 V362"/>
+  <text class="d-label" x="790.9" y="384" text-anchor="middle">classifier</text>
+  <text class="d-note" x="450" y="428" text-anchor="middle">LeNet-5 (LeCun et al., 1998): tanh-type squashing after every layer; each output unit scores its digit by distance from F6 (Euclidean RBF)</text>
+  </svg>
+diagram_caption: "LeNet-5: a 5×5 window slides over the 32×32 input, each position giving one unit of a feature map; convolution and 2×2 subsampling shrink the maps (28→14→10→5) while their number grows (6→16), then 120, 84 and 10 units classify the digit."
 notable_models:
   - { name: "LeNet-5", year: 1998, note: "Proved convolution + pooling could read handwritten digits reliably — the blueprint for every CNN that followed." }
   - { name: "AlexNet", year: 2012, note: "Showed a deep CNN with ReLU, dropout, and GPU training could crush the ImageNet benchmark — the spark of the deep learning boom." }

@@ -60,17 +60,45 @@ weaknesses:
   - "No likelihood means no clean way to measure how well the model fits the data or to compare models."
   - "Requires careful tricks (spectral normalization, gradient penalties) to train reliably at scale."
 
-diagram: |
-  flowchart LR
-    Z["Random noise z"] --> G["Generator G"]
-    G --> F["Fake image"]
-    R["Real image"] --> D["Discriminator D"]
-    F --> D
-    D --> S["Real or fake score"]
-    S -->|"gradient: fool the judge"| G
-    S -->|"gradient: catch the fake"| D
-diagram_caption: "The generator turns noise into fakes; the discriminator scores real vs. fake; the same signal trains both, in opposite directions."
-
+diagram_svg: |
+  <svg class="atlas-figure" viewBox="0 0 860 470" role="img" aria-label="A generative adversarial network: noise z goes through the generator G to a fake sample, a real sample comes from the data, and the discriminator D outputs the probability that its input is real; D is trained to tell real from fake while G is trained, through D, to fool it.">
+  <defs><marker id="gan-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-strong" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="gan-arrow-thin" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow" d="M0 0 L8 4 L0 8 Z"/></marker><marker id="gan-arrow-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path class="d-arrow-accent" d="M0 0 L8 4 L0 8 Z"/></marker></defs>
+  <rect class="d-box d-role-router" x="30" y="96" width="96" height="40" rx="5"/>
+  <text class="d-math" x="78" y="120" text-anchor="middle">z ~ p<tspan dy="3">z</tspan><tspan dy="-3"></tspan></text>
+  <text class="d-note" x="78" y="152" text-anchor="middle">random noise</text>
+  <path class="d-line-strong" d="M126 116 H166" marker-end="url(#gan-arrow)"/>
+  <polygon class="d-box d-role-feedforward" points="170,90 310,56 310,176 170,142"/>
+  <text class="d-title" x="240" y="113" text-anchor="middle">Generator G</text>
+  <text class="d-note" x="240" y="128" text-anchor="middle">noise → sample</text>
+  <path class="d-line-strong" d="M310 116 H352" marker-end="url(#gan-arrow)"/>
+  <rect class="d-fill-soft" x="358" y="87" width="58" height="58" rx="3"/><rect class="d-box d-role-output" x="372" y="91" width="10" height="10"/><rect class="d-box d-role-output" x="382" y="91" width="10" height="10"/><rect class="d-box d-role-output" x="362" y="101" width="10" height="10"/><rect class="d-box d-role-output" x="392" y="101" width="10" height="10"/><rect class="d-box d-role-output" x="402" y="101" width="10" height="10"/><rect class="d-box d-role-output" x="362" y="111" width="10" height="10"/><rect class="d-box d-role-output" x="402" y="111" width="10" height="10"/><rect class="d-box d-role-output" x="402" y="121" width="10" height="10"/><rect class="d-box d-role-output" x="372" y="131" width="10" height="10"/><rect class="d-box d-role-output" x="382" y="131" width="10" height="10"/><rect class="d-box d-role-output" x="392" y="131" width="10" height="10"/>
+  <text class="d-math" x="387" y="162" text-anchor="middle">fake G(z)</text>
+  <rect class="d-box d-role-input" x="30" y="284" width="126" height="40" rx="5"/>
+  <text class="d-title" x="93" y="302" text-anchor="middle">Training data</text>
+  <text class="d-math" x="93" y="317" text-anchor="middle">x ~ p<tspan dy="3">data</tspan><tspan dy="-3"></tspan></text>
+  <path class="d-line-strong" d="M156 304 H352" marker-end="url(#gan-arrow)"/>
+  <rect class="d-fill-soft" x="358" y="275" width="58" height="58" rx="3"/><rect class="d-box d-role-output" x="372" y="279" width="10" height="10"/><rect class="d-box d-role-output" x="382" y="279" width="10" height="10"/><rect class="d-box d-role-output" x="392" y="279" width="10" height="10"/><rect class="d-box d-role-output" x="362" y="289" width="10" height="10"/><rect class="d-box d-role-output" x="402" y="289" width="10" height="10"/><rect class="d-box d-role-output" x="362" y="299" width="10" height="10"/><rect class="d-box d-role-output" x="402" y="299" width="10" height="10"/><rect class="d-box d-role-output" x="362" y="309" width="10" height="10"/><rect class="d-box d-role-output" x="402" y="309" width="10" height="10"/><rect class="d-box d-role-output" x="372" y="319" width="10" height="10"/><rect class="d-box d-role-output" x="382" y="319" width="10" height="10"/><rect class="d-box d-role-output" x="392" y="319" width="10" height="10"/>
+  <text class="d-math" x="387" y="350" text-anchor="middle">real x</text>
+  <path class="d-line-strong" d="M420 116 L476 178" marker-end="url(#gan-arrow)"/>
+  <path class="d-line-strong" d="M420 304 L476 242" marker-end="url(#gan-arrow)"/>
+  <polygon class="d-box d-role-attention" points="480,130 630,172 630,248 480,290"/>
+  <text class="d-title" x="552" y="207" text-anchor="middle">Discriminator D</text>
+  <text class="d-note" x="552" y="222" text-anchor="middle">sample → score</text>
+  <path class="d-line-strong" d="M630 210 H681" marker-end="url(#gan-arrow)"/>
+  <circle class="d-node d-role-output" cx="708" cy="210" r="24"/>
+  <text class="d-math" x="708" y="214" text-anchor="middle">D(·)</text>
+  <text class="d-note" x="742" y="206" text-anchor="start">probability</text>
+  <text class="d-note" x="742" y="219" text-anchor="start">input is real</text>
+  <path class="d-line-back" d="M708 234 V372 H555 V276" marker-end="url(#gan-arrow-thin)"/>
+  <text class="d-title" x="640" y="392" text-anchor="middle">Train D: maximise the objective</text>
+  <text class="d-note" x="640" y="407" text-anchor="middle">push D(x) → 1 on real, D(G(z)) → 0 on fake</text>
+  <path class="d-line-accent" d="M708 186 V28 H240 V70" marker-end="url(#gan-arrow-accent)"/>
+  <text class="d-title" x="474" y="46" text-anchor="middle">Train G: minimise the objective</text>
+  <text class="d-note" x="474" y="61" text-anchor="middle">push D(G(z)) → 1; gradient flows back through D</text>
+  <text class="d-math" x="430" y="440" text-anchor="middle">min<tspan dy="3">G</tspan><tspan dy="-3"> max</tspan><tspan dy="3">D</tspan><tspan dy="-3">   E</tspan><tspan dy="3">x</tspan><tspan dy="-3"> [ log D(x) ]  +  E</tspan><tspan dy="3">z</tspan><tspan dy="-3"> [ log(1 − D(G(z))) ]</tspan></text>
+  <text class="d-note" x="430" y="459" text-anchor="middle">At the equilibrium the generator's distribution equals the data and D(·) = ½ everywhere</text>
+  </svg>
+diagram_caption: "The generator turns noise z into a fake sample; the discriminator scores real and fake samples with the probability \"real\". D is trained to tell them apart, and G is trained through D to fool it: one minimax objective."
 notable_models:
   - { name: "GAN", year: 2014, note: "The original — proved a generator can learn from a discriminator's gradient alone, with no explicit likelihood." }
   - { name: "DCGAN", year: 2015, note: "Made GAN training stable with convolutional architectures and showed the latent space supports smooth interpolation and arithmetic." }
