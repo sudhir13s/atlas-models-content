@@ -3,8 +3,8 @@ id: organization/dslim
 type: organization
 slug: dslim
 schema_version: 1.1
-title: D
-name: D
+title: dslim
+name: dslim
 website: https://huggingface.co/dslim
 hf_handles:
 - dslim
