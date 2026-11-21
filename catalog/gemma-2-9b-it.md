@@ -65,7 +65,6 @@ locked:
 - release_month
 - license
 - signal_strength
-- architecture_id
 - model_category
 - parameters_active_b
 - total_parameters
