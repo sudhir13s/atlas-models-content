@@ -19,6 +19,8 @@ fingerprint:
   context_window_tokens: 1024
   vocabulary_size: 256206
   activation_function: relu
+  norm_placement: pre
+  stack: encoder-decoder
 filters:
   is_quantized: false
   is_moe: false
@@ -41,13 +43,16 @@ tags:
 - translation
 - m2m-100
 - dense
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/facebook/nllb-200-distilled-600M
   title: facebook/nllb-200-distilled-600M — model page (Hugging Face)
   trust: 0.9
 - url: https://huggingface.co/facebook/nllb-200-distilled-600M/blob/main/config.json
   title: facebook/nllb-200-distilled-600M — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/m2m_100/modeling_m2m_100.py
+  title: 'transformers/models/m2m_100/modeling_m2m_100.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

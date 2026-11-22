@@ -26,6 +26,8 @@ fingerprint:
   vocabulary_size: 50272
   activation_function: relu
   positional_encoding: Learned
+  norm_placement: pre
+  stack: decoder
 filters:
   is_quantized: false
   is_moe: false
@@ -50,7 +52,7 @@ tags:
 - opt
 - dense
 - mha
-updated: '2026-11-20'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/facebook/opt-125m
   title: facebook/opt-125m — model page (Hugging Face)
@@ -64,6 +66,9 @@ sources:
 - url: https://arxiv.org/abs/2005.14165
   title: arXiv:2005.14165
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/opt/modeling_opt.py
+  title: 'transformers/models/opt/modeling_opt.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

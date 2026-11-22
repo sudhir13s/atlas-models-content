@@ -29,6 +29,8 @@ fingerprint:
   vocabulary_size: 49152
   activation_function: gelu_pytorch_tanh
   normalization: LayerNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000.0
 filters:
@@ -56,7 +58,7 @@ tags:
 - starcoder2
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/bigcode/starcoder2-7b
   title: bigcode/starcoder2-7b — model page (Hugging Face)
@@ -79,6 +81,9 @@ sources:
 - url: https://arxiv.org/abs/2402.19173
   title: arXiv:2402.19173
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/starcoder2/modeling_starcoder2.py
+  title: 'transformers/models/starcoder2/modeling_starcoder2.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

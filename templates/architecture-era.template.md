@@ -41,6 +41,7 @@ diagram: |
   flowchart TD
     A[Input] --> B[...]
 diagram_caption: "<one-line caption>"
+underlying_model_note: "<optional: how a catalog model's whole architecture, shown as a second figure, relates to the idea above; sourced>"
 notable_models:
   - { name: "<Model>", year: <YYYY>, note: "<what it proved>" }
 resources:

@@ -28,6 +28,8 @@ fingerprint:
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000.0
 filters:
@@ -61,7 +63,7 @@ tags:
 - qwen3
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-14B
   title: Qwen/Qwen3-14B — model page (Hugging Face)
@@ -75,6 +77,9 @@ sources:
 - url: https://arxiv.org/abs/2505.09388
   title: arXiv:2505.09388
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py
+  title: 'transformers/models/qwen3/modeling_qwen3.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

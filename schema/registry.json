@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.1",
+  "schema_version": "2.3",
   "shared": "schema/_shared.schema.json",
   "types": {
     "model": {
@@ -45,7 +45,15 @@
       "folder": "hyperparameters",
       "schema": "schema/hyperparameter.schema.json",
       "id_prefix": "hyperparameter/",
-      "sections": ["Definition", "What to look for", "Calculation", "Example"]
+      "sections": ["Definition"],
+      "optional_sections": [
+        "How It Works",
+        "What to look for",
+        "Calculation",
+        "Example",
+        "Worked Example",
+        "What To Watch"
+      ]
     },
     "fine-tuning-method": {
       "folder": "fine-tuning-methods",

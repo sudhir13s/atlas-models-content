@@ -28,6 +28,8 @@ fingerprint:
   vocabulary_size: 92544
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000.0
 filters:
@@ -55,7 +57,7 @@ tags:
 - internlm2
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/internlm/internlm2_5-7b-chat
   title: internlm/internlm2_5-7b-chat — model page (Hugging Face)
@@ -66,6 +68,9 @@ sources:
 - url: https://arxiv.org/abs/2403.17297
   title: arXiv:2403.17297
   trust: 0.95
+- url: https://huggingface.co/internlm/internlm2_5-7b-chat/blob/main/modeling_internlm2.py
+  title: 'internlm/internlm2_5-7b-chat: modeling_internlm2.py (official implementation)'
+  trust: 0.9
 ---
 
 

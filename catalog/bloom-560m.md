@@ -28,6 +28,8 @@ fingerprint:
   hidden_size: 1024
   vocabulary_size: 250880
   normalization: LayerNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: ALiBi
 filters:
   size_category: tiny
@@ -73,7 +75,7 @@ tags:
 - bloom
 - dense
 - mha
-updated: '2026-11-20'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/bigscience/bloom-560m
   title: bigscience/bloom-560m — model page (Hugging Face)
@@ -90,6 +92,9 @@ sources:
 - url: https://arxiv.org/abs/2108.12409
   title: arXiv:2108.12409
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bloom/modeling_bloom.py
+  title: 'transformers/models/bloom/modeling_bloom.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

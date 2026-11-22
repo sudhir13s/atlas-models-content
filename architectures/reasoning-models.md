@@ -157,6 +157,7 @@ diagram_svg: |
   <text class="d-note" x="625" y="366" text-anchor="middle">final answer and the format</text>
   </svg>
 diagram_caption: "A reasoning model writes a long, often hidden reasoning span before a short answer; all of it is billed output, so more thinking costs latency and money for accuracy (schematic). RL on automatically checkable answers trains it."
+underlying_model_note: "DeepSeek-R1 is a language model underneath: its makers took DeepSeek-V3-Base and trained it further with reinforcement learning, so the reasoning comes from the training, not from a different network."
 notable_models:
   - { name: "OpenAI o1", year: 2024, note: "Trained with large-scale reinforcement learning; OpenAI reports performance improving with both train-time and test-time compute." }
   - { name: "DeepSeek-R1", year: 2025, note: "Cold-start fine-tuning on long chain-of-thought data, then reinforcement learning with rule-based rewards; smaller distilled models were released." }

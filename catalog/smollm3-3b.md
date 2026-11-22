@@ -29,6 +29,8 @@ fingerprint:
   vocabulary_size: 128256
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 5000000.0
 filters:
@@ -56,13 +58,16 @@ tags:
 - smollm3
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
   title: HuggingFaceTB/SmolLM3-3B — model page (Hugging Face)
   trust: 0.9
 - url: https://huggingface.co/HuggingFaceTB/SmolLM3-3B/blob/main/config.json
   title: HuggingFaceTB/SmolLM3-3B — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/smollm3/modeling_smollm3.py
+  title: 'transformers/models/smollm3/modeling_smollm3.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

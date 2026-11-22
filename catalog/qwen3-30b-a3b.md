@@ -27,6 +27,8 @@ fingerprint:
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000.0
 moe_config:
@@ -57,7 +59,7 @@ tags:
 - qwen3-moe
 - moe
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-30B-A3B
   title: Qwen/Qwen3-30B-A3B — model page (Hugging Face)
@@ -71,6 +73,9 @@ sources:
 - url: https://arxiv.org/abs/2505.09388
   title: arXiv:2505.09388
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3_moe/modeling_qwen3_moe.py
+  title: 'transformers/models/qwen3_moe/modeling_qwen3_moe.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

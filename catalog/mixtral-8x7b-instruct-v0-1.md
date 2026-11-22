@@ -31,6 +31,8 @@ fingerprint:
   vocabulary_size: 32000
   activation_function: SwiGLU
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000
   parameters_active_b: 12.9
@@ -109,7 +111,7 @@ tags:
 - gqa
 - instruct
 - apache-2-0
-updated: '2026-11-20'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
   title: Mixtral-8x7B-Instruct-v0.1 — model card + config.json
@@ -119,6 +121,9 @@ sources:
   trust: 0.95
 - url: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json
   title: mistralai/Mixtral-8x7B-Instruct-v0.1 — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/mixtral/modeling_mixtral.py
+  title: 'transformers/models/mixtral/modeling_mixtral.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 related:
 - architecture-era/mixture-of-experts

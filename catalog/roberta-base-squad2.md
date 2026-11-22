@@ -24,6 +24,8 @@ fingerprint:
   vocabulary_size: 50265
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: post
+  stack: encoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -49,13 +51,16 @@ tags:
 - roberta
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/deepset/roberta-base-squad2
   title: deepset/roberta-base-squad2 — model page (Hugging Face)
   trust: 0.9
 - url: https://huggingface.co/deepset/roberta-base-squad2/blob/main/config.json
   title: deepset/roberta-base-squad2 — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/roberta/modeling_roberta.py
+  title: 'transformers/models/roberta/modeling_roberta.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

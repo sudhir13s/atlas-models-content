@@ -18,6 +18,8 @@ fingerprint:
   context_window_tokens: 1024
   vocabulary_size: 50264
   activation_function: gelu
+  norm_placement: post
+  stack: encoder-decoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -41,7 +43,7 @@ tags:
 - summarization
 - bart
 - dense
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/facebook/bart-large-cnn
   title: facebook/bart-large-cnn — model page (Hugging Face)
@@ -52,6 +54,9 @@ sources:
 - url: https://arxiv.org/abs/1910.13461
   title: arXiv:1910.13461
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bart/modeling_bart.py
+  title: 'transformers/models/bart/modeling_bart.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

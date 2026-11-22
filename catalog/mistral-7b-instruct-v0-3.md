@@ -32,6 +32,8 @@ fingerprint:
   vocabulary_size: 32768
   activation_function: SwiGLU
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000
   parameters_active_b: 7.25
@@ -104,7 +106,7 @@ tags:
 - gqa
 - instruct
 - apache-2-0
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3
   title: Mistral 7B Instruct v0.3 — model card + config.json
@@ -114,6 +116,9 @@ sources:
   trust: 0.95
 - url: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3/blob/main/config.json
   title: mistralai/Mistral-7B-Instruct-v0.3 — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/mistral/modeling_mistral.py
+  title: 'transformers/models/mistral/modeling_mistral.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 related:
 - architecture-era/transformer

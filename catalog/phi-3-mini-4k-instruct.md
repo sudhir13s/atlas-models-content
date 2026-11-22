@@ -31,6 +31,8 @@ fingerprint:
   vocabulary_size: 32064
   activation_function: SwiGLU
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 10000
   parameters_active_b: 3.82
@@ -105,7 +107,7 @@ tags:
 - instruct
 - small
 - mit
-updated: '2026-11-20'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct
   title: Phi-3-mini-4k-instruct — model card + config.json
@@ -115,6 +117,9 @@ sources:
   trust: 0.95
 - url: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/blob/main/config.json
   title: microsoft/Phi-3-mini-4k-instruct — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/phi3/modeling_phi3.py
+  title: 'transformers/models/phi3/modeling_phi3.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 related:
 - architecture-era/transformer

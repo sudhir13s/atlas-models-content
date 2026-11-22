@@ -23,6 +23,8 @@ fingerprint:
   context_window_tokens: 512
   vocabulary_size: 32128
   normalization: LayerNorm
+  norm_placement: pre
+  stack: encoder-decoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -48,7 +50,7 @@ tags:
 - t5
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/google-t5/t5-base
   title: google-t5/t5-base — model page (Hugging Face)
@@ -80,6 +82,9 @@ sources:
 - url: https://arxiv.org/abs/1910.09700
   title: arXiv:1910.09700
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/t5/modeling_t5.py
+  title: 'transformers/models/t5/modeling_t5.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

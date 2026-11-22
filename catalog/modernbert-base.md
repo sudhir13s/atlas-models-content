@@ -26,6 +26,8 @@ fingerprint:
   context_window_tokens: 8192
   vocabulary_size: 50368
   normalization: LayerNorm
+  norm_placement: pre
+  stack: encoder
   positional_encoding: Learned
 filters:
   size_category: tiny
@@ -52,7 +54,7 @@ tags:
 - modernbert
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/answerdotai/ModernBERT-base
   title: answerdotai/ModernBERT-base — model page (Hugging Face)
@@ -63,6 +65,9 @@ sources:
 - url: https://arxiv.org/abs/2412.13663
   title: arXiv:2412.13663
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/modernbert/modeling_modernbert.py
+  title: 'transformers/models/modernbert/modeling_modernbert.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

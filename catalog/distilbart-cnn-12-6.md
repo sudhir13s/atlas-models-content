@@ -16,6 +16,8 @@ fingerprint:
   context_window_tokens: 1024
   vocabulary_size: 50264
   activation_function: gelu
+  norm_placement: post
+  stack: encoder-decoder
 filters:
   is_quantized: false
   is_moe: false
@@ -38,13 +40,16 @@ tags:
 - summarization
 - bart
 - dense
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/sshleifer/distilbart-cnn-12-6
   title: sshleifer/distilbart-cnn-12-6 — model page (Hugging Face)
   trust: 0.9
 - url: https://huggingface.co/sshleifer/distilbart-cnn-12-6/blob/main/config.json
   title: sshleifer/distilbart-cnn-12-6 — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bart/modeling_bart.py
+  title: 'transformers/models/bart/modeling_bart.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

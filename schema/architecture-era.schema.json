@@ -90,6 +90,10 @@
       "description": "Hand-authored SVG figure (one <svg class=\"atlas-figure\"> element) using the d-* classes; preferred over `diagram`."
     },
     "diagram_caption": { "type": "string" },
+    "underlying_model_note": {
+      "type": "string",
+      "description": "One or two sentences a consumer prints above a second figure, the whole architecture of one catalog model of this record, saying how that model relates to the idea the first figure shows. Every statement rests on an entry of `sources`."
+    },
     "notable_models": {
       "type": "array",
       "description": "Landmark models in this family, each with what it proved.",

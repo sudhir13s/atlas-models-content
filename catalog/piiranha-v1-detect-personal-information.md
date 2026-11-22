@@ -27,6 +27,8 @@ fingerprint:
   vocabulary_size: 251000
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: post
+  stack: encoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -52,13 +54,16 @@ tags:
 - deberta-v2
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/iiiorg/piiranha-v1-detect-personal-information
   title: iiiorg/piiranha-v1-detect-personal-information — model page (Hugging Face)
   trust: 0.9
 - url: https://huggingface.co/iiiorg/piiranha-v1-detect-personal-information/blob/main/config.json
   title: iiiorg/piiranha-v1-detect-personal-information — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/deberta_v2/modeling_deberta_v2.py
+  title: 'transformers/models/deberta_v2/modeling_deberta_v2.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

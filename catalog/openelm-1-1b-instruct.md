@@ -23,6 +23,8 @@ fingerprint:
   vocabulary_size: 32000
   activation_function: swish
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
 filters:
   size_category: small
@@ -47,7 +49,7 @@ tags:
 - text-generation
 - openelm
 - dense
-updated: '2026-11-20'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/apple/OpenELM-1_1B-Instruct
   title: apple/OpenELM-1_1B-Instruct — model page (Hugging Face)
@@ -58,6 +60,9 @@ sources:
 - url: https://arxiv.org/abs/2404.14619
   title: arXiv:2404.14619
   trust: 0.95
+- url: https://huggingface.co/apple/OpenELM-1_1B-Instruct/blob/main/modeling_openelm.py
+  title: 'apple/OpenELM-1_1B-Instruct: modeling_openelm.py (official implementation)'
+  trust: 0.9
 ---
 
 

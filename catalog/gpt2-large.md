@@ -24,6 +24,8 @@ fingerprint:
   vocabulary_size: 50257
   activation_function: gelu_new
   normalization: LayerNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: Learned
 filters:
   size_category: tiny
@@ -50,7 +52,7 @@ tags:
 - gpt2
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/openai-community/gpt2-large
   title: openai-community/gpt2-large — model page (Hugging Face)
@@ -61,6 +63,9 @@ sources:
 - url: https://arxiv.org/abs/1910.09700
   title: arXiv:1910.09700
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/gpt2/modeling_gpt2.py
+  title: 'transformers/models/gpt2/modeling_gpt2.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

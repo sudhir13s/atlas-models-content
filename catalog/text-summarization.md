@@ -27,6 +27,8 @@ fingerprint:
   vocabulary_size: 32128
   activation_function: relu
   normalization: LayerNorm
+  norm_placement: pre
+  stack: encoder-decoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -52,13 +54,16 @@ tags:
 - t5
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/Falconsai/text_summarization
   title: Falconsai/text_summarization — model page (Hugging Face)
   trust: 0.9
 - url: https://huggingface.co/Falconsai/text_summarization/blob/main/config.json
   title: Falconsai/text_summarization — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/t5/modeling_t5.py
+  title: 'transformers/models/t5/modeling_t5.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

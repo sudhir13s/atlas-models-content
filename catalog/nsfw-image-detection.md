@@ -24,6 +24,8 @@ fingerprint:
   intermediate_size: 3072
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: pre
+  stack: encoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -48,7 +50,7 @@ tags:
 - vit
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/Falconsai/nsfw_image_detection
   title: Falconsai/nsfw_image_detection — model page (Hugging Face)
@@ -59,6 +61,9 @@ sources:
 - url: https://arxiv.org/abs/2010.11929
   title: arXiv:2010.11929
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/vit/modeling_vit.py
+  title: 'transformers/models/vit/modeling_vit.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

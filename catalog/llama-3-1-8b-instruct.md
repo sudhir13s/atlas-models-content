@@ -31,6 +31,8 @@ fingerprint:
   vocabulary_size: 128256
   activation_function: SwiGLU
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 500000
   parameters_active_b: 8.03
@@ -104,7 +106,7 @@ tags:
 - dense
 - gqa
 - instruct
-updated: '2026-11-20'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
   title: Llama 3.1 8B Instruct — model card + config.json
@@ -115,6 +117,9 @@ sources:
 - url: https://arxiv.org/abs/2204.05149
   title: arXiv:2204.05149
   trust: 0.95
+- url: https://github.com/meta-llama/llama3/blob/main/llama/model.py
+  title: 'meta-llama/llama3: llama/model.py (official reference implementation)'
+  trust: 0.9
 related:
 - architecture-era/transformer
 ---

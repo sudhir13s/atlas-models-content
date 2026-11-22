@@ -6,6 +6,7 @@ schema_version: 1.1
 title: vit-base-patch16-224
 organization: organization/google-deepmind
 license: license/apache-2-0
+architecture_id: architecture-era/vision-transformer
 model_category: vision
 tasks:
 - task/image-classification
@@ -21,6 +22,8 @@ fingerprint:
   intermediate_size: 3072
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: pre
+  stack: encoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -45,7 +48,7 @@ tags:
 - vit
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/google/vit-base-patch16-224
   title: google/vit-base-patch16-224 — model page (Hugging Face)
@@ -59,6 +62,9 @@ sources:
 - url: https://arxiv.org/abs/2006.03677
   title: arXiv:2006.03677
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/vit/modeling_vit.py
+  title: 'transformers/models/vit/modeling_vit.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

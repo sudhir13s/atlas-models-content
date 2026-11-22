@@ -28,6 +28,8 @@ fingerprint:
   vocabulary_size: 32000
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000.0
 filters:
@@ -56,7 +58,7 @@ tags:
 - mistral
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2
   title: mistralai/Mistral-7B-Instruct-v0.2 — model page (Hugging Face)
@@ -67,6 +69,9 @@ sources:
 - url: https://arxiv.org/abs/2310.06825
   title: arXiv:2310.06825
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/mistral/modeling_mistral.py
+  title: 'transformers/models/mistral/modeling_mistral.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

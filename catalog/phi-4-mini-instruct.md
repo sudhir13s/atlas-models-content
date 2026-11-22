@@ -29,6 +29,8 @@ fingerprint:
   vocabulary_size: 200064
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 10000.0
 filters:
@@ -56,7 +58,7 @@ tags:
 - phi3
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/microsoft/Phi-4-mini-instruct
   title: microsoft/Phi-4-mini-instruct — model page (Hugging Face)
@@ -67,6 +69,9 @@ sources:
 - url: https://arxiv.org/abs/2503.01743
   title: arXiv:2503.01743
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/phi3/modeling_phi3.py
+  title: 'transformers/models/phi3/modeling_phi3.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

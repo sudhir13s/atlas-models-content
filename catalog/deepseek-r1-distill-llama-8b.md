@@ -29,6 +29,8 @@ fingerprint:
   vocabulary_size: 128256
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 500000.0
 filters:
@@ -56,7 +58,7 @@ tags:
 - llama
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-8B
   title: deepseek-ai/DeepSeek-R1-Distill-Llama-8B — model page (Hugging Face)
@@ -67,6 +69,9 @@ sources:
 - url: https://arxiv.org/abs/2501.12948
   title: arXiv:2501.12948
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py
+  title: 'transformers/models/llama/modeling_llama.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

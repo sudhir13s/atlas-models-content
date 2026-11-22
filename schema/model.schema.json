@@ -143,6 +143,16 @@
         "vocabulary_size": { "type": "integer" },
         "activation_function": { "type": "string" },
         "normalization": { "type": "string" },
+        "norm_placement": {
+          "type": "string",
+          "enum": ["pre", "post"],
+          "description": "where the block normalises: `pre` is before each sub-layer, inside the residual branch, with one final norm after the last block; `post` is after each residual add, with no final norm. Set only when the model's paper or official implementation was read; absent for any other layout (parallel sub-layers, a norm on both sides, blocks that are not attention plus feed-forward)"
+        },
+        "stack": {
+          "type": "string",
+          "enum": ["encoder", "decoder", "encoder-decoder"],
+          "description": "which transformer stacks the model has: `encoder` (bidirectional blocks only), `decoder` (causal blocks only) or `encoder-decoder` (both, the decoder attending over the encoder's output). Set from the same source as `norm_placement`"
+        },
         "positional_encoding": { "type": "string" },
         "rope_theta": { "type": ["number", "null"] },
         "parameters_active_b": { "type": "number" },

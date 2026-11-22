@@ -28,6 +28,8 @@ fingerprint:
   vocabulary_size: 49152
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 130000.0
 filters:
@@ -56,7 +58,7 @@ tags:
 - llama
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct
   title: HuggingFaceTB/SmolLM2-1.7B-Instruct — model page (Hugging Face)
@@ -67,6 +69,9 @@ sources:
 - url: https://arxiv.org/abs/2502.02737
   title: arXiv:2502.02737
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py
+  title: 'transformers/models/llama/modeling_llama.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

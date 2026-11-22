@@ -28,6 +28,8 @@ fingerprint:
   vocabulary_size: 64000
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 5000000.0
 filters:
@@ -56,7 +58,7 @@ tags:
 - llama
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/01-ai/Yi-1.5-9B-Chat
   title: 01-ai/Yi-1.5-9B-Chat — model page (Hugging Face)
@@ -67,6 +69,9 @@ sources:
 - url: https://arxiv.org/abs/2403.04652
   title: arXiv:2403.04652
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py
+  title: 'transformers/models/llama/modeling_llama.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

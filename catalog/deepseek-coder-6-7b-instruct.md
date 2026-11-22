@@ -30,6 +30,8 @@ fingerprint:
   vocabulary_size: 32256
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 100000.0
 filters:
@@ -74,13 +76,16 @@ tags:
 - llama
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct
   title: deepseek-ai/deepseek-coder-6.7b-instruct — model page (Hugging Face)
   trust: 0.9
 - url: https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct/blob/main/config.json
   title: deepseek-ai/deepseek-coder-6.7b-instruct — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py
+  title: 'transformers/models/llama/modeling_llama.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

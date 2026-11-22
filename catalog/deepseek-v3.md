@@ -31,6 +31,8 @@ fingerprint:
   vocabulary_size: 129280
   activation_function: SwiGLU
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 10000
   parameters_active_b: 37
@@ -106,7 +108,7 @@ tags:
 - mla
 - frontier
 - fp8
-updated: '2026-11-20'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-V3
   title: DeepSeek-V3 — model card + config.json
@@ -114,6 +116,9 @@ sources:
 - url: https://arxiv.org/abs/2412.19437
   title: DeepSeek-V3 Technical Report
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/deepseek_v3/modeling_deepseek_v3.py
+  title: 'transformers/models/deepseek_v3/modeling_deepseek_v3.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 related:
 - architecture-era/mixture-of-experts
 - license/deepseek

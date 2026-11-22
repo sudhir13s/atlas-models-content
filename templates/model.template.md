@@ -39,6 +39,8 @@ fingerprint:
   vocabulary_size: <int>
   activation_function: <SwiGLU | GELU | ...>
   normalization: <RMSNorm | LayerNorm>
+  norm_placement: <pre | post>     # only when read from the paper or official implementation; absent for any other layout
+  stack: <encoder | decoder | encoder-decoder>   # same rule
   positional_encoding: <RoPE | ALiBi | learned>
   rope_theta: <number | null>
   parameters_active_b: <number>

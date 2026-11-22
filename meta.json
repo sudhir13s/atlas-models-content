@@ -2,7 +2,7 @@
   "name": "atlas-models-content",
   "domain": "models",
   "title": "AI Models — reference knowledge",
-  "schema_version": "2.1",
+  "schema_version": "2.3",
   "description": "Portable, reusable reference knowledge for AI models: catalog cards with architecture fingerprints, the era-wise architecture evolution (1950s to now), structural parameters, training/inference hyperparameters ranked by criticality, fine-tuning methods, and licenses. Content only — Markdown + JSON Schema + docs, zero code.",
   "entrypoints": {
     "human": "README.md",

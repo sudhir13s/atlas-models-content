@@ -29,6 +29,8 @@ fingerprint:
   vocabulary_size: 201088
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 150000.0
 moe_config:
@@ -60,7 +62,7 @@ tags:
 - gpt-oss
 - moe
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/openai/gpt-oss-20b
   title: openai/gpt-oss-20b — model page (Hugging Face)
@@ -71,6 +73,9 @@ sources:
 - url: https://arxiv.org/abs/2508.10925
   title: arXiv:2508.10925
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/gpt_oss/modeling_gpt_oss.py
+  title: 'transformers/models/gpt_oss/modeling_gpt_oss.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

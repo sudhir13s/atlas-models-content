@@ -31,6 +31,8 @@ fingerprint:
   vocabulary_size: 152064
   activation_function: SwiGLU
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000
   parameters_active_b: 7.61
@@ -112,7 +114,7 @@ tags:
 - instruct
 - multilingual
 - apache-2-0
-updated: '2026-11-20'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct
   title: Qwen2.5-7B-Instruct — model card + config.json
@@ -129,6 +131,9 @@ sources:
 - url: https://arxiv.org/abs/2407.10671
   title: arXiv:2407.10671
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen2/modeling_qwen2.py
+  title: 'transformers/models/qwen2/modeling_qwen2.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 related:
 - architecture-era/transformer
 - license/apache-2-0

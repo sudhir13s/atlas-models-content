@@ -28,6 +28,8 @@ fingerprint:
   vocabulary_size: 32002
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 10000.0
 filters:
@@ -57,7 +59,7 @@ tags:
 - mistral
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/openchat/openchat-3.5-0106
   title: openchat/openchat-3.5-0106 — model page (Hugging Face)
@@ -71,6 +73,9 @@ sources:
 - url: https://arxiv.org/abs/2303.08774
   title: arXiv:2303.08774
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/mistral/modeling_mistral.py
+  title: 'transformers/models/mistral/modeling_mistral.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

@@ -24,6 +24,8 @@ fingerprint:
   vocabulary_size: 21128
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: post
+  stack: encoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -49,7 +51,7 @@ tags:
 - bert
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/google-bert/bert-base-chinese
   title: google-bert/bert-base-chinese — model page (Hugging Face)
@@ -60,6 +62,9 @@ sources:
 - url: https://arxiv.org/abs/1810.04805
   title: arXiv:1810.04805
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/modeling_bert.py
+  title: 'transformers/models/bert/modeling_bert.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

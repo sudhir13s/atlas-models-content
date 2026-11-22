@@ -11,7 +11,7 @@ year: 2020
 family: vision
 core_innovation: "Treat an image as a sequence of patch embeddings and run a plain transformer over them — no convolutions required."
 description: "A pure transformer applied to sequences of image patches; pretrained on enough data, it approaches or beats state-of-the-art convolutional networks on image recognition."
-key_features: ["Image split into fixed patches", "Linear patch embeddings + position embeddings", "Transformer encoder over patch tokens", "Scales with data and model size"]
+key_features: ["Image split into fixed patches", "Linear patch embeddings + position embeddings", "Transformer encoder over patch tokens", "Two-layer MLP as the feed-forward sub-layer of each block", "Scales with data and model size"]
 key_models: ["ViT-B/L/H (2020)", "DeiT (2021)", "SAM / DINOv2 backbones (2023)"]
 paper_title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale"
 paper_url: "https://arxiv.org/abs/2010.11929"
@@ -215,6 +215,7 @@ tags: [vit, vision, transformer, patches, scaling]
 updated: '2026-11-21'
 sources:
   - { url: "https://arxiv.org/abs/2010.11929", title: "An Image is Worth 16x16 Words (Dosovitskiy et al., 2020)", trust: 0.95 }
+  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/vit/modeling_vit.py", title: "transformers/models/vit/modeling_vit.py: reference implementation (Hugging Face Transformers); the block's MLP is two linear layers with one activation between", trust: 0.9 }
   - { url: "https://huggingface.co/docs/transformers/model_doc/vit", title: "Vision Transformer (ViT) — Hugging Face documentation", trust: 0.9 }
   - { url: "https://arxiv.org/abs/2012.12877", title: "Training data-efficient image transformers & distillation through attention (Touvron et al., 2020)", trust: 0.95 }
   - { url: "https://arxiv.org/abs/2103.14030", title: "Swin Transformer: Hierarchical Vision Transformer using Shifted Windows (Liu et al., 2021)", trust: 0.95 }

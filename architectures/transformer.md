@@ -153,6 +153,7 @@ diagram_svg: |
   <text class="d-label" x="600" y="64" text-anchor="middle">Output probabilities (next token)</text>
   </svg>
 diagram_caption: "The original Transformer: six encoder layers (self-attention, feed-forward) and six decoder layers (masked self-attention, attention over the encoder output, feed-forward), each sub-layer wrapped in a residual and LayerNorm."
+underlying_model_note: "The first figure is the original Transformer, with an encoder stack and a decoder stack. The model drawn below keeps one stack of the same kind of block: attention, then a feed-forward layer, each inside a residual connection."
 notable_models:
   - { name: "Transformer", year: 2017, note: "The original: an attention-only model that outperformed earlier translation systems on WMT 2014 with less training time." }
   - { name: "BERT", year: 2018, note: "Took the encoder and pretrained it bidirectionally, reporting new state-of-the-art results on eleven language tasks." }

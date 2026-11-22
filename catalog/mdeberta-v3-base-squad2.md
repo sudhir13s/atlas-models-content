@@ -27,6 +27,8 @@ fingerprint:
   vocabulary_size: 251000
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: post
+  stack: encoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -52,7 +54,7 @@ tags:
 - deberta-v2
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/timpal0l/mdeberta-v3-base-squad2
   title: timpal0l/mdeberta-v3-base-squad2 — model page (Hugging Face)
@@ -66,6 +68,9 @@ sources:
 - url: https://arxiv.org/abs/2111.09543
   title: arXiv:2111.09543
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/deberta_v2/modeling_deberta_v2.py
+  title: 'transformers/models/deberta_v2/modeling_deberta_v2.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

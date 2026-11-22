@@ -21,6 +21,8 @@ fingerprint:
   hidden_size: 768
   context_window_tokens: 512
   vocabulary_size: 28996
+  norm_placement: post
+  stack: encoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -46,7 +48,7 @@ tags:
 - distilbert
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/distilbert/distilbert-base-cased-distilled-squad
   title: distilbert/distilbert-base-cased-distilled-squad — model page (Hugging Face)
@@ -60,6 +62,9 @@ sources:
 - url: https://arxiv.org/abs/1910.09700
   title: arXiv:1910.09700
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/distilbert/modeling_distilbert.py
+  title: 'transformers/models/distilbert/modeling_distilbert.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

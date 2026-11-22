@@ -26,6 +26,8 @@ fingerprint:
   vocabulary_size: 200064
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: encoder
   positional_encoding: RoPE
   rope_theta: 150000.0
 moe_config:
@@ -56,13 +58,16 @@ tags:
 - openai-privacy-filter
 - moe
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/openai/privacy-filter
   title: openai/privacy-filter — model page (Hugging Face)
   trust: 0.9
 - url: https://huggingface.co/openai/privacy-filter/blob/main/config.json
   title: openai/privacy-filter — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/openai_privacy_filter/modeling_openai_privacy_filter.py
+  title: 'transformers/models/openai_privacy_filter/modeling_openai_privacy_filter.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

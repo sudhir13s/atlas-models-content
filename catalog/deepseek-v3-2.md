@@ -27,6 +27,8 @@ fingerprint:
   vocabulary_size: 129280
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 10000.0
 moe_config:
@@ -60,13 +62,16 @@ tags:
 - deepseek-v32
 - moe
 - mla
-updated: '2026-11-20'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-V3.2
   title: deepseek-ai/DeepSeek-V3.2 — model page (Hugging Face)
   trust: 0.9
 - url: https://huggingface.co/deepseek-ai/DeepSeek-V3.2/blob/main/config.json
   title: deepseek-ai/DeepSeek-V3.2 — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/deepseek_v32/modeling_deepseek_v32.py
+  title: 'transformers/models/deepseek_v32/modeling_deepseek_v32.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

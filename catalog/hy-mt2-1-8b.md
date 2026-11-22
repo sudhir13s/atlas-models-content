@@ -27,6 +27,8 @@ fingerprint:
   vocabulary_size: 120818
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 10000.0
 filters:
@@ -54,7 +56,7 @@ tags:
 - hunyuan-v1-dense
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/tencent/Hy-MT2-1.8B
   title: tencent/Hy-MT2-1.8B — model page (Hugging Face)
@@ -65,6 +67,9 @@ sources:
 - url: https://arxiv.org/abs/2605.22064
   title: arXiv:2605.22064
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/hunyuan_v1_dense/modeling_hunyuan_v1_dense.py
+  title: 'transformers/models/hunyuan_v1_dense/modeling_hunyuan_v1_dense.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 

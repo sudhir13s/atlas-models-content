@@ -12,11 +12,98 @@
     "goals": { "type": "array", "items": { "type": "string", "enum": ["training", "finetuning", "inference", "architecture"] } },
     "models": { "type": "array", "items": { "type": "string", "enum": ["llm", "vision", "audio", "diffusion", "rl"] } },
     "range": { "type": "string" },
-    "starting_value": { "type": "string" },
-    "controls": { "type": "string" },
-    "if_increased": { "type": "string" },
-    "if_decreased": { "type": "string" },
-    "common_mistake": { "type": "string" }
+    "starting_value": { "type": "string", "description": "schema 1.0 form; a 2.2 record uses typical_values" },
+    "controls": { "type": "string", "description": "one plain-language sentence saying what the setting is; the page prints it under the title" },
+    "if_increased": { "type": "string", "description": "schema 1.0 form; a 2.2 record uses effects.increase" },
+    "if_decreased": { "type": "string", "description": "schema 1.0 form; a 2.2 record uses effects.decrease" },
+    "common_mistake": { "type": "string", "description": "schema 1.0 form; a 2.2 record uses mistakes" },
+    "effects": { "$ref": "#/$defs/effects" },
+    "scale": { "$ref": "#/$defs/scale" },
+    "typical_values": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/typical_value" } },
+    "mistakes": { "type": "array", "minItems": 2, "maxItems": 5, "items": { "$ref": "#/$defs/mistake" } },
+    "visual": { "oneOf": [{ "$ref": "#/$defs/schedule_visual" }, { "$ref": "#/$defs/distribution_visual" }] }
   },
-  "required": ["name", "context", "priority", "importance", "range"]
+  "required": ["name", "context", "priority", "importance", "range"],
+  "$defs": {
+    "phrases": { "type": "array", "minItems": 1, "maxItems": 5, "items": { "type": "string", "minLength": 1 } },
+    "effects": {
+      "type": "object",
+      "description": "what changes when the value goes down or up, as short phrases; drawn as the effect scale",
+      "additionalProperties": false,
+      "required": ["decrease", "increase"],
+      "properties": {
+        "decrease": { "$ref": "#/$defs/phrases" },
+        "increase": { "$ref": "#/$defs/phrases" }
+      }
+    },
+    "scale": {
+      "type": "object",
+      "description": "the numeric axis of the effect scale; typical_min and typical_max mark the band the typical_values span",
+      "additionalProperties": false,
+      "required": ["min", "max", "spacing"],
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "typical_min": { "type": "number" },
+        "typical_max": { "type": "number" },
+        "spacing": { "type": "string", "enum": ["linear", "log"], "description": "log needs min > 0" }
+      }
+    },
+    "typical_value": {
+      "type": "object",
+      "description": "one value somebody used or ships as a default, with the page that states it",
+      "additionalProperties": false,
+      "required": ["setting", "value", "source"],
+      "properties": {
+        "setting": { "type": "string", "minLength": 1, "description": "who used it, and for what" },
+        "value": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "format": "uri", "description": "the url of one entry of this record's sources" }
+      }
+    },
+    "mistake": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mistake", "why", "fix"],
+      "properties": {
+        "mistake": { "type": "string", "minLength": 1 },
+        "why": { "type": "string", "minLength": 1, "description": "why it goes wrong; Markdown" },
+        "fix": { "type": "string", "minLength": 1, "description": "what to do instead; Markdown" }
+      }
+    },
+    "schedule_visual": {
+      "type": "object",
+      "description": "the learning rate at every training step, computed by the consumer from these values",
+      "additionalProperties": false,
+      "required": ["kind", "peak", "warmup_steps", "total_steps", "curves", "caption"],
+      "properties": {
+        "kind": { "const": "schedule" },
+        "peak": { "type": "number", "exclusiveMinimum": 0, "description": "the value reached at the end of the warmup" },
+        "warmup_steps": { "type": "integer", "minimum": 0 },
+        "total_steps": { "type": "integer", "minimum": 1 },
+        "final_ratio": { "type": "number", "minimum": 0, "maximum": 1, "description": "where the cosine curve ends, as a share of the peak; 0 when absent" },
+        "curves": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["constant", "linear", "cosine", "inverse_sqrt"] }
+        },
+        "marks": { "type": "array", "maxItems": 6, "items": { "type": "integer", "minimum": 0 }, "description": "steps of the worked example, marked on the plot and listed under it" },
+        "caption": { "type": "string", "minLength": 1 }
+      }
+    },
+    "distribution_visual": {
+      "type": "object",
+      "description": "next-token probabilities of one small set of scores at several temperatures, computed by the consumer as softmax(logits / temperature)",
+      "additionalProperties": false,
+      "required": ["kind", "tokens", "logits", "temperatures", "caption"],
+      "properties": {
+        "kind": { "const": "distribution" },
+        "tokens": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "string", "minLength": 1 } },
+        "logits": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "number" }, "description": "one score per token, in the same order" },
+        "temperatures": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "number", "exclusiveMinimum": 0 } },
+        "caption": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
 }

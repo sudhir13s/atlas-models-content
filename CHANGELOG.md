@@ -5,6 +5,47 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Schema 2.3 for `model` and `architecture-era` (block layout as record facts; additive)
+
+- **Added** `fingerprint.norm_placement` (`pre` | `post`) and `fingerprint.stack` (`encoder` |
+  `decoder` | `encoder-decoder`) to `model`. Both are set only from the model's official
+  implementation or paper, and stay absent for any other layout (parallel sub-layers, a norm on
+  both sides of a sub-layer, blocks that are not attention plus feed-forward).
+- **Set** both fields on 79 catalog records, each from the implementation file now listed in the
+  record's `sources`. Left unset on 16 records whose block is not a plain pre-norm or post-norm
+  block: `phi-2`, `falcon-7b-instruct`, the three Pythia records, `gemma-2-9b-it`, `gemma-4-e4b-it`,
+  `qwen3-8-27b`, `qwen3-8-flash-next`, `autotrust-decider-pro-35b`, `qwen3-coder-next-fp8`, the
+  three Nemotron records, and the two Kimi records (text model code not published in the repository).
+- **Added** `underlying_model_note` to `architecture-era`: the sourced sentence a consumer prints
+  above a second figure, one catalog model's whole architecture. Written for `reasoning-models`
+  and `transformer`.
+- **Added** `architecture_id: architecture-era/vision-transformer` to `vit-base-patch16-224`, and
+  the key feature "Two-layer MLP as the feed-forward sub-layer of each
+  block" to `architecture-era/vision-transformer`, from the reference implementation.
+
+### Schema 2.2 for `hyperparameter` (a fuller, visual-first record; additive)
+
+- **Added** `effects` (`decrease[]`, `increase[]`: short phrases) and `scale` (`min`, `max`,
+  `typical_min`, `typical_max`, `spacing`), which a consumer draws as one lower-to-higher scale.
+- **Added** `typical_values[]` (`setting`, `value`, `source`): who used which value, each row
+  linked to one entry of `sources`.
+- **Added** `mistakes[]` (`mistake`, `why`, `fix`; 2 to 5).
+- **Added** `visual`, the parameters of a figure the consumer computes: `kind: schedule` (`peak`,
+  `warmup_steps`, `total_steps`, `curves`, optional `final_ratio` and `marks`) or
+  `kind: distribution` (`tokens`, `logits`, `temperatures`); both carry a `caption`.
+- **Added** the body sections How It Works, Worked Example and What To Watch.
+- **Changed** the registry entry: only Definition is required; How It Works, What to look for,
+  Calculation, Example, Worked Example and What To Watch are optional and keep that order. The
+  schema 1.0 fields (`starting_value`, `if_increased`, `if_decreased`, `common_mistake`) and
+  sections stay valid, so the 19 records not yet converted are unchanged.
+- **Converted** `hyperparameter/learning-rate` and `hyperparameter/temperature` to 2.2 and
+  rewrote both from sources read for this change. Removed because no source read supports them:
+  square-root scaling as the "safe default", "drop 10 to 100 times" for fine-tuning, the
+  gradient-norm guidance, the effective-batch formula, the Kaplan et al. citation, and the
+  per-task temperature bands (0.0 to 0.3 factual, 0.7 general, 1.0 to 1.2 creative).
+- **Changed** the template and CONVENTIONS to the 2.2 form: visual-first page order, plain-language
+  depth, calculations a reader can redo by hand.
+
 ### Accuracy pass over the teaching records (content only; no schema change)
 
 - **Fixed** attributions, definitions, dates and example-model lists in all `concepts/`,
@@ -105,3 +146,7 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
   and `license`, optional prose, shared `locked`.
 - **1.2** — `concept` and `milestone` types, `architecture-era.variants`.
 - **2.0** — `model.benchmarks` removed; scores live in `score-sheet` records.
+- **2.1** — `model` prose passages (`intended_use`, `what_sets_it_apart`, `running_it`,
+  `limitations`) and `quotes`.
+- **2.2** — `hyperparameter` `effects`, `scale`, `typical_values`, `mistakes`, `visual`; sections
+  How It Works, Worked Example, What To Watch.

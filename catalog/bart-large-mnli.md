@@ -18,6 +18,8 @@ fingerprint:
   context_window_tokens: 1024
   vocabulary_size: 50265
   activation_function: gelu
+  norm_placement: post
+  stack: encoder-decoder
 filters:
   size_category: tiny
   is_quantized: false
@@ -41,7 +43,7 @@ tags:
 - zero-shot-classification
 - bart
 - dense
-updated: '2026-11-21'
+updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/facebook/bart-large-mnli
   title: facebook/bart-large-mnli — model page (Hugging Face)
@@ -55,6 +57,9 @@ sources:
 - url: https://arxiv.org/abs/1909.00161
   title: arXiv:1909.00161
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bart/modeling_bart.py
+  title: 'transformers/models/bart/modeling_bart.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 
