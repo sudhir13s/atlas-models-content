@@ -9,7 +9,7 @@ priority: 13
 importance: optional
 applies_to: [llm, transformer, moe]
 range: "RMSNorm · LayerNorm · pre-norm vs post-norm"
-controls: "The normalization layer that stabilizes the residual stream before each sub-layer. RMSNorm halves the per-norm parameters versus LayerNorm."
+controls: "The normalization layer that stabilizes the residual stream, placed before each sub-layer (pre-norm) or after each residual add (post-norm). RMSNorm halves the per-norm parameters versus LayerNorm."
 formula: "RMSNorm = d params per norm; LayerNorm = 2d per norm; total ≈ (2L + 1) × d"
 if_increased: "(More/wider norms) negligible parameter change but affects training stability; extra norms rarely help."
 if_decreased: "RMSNorm drops LayerNorm's bias/mean terms (d instead of 2d per norm) and is faster, with equal or better stability."

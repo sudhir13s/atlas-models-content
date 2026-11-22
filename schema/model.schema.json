@@ -64,6 +64,24 @@
     "parameters_active_b": { "type": "number" },
     "total_parameters": { "type": "integer" },
     "context_window_tokens": { "type": "integer" },
+    "embedding_dimension": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "length of the vector an embedding model returns for one text, as its model card or pooling configuration states it; absent for a model that returns no embedding, and never copied from `fingerprint.hidden_size`"
+    },
+    "base_models": {
+      "type": "array",
+      "description": "the models this one was trained from that have no record here, nearest first, as the model card's `base_model` field or text names them; a base model with a record goes in `lineage.parents` instead",
+      "items": {
+        "type": "object",
+        "required": ["name", "address"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "description": "the repository id or name as the source gives it" },
+          "address": { "type": "string", "format": "uri" }
+        }
+      }
+    },
     "summary": { "type": "string", "description": "what the model is: its kind, its family or base model, what it was built to do; absent means the record has no prose yet, the prose queue writes it" },
     "intended_use": { "type": "string", "description": "the tasks and users the source names, and uses it puts out of scope; absent when the source names none" },
     "what_sets_it_apart": { "type": "string", "description": "the design choice, training approach, capability or reported result that separates it from its siblings, base model or predecessors; a result the authors claim is worded as their claim; absent when the source says none" },

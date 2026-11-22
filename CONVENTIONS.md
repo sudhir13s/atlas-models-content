@@ -31,7 +31,7 @@ numeric config) so it stays machine-parseable.
 - `tags`: lowercase, hyphen-separated.
 - `updated`: ISO date (`YYYY-MM-DD`).
 - `sources[]`: `{ url, title, trust }` — `trust` in `[0,1]`. Open-source-first; cite, do not copy.
-- `schema_version`: the `major.minor` the file was authored against (currently `2.3`).
+- `schema_version`: the `major.minor` the file was authored against (currently `2.4`).
 
 ## Body sections
 
@@ -87,7 +87,13 @@ numeric config) so it stays machine-parseable.
   neither field nor section. `fingerprint.norm_placement` (`pre` | `post`) and `fingerprint.stack`
   (`encoder` | `decoder` | `encoder-decoder`) are read from the model's official implementation or
   paper, which is then listed in `sources`; a block with any other layout leaves both absent, and a
-  consumer draws no block figure without them.
+  consumer draws no block figure without them. `embedding_dimension` is the vector length an
+  embedding model returns, copied from its card or pooling configuration (never from
+  `fingerprint.hidden_size`). `base_models[]` (`name`, `address`) names the bases that have no
+  record here, nearest first; a base with a record goes in `lineage.parents`. An arXiv entry of
+  `sources` carries the paper's title as the arXiv API gives it, copied by code, not the bare ID.
+  `summary` is written for a newcomer: what the model is and what it is for, with no ranking words
+  ("best", "strongest", "leading") unless the sentence names who said so.
 - **organization** — `name`, `kind` (lab, company, foundation, community), `website`, `hf_handles[]`,
   `aliases[]`. Body section: Overview.
 - **fine-tuning-method** — `method_type`, `memory_profile`, `related_hyperparameters[]` (IDs).

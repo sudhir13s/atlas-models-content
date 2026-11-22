@@ -17,8 +17,12 @@ tasks:
 parameters_active_b: 7.61
 total_parameters: 7615616512
 context_window_tokens: 131072
-summary: Dense decoder-only transformer, ~7.61B parameters, 128K context via YaRN, using GQA, SwiGLU, RMSNorm and RoPE.
-why_it_matters: The strongest Apache-2.0 model at the 7B tier, and the multilingual default that displaced Llama 3.1 8B for many builders.
+base_models:
+- name: Qwen/Qwen2.5-7B
+  address: https://huggingface.co/Qwen/Qwen2.5-7B
+summary: Qwen2.5 7B Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned member of the Qwen2.5 series at the 7B size, which means the base model was trained further to follow instructions and hold a conversation. The card says the Qwen2.5 series ranges from 0.5 to 72 billion parameters.
+what_sets_it_apart: Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. The card also states support for a context of up to 128K tokens and for over 29 languages.
+running_it: The model card says the published config.json is set for a context of up to 32,768 tokens, and that longer inputs rely on YaRN, a technique for extending the length a model handles. The card advises enabling it only when long contexts are needed, because the static form of YaRN may affect performance on shorter texts.
 fingerprint:
   attention_type: GQA
   num_layers: 28
@@ -37,7 +41,7 @@ fingerprint:
   rope_theta: 1000000
   parameters_active_b: 7.61
   kv_cache_rating: low
-  key_detail: Only 4 KV heads (aggressive GQA); QKV projections carry bias; 128K context via YaRN on a 32768-trained base
+  key_detail: 28 query heads share 4 KV heads; the QKV projections carry bias; the 128K context uses YaRN on a config set for 32,768 tokens
 moe_config: null
 filters:
   size_category: small
@@ -66,6 +70,10 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This repo contains the instruction-tuned 7B Qwen2.5 model
+  what_sets_it_apart: Significantly **more knowledge** and has greatly improved capabilities in **coding** and **mathematics**, thanks to our specialized expert models in these domains.
+  running_it: The current `config.json` is set for context length up to 32,768 tokens.
 locked:
 - title
 - organization
@@ -126,10 +134,10 @@ sources:
   title: Qwen/Qwen2.5-7B-Instruct — config.json
   trust: 0.9
 - url: https://arxiv.org/abs/2309.00071
-  title: arXiv:2309.00071
+  title: 'YaRN: Efficient Context Window Extension of Large Language Models'
   trust: 0.95
 - url: https://arxiv.org/abs/2407.10671
-  title: arXiv:2407.10671
+  title: Qwen2 Technical Report
   trust: 0.95
 - url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen2/modeling_qwen2.py
   title: 'transformers/models/qwen2/modeling_qwen2.py: reference implementation (Hugging Face Transformers)'
@@ -141,27 +149,18 @@ related:
 
 ## Summary
 
-Qwen2.5 7B Instruct is a dense, decoder-only transformer with 28 layers and a 3584-dimensional
-residual stream. It uses grouped-query attention with an unusually aggressive ratio — 28 query heads
-sharing just 4 key/value heads (head size 128) — plus SwiGLU feed-forward blocks (intermediate size
-18944), RMSNorm pre-normalization, and rotary positional embeddings with a base frequency of
-1000000. Following the Qwen2 lineage, the query/key/value projections carry additive bias terms, a
-departure from the bias-free projections used by Llama and Mistral. The 128K-token context window is
-obtained by applying YaRN RoPE scaling at inference on top of a 32768-token-trained base.
+Qwen2.5 7B Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned member of the Qwen2.5 series at the 7B size, which means the base model was trained further to follow instructions and hold a conversation. The card says the Qwen2.5 series ranges from 0.5 to 72 billion parameters.
 
-## Why It Matters
+## What Sets It Apart
 
-Qwen2.5 raised the ceiling at the 7B tier: on knowledge, math, and code it outperforms Llama 3.1 8B
-while remaining Apache-2.0 licensed, making it a genuinely permissive drop-in for commercial use. Its
-strong multilingual coverage (29+ languages) and long-context support made it the default open small
-model for many builders through 2025. The four-KV-head design keeps the KV cache small, which is a
-material advantage for long-context serving and batched inference — at 128K tokens the cache is a
-fraction of what an eight-KV-head model of similar size would require.
+Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. The card also states support for a context of up to 128K tokens and for over 29 languages.
+
+## Running It
+
+The model card says the published config.json is set for a context of up to 32,768 tokens, and that longer inputs rely on YaRN, a technique for extending the length a model handles. The card advises enabling it only when long contexts are needed, because the static form of YaRN may affect performance on shorter texts.
 
 ## Notes
 
-The base `config.json` reports `max_position_embeddings: 32768`; the advertised 128K context requires
-enabling YaRN scaling (set in `rope_scaling`) at load time — running without it caps effective context
-at 32K. The tokenizer vocabulary is 152064 tokens with strong CJK coverage. Recommended usage follows
-the ChatML template with `<|im_start|>` / `<|im_end|>` role markers. See [[license/apache-2-0]] for
-licensing and [[architecture-era/transformer]] for the architecture lineage.
+The base `config.json` reports `max_position_embeddings: 32768`; the 128K context needs YaRN
+scaling (set in `rope_scaling`). The tokenizer vocabulary is 152064 tokens. See
+[[license/apache-2-0]] for licensing and [[architecture-era/transformer]] for the architecture lineage.

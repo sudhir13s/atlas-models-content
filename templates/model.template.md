@@ -15,6 +15,9 @@ model_category: language
 parameters_active_b: <number>
 total_parameters: <int>
 context_window_tokens: <int>
+embedding_dimension: <int>       # embedding models only: the vector length the card or pooling configuration states
+base_models:                     # bases with no record here, nearest first; a base with a record goes in lineage.parents
+  - { name: "<owner/repo>", address: "https://huggingface.co/<owner/repo>" }
 summary: "<2-3 sentences: what the model is, its family or base model, what it was built to do>"   # omit the five passages, quotes and the body for a record with no prose yet
 intended_use: "<1-3 sentences: the tasks and users the source names, and uses it rules out>"   # a passage the source cannot support is omitted, never written as "unknown"
 what_sets_it_apart: "<1-3 sentences: the design choice, training approach or reported result that separates it from its siblings or predecessors>"
@@ -73,6 +76,7 @@ tags: [<tag>, <tag>]
 updated: <YYYY-MM-DD>
 sources:
   - { url: "<url>", title: "<title>", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/<id>", title: "<the paper's title as arXiv gives it>", trust: 0.95 }
 related: [architecture-era/<slug>]
 ---
 

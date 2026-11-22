@@ -5,6 +5,25 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Schema 2.4 for `model` (facts the detail page reads; additive)
+
+- **Added** `embedding_dimension` (integer) to `model`: the vector length an embedding model
+  returns, copied from its card or pooling configuration.
+- **Added** `base_models[]` (`name`, `address`) to `model`: the bases that have no record here,
+  nearest first. A base with a record stays in `lineage.parents`.
+- **Changed** the convention for arXiv entries of `sources`: the title is the paper's own title
+  as the arXiv API gives it, not the bare ID.
+- **Set** on `bge-m3`: `summary` and `what_sets_it_apart` with their `quotes`,
+  `total_parameters` (the tensor shapes of the published `pytorch_model.bin`, summed by code,
+  because the Hub gives no safetensors count for this repository), `embedding_dimension`,
+  `base_models`, `fingerprint.norm_placement` and `fingerprint.stack` (from the XLM-RoBERTa
+  reference implementation), and the titles of its five papers.
+- **Changed** on `qwen2-5-7b-instruct`: `summary` rewritten for a newcomer; `why_it_matters` and
+  its body section removed (ranking claims with no source); `what_sets_it_apart` and `running_it`
+  written from the model card with their `quotes`; `base_models` and paper titles set.
+- **Fixed** `parameter/normalization` `controls`: it said the norm sits before each sub-layer,
+  which is wrong for a post-norm block; it now names both placements.
+
 ### Schema 2.3 for `model` and `architecture-era` (block layout as record facts; additive)
 
 - **Added** `fingerprint.norm_placement` (`pre` | `post`) and `fingerprint.stack` (`encoder` |
