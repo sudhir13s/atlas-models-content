@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/quantization-topic.schema.json",
+  "title": "quantization-topic",
+  "description": "One teaching page of the Quantization guide: how weights are stored and quantized, or how to read the names of quantized files. Figures and sourced tables live in frontmatter, each opening the body section it names; the consumer computes every figure from these values.",
+  "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
+  "properties": {
+    "type": { "const": "quantization-topic" },
+    "order": { "type": "integer", "minimum": 1, "description": "position of the page in the guide's reading order" },
+    "summary": { "type": "string", "minLength": 1, "description": "one plain sentence saying what the page explains; printed under the title and on the page's card" },
+    "visuals": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/bit_layout_visual" },
+          { "$ref": "#/$defs/affine_example_visual" },
+          { "$ref": "#/$defs/model_memory_visual" },
+          { "$ref": "#/$defs/name_decoder_visual" }
+        ]
+      }
+    },
+    "tables": { "type": "array", "minItems": 1, "maxItems": 6, "items": { "$ref": "#/$defs/sourced_table" } }
+  },
+  "required": ["order", "summary"],
+  "unevaluatedProperties": false,
+  "$defs": {
+    "section": {
+      "type": "string",
+      "minLength": 1,
+      "description": "the `##` heading of the body section this figure or table opens; it is drawn first, then the section's text"
+    },
+    "caption": { "type": "string", "minLength": 1, "description": "printed under the figure; a value that is an example and not a published one is named as such here" },
+    "bit_field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "bits"],
+      "properties": {
+        "role": { "type": "string", "enum": ["sign", "exponent", "mantissa", "integer"] },
+        "bits": { "type": "integer", "minimum": 1, "maximum": 32 }
+      }
+    },
+    "bit_layout_visual": {
+      "type": "object",
+      "description": "one row per number format, one square per bit, coloured by what the bit does; a row's length is its total bits",
+      "additionalProperties": false,
+      "required": ["kind", "section", "formats", "caption"],
+      "properties": {
+        "kind": { "const": "bit_layout" },
+        "section": { "$ref": "#/$defs/section" },
+        "formats": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "fields"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "fields": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "$ref": "#/$defs/bit_field" }, "description": "the bit fields from the most significant bit down" }
+            }
+          }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "affine_example_visual": {
+      "type": "object",
+      "description": "a few example weights quantized to `bits` unsigned levels (0 to 2^bits - 1) with one scale and zero point, then restored; the consumer computes the scale, zero point, levels, restored values and rounding errors with the affine formulas of the Hugging Face Transformers quantization concepts page",
+      "additionalProperties": false,
+      "required": ["kind", "section", "bits", "weights", "caption"],
+      "properties": {
+        "kind": { "const": "affine_example" },
+        "section": { "$ref": "#/$defs/section" },
+        "bits": { "type": "integer", "minimum": 2, "maximum": 8 },
+        "weights": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "number" } },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "model_memory_visual": {
+      "type": "object",
+      "description": "the memory the weights of one catalog model take at each precision, computed by the consumer as total_parameters x bits / 8 from the model record",
+      "additionalProperties": false,
+      "required": ["kind", "section", "model", "precisions", "caption"],
+      "properties": {
+        "kind": { "const": "model_memory" },
+        "section": { "$ref": "#/$defs/section" },
+        "model": { "$ref": "_shared.schema.json#/$defs/id", "description": "a model record that carries total_parameters" },
+        "precisions": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "bits"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1 },
+              "bits": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "name_decoder_visual": {
+      "type": "object",
+      "description": "names split into their parts, each part explained; the same example shape as the name-decoder records of atlas-hardware-content",
+      "additionalProperties": false,
+      "required": ["kind", "section", "examples", "caption"],
+      "properties": {
+        "kind": { "const": "name_decoder" },
+        "section": { "$ref": "#/$defs/section" },
+        "examples": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "parts"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "parts": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 6,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["token", "explains"],
+                  "properties": {
+                    "token": { "type": "string", "minLength": 1 },
+                    "explains": { "type": "string", "minLength": 1 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "sourced_table": {
+      "type": "object",
+      "description": "a table of published or computed values; every row names one entry of sources. The first table naming a section without a figure opens it; any other is drawn after the section under its own title",
+      "additionalProperties": false,
+      "required": ["section", "title", "columns", "rows"],
+      "properties": {
+        "section": { "$ref": "#/$defs/section" },
+        "title": { "type": "string", "minLength": 1 },
+        "columns": { "type": "array", "minItems": 2, "maxItems": 5, "items": { "type": "string", "minLength": 1 } },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["cells", "source"],
+            "properties": {
+              "cells": { "type": "array", "minItems": 2, "maxItems": 5, "items": { "type": "string", "minLength": 1 }, "description": "one cell per entry of columns, in the same order" },
+              "source": { "type": "string", "format": "uri", "description": "the url of one entry of this record's sources" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

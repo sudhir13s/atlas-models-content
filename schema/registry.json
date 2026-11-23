@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.5",
+  "schema_version": "2.6",
   "shared": "schema/_shared.schema.json",
   "types": {
     "model": {
@@ -92,6 +92,13 @@
       "id_prefix": "milestone/",
       "sections": [],
       "optional_sections": ["Summary"]
+    },
+    "quantization-topic": {
+      "folder": "quantization",
+      "schema": "schema/quantization-topic.schema.json",
+      "id_prefix": "quantization-topic/",
+      "sections": ["What It Is"],
+      "optional_sections": ["What To Watch"]
     }
   }
 }

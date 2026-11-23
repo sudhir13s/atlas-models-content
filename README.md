@@ -21,6 +21,7 @@ It is the `models` domain of a seven-repo reference library
 | `hyperparameter` | `hyperparameters/` | Training + inference knobs, ranked by criticality, each with definition / calculation / example |
 | `fine-tuning-method` | `fine-tuning-methods/` | LoRA, QLoRA, full FT, DPO, RLHF, ORPO — when to use, key knobs, worked examples |
 | `license` | `licenses/` | Model licenses: permission matrix, conditions, limitations |
+| `quantization-topic` | `quantization/` | The Quantization guide: number formats, how quantization works, how to read quantized file names; computed figures and sourced tables |
 
 ## Quick start
 
@@ -43,7 +44,7 @@ meta.json                 # repo descriptor (machine entrypoint 1)
 schema/registry.json      # type → folder/schema/sections map (machine entrypoint 2)
 schema/*.schema.json      # JSON Schema per content type
 templates/*.template.md   # copy these to author new content
-catalog/ organizations/ architectures/ parameters/ hyperparameters/ fine-tuning-methods/ licenses/
+catalog/ organizations/ architectures/ parameters/ hyperparameters/ fine-tuning-methods/ licenses/ quantization/
 assets/                   # SVG diagrams
 ```
 

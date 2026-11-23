@@ -5,6 +5,22 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Schema 2.6: the `quantization-topic` type (additive)
+
+- **Added** the `quantization-topic` type (folder `quantization/`): one page of the Quantization
+  guide, with `order`, `summary`, computed figures in `visuals` (`bit_layout`, `affine_example`,
+  `model_memory`, `name_decoder`) and sourced `tables` (`section`, `title`, `columns`,
+  `rows[]` of `cells`, `source`, the shape of `key_numbers`). Body sections: What It Is, the
+  page's own topics, then the optional What To Watch. Schema, registry entry, `meta.json` type,
+  the base `type` enum and the template ship together.
+- **Added** two pilot pages, every fact from a source fetched for them: `number-formats` (how a
+  weight is stored as FP32, FP16, BF16, INT8 and 4-bit; affine quantization worked by hand;
+  memory per precision for Llama 3.1 8B Instruct; the perplexity increase llama.cpp lists per
+  file type) and `reading-quantized-file-names` (GGUF and its naming convention; what Q, the
+  number, `_0`, `_K`, `_S`/`_M`/`_L` and `IQ` mean; bits per weight per llama.cpp type from
+  `ggml-common.h` and per file from the llama.cpp quantize README; bitsandbytes, GPTQ, AWQ, EXL2,
+  MLX and Unsloth Dynamic files).
+
 ### Schema 2.5 for `architecture-era`: the teaching form (additive)
 
 - **Added** to `architecture-era`: `visual` (a `distribution` figure for the Worked Example),

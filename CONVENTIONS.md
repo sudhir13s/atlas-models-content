@@ -31,7 +31,7 @@ numeric config) so it stays machine-parseable.
 - `tags`: lowercase, hyphen-separated.
 - `updated`: ISO date (`YYYY-MM-DD`).
 - `sources[]`: `{ url, title, trust }` — `trust` in `[0,1]`. Open-source-first; cite, do not copy.
-- `schema_version`: the `major.minor` the file was authored against (currently `2.5`).
+- `schema_version`: the `major.minor` the file was authored against (currently `2.6`).
 
 ## Body sections
 
@@ -130,6 +130,25 @@ numeric config) so it stays machine-parseable.
   Body sections: Definition → What to look for → Calculation → Example.
 - **license** — `spdx_id`, `category`, a boolean `permissions` matrix, `conditions[]`,
   `limitations[]`, `models_using[]` (IDs). Body section: Plain-English.
+- **quantization-topic** — one page of the Quantization guide, in the teaching form: `summary` (one
+  plain sentence), `order` (reading order), then figures in `visuals` and sourced tables in
+  `tables`. Body sections: What It Is first, What To Watch last when present; between them the
+  page's own topics, in file order.
+  - **A figure or table opens the section it names** in `section`: it is drawn first, then the
+    section's text. A section takes at most one figure; a table naming a section that already has
+    a figure, or a second table, is drawn after the section under its own `title`.
+  - **Figures are computed, never drawn by hand.** `bit_layout` draws one square per bit of each
+    format, coloured by `role` (`sign`, `exponent`, `mantissa`, `integer`). `affine_example`
+    quantizes the example `weights` to `bits` unsigned levels with the affine formulas of the
+    Hugging Face Transformers quantization concepts page (scale, zero point, quantize, dequantize)
+    and prints every step. `model_memory` reads `total_parameters` from the `model` record and
+    draws parameters × bits ÷ 8 for each precision. `name_decoder` splits names into parts, the
+    example shape of the hardware repo's name decoders. Example values are named as examples in
+    `caption`.
+  - **Every row has its source.** Each table row names one entry of `sources`, fetched for the
+    record; a measured number is copied with the source and the model it was measured on, and a
+    computed one shows its formula in the cell or the text. No ranking words unless the sentence
+    names who said them.
 
 ## Sourcing
 
