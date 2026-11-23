@@ -2,23 +2,26 @@
 id: parameter/intermediate-size-ffn
 type: parameter
 slug: intermediate-size-ffn
-schema_version: 2.9
-title: "Intermediate Size (FFN Width)"
+schema_version: 3.1
+title: Intermediate Size (FFN Width)
 name: intermediate_size
 priority: 3
 importance: critical
-applies_to: [llm, transformer, moe]
-range: "2,048 — 53,248"
-controls: "How wide the feed-forward block inside every layer is: each token's vector is widened to this size and narrowed back."
+applies_to:
+- llm
+- transformer
+- moe
+range: 2,048 — 53,248
+controls: 'How wide the feed-forward block inside every layer is: each token''s vector is widened to this size and narrowed back.'
 effects:
   decrease:
-    - "Fewer parameters in every layer, in a straight line: 3 × hidden_size fewer per unit in a gated FFN"
-    - "Less computation per token in the FFN"
-    - "In the original Transformer's tests, d_ff 1024 scored 25.4 BLEU against 25.8 at 2048"
+  - 'Fewer parameters in every layer, in a straight line: 3 × hidden_size fewer per unit in a gated FFN'
+  - Less computation per token in the FFN
+  - In the original Transformer's tests, d_ff 1024 scored 25.4 BLEU against 25.8 at 2048
   increase:
-    - "More parameters in every layer, in a straight line"
-    - "More computation per token in the FFN"
-    - "In the same tests, d_ff 4096 scored 26.2 BLEU, with 90 million parameters against 65 million"
+  - More parameters in every layer, in a straight line
+  - More computation per token in the FFN
+  - In the same tests, d_ff 4096 scored 26.2 BLEU, with 90 million parameters against 65 million
 scale:
   min: 1024
   max: 65536
@@ -26,67 +29,102 @@ scale:
   typical_max: 53248
   spacing: log
 typical_values:
-  - setting: "Original Transformer, base model, d_model 512 (Vaswani et al.)"
-    value: "2048"
-    source: "https://arxiv.org/abs/1706.03762"
-  - setting: "BERT-base, hidden_size 768, two matrices (config.json)"
-    value: "3072"
-    source: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json"
-  - setting: "Qwen3-8B, hidden_size 4096, gated (config.json)"
-    value: "12288"
-    source: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json"
-  - setting: "Llama 3 8B, model dimension 4096, SwiGLU (Llama 3 paper, Table 3)"
-    value: "14336"
-    source: "https://arxiv.org/abs/2407.21783"
-  - setting: "Qwen3-32B, hidden_size 5120, gated (config.json)"
-    value: "25600"
-    source: "https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json"
-  - setting: "Llama 3 70B, model dimension 8192 (Llama 3 paper, Table 3)"
-    value: "28672"
-    source: "https://arxiv.org/abs/2407.21783"
-  - setting: "Llama 3 405B, model dimension 16384 (Llama 3 paper, Table 3)"
-    value: "53248"
-    source: "https://arxiv.org/abs/2407.21783"
+- setting: Original Transformer, base model, d_model 512 (Vaswani et al.)
+  value: '2048'
+  source: https://arxiv.org/abs/1706.03762
+- setting: BERT-base, hidden_size 768, two matrices (config.json)
+  value: '3072'
+  source: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+- setting: Qwen3-8B, hidden_size 4096, gated (config.json)
+  value: '12288'
+  source: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+- setting: Llama 3 8B, model dimension 4096, SwiGLU (Llama 3 paper, Table 3)
+  value: '14336'
+  source: https://arxiv.org/abs/2407.21783
+- setting: Qwen3-32B, hidden_size 5120, gated (config.json)
+  value: '25600'
+  source: https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json
+- setting: Llama 3 70B, model dimension 8192 (Llama 3 paper, Table 3)
+  value: '28672'
+  source: https://arxiv.org/abs/2407.21783
+- setting: Llama 3 405B, model dimension 16384 (Llama 3 paper, Table 3)
+  value: '53248'
+  source: https://arxiv.org/abs/2407.21783
 mistakes:
-  - mistake: "Comparing FFN sizes without counting the matrices"
-    why: >-
-      A plain FFN has two matrices; a gated one such as SwiGLU has three. Shazeer, who introduced
-      these variants, cut d_ff by a factor of **2/3** (from 3072 to 2048) to keep the parameters
-      and computation equal to the two-matrix version.
-    fix: "Multiply intermediate_size by the number of FFN matrices before comparing."
-  - mistake: "Assuming the FFN is the same share of every model"
-    why: >-
-      The share depends on the configuration. Computed from their config.json files, the FFN holds
-      **66.4%** of Qwen3-8B's parameters but **44.3%** of Qwen3-0.6B's, where the embedding table
-      takes 26.1%.
-    fix: "Compute the share for the model at hand, as in the figure."
-  - mistake: "Reading intermediate_size as the size of a mixture-of-experts layer"
-    why: >-
-      In a mixture-of-experts model each expert has its own FFN, with its own key. Qwen3-30B-A3B's
-      config.json lists intermediate_size **6144** but moe_intermediate_size **768** for each of its
-      **128** experts, 8 of them used per token.
-    fix: "See the MoE expert FFN size page for those models."
-related: [parameter/hidden-size, parameter/activation-function, parameter/moe-expert-ffn-size, parameter/num-hidden-layers]
+- mistake: Comparing FFN sizes without counting the matrices
+  why: A plain FFN has two matrices; a gated one such as SwiGLU has three. Shazeer, who introduced these variants, cut d_ff by a factor of **2/3** (from 3072 to 2048) to keep the parameters and computation equal to the two-matrix version.
+  fix: Multiply intermediate_size by the number of FFN matrices before comparing.
+- mistake: Assuming the FFN is the same share of every model
+  why: The share depends on the configuration. Computed from their config.json files, the FFN holds **66.4%** of Qwen3-8B's parameters but **44.3%** of Qwen3-0.6B's, where the embedding table takes 26.1%.
+  fix: Compute the share for the model at hand, as in the figure.
+- mistake: Reading intermediate_size as the size of a mixture-of-experts layer
+  why: In a mixture-of-experts model each expert has its own FFN, with its own key. Qwen3-30B-A3B's config.json lists intermediate_size **6144** but moe_intermediate_size **768** for each of its **128** experts, 8 of them used per token.
+  fix: See the MoE expert FFN size page for those models.
+related:
+- parameter/hidden-size
+- parameter/activation-function
+- parameter/moe-expert-ffn-size
+- parameter/num-hidden-layers
 visual:
   kind: count_breakdown
   models:
-    - { name: "Qwen3-8B", vocab_size: 151936, hidden_size: 4096, intermediate_size: 12288, num_hidden_layers: 36, num_attention_heads: 32, num_key_value_heads: 8, head_dim: 128, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: true }
-  caption: "Where the 8,190,735,360 parameters of Qwen3-8B sit, computed from its config.json part by part as Transformers builds the model; the total matches the published count."
-tags: [llm, transformer, ffn, mlp, swiglu, parameters]
-updated: 2026-11-23
+  - name: Qwen3-8B
+    vocabulary_size: 151936
+    hidden_size: 4096
+    intermediate_size: 12288
+    num_layers: 36
+    attention_heads: 32
+    kv_heads: 8
+    head_size: 128
+    tie_word_embeddings: false
+    ffn_matrices: 3
+    qk_norm: true
+  caption: Where the 8,190,735,360 parameters of Qwen3-8B sit, computed from its config.json part by part as Transformers builds the model; the total matches the published count.
+tags:
+- llm
+- transformer
+- ffn
+- mlp
+- swiglu
+- parameters
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2002.05202", title: "GLU Variants Improve Transformer (Shazeer, 2020)", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json", title: "Qwen3-8B configuration (config.json)", trust: 0.95 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py", title: "Hugging Face Transformers source: modeling_qwen3.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/modeling_bert.py", title: "Hugging Face Transformers source: modeling_bert.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py", title: "Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/config.json", title: "Qwen3-0.6B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json", title: "Qwen3-32B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json", title: "BERT-base uncased configuration (config.json)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (Llama Team, 2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2505.09388", title: "Qwen3 Technical Report (Qwen Team, 2025)", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-30B-A3B/blob/main/config.json", title: "Qwen3-30B-A3B configuration (config.json)", trust: 0.95 }
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.95
+- url: https://arxiv.org/abs/2002.05202
+  title: GLU Variants Improve Transformer (Shazeer, 2020)
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+  title: Qwen3-8B configuration (config.json)
+  trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py
+  title: 'Hugging Face Transformers source: modeling_qwen3.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/modeling_bert.py
+  title: 'Hugging Face Transformers source: modeling_bert.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py
+  title: 'Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)'
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/config.json
+  title: Qwen3-0.6B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json
+  title: Qwen3-32B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+  title: BERT-base uncased configuration (config.json)
+  trust: 0.95
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models (Llama Team, 2024)
+  trust: 0.9
+- url: https://arxiv.org/abs/2505.09388
+  title: Qwen3 Technical Report (Qwen Team, 2025)
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-30B-A3B/blob/main/config.json
+  title: Qwen3-30B-A3B configuration (config.json)
+  trust: 0.95
 ---
 
 ## Definition

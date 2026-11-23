@@ -2,23 +2,26 @@
 id: parameter/vocab-size
 type: parameter
 slug: vocab-size
-schema_version: 2.9
-title: "Vocabulary Size"
+schema_version: 3.1
+title: Vocabulary Size
 name: vocab_size
 priority: 4
 importance: critical
-applies_to: [llm, transformer, moe]
-range: "30,522 — 256,128"
-controls: "How many different tokens the model can read and write: the number of rows in its embedding table and of scores its output head gives."
+applies_to:
+- llm
+- transformer
+- moe
+range: 30,522 — 256,128
+controls: 'How many different tokens the model can read and write: the number of rows in its embedding table and of scores its output head gives.'
 effects:
   decrease:
-    - "A smaller embedding table and output head: hidden_size fewer parameters per token removed, twice if untied"
-    - "Fewer scores to compute for each next token"
-    - "Text splits into more, shorter tokens"
+  - 'A smaller embedding table and output head: hidden_size fewer parameters per token removed, twice if untied'
+  - Fewer scores to compute for each next token
+  - Text splits into more, shorter tokens
   increase:
-    - "A larger embedding table and output head"
-    - "More scores to compute for each next token"
-    - "Text can split into fewer tokens: the Llama 3 team report 3.94 characters per token against 3.17 for Llama 2's tokenizer on English"
+  - A larger embedding table and output head
+  - More scores to compute for each next token
+  - 'Text can split into fewer tokens: the Llama 3 team report 3.94 characters per token against 3.17 for Llama 2''s tokenizer on English'
 scale:
   min: 10000
   max: 400000
@@ -26,65 +29,110 @@ scale:
   typical_max: 256128
   spacing: log
 typical_values:
-  - setting: "BERT-base (config.json); the BERT paper describes a 30,000-token WordPiece vocabulary"
-    value: "30522"
-    source: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json"
-  - setting: "GPT-2 (GPT-2 paper)"
-    value: "50257"
-    source: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf"
-  - setting: "Llama 3 (Llama 3 paper, Table 3)"
-    value: "128000"
-    source: "https://arxiv.org/abs/2407.21783"
-  - setting: "Qwen3-8B and Qwen3-0.6B (config.json)"
-    value: "151936"
-    source: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json"
-  - setting: "Qwen3 tokenizer (Qwen3 report)"
-    value: "151669"
-    source: "https://arxiv.org/abs/2505.09388"
-  - setting: "Gemma 2, 2B to 27B (Gemma 2 report, Table 1)"
-    value: "256128"
-    source: "https://arxiv.org/abs/2408.00118"
+- setting: BERT-base (config.json); the BERT paper describes a 30,000-token WordPiece vocabulary
+  value: '30522'
+  source: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+- setting: GPT-2 (GPT-2 paper)
+  value: '50257'
+  source: https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf
+- setting: Llama 3 (Llama 3 paper, Table 3)
+  value: '128000'
+  source: https://arxiv.org/abs/2407.21783
+- setting: Qwen3-8B and Qwen3-0.6B (config.json)
+  value: '151936'
+  source: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+- setting: Qwen3 tokenizer (Qwen3 report)
+  value: '151669'
+  source: https://arxiv.org/abs/2505.09388
+- setting: Gemma 2, 2B to 27B (Gemma 2 report, Table 1)
+  value: '256128'
+  source: https://arxiv.org/abs/2408.00118
 mistakes:
-  - mistake: "Reading vocab_size as the number of tokens the tokenizer has"
-    why: >-
-      vocab_size is the number of rows of the embedding table. Qwen3's config.json says **151,936**,
-      while the Qwen3 report gives its tokenizer a vocabulary of **151,669**: the table has 267 more
-      rows than there are tokens.
-    fix: "Use vocab_size for parameter counts and the tokenizer for what text maps to."
-  - mistake: "Counting the embedding once when the output head is untied"
-    why: >-
-      An untied output head is a second vocab_size × hidden_size matrix. Qwen3-8B's config.json has
-      tie_word_embeddings **false**, so its 622,329,856 embedding parameters appear twice; Qwen3-0.6B
-      ties them, as its config.json and the Qwen3 report state.
-    fix: "Check tie_word_embeddings before adding up the model."
-  - mistake: "Ignoring the vocabulary in small models"
-    why: >-
-      Computed from its config.json, the embedding table holds **26.1%** of Qwen3-0.6B's parameters
-      even though it is tied, against **7.6%** for the embedding table of Qwen3-8B. Kaplan et al.
-      leave embedding parameters out of model size because the trends are cleaner without them.
-    fix: "Look at non-embedding parameters when comparing models of different vocabularies."
-related: [parameter/token-embedding, parameter/tied-embeddings, parameter/output-head, parameter/hidden-size]
+- mistake: Reading vocab_size as the number of tokens the tokenizer has
+  why: 'vocab_size is the number of rows of the embedding table. Qwen3''s config.json says **151,936**, while the Qwen3 report gives its tokenizer a vocabulary of **151,669**: the table has 267 more rows than there are tokens.'
+  fix: Use vocab_size for parameter counts and the tokenizer for what text maps to.
+- mistake: Counting the embedding once when the output head is untied
+  why: An untied output head is a second vocab_size × hidden_size matrix. Qwen3-8B's config.json has tie_word_embeddings **false**, so its 622,329,856 embedding parameters appear twice; Qwen3-0.6B ties them, as its config.json and the Qwen3 report state.
+  fix: Check tie_word_embeddings before adding up the model.
+- mistake: Ignoring the vocabulary in small models
+  why: Computed from its config.json, the embedding table holds **26.1%** of Qwen3-0.6B's parameters even though it is tied, against **7.6%** for the embedding table of Qwen3-8B. Kaplan et al. leave embedding parameters out of model size because the trends are cleaner without them.
+  fix: Look at non-embedding parameters when comparing models of different vocabularies.
+related:
+- parameter/token-embedding
+- parameter/tied-embeddings
+- parameter/output-head
+- parameter/hidden-size
 visual:
   kind: count_breakdown
   models:
-    - { name: "Qwen3-8B", vocab_size: 151936, hidden_size: 4096, intermediate_size: 12288, num_hidden_layers: 36, num_attention_heads: 32, num_key_value_heads: 8, head_dim: 128, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: true }
-    - { name: "Qwen3-0.6B", vocab_size: 151936, hidden_size: 1024, intermediate_size: 3072, num_hidden_layers: 28, num_attention_heads: 16, num_key_value_heads: 8, head_dim: 128, tie_word_embeddings: true, ffn_matrices: 3, qk_norm: true }
-  caption: "The same vocabulary of 151,936 rows in two Qwen3 models, computed from their config.json files: 7.6% of Qwen3-8B, plus 7.6% again for its untied output head, but 26.1% of Qwen3-0.6B, whose head is tied to the embedding."
-tags: [llm, transformer, tokenizer, vocabulary, embedding, parameters]
-updated: 2026-11-23
+  - name: Qwen3-8B
+    vocabulary_size: 151936
+    hidden_size: 4096
+    intermediate_size: 12288
+    num_layers: 36
+    attention_heads: 32
+    kv_heads: 8
+    head_size: 128
+    tie_word_embeddings: false
+    ffn_matrices: 3
+    qk_norm: true
+  - name: Qwen3-0.6B
+    vocabulary_size: 151936
+    hidden_size: 1024
+    intermediate_size: 3072
+    num_layers: 28
+    attention_heads: 16
+    kv_heads: 8
+    head_size: 128
+    tie_word_embeddings: true
+    ffn_matrices: 3
+    qk_norm: true
+  caption: 'The same vocabulary of 151,936 rows in two Qwen3 models, computed from their config.json files: 7.6% of Qwen3-8B, plus 7.6% again for its untied output head, but 26.1% of Qwen3-0.6B, whose head is tied to the embedding.'
+tags:
+- llm
+- transformer
+- tokenizer
+- vocabulary
+- embedding
+- parameters
+updated: '2026-11-23'
 sources:
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json", title: "Qwen3-8B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/config.json", title: "Qwen3-0.6B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-0.6B", title: "Qwen3-0.6B model card", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2505.09388", title: "Qwen3 Technical Report (Qwen Team, 2025)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py", title: "Hugging Face Transformers source: modeling_qwen3.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py", title: "Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)", trust: 0.9 }
-  - { url: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json", title: "BERT-base uncased configuration (config.json)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.9 }
-  - { url: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf", title: "Language Models are Unsupervised Multitask Learners (GPT-2, Radford et al., 2019)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (Llama Team, 2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2408.00118", title: "Gemma 2: Improving Open Language Models at a Practical Size (Gemma Team, 2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2001.08361", title: "Scaling Laws for Neural Language Models (Kaplan et al., 2020)", trust: 0.9 }
+- url: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+  title: Qwen3-8B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/config.json
+  title: Qwen3-0.6B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-0.6B
+  title: Qwen3-0.6B model card
+  trust: 0.9
+- url: https://arxiv.org/abs/2505.09388
+  title: Qwen3 Technical Report (Qwen Team, 2025)
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py
+  title: 'Hugging Face Transformers source: modeling_qwen3.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py
+  title: 'Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)'
+  trust: 0.9
+- url: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+  title: BERT-base uncased configuration (config.json)
+  trust: 0.95
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)'
+  trust: 0.9
+- url: https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf
+  title: Language Models are Unsupervised Multitask Learners (GPT-2, Radford et al., 2019)
+  trust: 0.9
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models (Llama Team, 2024)
+  trust: 0.9
+- url: https://arxiv.org/abs/2408.00118
+  title: 'Gemma 2: Improving Open Language Models at a Practical Size (Gemma Team, 2024)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2001.08361
+  title: Scaling Laws for Neural Language Models (Kaplan et al., 2020)
+  trust: 0.9
 ---
 
 ## Definition

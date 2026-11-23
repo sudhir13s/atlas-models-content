@@ -2,23 +2,26 @@
 id: parameter/num-key-value-heads-gqa
 type: parameter
 slug: num-key-value-heads-gqa
-schema_version: 2.9
-title: "Number of Key/Value Heads (GQA / MQA)"
+schema_version: 3.1
+title: Number of Key/Value Heads (GQA / MQA)
 name: num_key_value_heads
 priority: 8
 importance: important
-applies_to: [llm, transformer, moe]
-range: "1 — 8"
-controls: "How many key-value heads each attention layer has; groups of query heads share one, which sets the size of the KV cache."
+applies_to:
+- llm
+- transformer
+- moe
+range: 1 — 8
+controls: How many key-value heads each attention layer has; groups of query heads share one, which sets the size of the KV cache.
 effects:
   decrease:
-    - "A smaller KV cache, in a straight line: Qwen3-32B caches 256 KiB per token with 8, against 2 MiB with 64"
-    - "Smaller key and value projections, by the same factor"
-    - "In the GQA paper, multi-query attention (1 head) averaged 46.6 against 47.2 for multi-head attention"
+  - 'A smaller KV cache, in a straight line: Qwen3-32B caches 256 KiB per token with 8, against 2 MiB with 64'
+  - Smaller key and value projections, by the same factor
+  - In the GQA paper, multi-query attention (1 head) averaged 46.6 against 47.2 for multi-head attention
   increase:
-    - "A larger KV cache and more memory read at every generated token"
-    - "In the GQA paper, 8 groups averaged 47.1, close to multi-head attention's 47.2"
-    - "In the same table, time per sample 0.28 with 8 groups against 1.51 with multi-head attention"
+  - A larger KV cache and more memory read at every generated token
+  - In the GQA paper, 8 groups averaged 47.1, close to multi-head attention's 47.2
+  - In the same table, time per sample 0.28 with 8 groups against 1.51 with multi-head attention
 scale:
   min: 1
   max: 128
@@ -26,62 +29,92 @@ scale:
   typical_max: 8
   spacing: log
 typical_values:
-  - setting: "PaLM, multi-query attention (named in the GQA paper)"
-    value: "1"
-    source: "https://arxiv.org/abs/2305.13245"
-  - setting: "SmolLM2-135M, with 9 query heads (config.json)"
-    value: "3"
-    source: "https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/config.json"
-  - setting: "Qwen3-30B-A3B, with 32 query heads (config.json)"
-    value: "4"
-    source: "https://huggingface.co/Qwen/Qwen3-30B-A3B/blob/main/config.json"
-  - setting: "Qwen3-8B, with 32 query heads (config.json)"
-    value: "8"
-    source: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json"
-  - setting: "Qwen3-32B, with 64 query heads (config.json)"
-    value: "8"
-    source: "https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json"
-  - setting: "T5-XXL uptrained to GQA-8, the paper's main model (Ainslie et al.)"
-    value: "8"
-    source: "https://arxiv.org/abs/2305.13245"
+- setting: PaLM, multi-query attention (named in the GQA paper)
+  value: '1'
+  source: https://arxiv.org/abs/2305.13245
+- setting: SmolLM2-135M, with 9 query heads (config.json)
+  value: '3'
+  source: https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/config.json
+- setting: Qwen3-30B-A3B, with 32 query heads (config.json)
+  value: '4'
+  source: https://huggingface.co/Qwen/Qwen3-30B-A3B/blob/main/config.json
+- setting: Qwen3-8B, with 32 query heads (config.json)
+  value: '8'
+  source: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+- setting: Qwen3-32B, with 64 query heads (config.json)
+  value: '8'
+  source: https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json
+- setting: T5-XXL uptrained to GQA-8, the paper's main model (Ainslie et al.)
+  value: '8'
+  source: https://arxiv.org/abs/2305.13245
 mistakes:
-  - mistake: "Assuming fewer key-value heads means fewer attention heads"
-    why: >-
-      The query heads stay as they are. Ainslie et al. define grouped-query attention as query heads
-      divided into **G groups**, each sharing one key head and one value head. Qwen3-32B keeps all
-      **64** query heads; only the keys and values come in **8** heads.
-    fix: "Read num_attention_heads for the query heads and num_key_value_heads for the keys and values."
-  - mistake: "Sizing the KV cache from num_attention_heads"
-    why: >-
-      The cache holds keys and values, so it scales with the key-value heads. Ainslie et al. note that
-      going from multi-head to multi-query attention cuts the KV cache by a factor of **H**, the head
-      count. For Qwen3-32B that is **256 KiB** per token, not the **2 MiB** that 64 heads would need.
-    fix: "Compute the cache from num_key_value_heads, as in the worked example."
-  - mistake: "Treating multi-query attention as free"
-    why: >-
-      The GQA paper reports that MQA can lead to quality degradation and training instability. In its
-      Table 1, the uptrained MQA model averaged **46.6**, GQA-8 **47.1** and multi-head attention
-      **47.2**; its appendix reports loss spikes when training MQA models from scratch.
-    fix: "Compare the published results for the head count a model uses, not only its speed."
-related: [parameter/num-attention-heads, parameter/head-dim, parameter/context-length]
+- mistake: Assuming fewer key-value heads means fewer attention heads
+  why: The query heads stay as they are. Ainslie et al. define grouped-query attention as query heads divided into **G groups**, each sharing one key head and one value head. Qwen3-32B keeps all **64** query heads; only the keys and values come in **8** heads.
+  fix: Read num_attention_heads for the query heads and num_key_value_heads for the keys and values.
+- mistake: Sizing the KV cache from num_attention_heads
+  why: The cache holds keys and values, so it scales with the key-value heads. Ainslie et al. note that going from multi-head to multi-query attention cuts the KV cache by a factor of **H**, the head count. For Qwen3-32B that is **256 KiB** per token, not the **2 MiB** that 64 heads would need.
+  fix: Compute the cache from num_key_value_heads, as in the worked example.
+- mistake: Treating multi-query attention as free
+  why: The GQA paper reports that MQA can lead to quality degradation and training instability. In its Table 1, the uptrained MQA model averaged **46.6**, GQA-8 **47.1** and multi-head attention **47.2**; its appendix reports loss spikes when training MQA models from scratch.
+  fix: Compare the published results for the head count a model uses, not only its speed.
+related:
+- parameter/num-attention-heads
+- parameter/head-dim
+- parameter/context-length
 visual:
   kind: kv_cache
-  model: { name: "Qwen3-32B", vocab_size: 151936, hidden_size: 5120, intermediate_size: 25600, num_hidden_layers: 64, num_attention_heads: 64, num_key_value_heads: 8, head_dim: 128, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: true }
+  model:
+    name: Qwen3-32B
+    vocabulary_size: 151936
+    hidden_size: 5120
+    intermediate_size: 25600
+    num_layers: 64
+    attention_heads: 64
+    kv_heads: 8
+    head_size: 128
+    tie_word_embeddings: false
+    ffn_matrices: 3
+    qk_norm: true
   bytes_per_value: 2
   tokens: 32768
-  caption: "The keys and values Qwen3-32B caches, computed from its config.json with 16-bit numbers (2 bytes each): per token, and for its native context of 32,768 tokens from its card. The second bar is the same model with one key-value head per query head (64), which Qwen3-32B does not have."
-tags: [llm, transformer, attention, gqa, mqa, kv-cache, parameters]
-updated: 2026-11-23
+  caption: 'The keys and values Qwen3-32B caches, computed from its config.json with 16-bit numbers (2 bytes each): per token, and for its native context of 32,768 tokens from its card. The second bar is the same model with one key-value head per query head (64), which Qwen3-32B does not have.'
+tags:
+- llm
+- transformer
+- attention
+- gqa
+- mqa
+- kv-cache
+- parameters
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/2305.13245", title: "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints (Ainslie et al., 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1911.02150", title: "Fast Transformer Decoding: One Write-Head is All You Need (Shazeer, 2019)", trust: 0.85 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json", title: "Qwen3-32B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-32B", title: "Qwen3-32B model card", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json", title: "Qwen3-8B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-30B-A3B/blob/main/config.json", title: "Qwen3-30B-A3B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/config.json", title: "SmolLM2-135M configuration (config.json)", trust: 0.95 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py", title: "Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py", title: "Hugging Face Transformers source: modeling_qwen3.py", trust: 0.9 }
+- url: https://arxiv.org/abs/2305.13245
+  title: 'GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints (Ainslie et al., 2023)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1911.02150
+  title: 'Fast Transformer Decoding: One Write-Head is All You Need (Shazeer, 2019)'
+  trust: 0.85
+- url: https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json
+  title: Qwen3-32B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-32B
+  title: Qwen3-32B model card
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+  title: Qwen3-8B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-30B-A3B/blob/main/config.json
+  title: Qwen3-30B-A3B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/config.json
+  title: SmolLM2-135M configuration (config.json)
+  trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py
+  title: 'Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py
+  title: 'Hugging Face Transformers source: modeling_qwen3.py'
+  trust: 0.9
 ---
 
 ## Definition

@@ -2,7 +2,7 @@
 id: milestone/2024-llama-3-qwen-2-5-deepseek-v3
 type: milestone
 slug: 2024-llama-3-qwen-2-5-deepseek-v3
-schema_version: 1.2
+schema_version: 3.1
 title: Llama 3 + Qwen 2.5 + DeepSeek V3
 year: 2024
 order: 9

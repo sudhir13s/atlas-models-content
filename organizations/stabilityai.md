@@ -2,7 +2,7 @@
 id: organization/stabilityai
 type: organization
 slug: stabilityai
-schema_version: 1.1
+schema_version: 3.1
 title: Stability AI
 name: Stability AI
 website: https://huggingface.co/stabilityai

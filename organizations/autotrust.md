@@ -2,7 +2,7 @@
 id: organization/autotrust
 type: organization
 slug: autotrust
-schema_version: 1.1
+schema_version: 3.1
 title: AutoTrust AI Lab
 name: AutoTrust AI Lab
 website: https://huggingface.co/autotrust

@@ -2,7 +2,7 @@
 id: organization/deepseek
 type: organization
 slug: deepseek
-schema_version: 1.1
+schema_version: 3.1
 title: DeepSeek
 name: DeepSeek
 kind: company

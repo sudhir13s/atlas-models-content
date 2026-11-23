@@ -2,25 +2,30 @@
 id: hyperparameter/lora-alpha
 type: hyperparameter
 slug: lora-alpha
-schema_version: 2.2
-title: "LoRA Alpha"
+schema_version: 3.1
+title: LoRA Alpha
 name: lora_alpha
 context: training
 priority: 6
 importance: important
-goals: [finetuning]
-models: [llm, vision, audio, diffusion]
-range: "8 — 32"
-controls: "A number that sets how strongly a LoRA adapter's output is added to the frozen model: the adapter's output is multiplied by alpha divided by the rank r."
+goals:
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+range: 8 — 32
+controls: 'A number that sets how strongly a LoRA adapter''s output is added to the frozen model: the adapter''s output is multiplied by alpha divided by the rank r.'
 effects:
   decrease:
-    - "The adapter's output is multiplied by a smaller factor"
-    - "Each change to the adapter moves the model's output less"
-    - "At alpha equal to r, the factor is 1"
+  - The adapter's output is multiplied by a smaller factor
+  - Each change to the adapter moves the model's output less
+  - At alpha equal to r, the factor is 1
   increase:
-    - "The adapter's output is multiplied by a larger factor"
-    - "Each change to the adapter moves the model's output more"
-    - "With Adam, the LoRA paper finds this roughly the same as raising the learning rate"
+  - The adapter's output is multiplied by a larger factor
+  - Each change to the adapter moves the model's output more
+  - With Adam, the LoRA paper finds this roughly the same as raising the learning rate
 scale:
   min: 1
   max: 256
@@ -28,63 +33,69 @@ scale:
   typical_max: 32
   spacing: log
 typical_values:
-  - setting: "Hugging Face PEFT: default of LoraConfig (with its default r = 8, a factor of 1)"
-    value: "8"
-    source: "https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py"
-  - setting: "LoRA paper: RoBERTa base and DeBERTa XXL on GLUE, with r = 8 (a factor of 1)"
-    value: "8"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "LoRA paper: RoBERTa large on GLUE, with r = 8 (a factor of 2)"
-    value: "16"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "LoRA paper: GPT-2 on text generation tasks, with r = 4 (a factor of 8)"
-    value: "32"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "Alpaca-LoRA training script: default, with r = 8 (a factor of 2)"
-    value: "16"
-    source: "https://github.com/tloen/alpaca-lora/blob/main/finetune.py"
-  - setting: "QLoRA: LLaMA fine-tuning, with r = 64 (a factor of 0.25)"
-    value: "16"
-    source: "https://arxiv.org/abs/2305.14314"
+- setting: 'Hugging Face PEFT: default of LoraConfig (with its default r = 8, a factor of 1)'
+  value: '8'
+  source: https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py
+- setting: 'LoRA paper: RoBERTa base and DeBERTa XXL on GLUE, with r = 8 (a factor of 1)'
+  value: '8'
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'LoRA paper: RoBERTa large on GLUE, with r = 8 (a factor of 2)'
+  value: '16'
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'LoRA paper: GPT-2 on text generation tasks, with r = 4 (a factor of 8)'
+  value: '32'
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'Alpaca-LoRA training script: default, with r = 8 (a factor of 2)'
+  value: '16'
+  source: https://github.com/tloen/alpaca-lora/blob/main/finetune.py
+- setting: 'QLoRA: LLaMA fine-tuning, with r = 64 (a factor of 0.25)'
+  value: '16'
+  source: https://arxiv.org/abs/2305.14314
 mistakes:
-  - mistake: "Changing r and leaving lora_alpha where it was"
-    why: >-
-      The factor is **alpha / r**, so it moves whenever r moves. With alpha = 16, going from
-      r = 8 to r = 64 shrinks the factor from 2 to 0.25, eight times smaller (worked example,
-      Part C). Kalajdzievski reports that this factor **slows learning** at higher ranks.
-    fix: >-
-      Decide what factor you want and set alpha to factor × r, or set `use_rslora=True` in PEFT,
-      which divides by √r and changes the factor far less as r grows.
-  - mistake: "Tuning lora_alpha and the learning rate as two separate dials"
-    why: >-
-      The LoRA paper states that, when optimizing with Adam, **tuning alpha is roughly the same as
-      tuning the learning rate** (with the initialization scaled to match). Searching both at once
-      repeats much of the same search.
-    fix: >-
-      Fix one and tune the other. The LoRA authors set alpha to the **first r they tried** and did
-      not tune it, and report that this reduces the need to retune when r changes.
-  - mistake: "Comparing alpha values from runs with different ranks"
-    why: >-
-      Alpha alone does not say how strong the adapter is. QLoRA and Alpaca-LoRA both use
-      **alpha = 16**, but with r = 64 and r = 8 the factors are **0.25** and **2**.
-    fix: "Compare alpha / r (or alpha / √r with rsLoRA), not alpha."
-  - mistake: "Turning on use_rslora and keeping an alpha chosen for the alpha / r factor"
-    why: >-
-      PEFT's code sets the factor to `lora_alpha / math.sqrt(r)` with rsLoRA and to
-      `lora_alpha / r` without it. At r = 64 and alpha = 16, the factor jumps from 0.25 to 2,
-      **eight times** larger.
-    fix: "Recompute the factor after switching, and set alpha for the factor you want."
-tags: [finetuning, lora, peft, scaling]
-updated: 2026-11-23
-related: [hyperparameter/lora-r, hyperparameter/learning-rate, hyperparameter/target-modules]
+- mistake: Changing r and leaving lora_alpha where it was
+  why: The factor is **alpha / r**, so it moves whenever r moves. With alpha = 16, going from r = 8 to r = 64 shrinks the factor from 2 to 0.25, eight times smaller (worked example, Part C). Kalajdzievski reports that this factor **slows learning** at higher ranks.
+  fix: Decide what factor you want and set alpha to factor × r, or set `use_rslora=True` in PEFT, which divides by √r and changes the factor far less as r grows.
+- mistake: Tuning lora_alpha and the learning rate as two separate dials
+  why: The LoRA paper states that, when optimizing with Adam, **tuning alpha is roughly the same as tuning the learning rate** (with the initialization scaled to match). Searching both at once repeats much of the same search.
+  fix: Fix one and tune the other. The LoRA authors set alpha to the **first r they tried** and did not tune it, and report that this reduces the need to retune when r changes.
+- mistake: Comparing alpha values from runs with different ranks
+  why: Alpha alone does not say how strong the adapter is. QLoRA and Alpaca-LoRA both use **alpha = 16**, but with r = 64 and r = 8 the factors are **0.25** and **2**.
+  fix: Compare alpha / r (or alpha / √r with rsLoRA), not alpha.
+- mistake: Turning on use_rslora and keeping an alpha chosen for the alpha / r factor
+  why: PEFT's code sets the factor to `lora_alpha / math.sqrt(r)` with rsLoRA and to `lora_alpha / r` without it. At r = 64 and alpha = 16, the factor jumps from 0.25 to 2, **eight times** larger.
+  fix: Recompute the factor after switching, and set alpha for the factor you want.
+tags:
+- finetuning
+- lora
+- peft
+- scaling
+updated: '2026-11-23'
+related:
+- hyperparameter/lora-r
+- hyperparameter/learning-rate
+- hyperparameter/target-modules
 sources:
-  - { url: "https://arxiv.org/abs/2106.09685", title: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2312.03732", title: "A Rank Stabilization Scaling Factor for Fine-Tuning with LoRA (Kalajdzievski, 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2305.14314", title: "QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py", title: "Hugging Face PEFT source: LoraConfig (defaults, use_rslora)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/layer.py", title: "Hugging Face PEFT source: LoRA layer (scaling)", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/peft/developer_guides/lora", title: "Hugging Face PEFT documentation: LoRA", trust: 0.9 }
-  - { url: "https://github.com/tloen/alpaca-lora/blob/main/finetune.py", title: "Alpaca-LoRA training script (finetune.py)", trust: 0.8 }
+- url: https://arxiv.org/abs/2106.09685
+  title: 'LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2312.03732
+  title: A Rank Stabilization Scaling Factor for Fine-Tuning with LoRA (Kalajdzievski, 2023)
+  trust: 0.9
+- url: https://arxiv.org/abs/2305.14314
+  title: 'QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)'
+  trust: 0.9
+- url: https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py
+  title: 'Hugging Face PEFT source: LoraConfig (defaults, use_rslora)'
+  trust: 0.9
+- url: https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/layer.py
+  title: 'Hugging Face PEFT source: LoRA layer (scaling)'
+  trust: 0.9
+- url: https://huggingface.co/docs/peft/developer_guides/lora
+  title: 'Hugging Face PEFT documentation: LoRA'
+  trust: 0.9
+- url: https://github.com/tloen/alpaca-lora/blob/main/finetune.py
+  title: Alpaca-LoRA training script (finetune.py)
+  trust: 0.8
 ---
 
 ## Definition

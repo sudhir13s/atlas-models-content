@@ -2,7 +2,7 @@
 id: organization/lmms-lab
 type: organization
 slug: lmms-lab
-schema_version: 1.1
+schema_version: 3.1
 title: LMMs-Lab
 name: LMMs-Lab
 website: https://huggingface.co/lmms-lab

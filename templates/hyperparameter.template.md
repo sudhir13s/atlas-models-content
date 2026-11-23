@@ -2,7 +2,7 @@
 id: hyperparameter/<slug>
 type: hyperparameter
 slug: <slug>
-schema_version: 2.2
+schema_version: 3.1              # the schema's current version; the schema refuses any other
 title: "<Human Readable Name>"
 name: <exact_config_key>
 context: training                # training | inference

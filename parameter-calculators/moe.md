@@ -2,40 +2,132 @@
 id: parameter-calculator/moe
 type: parameter-calculator
 slug: moe
-schema_version: 1.0
-title: "Mixture-of-Experts (MoE) Parameters"
+schema_version: 3.1
+title: Mixture-of-Experts (MoE) Parameters
 arch: moe
 order: 2
 color_key: moe
 components:
-  - { name: "num_local_experts (expert count)", rank: 1, importance: critical, badge: "Per Layer", formula: "total FFN params = num_experts × per-expert FFN", range: "8 → 256" }
-  - { name: "num_experts_per_tok (top_k, active)", rank: 2, importance: critical, badge: "Per Layer", formula: "active FFN params = top_k × per-expert FFN", range: "1 → 8 (usually 2)" }
-  - { name: "expert FFN gate/up/down (per-expert SwiGLU)", rank: 3, importance: critical, badge: "Per Expert", formula: "per-expert = 3 × hidden × intermediate", range: "intermediate ≈ 1.75–4 × hidden" }
-  - { name: "hidden_size (d_model)", rank: 4, importance: critical, badge: "Structure", formula: "scales attention and every expert", range: "2048 → 8192" }
-  - { name: "num_hidden_layers (depth)", rank: 5, importance: critical, badge: "Structure", formula: "total = layers × per-layer params", range: "24 → 60" }
-  - { name: "token embedding table", rank: 6, importance: critical, badge: "Embedding", formula: "vocab_size × hidden_size (dense)", range: "V = 32k → 150k" }
-  - { name: "attention Q/K/V/O projections (GQA)", rank: 7, importance: critical, badge: "Per Layer", formula: "Q,O ≈ d² each; K,V shrink by kv_heads/num_heads (dense)", range: "≈ 2d² + GQA K/V" }
-  - { name: "output / unembedding head", rank: 8, importance: important, badge: "Head", formula: "vocab_size × hidden_size (0 if tied)", range: "0 or V·d" }
-  - { name: "shared_expert (optional, always-on)", rank: 9, importance: optional, badge: "Per Layer", formula: "adds one always-active FFN (3·d·d_ffn) to every token", range: "0 or 1" }
-  - { name: "router / gate network", rank: 10, importance: important, badge: "Per Layer", formula: "hidden × num_experts logits", range: "tiny (≪ 0.1% of layer)" }
-  - { name: "num_attention_heads / num_key_value_heads", rank: 11, importance: important, badge: "Per Layer", formula: "head_dim = hidden/num_heads; GQA sets KV cache", range: "MQA → MHA" }
-  - { name: "load-balancing auxiliary loss", rank: 12, importance: architectural, badge: "Training", formula: "0 params — a training-time term, not stored weights", range: "0" }
-  - { name: "RMSNorm (pre-attn + pre-MoE + final)", rank: 13, importance: optional, badge: "Per Layer", formula: "≈ (2L+1)·d (dense)", range: "tiny" }
+- name: num_local_experts (expert count)
+  rank: 1
+  importance: critical
+  badge: Per Layer
+  formula: total FFN params = num_experts × per-expert FFN
+  range: 8 → 256
+- name: num_experts_per_tok (top_k, active)
+  rank: 2
+  importance: critical
+  badge: Per Layer
+  formula: active FFN params = top_k × per-expert FFN
+  range: 1 → 8 (usually 2)
+- name: expert FFN gate/up/down (per-expert SwiGLU)
+  rank: 3
+  importance: critical
+  badge: Per Expert
+  formula: per-expert = 3 × hidden × intermediate
+  range: intermediate ≈ 1.75–4 × hidden
+- name: hidden_size (d_model)
+  rank: 4
+  importance: critical
+  badge: Structure
+  formula: scales attention and every expert
+  range: 2048 → 8192
+- name: num_hidden_layers (depth)
+  rank: 5
+  importance: critical
+  badge: Structure
+  formula: total = layers × per-layer params
+  range: 24 → 60
+- name: token embedding table
+  rank: 6
+  importance: critical
+  badge: Embedding
+  formula: vocab_size × hidden_size (dense)
+  range: V = 32k → 150k
+- name: attention Q/K/V/O projections (GQA)
+  rank: 7
+  importance: critical
+  badge: Per Layer
+  formula: Q,O ≈ d² each; K,V shrink by kv_heads/num_heads (dense)
+  range: ≈ 2d² + GQA K/V
+- name: output / unembedding head
+  rank: 8
+  importance: important
+  badge: Head
+  formula: vocab_size × hidden_size (0 if tied)
+  range: 0 or V·d
+- name: shared_expert (optional, always-on)
+  rank: 9
+  importance: optional
+  badge: Per Layer
+  formula: adds one always-active FFN (3·d·d_ffn) to every token
+  range: 0 or 1
+- name: router / gate network
+  rank: 10
+  importance: important
+  badge: Per Layer
+  formula: hidden × num_experts logits
+  range: tiny (≪ 0.1% of layer)
+- name: num_attention_heads / num_key_value_heads
+  rank: 11
+  importance: important
+  badge: Per Layer
+  formula: head_dim = hidden/num_heads; GQA sets KV cache
+  range: MQA → MHA
+- name: load-balancing auxiliary loss
+  rank: 12
+  importance: architectural
+  badge: Training
+  formula: 0 params — a training-time term, not stored weights
+  range: '0'
+- name: RMSNorm (pre-attn + pre-MoE + final)
+  rank: 13
+  importance: optional
+  badge: Per Layer
+  formula: ≈ (2L+1)·d (dense)
+  range: tiny
 worked_example:
-  label: "Mixtral 8x7B"
-  config: { hiddenDim: 4096, numLayers: 32, attentionHeads: 32, kvHeads: 8, headDim: 128, ffnDim: 14336, vocabSize: 32000, numExperts: 8, topK: 2, activation: SwiGLU, normalization: RMSNorm, tiedEmbeddings: false }
+  label: Mixtral 8x7B
+  config:
+    hidden_size: 4096
+    num_layers: 32
+    attention_heads: 32
+    kv_heads: 8
+    head_size: 128
+    intermediate_size: 14336
+    vocabulary_size: 32000
+    numExperts: 8
+    topK: 2
+    activation_function: SwiGLU
+    normalization: RMSNorm
+    tiedEmbeddings: false
   sources:
-    - { url: "https://arxiv.org/abs/2401.04088", title: "Mixtral of Experts (Jiang et al., 2024)", trust: 0.95 }
-    - { url: "https://arxiv.org/abs/2305.13245", title: "GQA: Grouped-Query Attention", trust: 0.9 }
-tags: [moe, mixture-of-experts, parameters, sparse]
-updated: 2026-07-17
+  - url: https://arxiv.org/abs/2401.04088
+    title: Mixtral of Experts (Jiang et al., 2024)
+    trust: 0.95
+  - url: https://arxiv.org/abs/2305.13245
+    title: 'GQA: Grouped-Query Attention'
+    trust: 0.9
+tags:
+- moe
+- mixture-of-experts
+- parameters
+- sparse
+updated: '2026-07-17'
 sources:
-  - { url: "https://arxiv.org/abs/2401.04088", title: "Mixtral of Experts (Jiang et al., 2024)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2101.03961", title: "Switch Transformers (Fedus et al., 2021)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1701.06538", title: "Outrageously Large Neural Networks: The Sparsely-Gated MoE Layer (Shazeer et al., 2017)", trust: 0.9 }
+- url: https://arxiv.org/abs/2401.04088
+  title: Mixtral of Experts (Jiang et al., 2024)
+  trust: 0.95
+- url: https://arxiv.org/abs/2101.03961
+  title: Switch Transformers (Fedus et al., 2021)
+  trust: 0.9
+- url: https://arxiv.org/abs/1701.06538
+  title: 'Outrageously Large Neural Networks: The Sparsely-Gated MoE Layer (Shazeer et al., 2017)'
+  trust: 0.9
 ---
 
 ## Overview
+
 A Mixture-of-Experts model replaces the single feed-forward block of each transformer layer with a
 bank of `num_experts` independent FFNs plus a small router. Every token is embedded and attended
 exactly as in a dense transformer, but the router selects only `top_k` experts to process each
@@ -49,6 +141,7 @@ the expert FFNs — which dominate parameter count — are used sparsely. The at
 router, and (if present) a shared always-on expert are dense: they run for every token.
 
 ## Components
+
 - **num_local_experts** sets total capacity. Expert FFNs hold the overwhelming majority of the
   weights, so total parameters scale almost linearly with the expert count.
 - **num_experts_per_tok (top_k)** sets the active/compute budget. With top-2 of 8, each token pays
@@ -72,6 +165,7 @@ The only difference is $E\,F$ (all experts, stored) versus $k\,F$ (chosen expert
 router term $dE$ and the norms $2d$ are dense in both.
 
 ## Worked Example
+
 Mixtral 8x7B (`config` above: $d=4096$, $L=32$, $E=8$, $k=2$, $d_\text{ffn}=14336$, GQA with 8 KV
 heads of dim 128, $V=32000$).
 

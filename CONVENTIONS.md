@@ -16,7 +16,7 @@ this file is the `models`-domain instance.
 
 - `id` = `<type>/<slug>` (e.g. `hyperparameter/learning-rate`). Globally unique, **immutable**.
 - All cross-references use IDs, never titles: `related`, `led_to`, `influenced_by`,
-  `models_using`, `architecture_id`, `license` (when it points at a `license` file), etc.
+  `architecture_id`, `learn_first[].id`, `notable_models[].model`, `license` (when it points at a `license` file), etc.
 - Every referenced ID must resolve to an existing file. Dangling references fail validation.
 
 ## Frontmatter
@@ -31,9 +31,12 @@ numeric config) so it stays machine-parseable.
 - `tags`: lowercase, hyphen-separated.
 - `updated`: ISO date (`YYYY-MM-DD`).
 - `sources[]`: `{ url, title, trust }` — `trust` in `[0,1]`. Open-source-first; cite, do not copy.
-- `schema_version`: the `major.minor` the file was authored against (the repo is at `3.0`). A
-  type whose schema fixes the value (`model`: `3.0`) is refused with any other, so every record of
-  that type carries the current version; a breaking change raises it and converts every record.
+- `schema_version`: the version of the type's schema (the repo is at `3.1`). Every schema fixes
+  the value (`model`: `3.0`, every other type: `3.1`) and a record with any other is refused, so
+  every record carries the current version; a breaking change raises it and converts every record.
+- **No unknown fields** on any type, at the top level or inside a block of fixed shape.
+- **No stored reverse link.** A record names what it points at; the list of what points at it is
+  read from those links (the models under a licence), never written into the target.
 
 ## Body sections
 
@@ -55,9 +58,8 @@ numeric config) so it stays machine-parseable.
     and `scale` → Definition → How It Works with the figure chosen by `visual` → `typical_values` →
     Calculation → Worked Example → `mistakes` → What To Watch → `related` and `sources`.
     Body sections: Definition → How It Works → Calculation → Worked Example → What To Watch.
-  - **Schema 1.0 (the records not yet converted).** `starting_value`, `if_increased`,
-    `if_decreased`, `common_mistake`; body sections Definition → What to look for → Calculation →
-    Example.
+  - **The schema 1.0 fields are gone** (`starting_value`, `if_increased`, `if_decreased`,
+    `common_mistake`): every record is in the 2.2 form.
   - **The effect scale.** A numeric setting gives `scale` (`min`, `max`, the typical band,
     `spacing`); the consumer draws the axis in three zones (below typical, the band, above typical)
     with tick values, and marks on it every `typical_values` row whose `value` is one plain number
@@ -86,7 +88,10 @@ numeric config) so it stays machine-parseable.
     one entry of `sources`; recommendations are attributed to who makes them; `range` and the
     `scale` band span the `typical_values`. `related` lists the settings this one interacts with.
 - **parameter-calculator** — one file per architecture family (`arch`), with a ranked `components[]`
-  list and a `worked_example.config` the consumer live-computes. Body explains each component + the
+  list and a `worked_example.config` the consumer live-computes. In the config a transformer fact
+  has the name a model record's `fingerprint` gives it (`num_layers`, `hidden_size`,
+  `intermediate_size`, `vocabulary_size`, `attention_heads`, `kv_heads`, `head_size`,
+  `activation_function`); any other input keeps the calculator's own name. Body explains each component + the
   master formula.
 - **parameter** — one structural setting of a model's configuration: `name` (the exact config key),
   `applies_to` (architecture families), `priority`, `importance`. A record is written in one of two
@@ -106,8 +111,9 @@ numeric config) so it stays machine-parseable.
     from and links that model's `config.json`, card or paper; a value the configuration and the
     card state differently (a context length) is given with both and explained.
   - **`visual`** is computed from a real model's configuration copied into `model` (or `models`):
-    `vocab_size`, `hidden_size`, `intermediate_size`, `num_hidden_layers`, `num_attention_heads`,
-    `num_key_value_heads`, `head_dim`, `tie_word_embeddings`, plus `ffn_matrices` (3 gated, 2
+    under the names a model record's `fingerprint` uses for the facts it has (`vocabulary_size`,
+    `hidden_size`, `intermediate_size`, `num_layers`, `attention_heads`, `kv_heads`, `head_size`),
+    then `tie_word_embeddings`, plus `ffn_matrices` (3 gated, 2
     plain) and `qk_norm`, each read from the model's official implementation. The count follows
     the implementation matrix by matrix, so the figure reproduces the model's published total.
     - `count_sweep`: the count per layer or in total as `vary` takes each of `values`.
@@ -159,8 +165,11 @@ numeric config) so it stays machine-parseable.
     with the What Changed section explaining it) → `key_numbers` (the configuration the original
     paper or named models publish) → `misunderstandings` (two to four, each corrected from a
     source) → analogy, strengths and limitations, story → `notable_models` and `sources`.
-    `build_steps` and `eli5` are left out: How It Works replaces both.
-  - **Earlier records** keep `build_steps` and `eli5`; their pages are unchanged until converted.
+  - **`notable_models`** is the one list of an architecture's models. An entry is `model`
+    (`model/<slug>`, when the catalog has a record under exactly that title; the consumer shows
+    the record's title) or `name`, never both, with `year` and `note`.
+  - **`learn_first`** lists prerequisites: `label`, an optional `tag`, and `id` when the
+    prerequisite is a record (`architecture-era/<slug>`). It never holds a site route.
   - **`visual`** is the Worked Example's computed figure. `kind` names the computation and the
     other fields are its inputs, exactly the numbers the Worked Example uses; the consumer
     computes everything it draws from them, so the figure cannot disagree with the text. The
@@ -304,7 +313,8 @@ numeric config) so it stays machine-parseable.
     Prose follows the hyperparameter rules: plain words for a newcomer, a bold lead line then
     labelled bullets, every calculation step numbered with its result.
 - **license** — `spdx_id`, `category`, a boolean `permissions` matrix, `conditions[]`,
-  `limitations[]`, `models_using[]` (IDs). Body section: Plain-English.
+  `limitations[]`. The models under a licence are not listed here: each model names its `license`.
+  Body section: Plain-English.
 - **quantization-topic** — one page of the Quantization guide, in the teaching form: `summary` (one
   plain sentence), `order` (reading order), then figures in `visuals` and sourced tables in
   `tables`. Body sections: What It Is first, What To Watch last when present; between them the

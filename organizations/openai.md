@@ -2,7 +2,7 @@
 id: organization/openai
 type: organization
 slug: openai
-schema_version: 1.1
+schema_version: 3.1
 title: OpenAI
 name: OpenAI
 kind: company

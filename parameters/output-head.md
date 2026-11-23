@@ -2,23 +2,26 @@
 id: parameter/output-head
 type: parameter
 slug: output-head
-schema_version: 2.9
-title: "Output / Unembedding Head"
+schema_version: 3.1
+title: Output / Unembedding Head
 name: lm_head
 priority: 9
 importance: important
-applies_to: [llm, transformer, moe]
-range: "0 (tied) or 131,072,000 — 926,679,040 parameters"
-controls: "The last layer, which turns the model's final vector for a token into one score per token of the vocabulary."
+applies_to:
+- llm
+- transformer
+- moe
+range: 0 (tied) or 131,072,000 — 926,679,040 parameters
+controls: The last layer, which turns the model's final vector for a token into one score per token of the vocabulary.
 effects:
   decrease:
-    - "Fewer parameters, in a straight line with vocab_size and hidden_size"
-    - "Fewer multiply-adds per generated token: one per weight"
-    - "Tied to the embedding, it adds no parameters but the same multiply-adds"
+  - Fewer parameters, in a straight line with vocab_size and hidden_size
+  - 'Fewer multiply-adds per generated token: one per weight'
+  - Tied to the embedding, it adds no parameters but the same multiply-adds
   increase:
-    - "More parameters: 622,329,856 in Qwen3-8B against 131,072,000 in Mistral-7B, at the same hidden_size"
-    - "More multiply-adds per generated token"
-    - "A larger share of a small model's total"
+  - 'More parameters: 622,329,856 in Qwen3-8B against 131,072,000 in Mistral-7B, at the same hidden_size'
+  - More multiply-adds per generated token
+  - A larger share of a small model's total
 scale:
   min: 5000000
   max: 3000000000
@@ -26,56 +29,98 @@ scale:
   typical_max: 926679040
   spacing: log
 typical_values:
-  - setting: "Qwen3-4B, tied to its embedding (config.json)"
-    value: "0 extra"
-    source: "https://huggingface.co/Qwen/Qwen3-4B/blob/main/config.json"
-  - setting: "Mistral-7B-v0.1, 32,000 × 4,096 (config.json)"
-    value: "131072000"
-    source: "https://huggingface.co/mistralai/Mistral-7B-v0.1/blob/main/config.json"
-  - setting: "Qwen3-8B, 151,936 × 4,096 (config.json)"
-    value: "622329856"
-    source: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json"
-  - setting: "Qwen3-32B, 151,936 × 5,120 (config.json)"
-    value: "777912320"
-    source: "https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json"
-  - setting: "DeepSeek-V3, 129,280 × 7,168 (config.json)"
-    value: "926679040"
-    source: "https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json"
+- setting: Qwen3-4B, tied to its embedding (config.json)
+  value: 0 extra
+  source: https://huggingface.co/Qwen/Qwen3-4B/blob/main/config.json
+- setting: Mistral-7B-v0.1, 32,000 × 4,096 (config.json)
+  value: '131072000'
+  source: https://huggingface.co/mistralai/Mistral-7B-v0.1/blob/main/config.json
+- setting: Qwen3-8B, 151,936 × 4,096 (config.json)
+  value: '622329856'
+  source: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+- setting: Qwen3-32B, 151,936 × 5,120 (config.json)
+  value: '777912320'
+  source: https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json
+- setting: DeepSeek-V3, 129,280 × 7,168 (config.json)
+  value: '926679040'
+  source: https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json
 mistakes:
-  - mistake: "Thinking the head outputs probabilities"
-    why: >-
-      It outputs scores, called logits. Transformers' Qwen3 code returns logits = lm_head(hidden
-      states); Vaswani et al. apply a softmax after this linear layer to get next-token probabilities.
-    fix: "Apply a softmax (and any sampling settings) to the logits to get probabilities."
-  - mistake: "Assuming a tied head costs nothing to run"
-    why: >-
-      Tying saves parameters only. The code runs lm_head on the final vectors either way, one
-      multiply-add per weight: **622,329,856** per token in Qwen3-8B.
-    fix: "Count the head's computation from vocab_size × hidden_size whether or not it is tied."
-  - mistake: "Expecting the head to grow with the model's depth"
-    why: >-
-      It is set by vocab_size and hidden_size alone. Mistral-7B and Qwen3-8B share hidden_size
-      **4096**, yet their heads differ about **4.7** times, the ratio of their vocabularies.
-    fix: "Read vocab_size and hidden_size to size the head."
-related: [parameter/tied-embeddings, parameter/token-embedding, parameter/vocab-size, parameter/hidden-size]
+- mistake: Thinking the head outputs probabilities
+  why: It outputs scores, called logits. Transformers' Qwen3 code returns logits = lm_head(hidden states); Vaswani et al. apply a softmax after this linear layer to get next-token probabilities.
+  fix: Apply a softmax (and any sampling settings) to the logits to get probabilities.
+- mistake: Assuming a tied head costs nothing to run
+  why: 'Tying saves parameters only. The code runs lm_head on the final vectors either way, one multiply-add per weight: **622,329,856** per token in Qwen3-8B.'
+  fix: Count the head's computation from vocab_size × hidden_size whether or not it is tied.
+- mistake: Expecting the head to grow with the model's depth
+  why: It is set by vocab_size and hidden_size alone. Mistral-7B and Qwen3-8B share hidden_size **4096**, yet their heads differ about **4.7** times, the ratio of their vocabularies.
+  fix: Read vocab_size and hidden_size to size the head.
+related:
+- parameter/tied-embeddings
+- parameter/token-embedding
+- parameter/vocab-size
+- parameter/hidden-size
 visual:
   kind: count_breakdown
   models:
-    - { name: "Mistral-7B-v0.1", vocab_size: 32000, hidden_size: 4096, intermediate_size: 14336, num_hidden_layers: 32, num_attention_heads: 32, num_key_value_heads: 8, head_dim: 128, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: false }
-    - { name: "Qwen3-8B", vocab_size: 151936, hidden_size: 4096, intermediate_size: 12288, num_hidden_layers: 36, num_attention_heads: 32, num_key_value_heads: 8, head_dim: 128, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: true }
-  caption: "Two untied models with the same hidden_size, 4096, computed from their config.json files: Mistral-7B's head is 1.8% of its parameters, Qwen3-8B's 7.6%, because its vocabulary is 4.7 times larger. Mistral-7B sets no head_dim; Transformers uses 4096 ÷ 32 = 128. Both totals match the counts on their catalog pages."
-tags: [llm, transformer, output, lm-head, unembedding, parameters]
-updated: 2026-11-23
+  - name: Mistral-7B-v0.1
+    vocabulary_size: 32000
+    hidden_size: 4096
+    intermediate_size: 14336
+    num_layers: 32
+    attention_heads: 32
+    kv_heads: 8
+    head_size: 128
+    tie_word_embeddings: false
+    ffn_matrices: 3
+    qk_norm: false
+  - name: Qwen3-8B
+    vocabulary_size: 151936
+    hidden_size: 4096
+    intermediate_size: 12288
+    num_layers: 36
+    attention_heads: 32
+    kv_heads: 8
+    head_size: 128
+    tie_word_embeddings: false
+    ffn_matrices: 3
+    qk_norm: true
+  caption: 'Two untied models with the same hidden_size, 4096, computed from their config.json files: Mistral-7B''s head is 1.8% of its parameters, Qwen3-8B''s 7.6%, because its vocabulary is 4.7 times larger. Mistral-7B sets no head_dim; Transformers uses 4096 ÷ 32 = 128. Both totals match the counts on their catalog pages.'
+tags:
+- llm
+- transformer
+- output
+- lm-head
+- unembedding
+- parameters
+updated: '2026-11-23'
 sources:
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py", title: "Hugging Face Transformers source: modeling_qwen3.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/mistral/configuration_mistral.py", title: "Hugging Face Transformers source: configuration_mistral.py", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1608.05859", title: "Using the Output Embedding to Improve Language Models (Press & Wolf, 2017)", trust: 0.85 }
-  - { url: "https://huggingface.co/mistralai/Mistral-7B-v0.1/blob/main/config.json", title: "Mistral-7B-v0.1 configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json", title: "Qwen3-8B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-4B/blob/main/config.json", title: "Qwen3-4B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json", title: "Qwen3-32B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json", title: "DeepSeek-V3 configuration (config.json)", trust: 0.95 }
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py
+  title: 'Hugging Face Transformers source: modeling_qwen3.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/mistral/configuration_mistral.py
+  title: 'Hugging Face Transformers source: configuration_mistral.py'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.95
+- url: https://arxiv.org/abs/1608.05859
+  title: Using the Output Embedding to Improve Language Models (Press & Wolf, 2017)
+  trust: 0.85
+- url: https://huggingface.co/mistralai/Mistral-7B-v0.1/blob/main/config.json
+  title: Mistral-7B-v0.1 configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+  title: Qwen3-8B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-4B/blob/main/config.json
+  title: Qwen3-4B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json
+  title: Qwen3-32B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json
+  title: DeepSeek-V3 configuration (config.json)
+  trust: 0.95
 ---
 
 ## Definition

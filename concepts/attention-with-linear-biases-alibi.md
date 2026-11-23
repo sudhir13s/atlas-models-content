@@ -2,7 +2,7 @@
 id: concept/attention-with-linear-biases-alibi
 type: concept
 slug: attention-with-linear-biases-alibi
-schema_version: 1.2
+schema_version: 3.1
 title: Attention with Linear Biases (ALiBi)
 category: positional-encoding
 code: ALiBi

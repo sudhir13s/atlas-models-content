@@ -2,7 +2,7 @@
 id: milestone/2012-alexnet-cnn-era
 type: milestone
 slug: 2012-alexnet-cnn-era
-schema_version: 1.2
+schema_version: 3.1
 title: AlexNet / CNN era
 year: 2012
 order: 3

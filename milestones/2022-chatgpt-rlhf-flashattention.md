@@ -2,7 +2,7 @@
 id: milestone/2022-chatgpt-rlhf-flashattention
 type: milestone
 slug: 2022-chatgpt-rlhf-flashattention
-schema_version: 1.2
+schema_version: 3.1
 title: ChatGPT / RLHF / FlashAttention
 year: 2022
 order: 7

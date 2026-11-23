@@ -2,7 +2,7 @@
 id: organization/usyd-community
 type: organization
 slug: usyd-community
-schema_version: 1.1
+schema_version: 3.1
 title: University of Sydney
 name: University of Sydney
 website: https://huggingface.co/usyd-community

@@ -2,7 +2,7 @@
 id: parameter/<slug>
 type: parameter
 slug: <slug>
-schema_version: 2.9
+schema_version: 3.1              # the schema's current version; the schema refuses any other
 title: "<Parameter Name>"
 name: <config_key>               # the exact key in config.json
 priority: <int>                  # 1 = most impactful
@@ -25,7 +25,7 @@ mistakes:                        # two to five, drawn as common misunderstanding
 related: [parameter/<slug>]
 visual:                          # count_sweep | count_breakdown | head_grid | kv_cache | context_cost
   kind: count_sweep
-  model: { name: "<Model>", vocab_size: <int>, hidden_size: <int>, intermediate_size: <int>, num_hidden_layers: <int>, num_attention_heads: <int>, num_key_value_heads: <int>, head_dim: <int>, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: false }
+  model: { name: "<Model>", vocabulary_size: <int>, hidden_size: <int>, intermediate_size: <int>, num_layers: <int>, attention_heads: <int>, kv_heads: <int>, head_size: <int>, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: false }
   vary: width
   values: [<number>, <number>]
   measure: per_layer

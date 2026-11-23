@@ -2,94 +2,104 @@
 id: hyperparameter/do-sample
 type: hyperparameter
 slug: do-sample
-schema_version: 2.2
-title: "Do Sample"
+schema_version: 3.1
+title: Do Sample
 name: do_sample
 context: inference
 priority: 6
 importance: important
-goals: [inference]
-models: [llm]
-range: "true | false"
-controls: "Whether a language model picks its next word by a random draw that follows the probabilities (true) or always takes the single most likely word (false)."
+goals:
+- inference
+models:
+- llm
+range: true | false
+controls: Whether a language model picks its next word by a random draw that follows the probabilities (true) or always takes the single most likely word (false).
 options:
-  - value: "false"
-    effect: "Greedy decoding: at every step the model takes the highest-scoring word. Nothing is drawn at random, and temperature, top_k and top_p are not used. This is the fallback of Hugging Face Transformers."
-  - value: "true"
-    effect: "Sampling: at every step one word is drawn at random, each with the probability the model gives it. Temperature, top_k and top_p shape that draw, and two runs can give different text."
+- value: 'false'
+  effect: 'Greedy decoding: at every step the model takes the highest-scoring word. Nothing is drawn at random, and temperature, top_k and top_p are not used. This is the fallback of Hugging Face Transformers.'
+- value: 'true'
+  effect: 'Sampling: at every step one word is drawn at random, each with the probability the model gives it. Temperature, top_k and top_p shape that draw, and two runs can give different text.'
 typical_values:
-  - setting: "Hugging Face Transformers: used when the model's generation_config.json sets no value"
-    value: "false"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py"
-  - setting: "Qwen2.5-7B-Instruct: value in the model's own generation_config.json"
-    value: "true"
-    source: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json"
-  - setting: "DeepSeek-R1: value in the model's own generation_config.json"
-    value: "true"
-    source: "https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/main/generation_config.json"
-  - setting: "Qwen3-8B: value in the model's own generation_config.json"
-    value: "true"
-    source: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/generation_config.json"
+- setting: 'Hugging Face Transformers: used when the model''s generation_config.json sets no value'
+  value: 'false'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+- setting: 'Qwen2.5-7B-Instruct: value in the model''s own generation_config.json'
+  value: 'true'
+  source: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json
+- setting: 'DeepSeek-R1: value in the model''s own generation_config.json'
+  value: 'true'
+  source: https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/main/generation_config.json
+- setting: 'Qwen3-8B: value in the model''s own generation_config.json'
+  value: 'true'
+  source: https://huggingface.co/Qwen/Qwen3-8B/blob/main/generation_config.json
 mistakes:
-  - mistake: "Setting temperature, top_p or top_k and leaving do_sample at false"
-    why: >-
-      The three settings shape a **random draw**, and with `do_sample=False` there is no draw:
-      the library takes the highest-scoring token. Transformers adds the temperature, top-k and
-      top-p steps only when `do_sample` is true, and logs a warning that the flag "is only used
-      in sample-based generation modes".
-    fix: >-
-      Pass `do_sample=True` together with the sampling settings, or check that the model's
-      `generation_config.json` already sets it.
-  - mistake: "Passing temperature=0 to get the same answer every time"
-    why: >-
-      Transformers divides the scores by the temperature and rejects 0 with a `ValueError`. The
-      error message itself gives the answer: "If you're looking for greedy decoding strategies,
-      set `do_sample=False`."
-    fix: >-
-      Set `do_sample=False`. That takes the most likely token at every step, which is what a
-      temperature of zero would mean.
-  - mistake: "Expecting the same text twice with do_sample=True"
-    why: >-
-      Each token is drawn at random, so two runs can part ways at any step, and every later
-      token then builds on a different text.
-    fix: >-
-      Fix the random seed before generating. The examples in the Transformers source call
-      `set_seed(0)` "for reproducibility". For output that must not vary at all, use
-      `do_sample=False`.
-  - mistake: "Assuming do_sample=True alone samples from the model's full distribution"
-    why: >-
-      Transformers falls back to `top_k=50` when no value is set, and adds the top-k step
-      whenever sampling is on and `top_k` is not 0. Switching sampling on therefore already
-      limits the draw to the 50 best-scoring tokens.
-    fix: >-
-      Pass `top_k=0` to sample with no top-k filter, and read the model's
-      `generation_config.json` for the values it ships.
-  - mistake: "Asking for several different answers with do_sample=False"
-    why: >-
-      Greedy decoding has one result per prompt. Transformers raises a `ValueError` when
-      `num_return_sequences` is above 1 with `do_sample=False` and no beam search.
-    fix: >-
-      Set `do_sample=True` to get several different draws, or use beam search (`num_beams`
-      above 1) to get the several highest-scoring texts.
+- mistake: Setting temperature, top_p or top_k and leaving do_sample at false
+  why: 'The three settings shape a **random draw**, and with `do_sample=False` there is no draw: the library takes the highest-scoring token. Transformers adds the temperature, top-k and top-p steps only when `do_sample` is true, and logs a warning that the flag "is only used in sample-based generation modes".'
+  fix: Pass `do_sample=True` together with the sampling settings, or check that the model's `generation_config.json` already sets it.
+- mistake: Passing temperature=0 to get the same answer every time
+  why: 'Transformers divides the scores by the temperature and rejects 0 with a `ValueError`. The error message itself gives the answer: "If you''re looking for greedy decoding strategies, set `do_sample=False`."'
+  fix: Set `do_sample=False`. That takes the most likely token at every step, which is what a temperature of zero would mean.
+- mistake: Expecting the same text twice with do_sample=True
+  why: Each token is drawn at random, so two runs can part ways at any step, and every later token then builds on a different text.
+  fix: Fix the random seed before generating. The examples in the Transformers source call `set_seed(0)` "for reproducibility". For output that must not vary at all, use `do_sample=False`.
+- mistake: Assuming do_sample=True alone samples from the model's full distribution
+  why: Transformers falls back to `top_k=50` when no value is set, and adds the top-k step whenever sampling is on and `top_k` is not 0. Switching sampling on therefore already limits the draw to the 50 best-scoring tokens.
+  fix: Pass `top_k=0` to sample with no top-k filter, and read the model's `generation_config.json` for the values it ships.
+- mistake: Asking for several different answers with do_sample=False
+  why: Greedy decoding has one result per prompt. Transformers raises a `ValueError` when `num_return_sequences` is above 1 with `do_sample=False` and no beam search.
+  fix: Set `do_sample=True` to get several different draws, or use beam search (`num_beams` above 1) to get the several highest-scoring texts.
 visual:
   kind: distribution
-  tokens: ["blue", "clear", "falling"]
-  logits: [2, 1, 0]
-  temperatures: [1]
-  caption: "Three candidate next words for \"The sky is\" with scores 2, 1 and 0, and the probability the model gives each (temperature 1, the scores used as they are). With do_sample false the model takes \"blue\" every time; with do_sample true each word is drawn with the probability shown. The scores are made up for this figure, not taken from a model."
-tags: [inference, sampling, decoding, greedy]
-updated: 2026-11-23
-related: [hyperparameter/temperature, hyperparameter/top-p, hyperparameter/top-k, hyperparameter/num-beams]
+  tokens:
+  - blue
+  - clear
+  - falling
+  logits:
+  - 2
+  - 1
+  - 0
+  temperatures:
+  - 1
+  caption: Three candidate next words for "The sky is" with scores 2, 1 and 0, and the probability the model gives each (temperature 1, the scores used as they are). With do_sample false the model takes "blue" every time; with do_sample true each word is drawn with the probability shown. The scores are made up for this figure, not taken from a model.
+tags:
+- inference
+- sampling
+- decoding
+- greedy
+updated: '2026-11-23'
+related:
+- hyperparameter/temperature
+- hyperparameter/top-p
+- hyperparameter/top-k
+- hyperparameter/num-beams
 sources:
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py", title: "Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: decoding modes, defaults, warnings)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py", title: "Hugging Face Transformers source: generation/utils.py (the draw, the greedy pick, the sampling-only steps)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/logits_process.py", title: "Hugging Face Transformers source: logits_process.py (TemperatureLogitsWarper)", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/generation_strategies", title: "Hugging Face Transformers documentation: Generation strategies", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/llm_tutorial", title: "Hugging Face Transformers documentation: Text generation", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1904.09751", title: "The Curious Case of Neural Text Degeneration (Holtzman et al., 2019)", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json", title: "Qwen2.5-7B-Instruct: generation_config.json", trust: 0.9 }
-  - { url: "https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/main/generation_config.json", title: "DeepSeek-R1: generation_config.json", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/generation_config.json", title: "Qwen3-8B: generation_config.json", trust: 0.9 }
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+  title: 'Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: decoding modes, defaults, warnings)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py
+  title: 'Hugging Face Transformers source: generation/utils.py (the draw, the greedy pick, the sampling-only steps)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/logits_process.py
+  title: 'Hugging Face Transformers source: logits_process.py (TemperatureLogitsWarper)'
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/generation_strategies
+  title: 'Hugging Face Transformers documentation: Generation strategies'
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/llm_tutorial
+  title: 'Hugging Face Transformers documentation: Text generation'
+  trust: 0.9
+- url: https://arxiv.org/abs/1904.09751
+  title: The Curious Case of Neural Text Degeneration (Holtzman et al., 2019)
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json
+  title: 'Qwen2.5-7B-Instruct: generation_config.json'
+  trust: 0.9
+- url: https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/main/generation_config.json
+  title: 'DeepSeek-R1: generation_config.json'
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-8B/blob/main/generation_config.json
+  title: 'Qwen3-8B: generation_config.json'
+  trust: 0.9
 ---
 
 ## Definition

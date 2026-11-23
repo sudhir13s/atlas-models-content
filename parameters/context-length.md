@@ -2,25 +2,28 @@
 id: parameter/context-length
 type: parameter
 slug: context-length
-schema_version: 2.9
-title: "Context Length (max_position_embeddings)"
+schema_version: 3.1
+title: Context Length (max_position_embeddings)
 name: max_position_embeddings
 priority: 10
 importance: important
-applies_to: [llm, transformer, moe]
-range: "512 — 131,072 tokens"
-controls: "The longest sequence of tokens the model is set up to handle in one pass; the usable context the maker states can differ from the configuration value."
+applies_to:
+- llm
+- transformer
+- moe
+range: 512 — 131,072 tokens
+controls: The longest sequence of tokens the model is set up to handle in one pass; the usable context the maker states can differ from the configuration value.
 effects:
   decrease:
-    - "Less text fits in one pass: prompt and answer together"
-    - "Attention scores fall with the square of the length: half the length, a quarter of the scores"
-    - "A smaller KV cache, in a straight line with the length"
-    - "With learned positions, fewer parameters: one row per position"
+  - 'Less text fits in one pass: prompt and answer together'
+  - 'Attention scores fall with the square of the length: half the length, a quarter of the scores'
+  - A smaller KV cache, in a straight line with the length
+  - 'With learned positions, fewer parameters: one row per position'
   increase:
-    - "More text fits in one pass"
-    - "Attention scores grow with the square of the length: double the length, four times the scores"
-    - "A larger KV cache, in a straight line"
-    - "No parameters at all with rotary positions (RoPE); one row per position with learned positions"
+  - More text fits in one pass
+  - 'Attention scores grow with the square of the length: double the length, four times the scores'
+  - A larger KV cache, in a straight line
+  - No parameters at all with rotary positions (RoPE); one row per position with learned positions
 scale:
   min: 256
   max: 262144
@@ -28,73 +31,110 @@ scale:
   typical_max: 131072
   spacing: log
 typical_values:
-  - setting: "BERT-base, learned positions (config.json)"
-    value: "512"
-    source: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json"
-  - setting: "GPT-2, context size (GPT-2 paper)"
-    value: "1024"
-    source: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf"
-  - setting: "Qwen3-8B, native context (model card)"
-    value: "32768"
-    source: "https://huggingface.co/Qwen/Qwen3-8B"
-  - setting: "Qwen3-8B, max_position_embeddings (config.json)"
-    value: "40960"
-    source: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json"
-  - setting: "Qwen3-8B, with YaRN scaling, validated by Qwen (model card)"
-    value: "131072"
-    source: "https://huggingface.co/Qwen/Qwen3-8B"
-  - setting: "Llama 3, after long-context pre-training (Llama 3 paper)"
-    value: "128K"
-    source: "https://arxiv.org/abs/2407.21783"
+- setting: BERT-base, learned positions (config.json)
+  value: '512'
+  source: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+- setting: GPT-2, context size (GPT-2 paper)
+  value: '1024'
+  source: https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf
+- setting: Qwen3-8B, native context (model card)
+  value: '32768'
+  source: https://huggingface.co/Qwen/Qwen3-8B
+- setting: Qwen3-8B, max_position_embeddings (config.json)
+  value: '40960'
+  source: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+- setting: Qwen3-8B, with YaRN scaling, validated by Qwen (model card)
+  value: '131072'
+  source: https://huggingface.co/Qwen/Qwen3-8B
+- setting: Llama 3, after long-context pre-training (Llama 3 paper)
+  value: 128K
+  source: https://arxiv.org/abs/2407.21783
 mistakes:
-  - mistake: "Reading max_position_embeddings as the usable context"
-    why: >-
-      Transformers describes the key as the maximum length the model "might ever be used with", not
-      the length it was trained or validated for. Qwen3-8B's config.json says **40,960**; its card
-      says it supports **32,768** tokens natively and **131,072** with YaRN, and explains 40,960 as
-      32,768 tokens reserved for output plus 8,192 for a typical prompt.
-    fix: "Take the context length from the model card, and the configuration value only as a limit."
-  - mistake: "Turning on context extension for every input"
-    why: >-
-      Qwen's card says the common frameworks implement **static** YaRN, whose scaling factor stays
-      the same whatever the input length, potentially impacting performance on shorter texts. It
-      advises against enabling YaRN when the context does not exceed 32,768 tokens.
-    fix: "Enable YaRN only for inputs longer than the native context, as the card recommends."
-  - mistake: "Assuming a longer context always costs parameters"
-    why: >-
-      It does only with **learned** positions: BERT's position table is max_position_embeddings ×
-      hidden_size, 512 × 768 = **393,216** parameters. Qwen3 uses rotary positions, computed from a
-      fixed formula into a buffer that holds no trained parameters.
-    fix: "Count position parameters only for models with a learned position table."
-  - mistake: "Ignoring the cost of long inputs at run time"
-    why: >-
-      Self-attention costs grow with the square of the sequence length (Vaswani et al., Table 1), and
-      the Llama 3 team trained on long sequences only in the final stages for this reason. The KV
-      cache grows in a straight line: Qwen3-8B needs **18 GiB** of it at 131,072 tokens in 16-bit.
-    fix: "Budget memory for the cache at the length you will actually use."
-related: [parameter/positional-encoding, parameter/head-dim, parameter/num-key-value-heads-gqa]
+- mistake: Reading max_position_embeddings as the usable context
+  why: Transformers describes the key as the maximum length the model "might ever be used with", not the length it was trained or validated for. Qwen3-8B's config.json says **40,960**; its card says it supports **32,768** tokens natively and **131,072** with YaRN, and explains 40,960 as 32,768 tokens reserved for output plus 8,192 for a typical prompt.
+  fix: Take the context length from the model card, and the configuration value only as a limit.
+- mistake: Turning on context extension for every input
+  why: Qwen's card says the common frameworks implement **static** YaRN, whose scaling factor stays the same whatever the input length, potentially impacting performance on shorter texts. It advises against enabling YaRN when the context does not exceed 32,768 tokens.
+  fix: Enable YaRN only for inputs longer than the native context, as the card recommends.
+- mistake: Assuming a longer context always costs parameters
+  why: 'It does only with **learned** positions: BERT''s position table is max_position_embeddings × hidden_size, 512 × 768 = **393,216** parameters. Qwen3 uses rotary positions, computed from a fixed formula into a buffer that holds no trained parameters.'
+  fix: Count position parameters only for models with a learned position table.
+- mistake: Ignoring the cost of long inputs at run time
+  why: 'Self-attention costs grow with the square of the sequence length (Vaswani et al., Table 1), and the Llama 3 team trained on long sequences only in the final stages for this reason. The KV cache grows in a straight line: Qwen3-8B needs **18 GiB** of it at 131,072 tokens in 16-bit.'
+  fix: Budget memory for the cache at the length you will actually use.
+related:
+- parameter/positional-encoding
+- parameter/head-dim
+- parameter/num-key-value-heads-gqa
 visual:
   kind: context_cost
-  model: { name: "Qwen3-8B", vocab_size: 151936, hidden_size: 4096, intermediate_size: 12288, num_hidden_layers: 36, num_attention_heads: 32, num_key_value_heads: 8, head_dim: 128, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: true }
+  model:
+    name: Qwen3-8B
+    vocabulary_size: 151936
+    hidden_size: 4096
+    intermediate_size: 12288
+    num_layers: 36
+    attention_heads: 32
+    kv_heads: 8
+    head_size: 128
+    tie_word_embeddings: false
+    ffn_matrices: 3
+    qk_norm: true
   bytes_per_value: 2
-  lengths: [4096, 8192, 16384, 32768, 40960, 65536, 98304, 131072]
+  lengths:
+  - 4096
+  - 8192
+  - 16384
+  - 32768
+  - 40960
+  - 65536
+  - 98304
+  - 131072
   marks:
-    - { length: 32768, label: "native (card)" }
-    - { length: 131072, label: "YaRN (card)" }
-  caption: "Computed from Qwen3-8B's config.json: the attention scores one layer computes (length² × 32 query heads) and the KV cache in 16-bit numbers, at each context length. Marked: the native 32,768 and the 131,072 with YaRN from the model card; the table also lists 40,960, the max_position_embeddings of its config.json."
-tags: [llm, transformer, context, positions, rope, parameters]
-updated: 2026-11-23
+  - length: 32768
+    label: native (card)
+  - length: 131072
+    label: YaRN (card)
+  caption: 'Computed from Qwen3-8B''s config.json: the attention scores one layer computes (length² × 32 query heads) and the KV cache in 16-bit numbers, at each context length. Marked: the native 32,768 and the 131,072 with YaRN from the model card; the table also lists 40,960, the max_position_embeddings of its config.json.'
+tags:
+- llm
+- transformer
+- context
+- positions
+- rope
+- parameters
+updated: '2026-11-23'
 sources:
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B", title: "Qwen3-8B model card", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json", title: "Qwen3-8B configuration (config.json)", trust: 0.95 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py", title: "Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py", title: "Hugging Face Transformers source: modeling_qwen3.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/modeling_bert.py", title: "Hugging Face Transformers source: modeling_bert.py", trust: 0.9 }
-  - { url: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json", title: "BERT-base uncased configuration (config.json)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (Llama Team, 2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2505.09388", title: "Qwen3 Technical Report (Qwen Team, 2025)", trust: 0.9 }
-  - { url: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf", title: "Language Models are Unsupervised Multitask Learners (GPT-2, Radford et al., 2019)", trust: 0.9 }
+- url: https://huggingface.co/Qwen/Qwen3-8B
+  title: Qwen3-8B model card
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+  title: Qwen3-8B configuration (config.json)
+  trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py
+  title: 'Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py
+  title: 'Hugging Face Transformers source: modeling_qwen3.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/modeling_bert.py
+  title: 'Hugging Face Transformers source: modeling_bert.py'
+  trust: 0.9
+- url: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+  title: BERT-base uncased configuration (config.json)
+  trust: 0.95
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.95
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models (Llama Team, 2024)
+  trust: 0.9
+- url: https://arxiv.org/abs/2505.09388
+  title: Qwen3 Technical Report (Qwen Team, 2025)
+  trust: 0.9
+- url: https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf
+  title: Language Models are Unsupervised Multitask Learners (GPT-2, Radford et al., 2019)
+  trust: 0.9
 ---
 
 ## Definition

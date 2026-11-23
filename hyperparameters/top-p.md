@@ -2,27 +2,29 @@
 id: hyperparameter/top-p
 type: hyperparameter
 slug: top-p
-schema_version: 2.2
-title: "Top-p (Nucleus Sampling)"
+schema_version: 3.1
+title: Top-p (Nucleus Sampling)
 name: top_p
 context: inference
 priority: 2
 importance: critical
-goals: [inference]
-models: [llm]
-range: "0.8 — 1.0"
-controls: "How much of the total probability a language model may choose its next word from: the most likely words are kept until their probabilities add up to p, and the rest are removed."
+goals:
+- inference
+models:
+- llm
+range: 0.8 — 1.0
+controls: 'How much of the total probability a language model may choose its next word from: the most likely words are kept until their probabilities add up to p, and the rest are removed.'
 effects:
   decrease:
-    - "Fewer candidate words stay in the draw"
-    - "Output is more focused and more predictable"
-    - "Too low, and text starts to repeat"
-    - "Near 0 only the single most likely word is left"
+  - Fewer candidate words stay in the draw
+  - Output is more focused and more predictable
+  - Too low, and text starts to repeat
+  - Near 0 only the single most likely word is left
   increase:
-    - "More candidate words stay in the draw"
-    - "Output is more varied"
-    - "More of the unlikely words can be picked"
-    - "At 1.0 nothing is removed"
+  - More candidate words stay in the draw
+  - Output is more varied
+  - More of the unlikely words can be picked
+  - At 1.0 nothing is removed
 scale:
   min: 0
   max: 1
@@ -30,73 +32,83 @@ scale:
   typical_max: 1
   spacing: linear
 typical_values:
-  - setting: "Hugging Face Transformers: used when the model's generation_config.json sets no value (no top-p filter)"
-    value: "1.0"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py"
-  - setting: "OpenAI Chat Completions API: default (the API accepts 0 to 1)"
-    value: "1"
-    source: "https://developers.openai.com/api/reference/resources/chat"
-  - setting: "Holtzman et al. (2019), GPT-2 Large: the nucleus sampling setting of the paper's comparison tables"
-    value: "0.95"
-    source: "https://arxiv.org/abs/1904.09751"
-  - setting: "DeepSeek-R1: value in the model's own generation_config.json (with temperature 0.6)"
-    value: "0.95"
-    source: "https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/main/generation_config.json"
-  - setting: "Qwen2.5-7B-Instruct: value in the model's own generation_config.json (with top_k 20 and temperature 0.7)"
-    value: "0.8"
-    source: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json"
+- setting: 'Hugging Face Transformers: used when the model''s generation_config.json sets no value (no top-p filter)'
+  value: '1.0'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+- setting: 'OpenAI Chat Completions API: default (the API accepts 0 to 1)'
+  value: '1'
+  source: https://developers.openai.com/api/reference/resources/chat
+- setting: 'Holtzman et al. (2019), GPT-2 Large: the nucleus sampling setting of the paper''s comparison tables'
+  value: '0.95'
+  source: https://arxiv.org/abs/1904.09751
+- setting: 'DeepSeek-R1: value in the model''s own generation_config.json (with temperature 0.6)'
+  value: '0.95'
+  source: https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/main/generation_config.json
+- setting: 'Qwen2.5-7B-Instruct: value in the model''s own generation_config.json (with top_k 20 and temperature 0.7)'
+  value: '0.8'
+  source: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json
 mistakes:
-  - mistake: "Setting top_p while sampling is switched off"
-    why: >-
-      Top-p only decides **which tokens may be drawn at random**. Hugging Face Transformers
-      applies it only when `do_sample=True`; with the default `do_sample=False` the library takes
-      the most likely token and `top_p` changes nothing. The library logs a warning that the flag
-      "is only used in sample-based generation modes".
-    fix: >-
-      Pass `do_sample=True` together with `top_p`, or check that the model's
-      `generation_config.json` already switches sampling on.
-  - mistake: "Reading top_p = 0.9 as 'the kept words hold exactly 90% of the probability'"
-    why: >-
-      Tokens are kept **up to and including** the one that carries the running total to p. The
-      kept set therefore holds **at least** p, usually more. In the worked example the kept words
-      hold 0.957, not 0.9, and a single very likely word can hold far more than p on its own.
-    fix: >-
-      Read p as a **minimum** share that is always kept. To see what was kept at a step, add up
-      the sorted probabilities yourself, as in the worked example.
-  - mistake: "Pushing temperature and top_p to extremes together"
-    why: >-
-      Both act on the same list of probabilities. In Transformers the temperature reshapes the
-      list **first** and top-p cuts the reshaped list, so the same `top_p` keeps a different
-      number of tokens at a different temperature (part C of the worked example).
-    fix: >-
-      Change one and hold the other still. The OpenAI documentation gives this advice for its
-      API: alter `top_p` or temperature, "but not both".
-  - mistake: "Treating 1.0 as the strongest setting"
-    why: >-
-      The scale runs the other way. At `top_p=1.0` every token stays in the draw: Transformers
-      adds the filter only when the value is **below 1.0**. The filter gets stronger as the value
-      goes **down**.
-    fix: >-
-      Lower the value to remove more of the unlikely tokens. Holtzman et al. note that values
-      of p "are usually in [0.9, 1)".
+- mistake: Setting top_p while sampling is switched off
+  why: Top-p only decides **which tokens may be drawn at random**. Hugging Face Transformers applies it only when `do_sample=True`; with the default `do_sample=False` the library takes the most likely token and `top_p` changes nothing. The library logs a warning that the flag "is only used in sample-based generation modes".
+  fix: Pass `do_sample=True` together with `top_p`, or check that the model's `generation_config.json` already switches sampling on.
+- mistake: Reading top_p = 0.9 as 'the kept words hold exactly 90% of the probability'
+  why: Tokens are kept **up to and including** the one that carries the running total to p. The kept set therefore holds **at least** p, usually more. In the worked example the kept words hold 0.957, not 0.9, and a single very likely word can hold far more than p on its own.
+  fix: Read p as a **minimum** share that is always kept. To see what was kept at a step, add up the sorted probabilities yourself, as in the worked example.
+- mistake: Pushing temperature and top_p to extremes together
+  why: Both act on the same list of probabilities. In Transformers the temperature reshapes the list **first** and top-p cuts the reshaped list, so the same `top_p` keeps a different number of tokens at a different temperature (part C of the worked example).
+  fix: 'Change one and hold the other still. The OpenAI documentation gives this advice for its API: alter `top_p` or temperature, "but not both".'
+- mistake: Treating 1.0 as the strongest setting
+  why: 'The scale runs the other way. At `top_p=1.0` every token stays in the draw: Transformers adds the filter only when the value is **below 1.0**. The filter gets stronger as the value goes **down**.'
+  fix: Lower the value to remove more of the unlikely tokens. Holtzman et al. note that values of p "are usually in [0.9, 1)".
 visual:
   kind: distribution
-  tokens: ["blue", "clear", "falling", "green", "loud"]
-  logits: [3, 2, 1, 0, -1]
+  tokens:
+  - blue
+  - clear
+  - falling
+  - green
+  - loud
+  logits:
+  - 3
+  - 2
+  - 1
+  - 0
+  - -1
   truncate:
     top_p: 0.9
-  caption: "Five candidate next words for \"The sky is\" with scores 3, 2, 1, 0 and -1, before and after top_p = 0.9. The scores are made up for this figure, not taken from a model; every probability is computed from them as under Calculation."
-tags: [inference, sampling, decoding, nucleus]
-updated: 2026-11-23
-related: [hyperparameter/do-sample, hyperparameter/temperature, hyperparameter/top-k]
+  caption: Five candidate next words for "The sky is" with scores 3, 2, 1, 0 and -1, before and after top_p = 0.9. The scores are made up for this figure, not taken from a model; every probability is computed from them as under Calculation.
+tags:
+- inference
+- sampling
+- decoding
+- nucleus
+updated: '2026-11-23'
+related:
+- hyperparameter/do-sample
+- hyperparameter/temperature
+- hyperparameter/top-k
 sources:
-  - { url: "https://arxiv.org/abs/1904.09751", title: "The Curious Case of Neural Text Degeneration (Holtzman et al., 2019)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/logits_process.py", title: "Hugging Face Transformers source: logits_process.py (TopPLogitsWarper)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py", title: "Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: parameters, defaults, warnings)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py", title: "Hugging Face Transformers source: generation/utils.py (which filters are applied, and in what order)", trust: 0.9 }
-  - { url: "https://developers.openai.com/api/reference/resources/chat", title: "OpenAI API reference: Chat Completions", trust: 0.85 }
-  - { url: "https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/main/generation_config.json", title: "DeepSeek-R1: generation_config.json", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json", title: "Qwen2.5-7B-Instruct: generation_config.json", trust: 0.9 }
+- url: https://arxiv.org/abs/1904.09751
+  title: The Curious Case of Neural Text Degeneration (Holtzman et al., 2019)
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/logits_process.py
+  title: 'Hugging Face Transformers source: logits_process.py (TopPLogitsWarper)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+  title: 'Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: parameters, defaults, warnings)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py
+  title: 'Hugging Face Transformers source: generation/utils.py (which filters are applied, and in what order)'
+  trust: 0.9
+- url: https://developers.openai.com/api/reference/resources/chat
+  title: 'OpenAI API reference: Chat Completions'
+  trust: 0.85
+- url: https://huggingface.co/deepseek-ai/DeepSeek-R1/blob/main/generation_config.json
+  title: 'DeepSeek-R1: generation_config.json'
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json
+  title: 'Qwen2.5-7B-Instruct: generation_config.json'
+  trust: 0.9
 ---
 
 ## Definition

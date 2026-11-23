@@ -2,7 +2,7 @@
 id: milestone/1986-backpropagation
 type: milestone
 slug: 1986-backpropagation
-schema_version: 1.2
+schema_version: 3.1
 title: Backpropagation
 year: 1986
 order: 2

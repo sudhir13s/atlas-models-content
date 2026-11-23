@@ -2,7 +2,7 @@
 id: organization/tencent
 type: organization
 slug: tencent
-schema_version: 1.1
+schema_version: 3.1
 title: Tencent
 name: Tencent
 website: https://huggingface.co/tencent

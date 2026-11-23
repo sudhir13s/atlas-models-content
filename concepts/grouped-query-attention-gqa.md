@@ -2,7 +2,7 @@
 id: concept/grouped-query-attention-gqa
 type: concept
 slug: grouped-query-attention-gqa
-schema_version: 1.2
+schema_version: 3.1
 title: Grouped Query Attention (GQA)
 category: attention
 code: GQA

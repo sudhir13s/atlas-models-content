@@ -2,7 +2,7 @@
 id: organization/technology-innovation-institute
 type: organization
 slug: technology-innovation-institute
-schema_version: 1.1
+schema_version: 3.1
 title: Technology Innovation Institute
 name: Technology Innovation Institute
 kind: lab

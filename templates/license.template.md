@@ -2,7 +2,7 @@
 id: license/<slug>
 type: license
 slug: <slug>
-schema_version: 1.0
+schema_version: 3.1              # the schema's current version; the schema refuses any other
 title: "<License Name>"
 name: "<License Name>"
 spdx_id: <SPDX-ID>
@@ -18,7 +18,6 @@ permissions:
   private_use: true
 conditions: ["<condition>"]
 limitations: ["<limitation>"]
-models_using: [model/<slug>]
 summary: "<one-line plain-English summary>"
 tags: [<tag>]
 updated: <YYYY-MM-DD>

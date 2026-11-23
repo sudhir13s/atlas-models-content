@@ -2,7 +2,7 @@
 id: organization/lerobot
 type: organization
 slug: lerobot
-schema_version: 1.1
+schema_version: 3.1
 title: LeRobot
 name: LeRobot
 website: https://huggingface.co/lerobot

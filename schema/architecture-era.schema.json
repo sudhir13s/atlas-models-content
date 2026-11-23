@@ -2,9 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://theaiatlas.dev/schema/models/architecture-era.schema.json",
   "title": "architecture-era",
+  "unevaluatedProperties": false,
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "properties": {
     "type": { "const": "architecture-era" },
+    "schema_version": { "const": 3.1 },
     "name": { "type": "string" },
     "era": { "type": "string", "enum": ["early", "foundation", "scaling", "post-transformer"] },
     "era_range": { "type": "string" },
@@ -15,21 +17,14 @@
     },
     "core_innovation": { "type": "string" },
     "description": { "type": "string" },
-    "long_description": { "type": "string" },
     "key_features": { "type": "array", "items": { "type": "string" } },
-    "key_models": { "type": "array", "items": { "type": "string" } },
     "paper_title": { "type": "string" },
     "paper_url": { "type": "string", "format": "uri" },
-    "diagram_url": { "type": "string" },
     "influenced_by": { "type": "array", "items": { "type": "string" }, "description": "FKs → architecture-era/<slug>" },
     "led_to": { "type": "array", "items": { "type": "string" }, "description": "FKs → architecture-era/<slug>" },
 
-    "eli5": {
-      "type": "string",
-      "description": "Plain-English explanation, zero jargon, 2-3 lines. The 'anyone can understand' layer."
-    },
     "analogy": {
-      "type": "object",
+      "type": "object", "unevaluatedProperties": false,
       "description": "One vivid real-world metaphor that makes the mechanism click.",
       "required": ["title", "body"],
       "properties": {
@@ -38,7 +33,7 @@
       }
     },
     "narrative": {
-      "type": "object",
+      "type": "object", "unevaluatedProperties": false,
       "description": "The research-story arc, four tight paragraphs.",
       "properties": {
         "motivation": { "type": "string" },
@@ -47,20 +42,8 @@
         "outcome": { "type": "string" }
       }
     },
-    "build_steps": {
-      "type": "array",
-      "description": "Ordered 'how it is constructed' steps; each a plain-language title + detail.",
-      "items": {
-        "type": "object",
-        "required": ["title", "detail"],
-        "properties": {
-          "title": { "type": "string" },
-          "detail": { "type": "string" }
-        }
-      }
-    },
     "key_equation": {
-      "type": "object",
+      "type": "object", "unevaluatedProperties": false,
       "description": "The one defining formula, in plain words.",
       "required": ["latex", "plain"],
       "properties": {
@@ -69,7 +52,7 @@
         "terms": {
           "type": "array",
           "items": {
-            "type": "object",
+            "type": "object", "unevaluatedProperties": false,
             "required": ["symbol", "meaning"],
             "properties": {
               "symbol": { "type": "string" },
@@ -96,22 +79,35 @@
     },
     "notable_models": {
       "type": "array",
-      "description": "Landmark models in this family, each with what it proved.",
+      "description": "Landmark models in this family, each with what it proved. An entry names a catalog record by `model` (its title is the name shown) or, when the catalog has no record, the model by `name`; never both.",
       "items": {
-        "type": "object",
-        "required": ["name", "note"],
-        "properties": {
-          "name": { "type": "string" },
-          "year": { "type": "integer" },
-          "note": { "type": "string", "description": "what this model proved / why it matters" }
-        }
+        "oneOf": [
+          {
+            "type": "object", "unevaluatedProperties": false,
+            "required": ["model", "note"],
+            "properties": {
+              "model": { "type": "string", "pattern": "^model/[a-z0-9]+(?:-[a-z0-9]+)*$", "description": "FK → model/<slug>" },
+              "year": { "type": "integer" },
+              "note": { "type": "string", "description": "what this model proved / why it matters" }
+            }
+          },
+          {
+            "type": "object", "unevaluatedProperties": false,
+            "required": ["name", "note"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "year": { "type": "integer" },
+              "note": { "type": "string", "description": "what this model proved / why it matters" }
+            }
+          }
+        ]
       }
     },
     "resources": {
       "type": "array",
       "description": "Curated open-access learning links.",
       "items": {
-        "type": "object",
+        "type": "object", "unevaluatedProperties": false,
         "required": ["kind", "title", "url"],
         "properties": {
           "kind": { "type": "string", "enum": ["paper", "blog", "video", "course", "tutorial"] },
@@ -218,13 +214,13 @@
     },
     "learn_first": {
       "type": "array",
-      "description": "Content-driven prerequisites (replaces the hardcoded PREREQS map).",
+      "description": "Prerequisites in reading order. An entry with `id` names a record the consumer links to by its own route; an entry without one is a topic that has no record yet, shown as text or left out.",
       "items": {
-        "type": "object",
-        "required": ["label", "href"],
+        "type": "object", "unevaluatedProperties": false,
+        "required": ["label"],
         "properties": {
-          "label": { "type": "string" },
-          "href": { "type": "string" },
+          "label": { "type": "string", "minLength": 1 },
+          "id": { "$ref": "_shared.schema.json#/$defs/id", "description": "FK → the prerequisite's record, e.g. architecture-era/transformer" },
           "tag": { "type": "string" }
         }
       }

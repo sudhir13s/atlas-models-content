@@ -2,7 +2,7 @@
 id: organization/jinaai
 type: organization
 slug: jinaai
-schema_version: 1.1
+schema_version: 3.1
 title: Jina AI
 name: Jina AI
 website: https://huggingface.co/jinaai

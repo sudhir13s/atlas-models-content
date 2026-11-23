@@ -2,23 +2,24 @@
 id: parameter/moe-num-experts
 type: parameter
 slug: moe-num-experts
-schema_version: 2.9
-title: "Number of Experts (num_experts)"
+schema_version: 3.1
+title: Number of Experts (num_experts)
 name: num_experts
 priority: 1
 importance: critical
-applies_to: [moe]
-range: "8 — 2,048 experts"
-controls: "How many expert feed-forward blocks each mixture-of-experts layer stores; it sets the total parameters, while the experts used per token set the computation."
+applies_to:
+- moe
+range: 8 — 2,048 experts
+controls: How many expert feed-forward blocks each mixture-of-experts layer stores; it sets the total parameters, while the experts used per token set the computation.
 effects:
   decrease:
-    - "Fewer stored parameters, in a straight line: 226,590,720 fewer per expert in Qwen3-30B-A3B"
-    - "Almost the same active parameters per token: only the router shrinks, by 98,304 per expert"
-    - "Less memory to hold the model"
+  - 'Fewer stored parameters, in a straight line: 226,590,720 fewer per expert in Qwen3-30B-A3B'
+  - 'Almost the same active parameters per token: only the router shrinks, by 98,304 per expert'
+  - Less memory to hold the model
   increase:
-    - "More stored parameters, in a straight line"
-    - "Computation per token almost unchanged when experts per token stay fixed (Mixtral paper)"
-    - "Switch Transformer calls the expert count the most efficient dimension for scaling, with diminishing returns"
+  - More stored parameters, in a straight line
+  - Computation per token almost unchanged when experts per token stay fixed (Mixtral paper)
+  - Switch Transformer calls the expert count the most efficient dimension for scaling, with diminishing returns
 scale:
   min: 2
   max: 4096
@@ -26,62 +27,106 @@ scale:
   typical_max: 2048
   spacing: log
 typical_values:
-  - setting: "Mixtral-8x7B, num_local_experts (config.json)"
-    value: "8"
-    source: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json"
-  - setting: "DeepSeek-V2-Lite, n_routed_experts, plus 2 shared (config.json)"
-    value: "64"
-    source: "https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat/blob/main/config.json"
-  - setting: "Qwen3-30B-A3B (config.json)"
-    value: "128"
-    source: "https://huggingface.co/Qwen/Qwen3-30B-A3B/blob/main/config.json"
-  - setting: "DeepSeek-V3, n_routed_experts, plus 1 shared (config.json)"
-    value: "256"
-    source: "https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json"
-  - setting: "Switch-C, 1,571B parameters (Switch Transformer paper, Table 9)"
-    value: "2048"
-    source: "https://arxiv.org/abs/2101.03961"
+- setting: Mixtral-8x7B, num_local_experts (config.json)
+  value: '8'
+  source: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json
+- setting: DeepSeek-V2-Lite, n_routed_experts, plus 2 shared (config.json)
+  value: '64'
+  source: https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat/blob/main/config.json
+- setting: Qwen3-30B-A3B (config.json)
+  value: '128'
+  source: https://huggingface.co/Qwen/Qwen3-30B-A3B/blob/main/config.json
+- setting: DeepSeek-V3, n_routed_experts, plus 1 shared (config.json)
+  value: '256'
+  source: https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json
+- setting: Switch-C, 1,571B parameters (Switch Transformer paper, Table 9)
+  value: '2048'
+  source: https://arxiv.org/abs/2101.03961
 mistakes:
-  - mistake: "Assuming more experts means more computation per token"
-    why: >-
-      The Mixtral paper says that increasing the number of experts while keeping the experts used per
-      token fixed raises the parameter count while keeping the computational cost effectively
-      constant. Going from 64 to 128 experts adds **14.5B** stored parameters to Qwen3-30B-A3B but only
-      **6.3M** active ones.
-    fix: "Read num_experts_per_tok for the computation and num_experts for the stored size."
-  - mistake: "Sizing memory from the active parameters"
-    why: >-
-      Every expert must be held. The Mixtral paper notes that its memory costs follow the sparse
-      parameter count, **47B**, not the **13B** active ones.
-    fix: "Budget memory for the total count, as in the worked example."
-  - mistake: "Reading the key under one name only"
-    why: >-
-      The same quantity has three names: num_experts in Qwen3-MoE, num_local_experts in Mixtral
-      (Transformers maps num_experts to it) and n_routed_experts in DeepSeek-V3, where it leaves out
-      the shared expert.
-    fix: "Look for all three names, and add shared experts separately."
-related: [parameter/moe-top-k, parameter/moe-expert-ffn-size, parameter/moe-shared-experts, parameter/intermediate-size-ffn]
+- mistake: Assuming more experts means more computation per token
+  why: The Mixtral paper says that increasing the number of experts while keeping the experts used per token fixed raises the parameter count while keeping the computational cost effectively constant. Going from 64 to 128 experts adds **14.5B** stored parameters to Qwen3-30B-A3B but only **6.3M** active ones.
+  fix: Read num_experts_per_tok for the computation and num_experts for the stored size.
+- mistake: Sizing memory from the active parameters
+  why: Every expert must be held. The Mixtral paper notes that its memory costs follow the sparse parameter count, **47B**, not the **13B** active ones.
+  fix: Budget memory for the total count, as in the worked example.
+- mistake: Reading the key under one name only
+  why: 'The same quantity has three names: num_experts in Qwen3-MoE, num_local_experts in Mixtral (Transformers maps num_experts to it) and n_routed_experts in DeepSeek-V3, where it leaves out the shared expert.'
+  fix: Look for all three names, and add shared experts separately.
+related:
+- parameter/moe-top-k
+- parameter/moe-expert-ffn-size
+- parameter/moe-shared-experts
+- parameter/intermediate-size-ffn
 visual:
   kind: moe_sweep
-  model: { name: "Qwen3-30B-A3B", vocab_size: 151936, hidden_size: 2048, intermediate_size: 6144, num_hidden_layers: 48, num_attention_heads: 32, num_key_value_heads: 4, head_dim: 128, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: true, num_experts: 128, num_experts_per_tok: 8, moe_intermediate_size: 768 }
+  model:
+    name: Qwen3-30B-A3B
+    vocabulary_size: 151936
+    hidden_size: 2048
+    intermediate_size: 6144
+    num_layers: 48
+    attention_heads: 32
+    kv_heads: 4
+    head_size: 128
+    tie_word_embeddings: false
+    ffn_matrices: 3
+    qk_norm: true
+    num_experts: 128
+    num_experts_per_tok: 8
+    moe_intermediate_size: 768
   vary: num_experts
-  values: [16, 32, 64, 128, 256]
-  caption: "Total and active parameters of Qwen3-30B-A3B, computed from its config.json, if only num_experts changed (8 experts per token kept). Its own 128 experts are marked and give the card's 30.5B total and 3.3B activated; the other counts are not real Qwen3 models."
-tags: [moe, mixture-of-experts, experts, capacity, parameters, sparse]
-updated: 2026-11-23
+  values:
+  - 16
+  - 32
+  - 64
+  - 128
+  - 256
+  caption: Total and active parameters of Qwen3-30B-A3B, computed from its config.json, if only num_experts changed (8 experts per token kept). Its own 128 experts are marked and give the card's 30.5B total and 3.3B activated; the other counts are not real Qwen3 models.
+tags:
+- moe
+- mixture-of-experts
+- experts
+- capacity
+- parameters
+- sparse
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/2401.04088", title: "Mixtral of Experts (Jiang et al., 2024)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2101.03961", title: "Switch Transformers: Scaling to Trillion Parameter Models (Fedus et al., 2021)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1701.06538", title: "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer (Shazeer et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2505.09388", title: "Qwen3 Technical Report (Qwen Team, 2025)", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-30B-A3B/blob/main/config.json", title: "Qwen3-30B-A3B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-30B-A3B", title: "Qwen3-30B-A3B model card", trust: 0.9 }
-  - { url: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json", title: "Mixtral-8x7B-Instruct-v0.1 configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json", title: "DeepSeek-V3 configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat/blob/main/config.json", title: "DeepSeek-V2-Lite-Chat configuration (config.json)", trust: 0.95 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3_moe/modeling_qwen3_moe.py", title: "Hugging Face Transformers source: modeling_qwen3_moe.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/mixtral/configuration_mixtral.py", title: "Hugging Face Transformers source: configuration_mixtral.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py", title: "Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)", trust: 0.9 }
+- url: https://arxiv.org/abs/2401.04088
+  title: Mixtral of Experts (Jiang et al., 2024)
+  trust: 0.95
+- url: https://arxiv.org/abs/2101.03961
+  title: 'Switch Transformers: Scaling to Trillion Parameter Models (Fedus et al., 2021)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1701.06538
+  title: 'Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer (Shazeer et al., 2017)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2505.09388
+  title: Qwen3 Technical Report (Qwen Team, 2025)
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-30B-A3B/blob/main/config.json
+  title: Qwen3-30B-A3B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-30B-A3B
+  title: Qwen3-30B-A3B model card
+  trust: 0.9
+- url: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json
+  title: Mixtral-8x7B-Instruct-v0.1 configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json
+  title: DeepSeek-V3 configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat/blob/main/config.json
+  title: DeepSeek-V2-Lite-Chat configuration (config.json)
+  trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3_moe/modeling_qwen3_moe.py
+  title: 'Hugging Face Transformers source: modeling_qwen3_moe.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/mixtral/configuration_mixtral.py
+  title: 'Hugging Face Transformers source: configuration_mixtral.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py
+  title: 'Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)'
+  trust: 0.9
 ---
 
 ## Definition

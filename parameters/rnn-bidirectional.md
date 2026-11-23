@@ -2,69 +2,87 @@
 id: parameter/rnn-bidirectional
 type: parameter
 slug: rnn-bidirectional
-schema_version: 2.9
-title: "Bidirectional"
+schema_version: 3.1
+title: Bidirectional
 name: bidirectional
 priority: 5
 importance: important
-applies_to: [rnn]
-range: "false or true"
-controls: "Whether each layer runs a second recurrence from the end of the sequence back to the start, so every position sees what comes after it as well as before."
+applies_to:
+- rnn
+range: false or true
+controls: Whether each layer runs a second recurrence from the end of the sequence back to the start, so every position sees what comes after it as well as before.
 options:
-  - value: "false"
-    effect: "One direction: each output depends only on the steps before it. PyTorch's D is 1."
-  - value: "true"
-    effect: "A forward and a backward recurrence with their own weights; their outputs are joined, 2 × hidden numbers per step. PyTorch's D is 2."
+- value: 'false'
+  effect: 'One direction: each output depends only on the steps before it. PyTorch''s D is 1.'
+- value: 'true'
+  effect: A forward and a backward recurrence with their own weights; their outputs are joined, 2 × hidden numbers per step. PyTorch's D is 2.
 typical_values:
-  - setting: "PyTorch RNN, GRU and LSTM default (documentation)"
-    value: "false"
-    source: "https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html"
-  - setting: "Sutskever et al.: one direction, with the source sentence fed in reverse"
-    value: "false"
-    source: "https://arxiv.org/abs/1409.3215"
-  - setting: "Bahdanau et al., RNNsearch encoder: forward and backward RNNs of 1,000 units each"
-    value: "true"
-    source: "https://arxiv.org/abs/1409.0473"
-  - setting: "Schuster and Paliwal, BRNN for TIMIT phoneme classification"
-    value: "true"
-    source: "https://ieeexplore.ieee.org/document/650093"
+- setting: PyTorch RNN, GRU and LSTM default (documentation)
+  value: 'false'
+  source: https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html
+- setting: 'Sutskever et al.: one direction, with the source sentence fed in reverse'
+  value: 'false'
+  source: https://arxiv.org/abs/1409.3215
+- setting: 'Bahdanau et al., RNNsearch encoder: forward and backward RNNs of 1,000 units each'
+  value: 'true'
+  source: https://arxiv.org/abs/1409.0473
+- setting: Schuster and Paliwal, BRNN for TIMIT phoneme classification
+  value: 'true'
+  source: https://ieeexplore.ieee.org/document/650093
 mistakes:
-  - mistake: "Assuming bidirectional exactly doubles the parameters"
-    why: >-
-      It doubles each layer at the same hidden_size, but a higher layer then reads 2 × hidden numbers
-      (PyTorch sizes weight_ih_l[k] by num_directions × hidden_size). In the figure's two-layer GRU the
-      total goes from **10,860,000** to **27,720,000**, 2.55 times. Whatever reads the output grows too:
-      Bahdanau et al.'s decoder matrices C, C_z, C_r are n × 2n.
-    fix: "Count each layer from what it reads, as in the figure."
-  - mistake: "Thinking a bidirectional network must be twice as large to be worth it"
-    why: >-
-      Schuster and Paliwal split the state neurons of one network into a forward and a backward part and
-      compared structures with about the same number of free parameters, about 13,000. Their BRNN
-      reached **68.53%** on TIMIT phonemes, against **63.2%** for a forward RNN and **65.28%** for two
-      separate one-way networks merged.
-    fix: "Compare one-way and two-way networks at equal parameter counts, as the paper did."
-  - mistake: "Using a bidirectional layer to generate a sequence step by step"
-    why: >-
-      The backward direction starts from the last step, so it needs the whole input first. Sutskever et
-      al. kept one direction and reversed the source sentence instead; reversing raised their test BLEU
-      score from 25.9 to 30.6.
-    fix: "Use bidirectional layers for inputs that are complete before processing, such as an encoder's."
-related: [parameter/rnn-num-layers, parameter/rnn-hidden-units, parameter/rnn-cell-type]
+- mistake: Assuming bidirectional exactly doubles the parameters
+  why: 'It doubles each layer at the same hidden_size, but a higher layer then reads 2 × hidden numbers (PyTorch sizes weight_ih_l[k] by num_directions × hidden_size). In the figure''s two-layer GRU the total goes from **10,860,000** to **27,720,000**, 2.55 times. Whatever reads the output grows too: Bahdanau et al.''s decoder matrices C, C_z, C_r are n × 2n.'
+  fix: Count each layer from what it reads, as in the figure.
+- mistake: Thinking a bidirectional network must be twice as large to be worth it
+  why: Schuster and Paliwal split the state neurons of one network into a forward and a backward part and compared structures with about the same number of free parameters, about 13,000. Their BRNN reached **68.53%** on TIMIT phonemes, against **63.2%** for a forward RNN and **65.28%** for two separate one-way networks merged.
+  fix: Compare one-way and two-way networks at equal parameter counts, as the paper did.
+- mistake: Using a bidirectional layer to generate a sequence step by step
+  why: The backward direction starts from the last step, so it needs the whole input first. Sutskever et al. kept one direction and reversed the source sentence instead; reversing raised their test BLEU score from 25.9 to 30.6.
+  fix: Use bidirectional layers for inputs that are complete before processing, such as an encoder's.
+related:
+- parameter/rnn-num-layers
+- parameter/rnn-hidden-units
+- parameter/rnn-cell-type
 visual:
   kind: recurrent_layers
   stacks:
-    - { label: "One-way", gates: 3, input_size: 620, hidden_size: 1000, num_layers: 2, bidirectional: false }
-    - { label: "Two-way", gates: 3, input_size: 620, hidden_size: 1000, num_layers: 2, bidirectional: true }
+  - label: One-way
+    gates: 3
+    input_size: 620
+    hidden_size: 1000
+    num_layers: 2
+    bidirectional: false
+  - label: Two-way
+    gates: 3
+    input_size: 620
+    hidden_size: 1000
+    num_layers: 2
+    bidirectional: true
   biases: 0
-  caption: "Weights of each layer of a GRU stack with Bahdanau et al.'s encoder sizes (620-number embeddings, 1,000 units per direction), biases left out as in the paper's equations. Layer 1 is their encoder: 4,860,000 one way, 9,720,000 both ways. Layer 2 is an example added to show what the next layer reads: 1,000 numbers one way, 2,000 both ways, so it triples."
-tags: [rnn, lstm, bidirectional, context, parameters]
-updated: 2026-11-23
+  caption: 'Weights of each layer of a GRU stack with Bahdanau et al.''s encoder sizes (620-number embeddings, 1,000 units per direction), biases left out as in the paper''s equations. Layer 1 is their encoder: 4,860,000 one way, 9,720,000 both ways. Layer 2 is an example added to show what the next layer reads: 1,000 numbers one way, 2,000 both ways, so it triples.'
+tags:
+- rnn
+- lstm
+- bidirectional
+- context
+- parameters
+updated: '2026-11-23'
 sources:
-  - { url: "https://ieeexplore.ieee.org/document/650093", title: "Bidirectional Recurrent Neural Networks (Schuster & Paliwal, IEEE Transactions on Signal Processing 45(11), 1997; doi:10.1109/78.650093)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1409.0473", title: "Neural Machine Translation by Jointly Learning to Align and Translate (Bahdanau, Cho & Bengio, arXiv:1409.0473)", trust: 0.95 }
-  - { url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html", title: "PyTorch documentation: torch.nn.LSTM", trust: 0.9 }
-  - { url: "https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/rnn.py", title: "PyTorch source: torch/nn/modules/rnn.py", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1409.3215", title: "Sequence to Sequence Learning with Neural Networks (Sutskever, Vinyals & Le, arXiv:1409.3215)", trust: 0.95 }
+- url: https://ieeexplore.ieee.org/document/650093
+  title: Bidirectional Recurrent Neural Networks (Schuster & Paliwal, IEEE Transactions on Signal Processing 45(11), 1997; doi:10.1109/78.650093)
+  trust: 0.9
+- url: https://arxiv.org/abs/1409.0473
+  title: Neural Machine Translation by Jointly Learning to Align and Translate (Bahdanau, Cho & Bengio, arXiv:1409.0473)
+  trust: 0.95
+- url: https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html
+  title: 'PyTorch documentation: torch.nn.LSTM'
+  trust: 0.9
+- url: https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/rnn.py
+  title: 'PyTorch source: torch/nn/modules/rnn.py'
+  trust: 0.9
+- url: https://arxiv.org/abs/1409.3215
+  title: Sequence to Sequence Learning with Neural Networks (Sutskever, Vinyals & Le, arXiv:1409.3215)
+  trust: 0.95
 ---
 
 ## Definition

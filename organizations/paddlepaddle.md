@@ -2,7 +2,7 @@
 id: organization/paddlepaddle
 type: organization
 slug: paddlepaddle
-schema_version: 1.1
+schema_version: 3.1
 title: PaddlePaddle
 name: PaddlePaddle
 website: https://huggingface.co/PaddlePaddle

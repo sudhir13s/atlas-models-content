@@ -2,23 +2,26 @@
 id: parameter/positional-encoding
 type: parameter
 slug: positional-encoding
-schema_version: 2.9
-title: "Positional Encoding (RoPE / Learned / ALiBi)"
+schema_version: 3.1
+title: Positional Encoding (RoPE / Learned / ALiBi)
 name: rope_theta
 priority: 11
 importance: optional
-applies_to: [llm, transformer, moe]
-range: "10,000 — 1,000,000"
-controls: "How the model knows where each token sits; in rotary models rope_theta, the base, sets how fast each pair of numbers in a head turns per position."
+applies_to:
+- llm
+- transformer
+- moe
+range: 10,000 — 1,000,000
+controls: How the model knows where each token sits; in rotary models rope_theta, the base, sets how fast each pair of numbers in a head turns per position.
 effects:
   decrease:
-    - "Every pair after the first turns faster per position"
-    - "The slowest pair repeats sooner: every 54,410 positions with base 10,000 and head_dim 128"
-    - "No change in the parameter count: rotary positions store none"
+  - Every pair after the first turns faster per position
+  - 'The slowest pair repeats sooner: every 54,410 positions with base 10,000 and head_dim 128'
+  - 'No change in the parameter count: rotary positions store none'
   increase:
-    - "Every pair after the first turns more slowly; the first always turns 1 radian per position"
-    - "The slowest pair repeats later: every 5,063,256 positions with base 1,000,000"
-    - "The Qwen3 report raised the base from 10,000 to 1,000,000 for its long-context stage"
+  - Every pair after the first turns more slowly; the first always turns 1 radian per position
+  - 'The slowest pair repeats later: every 5,063,256 positions with base 1,000,000'
+  - The Qwen3 report raised the base from 10,000 to 1,000,000 for its long-context stage
 scale:
   min: 1000
   max: 10000000
@@ -26,75 +29,115 @@ scale:
   typical_max: 1000000
   spacing: log
 typical_values:
-  - setting: "RoFormer, the base of θᵢ = 10000^(−2(i−1)/d) (Su et al.)"
-    value: "10000"
-    source: "https://arxiv.org/abs/2104.09864"
-  - setting: "Mistral-7B-v0.1 (config.json)"
-    value: "10000"
-    source: "https://huggingface.co/mistralai/Mistral-7B-v0.1/blob/main/config.json"
-  - setting: "DeepSeek-V3, with YaRN scaling (config.json)"
-    value: "10000"
-    source: "https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json"
-  - setting: "SmolLM2-135M (config.json)"
-    value: "100000"
-    source: "https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/config.json"
-  - setting: "Mixtral-8x7B (config.json)"
-    value: "1000000"
-    source: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json"
-  - setting: "Qwen3-8B (config.json)"
-    value: "1000000"
-    source: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json"
+- setting: RoFormer, the base of θᵢ = 10000^(−2(i−1)/d) (Su et al.)
+  value: '10000'
+  source: https://arxiv.org/abs/2104.09864
+- setting: Mistral-7B-v0.1 (config.json)
+  value: '10000'
+  source: https://huggingface.co/mistralai/Mistral-7B-v0.1/blob/main/config.json
+- setting: DeepSeek-V3, with YaRN scaling (config.json)
+  value: '10000'
+  source: https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json
+- setting: SmolLM2-135M (config.json)
+  value: '100000'
+  source: https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/config.json
+- setting: Mixtral-8x7B (config.json)
+  value: '1000000'
+  source: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json
+- setting: Qwen3-8B (config.json)
+  value: '1000000'
+  source: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
 mistakes:
-  - mistake: "Thinking rotary positions are added to the token vectors"
-    why: >-
-      RoFormer calls its method multiplicative, unlike the added position vectors of earlier
-      models: queries and keys are rotated. Transformers' Qwen3 code rotates only the queries and
-      keys, not the values or the token vectors.
-    fix: "Look for positions inside attention in rotary models, not in the embeddings."
-  - mistake: "Expecting the neighbouring-number pairing of the paper in Transformers' code"
-    why: >-
-      RoFormer rotates numbers 1 and 2, 3 and 4, and so on. Transformers' rotate_half pairs number
-      j with number j + head_dim ÷ 2, using the same set of angles.
-    fix: "Match the pairing to the code a checkpoint was trained with."
-  - mistake: "Assuming the encoding choice decides quality on its own"
-    why: >-
-      Vaswani et al. tried learned position embeddings in place of their sinusoids and found nearly
-      identical results: **25.7** against **25.8** BLEU. Press et al. show that how far a model can
-      run past its training length depends on the method; they introduced ALiBi for that.
-    fix: "Judge a positional scheme by the lengths it was trained and tested on."
-related: [parameter/context-length, parameter/head-dim, parameter/token-embedding]
+- mistake: Thinking rotary positions are added to the token vectors
+  why: 'RoFormer calls its method multiplicative, unlike the added position vectors of earlier models: queries and keys are rotated. Transformers'' Qwen3 code rotates only the queries and keys, not the values or the token vectors.'
+  fix: Look for positions inside attention in rotary models, not in the embeddings.
+- mistake: Expecting the neighbouring-number pairing of the paper in Transformers' code
+  why: RoFormer rotates numbers 1 and 2, 3 and 4, and so on. Transformers' rotate_half pairs number j with number j + head_dim ÷ 2, using the same set of angles.
+  fix: Match the pairing to the code a checkpoint was trained with.
+- mistake: Assuming the encoding choice decides quality on its own
+  why: 'Vaswani et al. tried learned position embeddings in place of their sinusoids and found nearly identical results: **25.7** against **25.8** BLEU. Press et al. show that how far a model can run past its training length depends on the method; they introduced ALiBi for that.'
+  fix: Judge a positional scheme by the lengths it was trained and tested on.
+related:
+- parameter/context-length
+- parameter/head-dim
+- parameter/token-embedding
 visual:
   kind: rope_rotation
-  model: "Qwen3-8B"
+  model: Qwen3-8B
   rope_theta: 1000000
-  head_dim: 128
+  head_size: 128
   pair: 0
-  query: [1, 0]
-  key: [0.6, 0.8]
+  query:
+  - 1
+  - 0
+  key:
+  - 0.6
+  - 0.8
   positions:
-    - { query: 0, key: 3 }
-    - { query: 10, key: 13 }
-    - { query: 2, key: 4 }
-  caption: "The first pair of numbers of a Qwen3-8B head (rope_theta 1,000,000 and head_dim 128 from its config.json) turns 1 radian per position. The query and key are an example, not from a trained model: at the same distance, 3, the score is the same at any position; at distance 2 it differs."
-tags: [llm, transformer, positional-encoding, rope, alibi, parameters]
-updated: 2026-11-23
+  - query: 0
+    key: 3
+  - query: 10
+    key: 13
+  - query: 2
+    key: 4
+  caption: 'The first pair of numbers of a Qwen3-8B head (rope_theta 1,000,000 and head_dim 128 from its config.json) turns 1 radian per position. The query and key are an example, not from a trained model: at the same distance, 3, the score is the same at any position; at distance 2 it differs.'
+tags:
+- llm
+- transformer
+- positional-encoding
+- rope
+- alibi
+- parameters
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/2104.09864", title: "RoFormer: Enhanced Transformer with Rotary Position Embedding (Su et al., 2021)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2108.12409", title: "Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation (Press et al., 2021)", trust: 0.85 }
-  - { url: "https://arxiv.org/abs/2505.09388", title: "Qwen3 Technical Report (Qwen Team, 2025)", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json", title: "Qwen3-8B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/mistralai/Mistral-7B-v0.1/blob/main/config.json", title: "Mistral-7B-v0.1 configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json", title: "Mixtral-8x7B-Instruct-v0.1 configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json", title: "DeepSeek-V3 configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/config.json", title: "SmolLM2-135M configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json", title: "BERT-base uncased configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/openai-community/gpt2/blob/main/config.json", title: "GPT-2 configuration (config.json)", trust: 0.95 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py", title: "Hugging Face Transformers source: modeling_qwen3.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/modeling_bert.py", title: "Hugging Face Transformers source: modeling_bert.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/gpt2/modeling_gpt2.py", title: "Hugging Face Transformers source: modeling_gpt2.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/bloom/modeling_bloom.py", title: "Hugging Face Transformers source: modeling_bloom.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py", title: "Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)", trust: 0.9 }
+- url: https://arxiv.org/abs/2104.09864
+  title: 'RoFormer: Enhanced Transformer with Rotary Position Embedding (Su et al., 2021)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.95
+- url: https://arxiv.org/abs/2108.12409
+  title: 'Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation (Press et al., 2021)'
+  trust: 0.85
+- url: https://arxiv.org/abs/2505.09388
+  title: Qwen3 Technical Report (Qwen Team, 2025)
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+  title: Qwen3-8B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/mistralai/Mistral-7B-v0.1/blob/main/config.json
+  title: Mistral-7B-v0.1 configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json
+  title: Mixtral-8x7B-Instruct-v0.1 configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json
+  title: DeepSeek-V3 configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/config.json
+  title: SmolLM2-135M configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+  title: BERT-base uncased configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/openai-community/gpt2/blob/main/config.json
+  title: GPT-2 configuration (config.json)
+  trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py
+  title: 'Hugging Face Transformers source: modeling_qwen3.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/modeling_bert.py
+  title: 'Hugging Face Transformers source: modeling_bert.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/gpt2/modeling_gpt2.py
+  title: 'Hugging Face Transformers source: modeling_gpt2.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bloom/modeling_bloom.py
+  title: 'Hugging Face Transformers source: modeling_bloom.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py
+  title: 'Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)'
+  trust: 0.9
 ---
 
 ## Definition

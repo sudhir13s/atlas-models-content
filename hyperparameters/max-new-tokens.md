@@ -2,25 +2,27 @@
 id: hyperparameter/max-new-tokens
 type: hyperparameter
 slug: max-new-tokens
-schema_version: 2.2
-title: "Max New Tokens"
+schema_version: 3.1
+title: Max New Tokens
 name: max_new_tokens
 context: inference
 priority: 3
 importance: critical
-goals: [inference]
-models: [llm]
-range: "20 — 512"
-controls: "The largest number of tokens (words or pieces of words) a language model may write in one answer, not counting the prompt: when the count is reached, generation stops, finished or not."
+goals:
+- inference
+models:
+- llm
+range: 20 — 512
+controls: 'The largest number of tokens (words or pieces of words) a language model may write in one answer, not counting the prompt: when the count is reached, generation stops, finished or not.'
 effects:
   decrease:
-    - "The answer is cut off sooner"
-    - "Too low, and the text stops in the middle of a sentence"
-    - "The longest possible wait gets shorter"
+  - The answer is cut off sooner
+  - Too low, and the text stops in the middle of a sentence
+  - The longest possible wait gets shorter
   increase:
-    - "More room before the answer is cut off"
-    - "A model that finishes on its own is not made to write more"
-    - "The longest possible wait gets longer"
+  - More room before the answer is cut off
+  - A model that finishes on its own is not made to write more
+  - The longest possible wait gets longer
 scale:
   min: 1
   max: 100000
@@ -28,69 +30,64 @@ scale:
   typical_max: 512
   spacing: log
 typical_values:
-  - setting: "Hugging Face Transformers: what a generate call produces at most when neither max_new_tokens nor max_length is set"
-    value: "20"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py"
-  - setting: "Hugging Face Transformers documentation: the value in the sampling and beam search examples of the generation guide"
-    value: "50"
-    source: "https://huggingface.co/docs/transformers/generation_strategies"
-  - setting: "Qwen2.5-7B-Instruct: the value in the quickstart code of the model card"
-    value: "512"
-    source: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct"
-  - setting: "Original Transformer (Vaswani et al., 2017), machine translation: maximum output length, set relative to the input"
-    value: "input length + 50"
-    source: "https://arxiv.org/abs/1706.03762"
+- setting: 'Hugging Face Transformers: what a generate call produces at most when neither max_new_tokens nor max_length is set'
+  value: '20'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py
+- setting: 'Hugging Face Transformers documentation: the value in the sampling and beam search examples of the generation guide'
+  value: '50'
+  source: https://huggingface.co/docs/transformers/generation_strategies
+- setting: 'Qwen2.5-7B-Instruct: the value in the quickstart code of the model card'
+  value: '512'
+  source: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct
+- setting: 'Original Transformer (Vaswani et al., 2017), machine translation: maximum output length, set relative to the input'
+  value: input length + 50
+  source: https://arxiv.org/abs/1706.03762
 mistakes:
-  - mistake: "Not setting it at all"
-    why: >-
-      Without a value, Hugging Face Transformers falls back to a total length setting of 20 and
-      generates **at most 20 new tokens**, unless the model's own configuration says otherwise.
-      Most answers are longer than that and come back cut off. The library logs a warning and
-      recommends setting `max_new_tokens`.
-    fix: >-
-      Always pass `max_new_tokens`. The Transformers documentation says: "Be sure to define it,
-      as it usually defaults to a small value."
-  - mistake: "Confusing it with max_length"
-    why: >-
-      `max_length` is the older setting and counts the **whole sequence**, which for a
-      decoder-only model includes the prompt. With a prompt of 30 tokens, `max_length=40` leaves
-      10 new tokens, and a prompt as long as `max_length` raises a `ValueError`. When both are
-      set, `max_new_tokens` takes precedence and the library logs a warning.
-    fix: >-
-      Use `max_new_tokens` only. The Transformers documentation recommends it and keeps
-      `max_length` "for backward compatibility".
-  - mistake: "Raising it to make answers longer"
-    why: >-
-      The setting is an **upper limit**, not a target. A model stops on its own when it writes
-      its end-of-sequence token, and a higher limit does not delay that.
-    fix: >-
-      To require a minimum length, use `min_new_tokens`. To get a longer answer, change the
-      prompt.
-  - mistake: "Counting in words"
-    why: >-
-      The limit counts **tokens**, and a token is a word or a piece of a word. The same number
-      of tokens is a different number of words for different texts and different models.
-    fix: >-
-      Count the tokens of a typical answer with the model's own tokenizer, and set the limit
-      with room to spare.
-  - mistake: "Assuming a hosted API counts the same things"
-    why: >-
-      Services define their own limit. The OpenAI Chat Completions API calls it
-      `max_completion_tokens` and describes it as an upper bound that includes "visible output
-      tokens and reasoning tokens", so the visible answer can be shorter than the number set.
-    fix: >-
-      Read the API reference of the service for what its limit counts.
-tags: [inference, generation, length]
-updated: 2026-11-23
-related: [hyperparameter/min-new-tokens, hyperparameter/num-beams]
+- mistake: Not setting it at all
+  why: Without a value, Hugging Face Transformers falls back to a total length setting of 20 and generates **at most 20 new tokens**, unless the model's own configuration says otherwise. Most answers are longer than that and come back cut off. The library logs a warning and recommends setting `max_new_tokens`.
+  fix: 'Always pass `max_new_tokens`. The Transformers documentation says: "Be sure to define it, as it usually defaults to a small value."'
+- mistake: Confusing it with max_length
+  why: '`max_length` is the older setting and counts the **whole sequence**, which for a decoder-only model includes the prompt. With a prompt of 30 tokens, `max_length=40` leaves 10 new tokens, and a prompt as long as `max_length` raises a `ValueError`. When both are set, `max_new_tokens` takes precedence and the library logs a warning.'
+  fix: Use `max_new_tokens` only. The Transformers documentation recommends it and keeps `max_length` "for backward compatibility".
+- mistake: Raising it to make answers longer
+  why: The setting is an **upper limit**, not a target. A model stops on its own when it writes its end-of-sequence token, and a higher limit does not delay that.
+  fix: To require a minimum length, use `min_new_tokens`. To get a longer answer, change the prompt.
+- mistake: Counting in words
+  why: The limit counts **tokens**, and a token is a word or a piece of a word. The same number of tokens is a different number of words for different texts and different models.
+  fix: Count the tokens of a typical answer with the model's own tokenizer, and set the limit with room to spare.
+- mistake: Assuming a hosted API counts the same things
+  why: Services define their own limit. The OpenAI Chat Completions API calls it `max_completion_tokens` and describes it as an upper bound that includes "visible output tokens and reasoning tokens", so the visible answer can be shorter than the number set.
+  fix: Read the API reference of the service for what its limit counts.
+tags:
+- inference
+- generation
+- length
+updated: '2026-11-23'
+related:
+- hyperparameter/min-new-tokens
+- hyperparameter/num-beams
 sources:
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py", title: "Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: length parameters, defaults, checks)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py", title: "Hugging Face Transformers source: generation/utils.py (how the length limits are prepared and checked)", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/generation_strategies", title: "Hugging Face Transformers documentation: Generation strategies", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/llm_tutorial", title: "Hugging Face Transformers documentation: Text generation", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct", title: "Qwen2.5-7B-Instruct model card", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.9 }
-  - { url: "https://developers.openai.com/api/reference/resources/chat", title: "OpenAI API reference: Chat Completions", trust: 0.85 }
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+  title: 'Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: length parameters, defaults, checks)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py
+  title: 'Hugging Face Transformers source: generation/utils.py (how the length limits are prepared and checked)'
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/generation_strategies
+  title: 'Hugging Face Transformers documentation: Generation strategies'
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/llm_tutorial
+  title: 'Hugging Face Transformers documentation: Text generation'
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct
+  title: Qwen2.5-7B-Instruct model card
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.9
+- url: https://developers.openai.com/api/reference/resources/chat
+  title: 'OpenAI API reference: Chat Completions'
+  trust: 0.85
 ---
 
 ## Definition

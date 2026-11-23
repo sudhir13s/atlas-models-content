@@ -2,7 +2,7 @@
 id: organization/openchat
 type: organization
 slug: openchat
-schema_version: 1.1
+schema_version: 3.1
 title: OpenChat
 name: OpenChat
 kind: community

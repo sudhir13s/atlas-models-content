@@ -2,7 +2,7 @@
 id: fine-tuning-method/<slug>
 type: fine-tuning-method
 slug: <slug>
-schema_version: 2.8
+schema_version: 3.1              # the schema's current version; the schema refuses any other
 title: "<Method Name>"
 method_type: peft                # peft | full | rlhf | preference | distillation
 memory_profile: low             # low | medium | high

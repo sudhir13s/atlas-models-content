@@ -2,7 +2,7 @@
 id: organization/coqui
 type: organization
 slug: coqui
-schema_version: 1.1
+schema_version: 3.1
 title: Coqui.ai
 name: Coqui.ai
 website: https://huggingface.co/coqui

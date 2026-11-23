@@ -2,7 +2,7 @@
 id: organization/internlm
 type: organization
 slug: internlm
-schema_version: 1.1
+schema_version: 3.1
 title: InternLM
 name: InternLM
 kind: lab

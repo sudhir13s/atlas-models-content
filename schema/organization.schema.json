@@ -2,9 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://theaiatlas.dev/schema/models/organization.schema.json",
   "title": "organization",
+  "unevaluatedProperties": false,
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "properties": {
     "type": { "const": "organization" },
+    "schema_version": { "const": 3.1 },
     "name": { "type": "string", "minLength": 1 },
     "kind": {
       "type": "string",

@@ -2,7 +2,7 @@
 id: organization/impira
 type: organization
 slug: impira
-schema_version: 1.1
+schema_version: 3.1
 title: Impira
 name: Impira
 website: https://huggingface.co/impira

@@ -2,125 +2,148 @@
 id: hyperparameter/learning-rate
 type: hyperparameter
 slug: learning-rate
-schema_version: 2.2
-title: "Learning Rate"
+schema_version: 3.1
+title: Learning Rate
 name: learning_rate
 context: training
 priority: 1
 importance: critical
-goals: [training, finetuning]
-models: [llm, vision, audio, diffusion, rl]
-range: "2e-5 — 1e-3"
-controls: "How big a step a model takes each time it corrects itself during training: small steps learn slowly, large steps learn fast but can overshoot."
+goals:
+- training
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+- rl
+range: 2e-5 — 1e-3
+controls: 'How big a step a model takes each time it corrects itself during training: small steps learn slowly, large steps learn fast but can overshoot.'
 effects:
   decrease:
-    - "Each update changes the model less"
-    - "Training takes more updates to get anywhere"
-    - "Too low, and training can stay stuck at a high error"
-    - "When fine-tuning, the model keeps more of what it already knew"
+  - Each update changes the model less
+  - Training takes more updates to get anywhere
+  - Too low, and training can stay stuck at a high error
+  - When fine-tuning, the model keeps more of what it already knew
   increase:
-    - "Each update changes the model more"
-    - "Training moves faster while the steps still fit the problem"
-    - "Too high, and the error goes up instead of down"
-    - "When fine-tuning, the model can lose what it already knew"
+  - Each update changes the model more
+  - Training moves faster while the steps still fit the problem
+  - Too high, and the error goes up instead of down
+  - When fine-tuning, the model can lose what it already knew
 scale:
-  min: 0.000001
+  min: 1.0e-06
   max: 0.01
-  typical_min: 0.00002
+  typical_min: 2.0e-05
   typical_max: 0.001
   spacing: log
 typical_values:
-  - setting: "PyTorch: default of the AdamW and SGD optimizers"
-    value: "1e-3"
-    source: "https://docs.pytorch.org/docs/2.15/generated/torch.optim.AdamW.html"
-  - setting: "Hugging Face Transformers: default of TrainingArguments"
-    value: "5e-5"
-    source: "https://huggingface.co/docs/transformers/main_classes/trainer"
-  - setting: "Original Transformer, base model: highest point of its schedule"
-    value: "about 7e-4 (from the paper's formula with model width 512 and 4,000 warmup steps)"
-    source: "https://arxiv.org/abs/1706.03762"
-  - setting: "BERT, training from scratch (Adam optimizer)"
-    value: "1e-4"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "BERT, fine-tuning on a task (Adam optimizer)"
-    value: "5e-5, 3e-5 or 2e-5"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "LLaMA, training from scratch: the 6.7 billion and 13.0 billion parameter models"
-    value: "3.0e-4"
-    source: "https://arxiv.org/abs/2302.13971"
-  - setting: "LLaMA, training from scratch: the 32.5 billion and 65.2 billion parameter models"
-    value: "1.5e-4"
-    source: "https://arxiv.org/abs/2302.13971"
-  - setting: "Llama 3 405B, training from scratch: highest point of its schedule"
-    value: "8e-5"
-    source: "https://arxiv.org/abs/2407.21783"
-  - setting: "LoRA adapters on GPT-2 (text generation tasks)"
-    value: "2e-4"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "LoRA adapters on RoBERTa-base (GLUE tasks)"
-    value: "4e-4 or 5e-4, depending on the task"
-    source: "https://arxiv.org/abs/2106.09685"
+- setting: 'PyTorch: default of the AdamW and SGD optimizers'
+  value: 1e-3
+  source: https://docs.pytorch.org/docs/2.15/generated/torch.optim.AdamW.html
+- setting: 'Hugging Face Transformers: default of TrainingArguments'
+  value: 5e-5
+  source: https://huggingface.co/docs/transformers/main_classes/trainer
+- setting: 'Original Transformer, base model: highest point of its schedule'
+  value: about 7e-4 (from the paper's formula with model width 512 and 4,000 warmup steps)
+  source: https://arxiv.org/abs/1706.03762
+- setting: BERT, training from scratch (Adam optimizer)
+  value: 1e-4
+  source: https://arxiv.org/abs/1810.04805
+- setting: BERT, fine-tuning on a task (Adam optimizer)
+  value: 5e-5, 3e-5 or 2e-5
+  source: https://arxiv.org/abs/1810.04805
+- setting: 'LLaMA, training from scratch: the 6.7 billion and 13.0 billion parameter models'
+  value: '3.0e-4'
+  source: https://arxiv.org/abs/2302.13971
+- setting: 'LLaMA, training from scratch: the 32.5 billion and 65.2 billion parameter models'
+  value: '1.5e-4'
+  source: https://arxiv.org/abs/2302.13971
+- setting: 'Llama 3 405B, training from scratch: highest point of its schedule'
+  value: 8e-5
+  source: https://arxiv.org/abs/2407.21783
+- setting: LoRA adapters on GPT-2 (text generation tasks)
+  value: 2e-4
+  source: https://arxiv.org/abs/2106.09685
+- setting: LoRA adapters on RoBERTa-base (GLUE tasks)
+  value: 4e-4 or 5e-4, depending on the task
+  source: https://arxiv.org/abs/2106.09685
 mistakes:
-  - mistake: "Fine-tuning with a learning rate sized for training from scratch"
-    why: >-
-      A model that is already trained holds useful knowledge in its weights, and large steps
-      overwrite it. Sun et al. fine-tuned BERT at four learning rates: at **4e-4** the training
-      set **failed to converge**, and they report that a lower rate such as **2e-5** is needed to
-      avoid **catastrophic forgetting** (the model losing what it learned before).
-    fix: >-
-      Start from the fine-tuning values the model's authors report. For BERT the paper lists
-      **5e-5, 3e-5 and 2e-5**.
-  - mistake: "Changing the batch size and leaving the learning rate alone"
-    why: >-
-      The batch size (how many examples are averaged into one update) and the learning rate work
-      as a pair. Goyal et al. kept the same accuracy at batch sizes from 256 up to 8,192 images
-      only by scaling the learning rate together with the batch size.
-    fix: >-
-      Apply their **linear scaling rule**: when the batch size is multiplied by k, multiply the
-      learning rate by k. They showed it for image classification up to 8,192 images per batch and
-      report that accuracy drops quickly beyond that.
-  - mistake: "Using the full learning rate from the very first update"
-    why: >-
-      Goyal et al. found that large-batch training runs into optimization difficulties early on,
-      while the network is changing rapidly. The Transformer, BERT, LLaMA and Llama 3 papers all
-      begin with a warmup. In Hugging Face
-      Transformers the default is `warmup_steps=0`, so there is **no warmup unless you set one**.
-    fix: >-
-      Add a **warmup**: raise the learning rate gradually from a small value to the full value
-      over the first updates (4,000 in the Transformer paper, 10,000 for BERT, 2,000 for LLaMA).
-  - mistake: "Searching for a good value in small, evenly spaced steps"
-    why: >-
-      Useful learning rates span factors of ten, not small differences: the values in the table
-      above run from 2e-5 to 1e-3. Trying 1e-4, 1.1e-4 and 1.2e-4 tests almost the same thing
-      three times.
-    fix: >-
-      Search on a **logarithmic scale**, where each candidate is a multiple of the last.
-      Goodfellow et al. give the example set 0.1, 0.01, 1e-3, 1e-4, 1e-5.
+- mistake: Fine-tuning with a learning rate sized for training from scratch
+  why: 'A model that is already trained holds useful knowledge in its weights, and large steps overwrite it. Sun et al. fine-tuned BERT at four learning rates: at **4e-4** the training set **failed to converge**, and they report that a lower rate such as **2e-5** is needed to avoid **catastrophic forgetting** (the model losing what it learned before).'
+  fix: Start from the fine-tuning values the model's authors report. For BERT the paper lists **5e-5, 3e-5 and 2e-5**.
+- mistake: Changing the batch size and leaving the learning rate alone
+  why: The batch size (how many examples are averaged into one update) and the learning rate work as a pair. Goyal et al. kept the same accuracy at batch sizes from 256 up to 8,192 images only by scaling the learning rate together with the batch size.
+  fix: 'Apply their **linear scaling rule**: when the batch size is multiplied by k, multiply the learning rate by k. They showed it for image classification up to 8,192 images per batch and report that accuracy drops quickly beyond that.'
+- mistake: Using the full learning rate from the very first update
+  why: Goyal et al. found that large-batch training runs into optimization difficulties early on, while the network is changing rapidly. The Transformer, BERT, LLaMA and Llama 3 papers all begin with a warmup. In Hugging Face Transformers the default is `warmup_steps=0`, so there is **no warmup unless you set one**.
+  fix: 'Add a **warmup**: raise the learning rate gradually from a small value to the full value over the first updates (4,000 in the Transformer paper, 10,000 for BERT, 2,000 for LLaMA).'
+- mistake: Searching for a good value in small, evenly spaced steps
+  why: 'Useful learning rates span factors of ten, not small differences: the values in the table above run from 2e-5 to 1e-3. Trying 1e-4, 1.1e-4 and 1.2e-4 tests almost the same thing three times.'
+  fix: Search on a **logarithmic scale**, where each candidate is a multiple of the last. Goodfellow et al. give the example set 0.1, 0.01, 1e-3, 1e-4, 1e-5.
 visual:
   kind: schedule
-  peak: 0.00005
+  peak: 5.0e-05
   warmup_steps: 100
   total_steps: 1000
-  curves: [constant, linear, cosine]
-  marks: [50, 100, 325, 550, 1000]
-  caption: "The learning rate at every update of a 1,000-update run, for three schedules of Hugging Face Transformers. Each rises in a straight line to 5e-5 (the library's default) over the first 100 updates. The run length and the warmup length are small round numbers picked for this figure. The marked updates are the ones the worked example computes."
-tags: [training, optimization, learning-rate]
-updated: 2026-11-22
-related: [hyperparameter/lr-warmup-schedule, hyperparameter/effective-batch-size]
+  curves:
+  - constant
+  - linear
+  - cosine
+  marks:
+  - 50
+  - 100
+  - 325
+  - 550
+  - 1000
+  caption: The learning rate at every update of a 1,000-update run, for three schedules of Hugging Face Transformers. Each rises in a straight line to 5e-5 (the library's default) over the first 100 updates. The run length and the warmup length are small round numbers picked for this figure. The marked updates are the ones the worked example computes.
+tags:
+- training
+- optimization
+- learning-rate
+updated: '2026-11-22'
+related:
+- hyperparameter/lr-warmup-schedule
+- hyperparameter/effective-batch-size
 sources:
-  - { url: "https://www.deeplearningbook.org/contents/guidelines.html", title: "Deep Learning (Goodfellow, Bengio, Courville), chapter 11: Practical Methodology", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/2.15/generated/torch.optim.SGD.html", title: "PyTorch documentation: torch.optim.SGD", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/2.15/generated/torch.optim.AdamW.html", title: "PyTorch documentation: torch.optim.AdamW", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/main_classes/trainer", title: "Hugging Face Transformers documentation: Trainer and TrainingArguments", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/main_classes/optimizer_schedules", title: "Hugging Face Transformers documentation: Optimization (learning rate schedules)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/optimization.py", title: "Hugging Face Transformers source: optimization.py (schedule formulas)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2106.09685", title: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.02677", title: "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour (Goyal et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1905.05583", title: "How to Fine-Tune BERT for Text Classification? (Sun et al., 2019)", trust: 0.9 }
+- url: https://www.deeplearningbook.org/contents/guidelines.html
+  title: 'Deep Learning (Goodfellow, Bengio, Courville), chapter 11: Practical Methodology'
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/2.15/generated/torch.optim.SGD.html
+  title: 'PyTorch documentation: torch.optim.SGD'
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/2.15/generated/torch.optim.AdamW.html
+  title: 'PyTorch documentation: torch.optim.AdamW'
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/main_classes/trainer
+  title: 'Hugging Face Transformers documentation: Trainer and TrainingArguments'
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/main_classes/optimizer_schedules
+  title: 'Hugging Face Transformers documentation: Optimization (learning rate schedules)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/optimization.py
+  title: 'Hugging Face Transformers source: optimization.py (schedule formulas)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models (2024)
+  trust: 0.9
+- url: https://arxiv.org/abs/2106.09685
+  title: 'LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.02677
+  title: 'Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour (Goyal et al., 2017)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1905.05583
+  title: How to Fine-Tune BERT for Text Classification? (Sun et al., 2019)
+  trust: 0.9
 ---
 
 ## Definition

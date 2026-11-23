@@ -2,7 +2,7 @@
 id: organization/answerdotai
 type: organization
 slug: answerdotai
-schema_version: 1.1
+schema_version: 3.1
 title: Answer.AI
 name: Answer.AI
 website: https://huggingface.co/answerdotai

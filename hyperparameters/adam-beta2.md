@@ -2,27 +2,34 @@
 id: hyperparameter/adam-beta2
 type: hyperparameter
 slug: adam-beta2
-schema_version: 2.2
-title: "Adam Beta2"
+schema_version: 3.1
+title: Adam Beta2
 name: adam_beta2
 context: training
 priority: 12
 importance: optional
-goals: [training, finetuning]
-models: [llm, vision, audio, diffusion, rl]
-range: "0.95 — 0.999"
-controls: "How long the Adam optimizer remembers the size of past gradients when it decides how big each weight's step should be: closer to 1 means a longer memory."
+goals:
+- training
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+- rl
+range: 0.95 — 0.999
+controls: 'How long the Adam optimizer remembers the size of past gradients when it decides how big each weight''s step should be: closer to 1 means a longer memory.'
 effects:
   decrease:
-    - "The running average of squared gradients covers fewer past updates"
-    - "Step sizes follow a change in gradient size more quickly"
-    - "The average rests on fewer gradients, so it fluctuates more"
-    - "RoBERTa authors: 0.98 improved stability with large batches"
+  - The running average of squared gradients covers fewer past updates
+  - Step sizes follow a change in gradient size more quickly
+  - The average rests on fewer gradients, so it fluctuates more
+  - 'RoBERTa authors: 0.98 improved stability with large batches'
   increase:
-    - "The running average covers more past updates"
-    - "Step sizes react more slowly when gradients suddenly grow or shrink"
-    - "Larger start-up bias, which Adam's bias correction removes"
-    - "Kingma and Ba: values close to 1 are needed for sparse gradients"
+  - The running average covers more past updates
+  - Step sizes react more slowly when gradients suddenly grow or shrink
+  - Larger start-up bias, which Adam's bias correction removes
+  - 'Kingma and Ba: values close to 1 are needed for sparse gradients'
 scale:
   min: 0.9
   max: 1
@@ -30,75 +37,76 @@ scale:
   typical_max: 0.999
   spacing: linear
 typical_values:
-  - setting: "Adam paper (Kingma and Ba): good default for the problems they tested"
-    value: "0.999"
-    source: "https://arxiv.org/abs/1412.6980"
-  - setting: "PyTorch Adam and AdamW, and Hugging Face TrainingArguments: default"
-    value: "0.999"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py"
-  - setting: "Original Transformer (2017)"
-    value: "0.98"
-    source: "https://arxiv.org/abs/1706.03762"
-  - setting: "RoBERTa, training from scratch with batches of 8,000 sequences"
-    value: "0.98"
-    source: "https://arxiv.org/abs/1907.11692"
-  - setting: "GPT-3, all model sizes"
-    value: "0.95"
-    source: "https://arxiv.org/abs/2005.14165"
-  - setting: "LLaMA (AdamW optimizer)"
-    value: "0.95"
-    source: "https://arxiv.org/abs/2302.13971"
+- setting: 'Adam paper (Kingma and Ba): good default for the problems they tested'
+  value: '0.999'
+  source: https://arxiv.org/abs/1412.6980
+- setting: 'PyTorch Adam and AdamW, and Hugging Face TrainingArguments: default'
+  value: '0.999'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+- setting: Original Transformer (2017)
+  value: '0.98'
+  source: https://arxiv.org/abs/1706.03762
+- setting: RoBERTa, training from scratch with batches of 8,000 sequences
+  value: '0.98'
+  source: https://arxiv.org/abs/1907.11692
+- setting: GPT-3, all model sizes
+  value: '0.95'
+  source: https://arxiv.org/abs/2005.14165
+- setting: LLaMA (AdamW optimizer)
+  value: '0.95'
+  source: https://arxiv.org/abs/2302.13971
 mistakes:
-  - mistake: "Assuming the library default matches the recipe being reproduced"
-    why: >-
-      PyTorch's `Adam` and `AdamW` and Hugging Face `TrainingArguments` all default to **0.999**,
-      the Adam paper's suggestion. Several published language models used other values: **0.98**
-      for the original Transformer and RoBERTa, **0.95** for GPT-3 and LLaMA. A run that leaves the
-      default in place is not the published recipe.
-    fix: >-
-      Set `adam_beta2` (Hugging Face) or `betas=(beta1, beta2)` (PyTorch) explicitly to the value
-      of the source you follow, and record it.
-  - mistake: "Changing beta2 and leaving epsilon at its default"
-    why: >-
-      The two sit in the same part of the formula: the step is divided by the square root of the
-      squared-gradient average **plus epsilon**. The RoBERTa authors found training "very sensitive"
-      to epsilon and paired **β2 = 0.98 with ε = 1e-6**. The original Transformer used **ε = 1e-9**
-      and GPT-3 **ε = 1e-8**, the library default.
-    fix: >-
-      Copy beta2 and epsilon **as a pair** from the source; in Hugging Face, `adam_epsilon` sits next
-      to `adam_beta2`.
-  - mistake: "Treating 0.99, 0.995 and 0.999 as small differences"
-    why: >-
-      What matters is the **distance from 1**, because it sets how fast old gradients are
-      forgotten. 1 − 0.99 = 0.01 and 1 − 0.999 = 0.001: the second forgets ten times more slowly.
-      Part B of the worked example puts numbers on this: half of the average's weight lies in the
-      last 693 updates at 0.999 and in the last 14 at 0.95.
-    fix: >-
-      Compare candidate values by **1 − β2** (or by the half-life in Part B), which works on a
-      scale of factors of ten.
-  - mistake: "Writing an Adam update without the bias correction"
-    why: >-
-      The running averages start at zero, so early on they are too small. Kingma and Ba show that
-      without the correction step, values of β2 close to 1 "lead to instabilities in training",
-      especially in the first epochs, and that dropping it makes the method a version of RMSProp
-      with momentum. Part A of the worked example shows a first step about 3.16 times too large.
-    fix: >-
-      Use the library optimizers, which divide by **1 − β2 to the power t** (PyTorch's `Adam` and
-      `AdamW` do), or include that division in your own code.
-tags: [training, optimizer, adam]
-updated: 2026-11-23
-related: [hyperparameter/learning-rate, hyperparameter/effective-batch-size]
+- mistake: Assuming the library default matches the recipe being reproduced
+  why: 'PyTorch''s `Adam` and `AdamW` and Hugging Face `TrainingArguments` all default to **0.999**, the Adam paper''s suggestion. Several published language models used other values: **0.98** for the original Transformer and RoBERTa, **0.95** for GPT-3 and LLaMA. A run that leaves the default in place is not the published recipe.'
+  fix: Set `adam_beta2` (Hugging Face) or `betas=(beta1, beta2)` (PyTorch) explicitly to the value of the source you follow, and record it.
+- mistake: Changing beta2 and leaving epsilon at its default
+  why: 'The two sit in the same part of the formula: the step is divided by the square root of the squared-gradient average **plus epsilon**. The RoBERTa authors found training "very sensitive" to epsilon and paired **β2 = 0.98 with ε = 1e-6**. The original Transformer used **ε = 1e-9** and GPT-3 **ε = 1e-8**, the library default.'
+  fix: Copy beta2 and epsilon **as a pair** from the source; in Hugging Face, `adam_epsilon` sits next to `adam_beta2`.
+- mistake: Treating 0.99, 0.995 and 0.999 as small differences
+  why: 'What matters is the **distance from 1**, because it sets how fast old gradients are forgotten. 1 − 0.99 = 0.01 and 1 − 0.999 = 0.001: the second forgets ten times more slowly. Part B of the worked example puts numbers on this: half of the average''s weight lies in the last 693 updates at 0.999 and in the last 14 at 0.95.'
+  fix: Compare candidate values by **1 − β2** (or by the half-life in Part B), which works on a scale of factors of ten.
+- mistake: Writing an Adam update without the bias correction
+  why: The running averages start at zero, so early on they are too small. Kingma and Ba show that without the correction step, values of β2 close to 1 "lead to instabilities in training", especially in the first epochs, and that dropping it makes the method a version of RMSProp with momentum. Part A of the worked example shows a first step about 3.16 times too large.
+  fix: Use the library optimizers, which divide by **1 − β2 to the power t** (PyTorch's `Adam` and `AdamW` do), or include that division in your own code.
+tags:
+- training
+- optimizer
+- adam
+updated: '2026-11-23'
+related:
+- hyperparameter/learning-rate
+- hyperparameter/effective-batch-size
 sources:
-  - { url: "https://arxiv.org/abs/1412.6980", title: "Adam: A Method for Stochastic Optimization (Kingma and Ba, 2015)", trust: 0.9 }
-  - { url: "https://github.com/pytorch/pytorch/blob/main/torch/optim/adam.py", title: "PyTorch source: torch/optim/adam.py (Adam defaults and algorithm)", trust: 0.9 }
-  - { url: "https://github.com/pytorch/pytorch/blob/main/torch/optim/adamw.py", title: "PyTorch source: torch/optim/adamw.py (AdamW defaults)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py", title: "Hugging Face Transformers source: training_args.py (adam_beta1, adam_beta2, adam_epsilon defaults)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1907.11692", title: "RoBERTa: A Robustly Optimized BERT Pretraining Approach (Liu et al., 2019)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2005.14165", title: "Language Models are Few-Shot Learners (Brown et al., 2020), the GPT-3 paper", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2010.11929", title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020), the Vision Transformer paper", trust: 0.9 }
+- url: https://arxiv.org/abs/1412.6980
+  title: 'Adam: A Method for Stochastic Optimization (Kingma and Ba, 2015)'
+  trust: 0.9
+- url: https://github.com/pytorch/pytorch/blob/main/torch/optim/adam.py
+  title: 'PyTorch source: torch/optim/adam.py (Adam defaults and algorithm)'
+  trust: 0.9
+- url: https://github.com/pytorch/pytorch/blob/main/torch/optim/adamw.py
+  title: 'PyTorch source: torch/optim/adamw.py (AdamW defaults)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+  title: 'Hugging Face Transformers source: training_args.py (adam_beta1, adam_beta2, adam_epsilon defaults)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1907.11692
+  title: 'RoBERTa: A Robustly Optimized BERT Pretraining Approach (Liu et al., 2019)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2005.14165
+  title: Language Models are Few-Shot Learners (Brown et al., 2020), the GPT-3 paper
+  trust: 0.9
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2010.11929
+  title: 'An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020), the Vision Transformer paper'
+  trust: 0.9
 ---
 
 ## Definition

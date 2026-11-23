@@ -2,149 +2,301 @@
 id: architecture-era/llama-recipe
 type: architecture-era
 slug: llama-recipe
-schema_version: 2.7
-title: "The LLaMA Recipe"
-name: "LLaMA (Modern Open LLM Recipe)"
+schema_version: 3.1
+title: The LLaMA Recipe
+name: LLaMA (Modern Open LLM Recipe)
 era: post-transformer
-era_range: "2023–2026"
+era_range: 2023–2026
 year: 2023
 family: llm
-core_innovation: "A decoder-only transformer with pre-normalisation (RMSNorm), SwiGLU activations and rotary position embeddings (RoPE), trained on more tokens than compute-optimal and released to the research community."
-description: "A Transformer that predicts the next token from the tokens before it, built with three changes borrowed from earlier work (RMSNorm before each sub-layer, a SwiGLU feed-forward layer and rotary position embeddings); introduced in Meta's LLaMA paper (2023) and kept in Llama 2 and Llama 3."
-key_features: ["Pre-normalisation with RMSNorm", "SwiGLU activation in the feed-forward layer", "Rotary position embeddings (RoPE) instead of absolute position embeddings", "Grouped-query attention in the 34B and 70B Llama 2 models and in every Llama 3 model", "Smaller models trained on more tokens, for cheaper inference", "Weights released"]
-key_models: ["LLaMA (2023)", "Llama 2 (2023)", "Llama 3 (2024)"]
-paper_title: "LLaMA: Open and Efficient Foundation Language Models"
-paper_url: "https://arxiv.org/abs/2302.13971"
-influenced_by: [architecture-era/transformer, architecture-era/scaling-laws]
-led_to: [architecture-era/mamba-ssm]
-
+core_innovation: A decoder-only transformer with pre-normalisation (RMSNorm), SwiGLU activations and rotary position embeddings (RoPE), trained on more tokens than compute-optimal and released to the research community.
+description: A Transformer that predicts the next token from the tokens before it, built with three changes borrowed from earlier work (RMSNorm before each sub-layer, a SwiGLU feed-forward layer and rotary position embeddings); introduced in Meta's LLaMA paper (2023) and kept in Llama 2 and Llama 3.
+key_features:
+- Pre-normalisation with RMSNorm
+- SwiGLU activation in the feed-forward layer
+- Rotary position embeddings (RoPE) instead of absolute position embeddings
+- Grouped-query attention in the 34B and 70B Llama 2 models and in every Llama 3 model
+- Smaller models trained on more tokens, for cheaper inference
+- Weights released
+paper_title: 'LLaMA: Open and Efficient Foundation Language Models'
+paper_url: https://arxiv.org/abs/2302.13971
+influenced_by:
+- architecture-era/transformer
+- architecture-era/scaling-laws
+led_to:
+- architecture-era/mamba-ssm
 analogy:
-  title: "A recipe assembled from tested ingredients"
-  body: "This is an analogy, not the mechanism. Several cooks had each published one improvement: a steadier way to mix (RMSNorm), a better sauce (SwiGLU) and a new way to mark the order of the courses (rotary embeddings). The LLaMA cooks did not invent a new dish; they combined these three in one recipe, cooked smaller portions for longer instead of bigger ones so each plate is cheaper to serve, and handed the result to other researchers. Unlike a kitchen, nothing here is chosen by taste: each change is a formula, shown with numbers in the worked example."
-
+  title: A recipe assembled from tested ingredients
+  body: 'This is an analogy, not the mechanism. Several cooks had each published one improvement: a steadier way to mix (RMSNorm), a better sauce (SwiGLU) and a new way to mark the order of the courses (rotary embeddings). The LLaMA cooks did not invent a new dish; they combined these three in one recipe, cooked smaller portions for longer instead of bigger ones so each plate is cheaper to serve, and handed the result to other researchers. Unlike a kitchen, nothing here is chosen by taste: each change is a formula, shown with numbers in the worked example.'
 narrative:
-  motivation: "**Compute-optimal training ignored the cost of running the model.** The paper is by **Touvron et al. (2023)** at Meta AI.\n\n- **The prior finding:** **Hoffmann et al. (2022)** showed that, for a fixed training budget, the best results come from smaller models trained on more data.\n- **The gap the authors name:** that objective disregards the **inference budget**, which matters when a model is served at scale.\n- **Their example:** Hoffmann et al. recommend a **10B** model on **200B** tokens, yet the authors find a **7B** model keeps improving **after 1T** tokens."
-  approach: "**Train smaller models for longer, on public data only.**\n\n- **Sizes:** **7B, 13B, 33B and 65B** parameters.\n- **Data:** **1.0T** tokens for 7B and 13B, **1.4T** for 33B and 65B, using only publicly available data: CommonCrawl **67%**, C4 **15%**, GitHub, Wikipedia and books **4.5%** each, arXiv **2.5%**, Stack Exchange **2%**.\n- **Architecture:** the Transformer of **Vaswani et al. (2017)** with three changes taken from earlier models, each named with where the authors found it: pre-normalisation (**GPT-3**), SwiGLU (**PaLM**) and rotary embeddings (**GPT-Neo**)."
-  solution: "**Three changes to the block, then standard training.**\n\n- **RMSNorm before each sub-layer:** the input of each sub-layer is normalised, not its output, using RMSNorm by **Zhang and Sennrich (2019)**.\n- **SwiGLU feed-forward:** the ReLU is replaced by SwiGLU by **Shazeer (2020)**, with an inner width of **2/3 · 4d**.\n- **Rotary embeddings:** absolute position embeddings are removed and RoPE by **Su et al. (2021)** is applied **at each layer**.\n- **Training:** AdamW (β₁ = **0.9**, β₂ = **0.95**), cosine schedule down to **10%** of the peak, weight decay **0.1**, **2,000** warm-up steps; the 65B model processed about **380 tokens per second per GPU** on **2,048** A100 GPUs, about **21 days** for 1.4T tokens.\n- **Llama 2 (2023):** **40%** more tokens (**2.0T**), context doubled to **4,096**, and **grouped-query attention (GQA)** in the 34B and 70B models.\n- **Llama 3 (2024):** GQA with **8 key-value heads** in every size, a **128,000**-token vocabulary and a RoPE base frequency of **500,000**."
-  outcome: "**Results the authors report:**\n\n- **LLaMA-13B:** outperforms **GPT-3 (175B)** on most benchmarks while being more than **10×** smaller, and runs on a single V100 GPU for inference.\n- **LLaMA-65B:** competitive with **Chinchilla-70B** and **PaLM-540B**; it outperforms Chinchilla-70B on all reported common-sense benchmarks except BoolQ.\n- **Release:** the models were released to the research community under a **non-commercial** licence; Llama 2 and Llama 3 followed under a **custom commercial** licence.\n\n**What came next:**\n\n- **Llama 3 405B:** **126** layers, trained on **15.6T** tokens with a context window of up to **128K** tokens; its authors write that the architecture does not deviate significantly from Llama and Llama 2."
+  motivation: '**Compute-optimal training ignored the cost of running the model.** The paper is by **Touvron et al. (2023)** at Meta AI.
 
+
+    - **The prior finding:** **Hoffmann et al. (2022)** showed that, for a fixed training budget, the best results come from smaller models trained on more data.
+
+    - **The gap the authors name:** that objective disregards the **inference budget**, which matters when a model is served at scale.
+
+    - **Their example:** Hoffmann et al. recommend a **10B** model on **200B** tokens, yet the authors find a **7B** model keeps improving **after 1T** tokens.'
+  approach: '**Train smaller models for longer, on public data only.**
+
+
+    - **Sizes:** **7B, 13B, 33B and 65B** parameters.
+
+    - **Data:** **1.0T** tokens for 7B and 13B, **1.4T** for 33B and 65B, using only publicly available data: CommonCrawl **67%**, C4 **15%**, GitHub, Wikipedia and books **4.5%** each, arXiv **2.5%**, Stack Exchange **2%**.
+
+    - **Architecture:** the Transformer of **Vaswani et al. (2017)** with three changes taken from earlier models, each named with where the authors found it: pre-normalisation (**GPT-3**), SwiGLU (**PaLM**) and rotary embeddings (**GPT-Neo**).'
+  solution: '**Three changes to the block, then standard training.**
+
+
+    - **RMSNorm before each sub-layer:** the input of each sub-layer is normalised, not its output, using RMSNorm by **Zhang and Sennrich (2019)**.
+
+    - **SwiGLU feed-forward:** the ReLU is replaced by SwiGLU by **Shazeer (2020)**, with an inner width of **2/3 · 4d**.
+
+    - **Rotary embeddings:** absolute position embeddings are removed and RoPE by **Su et al. (2021)** is applied **at each layer**.
+
+    - **Training:** AdamW (β₁ = **0.9**, β₂ = **0.95**), cosine schedule down to **10%** of the peak, weight decay **0.1**, **2,000** warm-up steps; the 65B model processed about **380 tokens per second per GPU** on **2,048** A100 GPUs, about **21 days** for 1.4T tokens.
+
+    - **Llama 2 (2023):** **40%** more tokens (**2.0T**), context doubled to **4,096**, and **grouped-query attention (GQA)** in the 34B and 70B models.
+
+    - **Llama 3 (2024):** GQA with **8 key-value heads** in every size, a **128,000**-token vocabulary and a RoPE base frequency of **500,000**.'
+  outcome: '**Results the authors report:**
+
+
+    - **LLaMA-13B:** outperforms **GPT-3 (175B)** on most benchmarks while being more than **10×** smaller, and runs on a single V100 GPU for inference.
+
+    - **LLaMA-65B:** competitive with **Chinchilla-70B** and **PaLM-540B**; it outperforms Chinchilla-70B on all reported common-sense benchmarks except BoolQ.
+
+    - **Release:** the models were released to the research community under a **non-commercial** licence; Llama 2 and Llama 3 followed under a **custom commercial** licence.
+
+
+    **What came next:**
+
+
+    - **Llama 3 405B:** **126** layers, trained on **15.6T** tokens with a context window of up to **128K** tokens; its authors write that the architecture does not deviate significantly from Llama and Llama 2.'
 key_equation:
-  latex: "q_m^{\\top} k_n = \\left(R_{m\\theta}\\, W_q x_m\\right)^{\\top}\\left(R_{n\\theta}\\, W_k x_n\\right) = x_m^{\\top} W_q^{\\top} R_{(n-m)\\theta}\\, W_k x_n"
-  plain: "In words: rotary position embedding turns the query of the token at position m by the angle m·θ and the key of the token at position n by n·θ, then takes their dot product as the attention score. Two rotations combine into one rotation by the difference, so the score depends on the words and on how far apart they are (n − m), not on where they sit in the text. This is equation 16 of the RoFormer paper; part 3 of the worked example checks it with numbers."
+  latex: q_m^{\top} k_n = \left(R_{m\theta}\, W_q x_m\right)^{\top}\left(R_{n\theta}\, W_k x_n\right) = x_m^{\top} W_q^{\top} R_{(n-m)\theta}\, W_k x_n
+  plain: 'In words: rotary position embedding turns the query of the token at position m by the angle m·θ and the key of the token at position n by n·θ, then takes their dot product as the attention score. Two rotations combine into one rotation by the difference, so the score depends on the words and on how far apart they are (n − m), not on where they sit in the text. This is equation 16 of the RoFormer paper; part 3 of the worked example checks it with numbers.'
   terms:
-    - { symbol: "x_m, x_n", meaning: "the vectors of the tokens at positions m and n, after RMSNorm" }
-    - { symbol: "W_q, W_k", meaning: "the learned matrices that turn a token's vector into its query and its key" }
-    - { symbol: "R_{m\\theta}", meaning: "a rotation by the angle m·θ, applied to each pair of numbers of the vector; each pair i has its own angle θᵢ = 10000^(−2(i−1)/d)" }
-    - { symbol: "q_m^{\\top} k_n", meaning: "the attention score of the query at position m for the key at position n, before division by the square root of the head size" }
-    - { symbol: "n - m", meaning: "the distance between the two tokens: the only position information left in the score" }
-
+  - symbol: x_m, x_n
+    meaning: the vectors of the tokens at positions m and n, after RMSNorm
+  - symbol: W_q, W_k
+    meaning: the learned matrices that turn a token's vector into its query and its key
+  - symbol: R_{m\theta}
+    meaning: a rotation by the angle m·θ, applied to each pair of numbers of the vector; each pair i has its own angle θᵢ = 10000^(−2(i−1)/d)
+  - symbol: q_m^{\top} k_n
+    meaning: the attention score of the query at position m for the key at position n, before division by the square root of the head size
+  - symbol: n - m
+    meaning: 'the distance between the two tokens: the only position information left in the score'
 strengths:
-  - "**Cheaper to run for its quality:** the authors report that **LLaMA-13B** outperforms **GPT-3 (175B)** on most benchmarks while being more than **10×** smaller, and that it runs on a **single V100 GPU** at inference."
-  - "**Public data only:** every training source is publicly available (CommonCrawl **67%**, C4 **15%**, and smaller shares of GitHub, Wikipedia, books, arXiv and Stack Exchange), which the authors call compatible with open-sourcing."
-  - "**A lighter normalisation:** the RMSNorm authors report performance comparable to LayerNorm with running time reduced by **7% to 64%** across their models."
-  - "**A better feed-forward layer:** with parameters and computation matched, Shazeer reports a held-out log-perplexity of **1.636** for SwiGLU against **1.677** for ReLU after **524,288** training steps."
-  - "**A smaller key-value cache:** Llama 3 uses grouped-query attention with **8 key-value heads**, which its authors adopt to speed up inference and reduce the size of the key-value cache during decoding."
-
+- '**Cheaper to run for its quality:** the authors report that **LLaMA-13B** outperforms **GPT-3 (175B)** on most benchmarks while being more than **10×** smaller, and that it runs on a **single V100 GPU** at inference.'
+- '**Public data only:** every training source is publicly available (CommonCrawl **67%**, C4 **15%**, and smaller shares of GitHub, Wikipedia, books, arXiv and Stack Exchange), which the authors call compatible with open-sourcing.'
+- '**A lighter normalisation:** the RMSNorm authors report performance comparable to LayerNorm with running time reduced by **7% to 64%** across their models.'
+- '**A better feed-forward layer:** with parameters and computation matched, Shazeer reports a held-out log-perplexity of **1.636** for SwiGLU against **1.677** for ReLU after **524,288** training steps.'
+- '**A smaller key-value cache:** Llama 3 uses grouped-query attention with **8 key-value heads**, which its authors adopt to speed up inference and reduce the size of the key-value cache during decoding.'
 weaknesses:
-  - "**Little new architecture, by design:** the LLaMA authors describe their changes as improvements proposed in earlier work, and the Llama 3 authors write that their gains come **primarily from data quality and scale**, not from architecture."
-  - "**Attention still grows with the square of length:** self-attention costs **O(n²·d)** per layer (Vaswani et al., Table 1); LLaMA was trained with a **2,048**-token context and Llama 2 with **4,096**."
-  - "**Bespoke licences:** the LLaMA model card gives a **non-commercial bespoke licence**; the Llama 2 and Llama 3 model cards give a **custom commercial licence** with an Acceptable Use Policy."
-  - "**More training compute per model:** the authors acknowledge that a larger model may be **cheaper to train** to a given level of performance; training the 65B model on 1.4T tokens took about **21 days** on **2,048** A100 GPUs."
-  - "**An empirical gain, not an explained one:** Shazeer writes that he offers **no explanation** for why the GLU variants work."
-
+- '**Little new architecture, by design:** the LLaMA authors describe their changes as improvements proposed in earlier work, and the Llama 3 authors write that their gains come **primarily from data quality and scale**, not from architecture.'
+- '**Attention still grows with the square of length:** self-attention costs **O(n²·d)** per layer (Vaswani et al., Table 1); LLaMA was trained with a **2,048**-token context and Llama 2 with **4,096**.'
+- '**Bespoke licences:** the LLaMA model card gives a **non-commercial bespoke licence**; the Llama 2 and Llama 3 model cards give a **custom commercial licence** with an Acceptable Use Policy.'
+- '**More training compute per model:** the authors acknowledge that a larger model may be **cheaper to train** to a given level of performance; training the 65B model on 1.4T tokens took about **21 days** on **2,048** A100 GPUs.'
+- '**An empirical gain, not an explained one:** Shazeer writes that he offers **no explanation** for why the GLU variants work.'
 visual:
   kind: rotary
-  query: [1, 0]
-  key: [2, 1]
+  query:
+  - 1
+  - 0
+  key:
+  - 2
+  - 1
   angle_degrees: 90
   positions:
-    - { query: 1, key: 3 }
-    - { query: 2, key: 4 }
-    - { query: 1, key: 2 }
-  caption: "Part 3 of the worked example: the query and the key turned by 90° per position, for the three pairs of positions it works through, with each score computed from the turned arrows. The first two pairs are 2 apart and score the same; the third is 1 apart and scores differently. The vectors and the angle are an example, not from a trained model."
-
+  - query: 1
+    key: 3
+  - query: 2
+    key: 4
+  - query: 1
+    key: 2
+  caption: 'Part 3 of the worked example: the query and the key turned by 90° per position, for the three pairs of positions it works through, with each score computed from the turned arrows. The first two pairs are 2 apart and score the same; the third is 1 apart and scores differently. The vectors and the angle are an example, not from a trained model.'
 comparison:
-  before: "Original Transformer (2017)"
-  after: "LLaMA (2023)"
+  before: Original Transformer (2017)
+  after: LLaMA (2023)
   rows:
-    - { aspect: "Where normalisation is applied", before: "To the output of each sub-layer: LayerNorm(x + Sublayer(x))", after: "To the input of each sub-layer (pre-normalisation), for training stability", source: "https://arxiv.org/abs/2302.13971" }
-    - { aspect: "Normalisation function", before: "LayerNorm: subtract the mean, divide by the standard deviation, then rescale", after: "RMSNorm: divide by the root mean square only, then rescale; no mean is subtracted", source: "https://arxiv.org/abs/1910.07467" }
-    - { aspect: "Feed-forward non-linearity", before: "ReLU between two weight matrices", after: "SwiGLU, with three weight matrices and an inner width of 2/3 · 4d", source: "https://arxiv.org/abs/2302.13971" }
-    - { aspect: "How word order enters", before: "Absolute position embeddings added once to the input", after: "Rotary position embeddings applied at each layer", source: "https://arxiv.org/abs/2302.13971" }
-    - { aspect: "Key and value heads (Llama 3)", before: "One key head and one value head for every query head", after: "8 key-value heads shared by 32 to 128 query heads (grouped-query attention)", source: "https://arxiv.org/abs/2407.21783" }
-
+  - aspect: Where normalisation is applied
+    before: 'To the output of each sub-layer: LayerNorm(x + Sublayer(x))'
+    after: To the input of each sub-layer (pre-normalisation), for training stability
+    source: https://arxiv.org/abs/2302.13971
+  - aspect: Normalisation function
+    before: 'LayerNorm: subtract the mean, divide by the standard deviation, then rescale'
+    after: 'RMSNorm: divide by the root mean square only, then rescale; no mean is subtracted'
+    source: https://arxiv.org/abs/1910.07467
+  - aspect: Feed-forward non-linearity
+    before: ReLU between two weight matrices
+    after: SwiGLU, with three weight matrices and an inner width of 2/3 · 4d
+    source: https://arxiv.org/abs/2302.13971
+  - aspect: How word order enters
+    before: Absolute position embeddings added once to the input
+    after: Rotary position embeddings applied at each layer
+    source: https://arxiv.org/abs/2302.13971
+  - aspect: Key and value heads (Llama 3)
+    before: One key head and one value head for every query head
+    after: 8 key-value heads shared by 32 to 128 query heads (grouped-query attention)
+    source: https://arxiv.org/abs/2407.21783
 key_numbers:
-  columns: ["Model", "Parameters", "Layers", "Vector width (d)", "Attention heads", "Training tokens"]
+  columns:
+  - Model
+  - Parameters
+  - Layers
+  - Vector width (d)
+  - Attention heads
+  - Training tokens
   rows:
-    - { cells: ["LLaMA 7B (2023)", "6.7B", "32", "4,096", "32", "1.0T"], source: "https://arxiv.org/abs/2302.13971" }
-    - { cells: ["LLaMA 13B (2023)", "13.0B", "40", "5,120", "40", "1.0T"], source: "https://arxiv.org/abs/2302.13971" }
-    - { cells: ["LLaMA 33B (2023)", "32.5B", "60", "6,656", "52", "1.4T"], source: "https://arxiv.org/abs/2302.13971" }
-    - { cells: ["LLaMA 65B (2023)", "65.2B", "80", "8,192", "64", "1.4T"], source: "https://arxiv.org/abs/2302.13971" }
-    - { cells: ["Llama 3 8B (2024)", "8B", "32", "4,096", "32 query, 8 key-value", "about 15T (the pre-training corpus)"], source: "https://arxiv.org/abs/2407.21783" }
-    - { cells: ["Llama 3 405B (2024)", "405B", "126", "16,384", "128 query, 8 key-value", "15.6T"], source: "https://arxiv.org/abs/2407.21783" }
-
+  - cells:
+    - LLaMA 7B (2023)
+    - 6.7B
+    - '32'
+    - 4,096
+    - '32'
+    - 1.0T
+    source: https://arxiv.org/abs/2302.13971
+  - cells:
+    - LLaMA 13B (2023)
+    - 13.0B
+    - '40'
+    - 5,120
+    - '40'
+    - 1.0T
+    source: https://arxiv.org/abs/2302.13971
+  - cells:
+    - LLaMA 33B (2023)
+    - 32.5B
+    - '60'
+    - 6,656
+    - '52'
+    - 1.4T
+    source: https://arxiv.org/abs/2302.13971
+  - cells:
+    - LLaMA 65B (2023)
+    - 65.2B
+    - '80'
+    - 8,192
+    - '64'
+    - 1.4T
+    source: https://arxiv.org/abs/2302.13971
+  - cells:
+    - Llama 3 8B (2024)
+    - 8B
+    - '32'
+    - 4,096
+    - 32 query, 8 key-value
+    - about 15T (the pre-training corpus)
+    source: https://arxiv.org/abs/2407.21783
+  - cells:
+    - Llama 3 405B (2024)
+    - 405B
+    - '126'
+    - 16,384
+    - 128 query, 8 key-value
+    - 15.6T
+    source: https://arxiv.org/abs/2407.21783
 misunderstandings:
-  - misunderstanding: "LLaMA invented RMSNorm, SwiGLU and rotary position embeddings."
-    truth: "The paper credits each change to earlier work and names the model that inspired it: pre-normalisation from **GPT-3**, using RMSNorm by **Zhang and Sennrich (2019)**; SwiGLU by **Shazeer (2020)**, as used in **PaLM**; rotary embeddings by **Su et al. (2021)**, as used in **GPT-Neo**. The recipe is the combination, together with how long the models were trained."
-    source: "https://arxiv.org/abs/2302.13971"
-  - misunderstanding: "Training a model on more tokens than the compute-optimal amount wastes compute."
-    truth: "It spends more **training** compute, but the authors argue that the compute-optimal objective of Hoffmann et al. disregards the **inference** budget. For a target performance, a smaller model trained longer is cheaper to run. Their example: Hoffmann et al. recommend a **10B** model on **200B** tokens, while a **7B** model keeps improving **after 1T** tokens."
-    source: "https://arxiv.org/abs/2302.13971"
-  - misunderstanding: "Every Llama model uses grouped-query attention."
-    truth: "The Llama 2 paper's Table 1 marks **no** grouped-query attention for any LLaMA (version 1) model or for Llama 2 7B and 13B. Only the **34B** and **70B** Llama 2 models use it, and the 34B model was not released. Llama 3 later used it in every size (see the key numbers)."
-    source: "https://arxiv.org/abs/2307.09288"
-  - misunderstanding: "The original LLaMA weights were released under an open-source licence."
-    truth: "The LLaMA model card gives a **non-commercial bespoke licence**, and names **researchers** in natural language processing, machine learning and artificial intelligence as the primary intended users. Llama 2 and Llama 3 later moved to a custom licence that allows commercial use."
-    source: "https://github.com/meta-llama/llama/blob/llama_v1/MODEL_CARD.md"
-
-diagram: |
-  flowchart TD
-    IN["Token embedding"] --> N1["RMSNorm (pre-norm)"]
-    N1 --> ATT["Causal self-attention with RoPE<br/>(grouped-query in larger models)"]
-    ATT --> A1["Add (residual)"]
-    IN --> A1
-    A1 --> N2["RMSNorm (pre-norm)"]
-    N2 --> FF["SwiGLU feed-forward"]
-    FF --> A2["Add (residual)"]
-    A1 --> A2
-    A2 --> REP{"Repeat × N"}
-    REP -->|"next block"| N1
-    REP -->|"final"| OUT["Next-token prediction"]
-diagram_caption: "One LLaMA block: RMSNorm before each sub-layer, causal self-attention with rotary position embeddings, and a SwiGLU feed-forward layer, wrapped in residual connections and repeated N times."
-
+- misunderstanding: LLaMA invented RMSNorm, SwiGLU and rotary position embeddings.
+  truth: 'The paper credits each change to earlier work and names the model that inspired it: pre-normalisation from **GPT-3**, using RMSNorm by **Zhang and Sennrich (2019)**; SwiGLU by **Shazeer (2020)**, as used in **PaLM**; rotary embeddings by **Su et al. (2021)**, as used in **GPT-Neo**. The recipe is the combination, together with how long the models were trained.'
+  source: https://arxiv.org/abs/2302.13971
+- misunderstanding: Training a model on more tokens than the compute-optimal amount wastes compute.
+  truth: 'It spends more **training** compute, but the authors argue that the compute-optimal objective of Hoffmann et al. disregards the **inference** budget. For a target performance, a smaller model trained longer is cheaper to run. Their example: Hoffmann et al. recommend a **10B** model on **200B** tokens, while a **7B** model keeps improving **after 1T** tokens.'
+  source: https://arxiv.org/abs/2302.13971
+- misunderstanding: Every Llama model uses grouped-query attention.
+  truth: The Llama 2 paper's Table 1 marks **no** grouped-query attention for any LLaMA (version 1) model or for Llama 2 7B and 13B. Only the **34B** and **70B** Llama 2 models use it, and the 34B model was not released. Llama 3 later used it in every size (see the key numbers).
+  source: https://arxiv.org/abs/2307.09288
+- misunderstanding: The original LLaMA weights were released under an open-source licence.
+  truth: The LLaMA model card gives a **non-commercial bespoke licence**, and names **researchers** in natural language processing, machine learning and artificial intelligence as the primary intended users. Llama 2 and Llama 3 later moved to a custom licence that allows commercial use.
+  source: https://github.com/meta-llama/llama/blob/llama_v1/MODEL_CARD.md
+diagram: "flowchart TD\n  IN[\"Token embedding\"] --> N1[\"RMSNorm (pre-norm)\"]\n  N1 --> ATT[\"Causal self-attention with RoPE<br/>(grouped-query in larger models)\"]\n  ATT --> A1[\"Add (residual)\"]\n  IN --> A1\n  A1 --> N2[\"RMSNorm (pre-norm)\"]\n  N2 --> FF[\"SwiGLU feed-forward\"]\n  FF --> A2[\"Add (residual)\"]\n  A1 --> A2\n  A2 --> REP{\"Repeat × N\"}\n  REP -->|\"next block\"| N1\n  REP -->|\"final\"| OUT[\"Next-token prediction\"]\n"
+diagram_caption: 'One LLaMA block: RMSNorm before each sub-layer, causal self-attention with rotary position embeddings, and a SwiGLU feed-forward layer, wrapped in residual connections and repeated N times.'
 notable_models:
-  - { name: "LLaMA", year: 2023, note: "7B to 65B models trained on public data only; the authors report the 13B model outperforming GPT-3 (175B) on most benchmarks." }
-  - { name: "Llama 2", year: 2023, note: "7B, 13B and 70B models released with fine-tuned chat versions, trained on 2.0T tokens with a 4,096-token context; the 70B model uses grouped-query attention." }
-  - { name: "Llama 3", year: 2024, note: "8B and 70B models pretrained on over 15 trillion tokens, with a 128K-token vocabulary and grouped-query attention in all sizes." }
-  - { name: "Mistral 7B", year: 2023, note: "Uses grouped-query attention and sliding-window attention; its authors report it outperforming Llama 2 13B across all tested benchmarks, and released it under the Apache 2.0 licence." }
-
+- name: LLaMA
+  year: 2023
+  note: 7B to 65B models trained on public data only; the authors report the 13B model outperforming GPT-3 (175B) on most benchmarks.
+- name: Llama 2
+  year: 2023
+  note: 7B, 13B and 70B models released with fine-tuned chat versions, trained on 2.0T tokens with a 4,096-token context; the 70B model uses grouped-query attention.
+- name: Llama 3
+  year: 2024
+  note: 8B and 70B models pretrained on over 15 trillion tokens, with a 128K-token vocabulary and grouped-query attention in all sizes.
+- name: Mistral 7B
+  year: 2023
+  note: Uses grouped-query attention and sliding-window attention; its authors report it outperforming Llama 2 13B across all tested benchmarks, and released it under the Apache 2.0 licence.
 resources:
-  - { kind: paper, title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", url: "https://arxiv.org/abs/2302.13971" }
-  - { kind: paper, title: "Llama 2: Open Foundation and Fine-Tuned Chat Models (Touvron et al., 2023)", url: "https://arxiv.org/abs/2307.09288" }
-  - { kind: paper, title: "The Llama 3 Herd of Models (Grattafiori et al., 2024)", url: "https://arxiv.org/abs/2407.21783" }
-  - { kind: paper, title: "RoFormer: Enhanced Transformer with Rotary Position Embedding (Su et al., 2021)", url: "https://arxiv.org/abs/2104.09864" }
-
+- kind: paper
+  title: 'LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)'
+  url: https://arxiv.org/abs/2302.13971
+- kind: paper
+  title: 'Llama 2: Open Foundation and Fine-Tuned Chat Models (Touvron et al., 2023)'
+  url: https://arxiv.org/abs/2307.09288
+- kind: paper
+  title: The Llama 3 Herd of Models (Grattafiori et al., 2024)
+  url: https://arxiv.org/abs/2407.21783
+- kind: paper
+  title: 'RoFormer: Enhanced Transformer with Rotary Position Embedding (Su et al., 2021)'
+  url: https://arxiv.org/abs/2104.09864
 learn_first:
-  - { label: "The Transformer block (what the recipe modifies)", href: "/models/architecture/transformer", tag: "Architecture" }
-  - { label: "GPT & decoder-only autoregressive training", href: "/models/architecture/gpt", tag: "Architecture" }
-  - { label: "Scaling laws and compute-optimal training (Chinchilla)", href: "/models/architecture/scaling-laws", tag: "Concept" }
-
-tags: [llama, open-weights, rope, rmsnorm, swiglu, gqa, llm]
+- label: The Transformer block (what the recipe modifies)
+  id: architecture-era/transformer
+  tag: Architecture
+- label: GPT & decoder-only autoregressive training
+  id: architecture-era/gpt
+  tag: Architecture
+- label: Scaling laws and compute-optimal training (Chinchilla)
+  id: architecture-era/scaling-laws
+  tag: Concept
+tags:
+- llama
+- open-weights
+- rope
+- rmsnorm
+- swiglu
+- gqa
+- llm
 updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1910.07467", title: "Root Mean Square Layer Normalization (Zhang and Sennrich, 2019)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2002.05202", title: "GLU Variants Improve Transformer (Shazeer, 2020)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2104.09864", title: "RoFormer: Enhanced Transformer with Rotary Position Embedding (Su et al., 2021)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.98 }
-  - { url: "https://arxiv.org/abs/2305.13245", title: "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints (Ainslie et al., 2023)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2307.09288", title: "Llama 2: Open Foundation and Fine-Tuned Chat Models (Touvron et al., 2023)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (Grattafiori et al., 2024)", trust: 0.95 }
-  - { url: "https://github.com/meta-llama/llama/blob/llama_v1/MODEL_CARD.md", title: "LLaMA model card, version 1 (Meta)", trust: 0.9 }
-  - { url: "https://github.com/meta-llama/llama/blob/main/MODEL_CARD.md", title: "Llama 2 model card (Meta)", trust: 0.9 }
-  - { url: "https://github.com/meta-llama/llama3/blob/main/MODEL_CARD.md", title: "Llama 3 model card (Meta)", trust: 0.9 }
-  - { url: "https://github.com/meta-llama/llama/blob/main/llama/model.py", title: "Llama reference implementation, model.py (Meta): RMSNorm, rotary embeddings, SwiGLU width rounding", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2310.06825", title: "Mistral 7B (Jiang et al., 2023)", trust: 0.95 }
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)'
+  trust: 0.95
+- url: https://arxiv.org/abs/1910.07467
+  title: Root Mean Square Layer Normalization (Zhang and Sennrich, 2019)
+  trust: 0.95
+- url: https://arxiv.org/abs/2002.05202
+  title: GLU Variants Improve Transformer (Shazeer, 2020)
+  trust: 0.95
+- url: https://arxiv.org/abs/2104.09864
+  title: 'RoFormer: Enhanced Transformer with Rotary Position Embedding (Su et al., 2021)'
+  trust: 0.95
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.98
+- url: https://arxiv.org/abs/2305.13245
+  title: 'GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints (Ainslie et al., 2023)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2307.09288
+  title: 'Llama 2: Open Foundation and Fine-Tuned Chat Models (Touvron et al., 2023)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models (Grattafiori et al., 2024)
+  trust: 0.95
+- url: https://github.com/meta-llama/llama/blob/llama_v1/MODEL_CARD.md
+  title: LLaMA model card, version 1 (Meta)
+  trust: 0.9
+- url: https://github.com/meta-llama/llama/blob/main/MODEL_CARD.md
+  title: Llama 2 model card (Meta)
+  trust: 0.9
+- url: https://github.com/meta-llama/llama3/blob/main/MODEL_CARD.md
+  title: Llama 3 model card (Meta)
+  trust: 0.9
+- url: https://github.com/meta-llama/llama/blob/main/llama/model.py
+  title: 'Llama reference implementation, model.py (Meta): RMSNorm, rotary embeddings, SwiGLU width rounding'
+  trust: 0.9
+- url: https://arxiv.org/abs/2310.06825
+  title: Mistral 7B (Jiang et al., 2023)
+  trust: 0.95
 ---
 
 ## What Changed

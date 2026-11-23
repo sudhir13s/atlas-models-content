@@ -2,7 +2,7 @@
 id: organization/nari-labs
 type: organization
 slug: nari-labs
-schema_version: 1.1
+schema_version: 3.1
 title: Nari Labs
 name: Nari Labs
 website: https://huggingface.co/nari-labs

@@ -2,78 +2,95 @@
 id: parameter/cnn-batch-norm
 type: parameter
 slug: cnn-batch-norm
-schema_version: 2.9
-title: "Batch Normalization (γ, β)"
+schema_version: 3.1
+title: Batch Normalization (γ, β)
 name: batch_norm
 priority: 6
 importance: important
-applies_to: [cnn]
-range: "2 learned numbers per channel"
-controls: "Whether each convolution's output is normalised per channel with the mean and variance of the mini-batch and then rescaled by a learned γ and shifted by a learned β."
+applies_to:
+- cnn
+range: 2 learned numbers per channel
+controls: Whether each convolution's output is normalised per channel with the mean and variance of the mini-batch and then rescaled by a learned γ and shifted by a learned β.
 options:
-  - value: "Without"
-    effect: "No γ, β or running statistics; each convolution keeps its own bias (VGG's configurations)."
-  - value: "After each convolution"
-    effect: "2 learned numbers per channel (γ, β) and 2 tracked statistics per channel that are not learned; the convolution's bias can be dropped (Ioffe and Szegedy; torchvision's ResNet)."
+- value: Without
+  effect: No γ, β or running statistics; each convolution keeps its own bias (VGG's configurations).
+- value: After each convolution
+  effect: 2 learned numbers per channel (γ, β) and 2 tracked statistics per channel that are not learned; the convolution's bias can be dropped (Ioffe and Szegedy; torchvision's ResNet).
 typical_values:
-  - setting: "ResNet: after each convolution and before the activation (ResNet paper)"
-    value: "on"
-    source: "https://arxiv.org/abs/1512.03385"
-  - setting: "VGG configurations A to E: no batch normalization in Table 1 (VGG paper)"
-    value: "off"
-    source: "https://arxiv.org/abs/1409.1556"
-  - setting: "PyTorch BatchNorm2d, eps added to the variance (documentation default)"
-    value: "0.00001"
-    source: "https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html"
-  - setting: "PyTorch BatchNorm2d, momentum of the running statistics (documentation default)"
-    value: "0.1"
-    source: "https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html"
-  - setting: "ResNet-50, γ and β of all its batch-norm layers, counted from torchvision's code"
-    value: "53,120"
-    source: "https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py"
+- setting: 'ResNet: after each convolution and before the activation (ResNet paper)'
+  value: 'on'
+  source: https://arxiv.org/abs/1512.03385
+- setting: 'VGG configurations A to E: no batch normalization in Table 1 (VGG paper)'
+  value: 'off'
+  source: https://arxiv.org/abs/1409.1556
+- setting: PyTorch BatchNorm2d, eps added to the variance (documentation default)
+  value: '0.00001'
+  source: https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html
+- setting: PyTorch BatchNorm2d, momentum of the running statistics (documentation default)
+  value: '0.1'
+  source: https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html
+- setting: ResNet-50, γ and β of all its batch-norm layers, counted from torchvision's code
+  value: 53,120
+  source: https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py
 mistakes:
-  - mistake: "Counting the running mean and variance as parameters"
-    why: >-
-      PyTorch's documentation calls running_mean and running_var buffers: they are tracked during
-      training, not learned by the optimiser. Only γ and β (affine=True) are parameters, so ResNet-50's
-      batch-norm layers add **53,120** of its **25,557,032** parameters, 0.21%.
-    fix: "Count 2 × channels per layer as parameters, and the running statistics separately."
-  - mistake: "Normalising each position of a feature map on its own"
-    why: >-
-      For convolutional layers Ioffe and Szegedy normalise all values of a feature map together, over
-      the mini-batch and every location: for m images of p × q maps, m × p × q values. They learn one
-      pair γ, β per feature map, not per activation.
-    fix: "Compute one mean and one variance per channel, as in the figure."
-  - mistake: "Expecting the same output in training and in use"
-    why: >-
-      In training the layer uses the batch's own mean and variance (PyTorch divides by n). In use the
-      paper normalises with population statistics and the unbiased variance, n ÷ (n − 1) times the
-      average batch variance; PyTorch uses its running estimates in evaluation mode.
-    fix: "Switch the model to evaluation mode before using it, so the stored statistics are used."
-  - mistake: "Keeping a bias in the convolution before batch normalization"
-    why: >-
-      Ioffe and Szegedy write that the bias can be ignored because the mean subtraction cancels it; its
-      role is taken by β. torchvision's ResNet builds its convolutions with bias=False.
-    fix: "Drop the convolution's bias when batch normalization follows it."
-related: [parameter/cnn-num-filters, parameter/cnn-num-conv-layers, parameter/normalization]
+- mistake: Counting the running mean and variance as parameters
+  why: 'PyTorch''s documentation calls running_mean and running_var buffers: they are tracked during training, not learned by the optimiser. Only γ and β (affine=True) are parameters, so ResNet-50''s batch-norm layers add **53,120** of its **25,557,032** parameters, 0.21%.'
+  fix: Count 2 × channels per layer as parameters, and the running statistics separately.
+- mistake: Normalising each position of a feature map on its own
+  why: 'For convolutional layers Ioffe and Szegedy normalise all values of a feature map together, over the mini-batch and every location: for m images of p × q maps, m × p × q values. They learn one pair γ, β per feature map, not per activation.'
+  fix: Compute one mean and one variance per channel, as in the figure.
+- mistake: Expecting the same output in training and in use
+  why: In training the layer uses the batch's own mean and variance (PyTorch divides by n). In use the paper normalises with population statistics and the unbiased variance, n ÷ (n − 1) times the average batch variance; PyTorch uses its running estimates in evaluation mode.
+  fix: Switch the model to evaluation mode before using it, so the stored statistics are used.
+- mistake: Keeping a bias in the convolution before batch normalization
+  why: Ioffe and Szegedy write that the bias can be ignored because the mean subtraction cancels it; its role is taken by β. torchvision's ResNet builds its convolutions with bias=False.
+  fix: Drop the convolution's bias when batch normalization follows it.
+related:
+- parameter/cnn-num-filters
+- parameter/cnn-num-conv-layers
+- parameter/normalization
 visual:
   kind: batch_norm
   values:
-    - [2, 4, 4, 4]
-    - [5, 5, 7, 9]
+  - - 2
+    - 4
+    - 4
+    - 4
+  - - 5
+    - 5
+    - 7
+    - 9
   gamma: 2
   beta: 1
-  epsilon: 0.00001
-  worked: { row: 1, column: 1 }
-  caption: "One channel of a mini-batch of two images whose maps are 2 × 2: each row holds one image's four values. The mean and variance are taken over all eight values together, as in training; then each value is normalised and multiplied by γ = 2 and shifted by β = 1, with PyTorch's default ε. The values, γ and β are an example, not from a trained model."
-tags: [cnn, normalization, batchnorm, training, parameters, vision]
-updated: 2026-11-23
+  epsilon: 1.0e-05
+  worked:
+    row: 1
+    column: 1
+  caption: 'One channel of a mini-batch of two images whose maps are 2 × 2: each row holds one image''s four values. The mean and variance are taken over all eight values together, as in training; then each value is normalised and multiplied by γ = 2 and shifted by β = 1, with PyTorch''s default ε. The values, γ and β are an example, not from a trained model.'
+tags:
+- cnn
+- normalization
+- batchnorm
+- training
+- parameters
+- vision
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/1502.03167", title: "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift (Ioffe & Szegedy, arXiv:1502.03167)", trust: 0.95 }
-  - { url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html", title: "PyTorch documentation: torch.nn.BatchNorm2d", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1512.03385", title: "Deep Residual Learning for Image Recognition (He, Zhang, Ren & Sun, arXiv:1512.03385)", trust: 0.95 }
-  - { url: "https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py", title: "torchvision source: models/resnet.py", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1409.1556", title: "Very Deep Convolutional Networks for Large-Scale Image Recognition (Simonyan & Zisserman, arXiv:1409.1556)", trust: 0.95 }
+- url: https://arxiv.org/abs/1502.03167
+  title: 'Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift (Ioffe & Szegedy, arXiv:1502.03167)'
+  trust: 0.95
+- url: https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html
+  title: 'PyTorch documentation: torch.nn.BatchNorm2d'
+  trust: 0.9
+- url: https://arxiv.org/abs/1512.03385
+  title: Deep Residual Learning for Image Recognition (He, Zhang, Ren & Sun, arXiv:1512.03385)
+  trust: 0.95
+- url: https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py
+  title: 'torchvision source: models/resnet.py'
+  trust: 0.9
+- url: https://arxiv.org/abs/1409.1556
+  title: Very Deep Convolutional Networks for Large-Scale Image Recognition (Simonyan & Zisserman, arXiv:1409.1556)
+  trust: 0.95
 ---
 
 ## Definition

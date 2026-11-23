@@ -2,78 +2,86 @@
 id: fine-tuning-method/full-fine-tuning
 type: fine-tuning-method
 slug: full-fine-tuning
-schema_version: 2.8
-title: "Full Fine-Tuning"
+schema_version: 3.1
+title: Full Fine-Tuning
 method_type: full
 memory_profile: high
-summary: "Start from a trained model and keep training every one of its weights on new task data."
-when_to_use: "When every weight should be free to change and the memory for training them all, about 16 bytes per weight with mixed-precision Adam, is available."
-related_hyperparameters: [hyperparameter/learning-rate, hyperparameter/training-duration, hyperparameter/effective-batch-size, hyperparameter/weight-decay, hyperparameter/precision]
+summary: Start from a trained model and keep training every one of its weights on new task data.
+when_to_use: When every weight should be free to change and the memory for training them all, about 16 bytes per weight with mixed-precision Adam, is available.
+related_hyperparameters:
+- hyperparameter/learning-rate
+- hyperparameter/training-duration
+- hyperparameter/effective-batch-size
+- hyperparameter/weight-decay
+- hyperparameter/precision
 profile:
-  trains: "Every weight of the model"
-  models_in_training: "One: the model being trained"
-  data: "Labelled examples for the task"
-  stages: "One"
-  source: "https://arxiv.org/abs/1810.04805"
+  trains: Every weight of the model
+  models_in_training: 'One: the model being trained'
+  data: Labelled examples for the task
+  stages: One
+  source: https://arxiv.org/abs/1810.04805
 typical_values:
-  - setting: "BERT paper: learning rates (Adam) that worked well across its tasks"
-    value: "5e-5, 3e-5, 2e-5"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "BERT paper: batch sizes"
-    value: "16, 32"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "BERT paper: epochs"
-    value: "2, 3, 4"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "LoRA paper: full fine-tuning of GPT-3 175B (AdamW, batch size 128, 2 epochs)"
-    value: "learning rate 5e-6"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "ULMFiT: learning rate of each lower layer (discriminative fine-tuning)"
-    value: "the layer above's ÷ 2.6"
-    source: "https://arxiv.org/abs/1801.06146"
+- setting: 'BERT paper: learning rates (Adam) that worked well across its tasks'
+  value: 5e-5, 3e-5, 2e-5
+  source: https://arxiv.org/abs/1810.04805
+- setting: 'BERT paper: batch sizes'
+  value: 16, 32
+  source: https://arxiv.org/abs/1810.04805
+- setting: 'BERT paper: epochs'
+  value: 2, 3, 4
+  source: https://arxiv.org/abs/1810.04805
+- setting: 'LoRA paper: full fine-tuning of GPT-3 175B (AdamW, batch size 128, 2 epochs)'
+  value: learning rate 5e-6
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'ULMFiT: learning rate of each lower layer (discriminative fine-tuning)'
+  value: the layer above's ÷ 2.6
+  source: https://arxiv.org/abs/1801.06146
 mistakes:
-  - mistake: "Sizing memory by the weights alone"
-    why: >-
-      ZeRO's authors note that a **1.5B**-parameter GPT-2 needs **3 GB** for its 16-bit weights but
-      at least **24 GB** to train with mixed-precision Adam, which keeps gradients, a 32-bit copy of
-      the weights and two moment estimates. Activations come on top: about **60 GB** for that model
-      at sequence length 1K and batch size 32.
-    fix: >-
-      Budget 16 bytes per weight plus activations (see Memory); activation checkpointing and
-      sharding across GPUs reduce them.
-  - mistake: "Fine-tuning too aggressively"
-    why: >-
-      The ULMFiT authors write that overly aggressive fine-tuning causes **catastrophic
-      forgetting**, losing what pre-training learned, while too cautious fine-tuning converges
-      slowly and overfits. BERT's learning rates are 2e-5 to 5e-5, and the LoRA paper's for GPT-3
-      175B is 5e-6.
-    fix: >-
-      Search a few small learning rates on a development set, as BERT did; ULMFiT adds lower rates
-      for lower layers and unfreezes them one at a time.
-  - mistake: "Storing one full copy per task"
-    why: >-
-      Every fully fine-tuned model has as many parameters as the original. The LoRA authors compute
-      that **100** fine-tuned copies of GPT-3 175B take about **35 TB**, against about **354 GB** for
-      one base plus 100 LoRA adapters.
-    fix: "When many task versions are needed, consider LoRA, which stores only a small adapter per task."
+- mistake: Sizing memory by the weights alone
+  why: 'ZeRO''s authors note that a **1.5B**-parameter GPT-2 needs **3 GB** for its 16-bit weights but at least **24 GB** to train with mixed-precision Adam, which keeps gradients, a 32-bit copy of the weights and two moment estimates. Activations come on top: about **60 GB** for that model at sequence length 1K and batch size 32.'
+  fix: Budget 16 bytes per weight plus activations (see Memory); activation checkpointing and sharding across GPUs reduce them.
+- mistake: Fine-tuning too aggressively
+  why: The ULMFiT authors write that overly aggressive fine-tuning causes **catastrophic forgetting**, losing what pre-training learned, while too cautious fine-tuning converges slowly and overfits. BERT's learning rates are 2e-5 to 5e-5, and the LoRA paper's for GPT-3 175B is 5e-6.
+  fix: Search a few small learning rates on a development set, as BERT did; ULMFiT adds lower rates for lower layers and unfreezes them one at a time.
+- mistake: Storing one full copy per task
+  why: Every fully fine-tuned model has as many parameters as the original. The LoRA authors compute that **100** fine-tuned copies of GPT-3 175B take about **35 TB**, against about **354 GB** for one base plus 100 LoRA adapters.
+  fix: When many task versions are needed, consider LoRA, which stores only a small adapter per task.
 visual:
   kind: memory_terms
   parameters: 1500000000
   terms:
-    - { label: "16-bit weights", bytes: 2 }
-    - { label: "16-bit grads", bytes: 2 }
-    - { label: "32-bit weights", bytes: 4 }
-    - { label: "momentum", bytes: 4 }
-    - { label: "variance", bytes: 4 }
-  caption: "The memory for training every weight of a 1.5-billion-parameter model (ZeRO's GPT-2 example) with mixed-precision Adam, computed as bytes per weight × parameters for each term ZeRO lists: 16-bit weights and gradients, and 32-bit weights, momentum and variance. Activations are not included."
-tags: [fine-tuning, full, sft]
-updated: 2026-11-23
+  - label: 16-bit weights
+    bytes: 2
+  - label: 16-bit grads
+    bytes: 2
+  - label: 32-bit weights
+    bytes: 4
+  - label: momentum
+    bytes: 4
+  - label: variance
+    bytes: 4
+  caption: 'The memory for training every weight of a 1.5-billion-parameter model (ZeRO''s GPT-2 example) with mixed-precision Adam, computed as bytes per weight × parameters for each term ZeRO lists: 16-bit weights and gradients, and 32-bit weights, momentum and variance. Activations are not included.'
+tags:
+- fine-tuning
+- full
+- sft
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1801.06146", title: "Universal Language Model Fine-tuning for Text Classification (Howard and Ruder, 2018)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1910.02054", title: "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models (Rajbhandari et al., 2019)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1412.6980", title: "Adam: A Method for Stochastic Optimization (Kingma and Ba, 2014)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2106.09685", title: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)", trust: 0.9 }
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1801.06146
+  title: Universal Language Model Fine-tuning for Text Classification (Howard and Ruder, 2018)
+  trust: 0.9
+- url: https://arxiv.org/abs/1910.02054
+  title: 'ZeRO: Memory Optimizations Toward Training Trillion Parameter Models (Rajbhandari et al., 2019)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1412.6980
+  title: 'Adam: A Method for Stochastic Optimization (Kingma and Ba, 2014)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2106.09685
+  title: 'LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)'
+  trust: 0.9
 ---
 
 ## Definition

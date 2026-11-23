@@ -2,7 +2,7 @@
 id: organization/eleutherai
 type: organization
 slug: eleutherai
-schema_version: 1.1
+schema_version: 3.1
 title: EleutherAI
 name: EleutherAI
 kind: foundation

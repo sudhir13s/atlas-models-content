@@ -2,27 +2,29 @@
 id: hyperparameter/temperature
 type: hyperparameter
 slug: temperature
-schema_version: 2.2
-title: "Temperature"
+schema_version: 3.1
+title: Temperature
 name: temperature
 context: inference
 priority: 1
 importance: critical
-goals: [inference]
-models: [llm]
-range: "0.6 — 1.0"
-controls: "How adventurous a language model is when it picks the next word: low values make it stay with the most likely word, high values give unlikely words a real chance."
+goals:
+- inference
+models:
+- llm
+range: 0.6 — 1.0
+controls: 'How adventurous a language model is when it picks the next word: low values make it stay with the most likely word, high values give unlikely words a real chance.'
 effects:
   decrease:
-    - "The most likely words take a larger share of the probability"
-    - "Output is more focused and more repeatable"
-    - "Less variety from one run to the next"
-    - "Near zero: always the single most likely word"
+  - The most likely words take a larger share of the probability
+  - Output is more focused and more repeatable
+  - Less variety from one run to the next
+  - 'Near zero: always the single most likely word'
   increase:
-    - "Probability spreads out to less likely words"
-    - "Output is more varied and more random"
-    - "Unlikely words get picked more often, and text can lose its thread"
-    - "Very high: every word becomes almost equally likely"
+  - Probability spreads out to less likely words
+  - Output is more varied and more random
+  - Unlikely words get picked more often, and text can lose its thread
+  - 'Very high: every word becomes almost equally likely'
 scale:
   min: 0
   max: 2
@@ -30,69 +32,80 @@ scale:
   typical_max: 1
   spacing: linear
 typical_values:
-  - setting: "Hugging Face Transformers: used when the model's generation_config.json sets no value"
-    value: "1.0"
-    source: "https://huggingface.co/docs/transformers/main_classes/text_generation"
-  - setting: "OpenAI Chat Completions API: default (the API accepts 0 to 2)"
-    value: "1"
-    source: "https://developers.openai.com/api/reference/resources/chat"
-  - setting: "Qwen2.5-7B-Instruct: value in the model's own generation_config.json (with top_p 0.8 and top_k 20)"
-    value: "0.7"
-    source: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json"
-  - setting: "DeepSeek-R1: recommendation on the model card"
-    value: "0.5 to 0.7, with 0.6 recommended"
-    source: "https://huggingface.co/deepseek-ai/DeepSeek-R1"
+- setting: 'Hugging Face Transformers: used when the model''s generation_config.json sets no value'
+  value: '1.0'
+  source: https://huggingface.co/docs/transformers/main_classes/text_generation
+- setting: 'OpenAI Chat Completions API: default (the API accepts 0 to 2)'
+  value: '1'
+  source: https://developers.openai.com/api/reference/resources/chat
+- setting: 'Qwen2.5-7B-Instruct: value in the model''s own generation_config.json (with top_p 0.8 and top_k 20)'
+  value: '0.7'
+  source: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json
+- setting: 'DeepSeek-R1: recommendation on the model card'
+  value: 0.5 to 0.7, with 0.6 recommended
+  source: https://huggingface.co/deepseek-ai/DeepSeek-R1
 mistakes:
-  - mistake: "Setting a temperature while sampling is switched off"
-    why: >-
-      Temperature only matters when the model **draws** the next token at random. In Hugging Face
-      Transformers that happens only with `do_sample=True`; otherwise the library uses greedy
-      decoding (always the most likely token) and, as its documentation warns, the temperature
-      value **has no effect**.
-    fix: >-
-      Pass `do_sample=True` together with the temperature, or check that the model's
-      `generation_config.json` already sets it.
-  - mistake: "Passing temperature=0 to Transformers to get the same answer every time"
-    why: >-
-      The scores are **divided** by the temperature, and nothing can be divided by zero. The
-      library requires a strictly positive number and raises a `ValueError` for 0.
-    fix: >-
-      Set `do_sample=False`. That is greedy decoding, which is what a temperature of zero would
-      mean. Hosted APIs differ: the OpenAI API accepts 0 as a value.
-  - mistake: "Pushing temperature and top_p to extremes together"
-    why: >-
-      Both settings change the same list of probabilities. In Transformers the temperature
-      reshapes it first, then `top_k` and `top_p` cut off the unlikely end of the reshaped list,
-      so the effect of one depends on the other.
-    fix: >-
-      Change one and hold the other still. The OpenAI documentation gives this advice for its
-      API: alter temperature or `top_p`, but not both.
-  - mistake: "Copying a temperature from one model or service to another"
-    why: >-
-      Defaults and limits differ. Transformers falls back to 1.0, but Qwen2.5-7B-Instruct ships
-      with 0.7 in its own configuration, and the DeepSeek-R1 card asks for 0.5 to 0.7 to prevent
-      endless repetitions or incoherent outputs. The OpenAI API accepts 0 to 2.
-    fix: >-
-      Read the model's `generation_config.json` and model card first, and treat a value taken
-      from elsewhere as something to test.
+- mistake: Setting a temperature while sampling is switched off
+  why: Temperature only matters when the model **draws** the next token at random. In Hugging Face Transformers that happens only with `do_sample=True`; otherwise the library uses greedy decoding (always the most likely token) and, as its documentation warns, the temperature value **has no effect**.
+  fix: Pass `do_sample=True` together with the temperature, or check that the model's `generation_config.json` already sets it.
+- mistake: Passing temperature=0 to Transformers to get the same answer every time
+  why: The scores are **divided** by the temperature, and nothing can be divided by zero. The library requires a strictly positive number and raises a `ValueError` for 0.
+  fix: 'Set `do_sample=False`. That is greedy decoding, which is what a temperature of zero would mean. Hosted APIs differ: the OpenAI API accepts 0 as a value.'
+- mistake: Pushing temperature and top_p to extremes together
+  why: Both settings change the same list of probabilities. In Transformers the temperature reshapes it first, then `top_k` and `top_p` cut off the unlikely end of the reshaped list, so the effect of one depends on the other.
+  fix: 'Change one and hold the other still. The OpenAI documentation gives this advice for its API: alter temperature or `top_p`, but not both.'
+- mistake: Copying a temperature from one model or service to another
+  why: Defaults and limits differ. Transformers falls back to 1.0, but Qwen2.5-7B-Instruct ships with 0.7 in its own configuration, and the DeepSeek-R1 card asks for 0.5 to 0.7 to prevent endless repetitions or incoherent outputs. The OpenAI API accepts 0 to 2.
+  fix: Read the model's `generation_config.json` and model card first, and treat a value taken from elsewhere as something to test.
 visual:
   kind: distribution
-  tokens: ["blue", "clear", "falling"]
-  logits: [2, 1, 0]
-  temperatures: [0.5, 1, 2]
-  caption: "Three candidate next words for \"The sky is\" with scores 2, 1 and 0, and the probability each one gets at three temperatures. The scores are made up for this figure, not taken from a model; the probabilities are computed from them with the formula under Calculation."
-tags: [inference, sampling, decoding]
-updated: 2026-11-22
-related: [hyperparameter/do-sample, hyperparameter/top-p, hyperparameter/top-k]
+  tokens:
+  - blue
+  - clear
+  - falling
+  logits:
+  - 2
+  - 1
+  - 0
+  temperatures:
+  - 0.5
+  - 1
+  - 2
+  caption: Three candidate next words for "The sky is" with scores 2, 1 and 0, and the probability each one gets at three temperatures. The scores are made up for this figure, not taken from a model; the probabilities are computed from them with the formula under Calculation.
+tags:
+- inference
+- sampling
+- decoding
+updated: '2026-11-22'
+related:
+- hyperparameter/do-sample
+- hyperparameter/top-p
+- hyperparameter/top-k
 sources:
-  - { url: "https://huggingface.co/docs/transformers/main_classes/text_generation", title: "Hugging Face Transformers documentation: Generation (GenerationConfig)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/logits_process.py", title: "Hugging Face Transformers source: logits_process.py (TemperatureLogitsWarper)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py", title: "Hugging Face Transformers source: generation/utils.py (order of the sampling steps)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1503.02531", title: "Distilling the Knowledge in a Neural Network (Hinton, Vinyals, Dean, 2015)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1904.09751", title: "The Curious Case of Neural Text Degeneration (Holtzman et al., 2019)", trust: 0.9 }
-  - { url: "https://developers.openai.com/api/reference/resources/chat", title: "OpenAI API reference: Chat Completions", trust: 0.85 }
-  - { url: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json", title: "Qwen2.5-7B-Instruct: generation_config.json", trust: 0.9 }
-  - { url: "https://huggingface.co/deepseek-ai/DeepSeek-R1", title: "DeepSeek-R1 model card", trust: 0.9 }
+- url: https://huggingface.co/docs/transformers/main_classes/text_generation
+  title: 'Hugging Face Transformers documentation: Generation (GenerationConfig)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/logits_process.py
+  title: 'Hugging Face Transformers source: logits_process.py (TemperatureLogitsWarper)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py
+  title: 'Hugging Face Transformers source: generation/utils.py (order of the sampling steps)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1503.02531
+  title: Distilling the Knowledge in a Neural Network (Hinton, Vinyals, Dean, 2015)
+  trust: 0.9
+- url: https://arxiv.org/abs/1904.09751
+  title: The Curious Case of Neural Text Degeneration (Holtzman et al., 2019)
+  trust: 0.9
+- url: https://developers.openai.com/api/reference/resources/chat
+  title: 'OpenAI API reference: Chat Completions'
+  trust: 0.85
+- url: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json
+  title: 'Qwen2.5-7B-Instruct: generation_config.json'
+  trust: 0.9
+- url: https://huggingface.co/deepseek-ai/DeepSeek-R1
+  title: DeepSeek-R1 model card
+  trust: 0.9
 ---
 
 ## Definition

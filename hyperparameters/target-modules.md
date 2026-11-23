@@ -2,99 +2,115 @@
 id: hyperparameter/target-modules
 type: hyperparameter
 slug: target-modules
-schema_version: 2.2
-title: "LoRA Target Modules"
+schema_version: 3.1
+title: LoRA Target Modules
 name: target_modules
 context: training
 priority: 7
 importance: important
-goals: [finetuning]
-models: [llm, vision, audio, diffusion]
-range: "query and value matrices only — all linear layers"
-controls: "Which of a model's weight matrices get a LoRA adapter: every matrix not listed stays exactly as it was."
+goals:
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+range: query and value matrices only — all linear layers
+controls: 'Which of a model''s weight matrices get a LoRA adapter: every matrix not listed stays exactly as it was.'
 effects:
   decrease:
-    - "Fewer matrices get an adapter"
-    - "Fewer trainable numbers and a smaller adapter file"
-    - "Fewer places where the model can change"
+  - Fewer matrices get an adapter
+  - Fewer trainable numbers and a smaller adapter file
+  - Fewer places where the model can change
   increase:
-    - "More matrices get an adapter"
-    - "More trainable numbers, in proportion to the matrices added"
-    - "QLoRA: adapters on all linear layers were needed to match full fine-tuning"
+  - More matrices get an adapter
+  - More trainable numbers, in proportion to the matrices added
+  - 'QLoRA: adapters on all linear layers were needed to match full fine-tuning'
 options:
-  - value: "None (the default)"
-    effect: "PEFT picks a list for the model's architecture: for LLaMA, Mistral and Qwen2, q_proj and v_proj. For an architecture it does not know, it raises an error."
-  - value: "[\"q_proj\", \"v_proj\"]"
-    effect: "Adapters on the attention query and value matrices only, as in the LoRA paper's main experiments. The fewest trainable numbers of these choices."
-  - value: "[\"q_proj\", \"k_proj\", \"v_proj\", \"o_proj\"]"
-    effect: "Adapters on all four attention matrices. The LoRA paper's Table 5 tested this at the same budget as one or two matrices."
-  - value: "\"all-linear\""
-    effect: "Adapters on every linear layer, attention and feed-forward, except the output layer. The QLoRA setting; the most trainable numbers of these choices."
+- value: None (the default)
+  effect: 'PEFT picks a list for the model''s architecture: for LLaMA, Mistral and Qwen2, q_proj and v_proj. For an architecture it does not know, it raises an error.'
+- value: '["q_proj", "v_proj"]'
+  effect: Adapters on the attention query and value matrices only, as in the LoRA paper's main experiments. The fewest trainable numbers of these choices.
+- value: '["q_proj", "k_proj", "v_proj", "o_proj"]'
+  effect: Adapters on all four attention matrices. The LoRA paper's Table 5 tested this at the same budget as one or two matrices.
+- value: '"all-linear"'
+  effect: Adapters on every linear layer, attention and feed-forward, except the output layer. The QLoRA setting; the most trainable numbers of these choices.
 typical_values:
-  - setting: "Hugging Face PEFT: default when target_modules is not set, for LLaMA, Mistral, Qwen2, Gemma and OPT"
-    value: "q_proj, v_proj"
-    source: "https://github.com/huggingface/peft/blob/main/src/peft/utils/constants.py"
-  - setting: "Hugging Face PEFT: default when target_modules is not set, for BERT and RoBERTa (GPT-2: c_attn; T5: q, v)"
-    value: "query, value"
-    source: "https://github.com/huggingface/peft/blob/main/src/peft/utils/constants.py"
-  - setting: "LoRA paper: RoBERTa, DeBERTa, GPT-2 and GPT-3 experiments"
-    value: "Wq, Wv (attention query and value)"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "Alpaca-LoRA training script: default"
-    value: "q_proj, v_proj"
-    source: "https://github.com/tloen/alpaca-lora/blob/main/finetune.py"
-  - setting: "QLoRA: LLaMA fine-tuning (the training script collects every linear layer and drops lm_head)"
-    value: "all linear layers"
-    source: "https://arxiv.org/abs/2305.14314"
+- setting: 'Hugging Face PEFT: default when target_modules is not set, for LLaMA, Mistral, Qwen2, Gemma and OPT'
+  value: q_proj, v_proj
+  source: https://github.com/huggingface/peft/blob/main/src/peft/utils/constants.py
+- setting: 'Hugging Face PEFT: default when target_modules is not set, for BERT and RoBERTa (GPT-2: c_attn; T5: q, v)'
+  value: query, value
+  source: https://github.com/huggingface/peft/blob/main/src/peft/utils/constants.py
+- setting: 'LoRA paper: RoBERTa, DeBERTa, GPT-2 and GPT-3 experiments'
+  value: Wq, Wv (attention query and value)
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'Alpaca-LoRA training script: default'
+  value: q_proj, v_proj
+  source: https://github.com/tloen/alpaca-lora/blob/main/finetune.py
+- setting: 'QLoRA: LLaMA fine-tuning (the training script collects every linear layer and drops lm_head)'
+  value: all linear layers
+  source: https://arxiv.org/abs/2305.14314
 mistakes:
-  - mistake: "Assuming LoRA adapts every layer when target_modules is left out"
-    why: >-
-      The PEFT documentation states that the **default settings add trainable weights to the query
-      and value layers** of each attention block; for LLaMA the default list is `q_proj` and
-      `v_proj`. QLoRA reports that LoRA on **all linear transformer block layers is required to
-      match full fine-tuning** performance.
-    fix: >-
-      Set `target_modules="all-linear"` when you want QLoRA's setting; PEFT documents it as easier
-      than naming the modules one by one.
-  - mistake: "Copying module names from a model of another architecture"
-    why: >-
-      Names differ between architectures. PEFT's own defaults use `q_proj`/`v_proj` for LLaMA,
-      `query`/`value` for BERT, `c_attn` for GPT-2, `q`/`v` for T5 and `query_key_value` for
-      Falcon. The PEFT documentation notes that names **vary by architecture**.
-    fix: >-
-      Read the names from the model itself (for example with `model.named_modules()` in PyTorch),
-      or use `"all-linear"`, which needs no names.
-  - mistake: "Expecting a name in the list to match one layer only"
-    why: >-
-      PEFT matches a listed name **as a suffix**: the PEFT quicktour notes that `["q_proj"]` targets
-      the `q_proj` matrix of **every** layer of the model.
-    fix: >-
-      To target only some layers, pass a single string, which PEFT reads as a regular expression
-      (a text pattern), or list the layers to skip in `exclude_modules`.
-  - mistake: "Raising the rank instead of adapting more matrices"
-    why: >-
-      At the same budget of 18 million parameters on GPT-3, the LoRA paper's Table 5 gives **70.4**
-      on WikiSQL for Wq alone at r = 8, **73.7** for Wq and Wv at r = 4, and **73.7** for all four
-      attention matrices at r = 2. QLoRA calls the total number of adapters the most critical
-      LoRA hyperparameter.
-    fix: >-
-      Spread a fixed budget over more matrices before raising the rank; see the LoRA rank page.
-tags: [finetuning, lora, peft, architecture]
-updated: 2026-11-23
-related: [hyperparameter/lora-r, hyperparameter/lora-alpha, hyperparameter/precision]
+- mistake: Assuming LoRA adapts every layer when target_modules is left out
+  why: The PEFT documentation states that the **default settings add trainable weights to the query and value layers** of each attention block; for LLaMA the default list is `q_proj` and `v_proj`. QLoRA reports that LoRA on **all linear transformer block layers is required to match full fine-tuning** performance.
+  fix: Set `target_modules="all-linear"` when you want QLoRA's setting; PEFT documents it as easier than naming the modules one by one.
+- mistake: Copying module names from a model of another architecture
+  why: Names differ between architectures. PEFT's own defaults use `q_proj`/`v_proj` for LLaMA, `query`/`value` for BERT, `c_attn` for GPT-2, `q`/`v` for T5 and `query_key_value` for Falcon. The PEFT documentation notes that names **vary by architecture**.
+  fix: Read the names from the model itself (for example with `model.named_modules()` in PyTorch), or use `"all-linear"`, which needs no names.
+- mistake: Expecting a name in the list to match one layer only
+  why: 'PEFT matches a listed name **as a suffix**: the PEFT quicktour notes that `["q_proj"]` targets the `q_proj` matrix of **every** layer of the model.'
+  fix: To target only some layers, pass a single string, which PEFT reads as a regular expression (a text pattern), or list the layers to skip in `exclude_modules`.
+- mistake: Raising the rank instead of adapting more matrices
+  why: At the same budget of 18 million parameters on GPT-3, the LoRA paper's Table 5 gives **70.4** on WikiSQL for Wq alone at r = 8, **73.7** for Wq and Wv at r = 4, and **73.7** for all four attention matrices at r = 2. QLoRA calls the total number of adapters the most critical LoRA hyperparameter.
+  fix: Spread a fixed budget over more matrices before raising the rank; see the LoRA rank page.
+tags:
+- finetuning
+- lora
+- peft
+- architecture
+updated: '2026-11-23'
+related:
+- hyperparameter/lora-r
+- hyperparameter/lora-alpha
+- hyperparameter/precision
 sources:
-  - { url: "https://arxiv.org/abs/2106.09685", title: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2305.14314", title: "QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py", title: "Hugging Face PEFT source: LoraConfig (target_modules, exclude_modules)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/peft/blob/main/src/peft/utils/constants.py", title: "Hugging Face PEFT source: constants.py (default target modules per architecture)", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/peft/developer_guides/lora", title: "Hugging Face PEFT documentation: LoRA", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/peft/quicktour", title: "Hugging Face PEFT documentation: Quicktour", trust: 0.9 }
-  - { url: "https://github.com/artidoro/qlora/blob/main/qlora.py", title: "QLoRA training script (qlora.py)", trust: 0.85 }
-  - { url: "https://github.com/tloen/alpaca-lora/blob/main/finetune.py", title: "Alpaca-LoRA training script (finetune.py)", trust: 0.8 }
-  - { url: "https://huggingface.co/huggyllama/llama-7b/blob/main/config.json", title: "LLaMA 7B (huggyllama conversion): config.json", trust: 0.8 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py", title: "Hugging Face Transformers source: modeling_llama.py (layer shapes)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/configuration_llama.py", title: "Hugging Face Transformers source: configuration_llama.py", trust: 0.9 }
+- url: https://arxiv.org/abs/2106.09685
+  title: 'LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2305.14314
+  title: 'QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.9
+- url: https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py
+  title: 'Hugging Face PEFT source: LoraConfig (target_modules, exclude_modules)'
+  trust: 0.9
+- url: https://github.com/huggingface/peft/blob/main/src/peft/utils/constants.py
+  title: 'Hugging Face PEFT source: constants.py (default target modules per architecture)'
+  trust: 0.9
+- url: https://huggingface.co/docs/peft/developer_guides/lora
+  title: 'Hugging Face PEFT documentation: LoRA'
+  trust: 0.9
+- url: https://huggingface.co/docs/peft/quicktour
+  title: 'Hugging Face PEFT documentation: Quicktour'
+  trust: 0.9
+- url: https://github.com/artidoro/qlora/blob/main/qlora.py
+  title: QLoRA training script (qlora.py)
+  trust: 0.85
+- url: https://github.com/tloen/alpaca-lora/blob/main/finetune.py
+  title: Alpaca-LoRA training script (finetune.py)
+  trust: 0.8
+- url: https://huggingface.co/huggyllama/llama-7b/blob/main/config.json
+  title: 'LLaMA 7B (huggyllama conversion): config.json'
+  trust: 0.8
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py
+  title: 'Hugging Face Transformers source: modeling_llama.py (layer shapes)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/configuration_llama.py
+  title: 'Hugging Face Transformers source: configuration_llama.py'
+  trust: 0.9
 ---
 
 ## Definition

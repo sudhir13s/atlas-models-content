@@ -2,7 +2,7 @@
 id: architecture-era/<slug>
 type: architecture-era
 slug: <slug>
-schema_version: 2.5
+schema_version: 3.1              # the schema's current version; the schema refuses any other
 title: "<Human Readable Name>"
 name: "<Name>"
 era: scaling                     # early | foundation | scaling | post-transformer
@@ -12,14 +12,12 @@ family: llm                      # classical-nn | classical-dl | llm | vision | 
 core_innovation: "<the one thing it introduced>"
 description: "<one-line description>"
 key_features: ["<feature>", "<feature>"]
-key_models: ["<Model (year)>"]
 paper_title: "<Paper Title>"
 paper_url: "<arxiv url>"
 influenced_by: [architecture-era/<slug>]
 led_to: [architecture-era/<slug>]
 
 # ── Teaching layer (all optional; author every one to the anyone-can-understand bar) ──
-eli5: "<2-3 lines, zero jargon: what is this, really?>"
 analogy:
   title: "<short metaphor name>"
   body: "<one vivid real-world metaphor that makes the mechanism click>"
@@ -28,8 +26,6 @@ narrative:
   approach: "<the core idea / bet>"
   solution: "<how they actually built it>"
   outcome: "<what it unlocked / how the field changed>"
-build_steps:
-  - { title: "<plain-language step name>", detail: "<what happens in this step and why>" }
 key_equation:
   latex: "<LaTeX, no surrounding $>"
   plain: "<what the equation says, in plain English>"
@@ -65,11 +61,13 @@ key_numbers:
 misunderstandings:
   - { misunderstanding: "<what people often think>", truth: "<what is actually true; Markdown>", source: "<url in sources>" }
 notable_models:
-  - { name: "<Model>", year: <YYYY>, note: "<what it proved>" }
+  - { model: model/<slug>, year: <YYYY>, note: "<what it proved>" }   # the catalog has the record: its title is the name shown
+  - { name: "<Model>", year: <YYYY>, note: "<what it proved>" }       # no record: the name as written
 resources:
   - { kind: blog, title: "<title>", url: "<url>" }   # kind: paper | blog | video | course | tutorial
 learn_first:
-  - { label: "<prereq concept>", href: "<internal or external href>", tag: "<Math | Concept | Architecture>" }
+  - { label: "<prerequisite>", id: architecture-era/<slug>, tag: Architecture }   # a record: the consumer links to its page
+  - { label: "<prerequisite with no record yet>", tag: "<Math | Concept>" }       # never a site route
 tags: [<tag>]
 updated: <YYYY-MM-DD>
 sources:

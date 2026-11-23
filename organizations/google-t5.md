@@ -2,7 +2,7 @@
 id: organization/google-t5
 type: organization
 slug: google-t5
-schema_version: 1.1
+schema_version: 3.1
 title: T5 community
 name: T5 community
 website: https://huggingface.co/google-t5

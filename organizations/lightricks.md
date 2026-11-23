@@ -2,7 +2,7 @@
 id: organization/lightricks
 type: organization
 slug: lightricks
-schema_version: 1.1
+schema_version: 3.1
 title: LTX.io
 name: LTX.io
 website: https://huggingface.co/Lightricks

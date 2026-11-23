@@ -2,7 +2,7 @@
 id: organization/timpal0l
 type: organization
 slug: timpal0l
-schema_version: 1.1
+schema_version: 3.1
 title: Tim
 name: Tim
 website: https://huggingface.co/timpal0l

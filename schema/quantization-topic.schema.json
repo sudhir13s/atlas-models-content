@@ -6,6 +6,7 @@
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "properties": {
     "type": { "const": "quantization-topic" },
+    "schema_version": { "const": 3.1 },
     "order": { "type": "integer", "minimum": 1, "description": "position of the page in the guide's reading order" },
     "summary": { "type": "string", "minLength": 1, "description": "one plain sentence saying what the page explains; printed under the title and on the page's card" },
     "visuals": {

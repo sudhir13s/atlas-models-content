@@ -2,7 +2,7 @@
 id: organization/iiiorg
 type: organization
 slug: iiiorg
-schema_version: 1.1
+schema_version: 3.1
 title: The Internet Integrity Initiative
 name: The Internet Integrity Initiative
 website: https://huggingface.co/iiiorg

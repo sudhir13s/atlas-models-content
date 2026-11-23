@@ -2,7 +2,7 @@
 id: organization/speridlabs
 type: organization
 slug: speridlabs
-schema_version: 1.1
+schema_version: 3.1
 title: speridlabs
 name: speridlabs
 website: https://huggingface.co/speridlabs

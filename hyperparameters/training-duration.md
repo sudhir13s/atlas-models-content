@@ -2,28 +2,35 @@
 id: hyperparameter/training-duration
 type: hyperparameter
 slug: training-duration
-schema_version: 2.2
-title: "Training Duration"
+schema_version: 3.1
+title: Training Duration
 name: max_steps
 context: training
 priority: 3
 importance: critical
-goals: [training, finetuning]
-models: [llm, vision, audio, diffusion, rl]
-range: "1,875 — 1,200,000 updates"
-controls: "How long a training run lasts, counted either in updates of the model (steps) or in full passes over the training data (epochs)."
+goals:
+- training
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+- rl
+range: 1,875 — 1,200,000 updates
+controls: How long a training run lasts, counted either in updates of the model (steps) or in full passes over the training data (epochs).
 effects:
   decrease:
-    - "The model is updated fewer times"
-    - "The run costs less time and compute"
-    - "The model sees less data, or sees each example fewer times"
-    - "The learning-rate schedule is squeezed into fewer updates"
+  - The model is updated fewer times
+  - The run costs less time and compute
+  - The model sees less data, or sees each example fewer times
+  - The learning-rate schedule is squeezed into fewer updates
   increase:
-    - "The model is updated more times"
-    - "The run costs more time and compute"
-    - "On a fixed dataset, every example is seen more often"
-    - "Training error keeps falling, but error on held-out data can start to rise"
-    - "The learning-rate schedule is stretched over more updates"
+  - The model is updated more times
+  - The run costs more time and compute
+  - On a fixed dataset, every example is seen more often
+  - Training error keeps falling, but error on held-out data can start to rise
+  - The learning-rate schedule is stretched over more updates
 scale:
   min: 100
   max: 10000000
@@ -31,79 +38,81 @@ scale:
   typical_max: 1200000
   spacing: log
 typical_values:
-  - setting: "QLoRA, fine-tuning LLaMA on the OASST1 dataset (batch of 16)"
-    value: "1,875"
-    source: "https://arxiv.org/abs/2305.14314"
-  - setting: "QLoRA, fine-tuning LLaMA 7B and 13B on the HH-RLHF dataset (batch of 16)"
-    value: "10,000"
-    source: "https://arxiv.org/abs/2305.14314"
-  - setting: "Original Transformer, base model, training from scratch (12 hours on 8 GPUs)"
-    value: "100,000"
-    source: "https://arxiv.org/abs/1706.03762"
-  - setting: "Original Transformer, big model, training from scratch (3.5 days)"
-    value: "300,000"
-    source: "https://arxiv.org/abs/1706.03762"
-  - setting: "BERT, training from scratch (about 40 epochs over its 3.3 billion word corpus)"
-    value: "1,000,000"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "Llama 3 405B, training from scratch: length of its learning-rate schedule"
-    value: "1,200,000"
-    source: "https://arxiv.org/abs/2407.21783"
+- setting: QLoRA, fine-tuning LLaMA on the OASST1 dataset (batch of 16)
+  value: 1,875
+  source: https://arxiv.org/abs/2305.14314
+- setting: QLoRA, fine-tuning LLaMA 7B and 13B on the HH-RLHF dataset (batch of 16)
+  value: 10,000
+  source: https://arxiv.org/abs/2305.14314
+- setting: Original Transformer, base model, training from scratch (12 hours on 8 GPUs)
+  value: 100,000
+  source: https://arxiv.org/abs/1706.03762
+- setting: Original Transformer, big model, training from scratch (3.5 days)
+  value: 300,000
+  source: https://arxiv.org/abs/1706.03762
+- setting: BERT, training from scratch (about 40 epochs over its 3.3 billion word corpus)
+  value: 1,000,000
+  source: https://arxiv.org/abs/1810.04805
+- setting: 'Llama 3 405B, training from scratch: length of its learning-rate schedule'
+  value: 1,200,000
+  source: https://arxiv.org/abs/2407.21783
 mistakes:
-  - mistake: "Setting max_steps and num_train_epochs together and expecting the epochs to count"
-    why: >-
-      In Hugging Face Transformers a positive `max_steps` **overrides** `num_train_epochs`. The
-      `Trainer` logs "max_steps is given, it will override any value given in num_train_epochs"
-      and carries on.
-    fix: >-
-      Set one of the two. Leave `max_steps` at its default of -1 to train by epochs, or set it to
-      a positive number to train by updates.
-  - mistake: "Leaving max_steps unset with a streaming dataset"
-    why: >-
-      A streaming dataset has no known length, so the number of updates in an epoch cannot be
-      worked out. The `Trainer` raises a `ValueError`: the total number of steps must be known in
-      advance to bound the training loop and to configure the learning-rate scheduler.
-    fix: >-
-      Set `max_steps` to a positive number whenever the dataset cannot report its length.
-  - mistake: "Changing the batch size or the accumulation steps and keeping the same max_steps"
-    why: >-
-      A step is **one update**, and the data consumed by one update is the effective batch. The
-      `Trainer` computes the examples seen as `max_steps` × total train batch size. Double the
-      effective batch and the same `max_steps` reads twice as much data and costs about twice
-      the compute.
-    fix: >-
-      Decide the length in examples (or epochs, or tokens) first, then divide by the effective
-      batch to get the number of updates.
-  - mistake: "Copying a number of epochs from a different setup"
-    why: >-
-      Published values differ by more than a factor of ten. The BERT paper fine-tunes for 2, 3
-      or 4 epochs; the LoRA paper trains its RoBERTa-base adapters for 25 to 80 epochs depending
-      on the task, and its GPT-3 adapters for 2.
-    fix: >-
-      Take the value from a source that matches your model, method and data size, and check it
-      against the error on held-out data.
-  - mistake: "Changing the run length without looking at the learning-rate schedule"
-    why: >-
-      The `Trainer` builds the schedule from the total number of updates. A schedule that falls
-      to zero does so at the **last** update, whatever that number is, so a longer or shorter
-      run changes the learning rate at every point in between.
-    fix: >-
-      Look at the schedule again after changing the length. See the learning rate warmup and
-      schedule page.
-tags: [training, compute-budget, epochs]
-updated: 2026-11-23
-related: [hyperparameter/effective-batch-size, hyperparameter/gradient-accumulation, hyperparameter/lr-warmup-schedule, hyperparameter/learning-rate]
+- mistake: Setting max_steps and num_train_epochs together and expecting the epochs to count
+  why: In Hugging Face Transformers a positive `max_steps` **overrides** `num_train_epochs`. The `Trainer` logs "max_steps is given, it will override any value given in num_train_epochs" and carries on.
+  fix: Set one of the two. Leave `max_steps` at its default of -1 to train by epochs, or set it to a positive number to train by updates.
+- mistake: Leaving max_steps unset with a streaming dataset
+  why: 'A streaming dataset has no known length, so the number of updates in an epoch cannot be worked out. The `Trainer` raises a `ValueError`: the total number of steps must be known in advance to bound the training loop and to configure the learning-rate scheduler.'
+  fix: Set `max_steps` to a positive number whenever the dataset cannot report its length.
+- mistake: Changing the batch size or the accumulation steps and keeping the same max_steps
+  why: A step is **one update**, and the data consumed by one update is the effective batch. The `Trainer` computes the examples seen as `max_steps` × total train batch size. Double the effective batch and the same `max_steps` reads twice as much data and costs about twice the compute.
+  fix: Decide the length in examples (or epochs, or tokens) first, then divide by the effective batch to get the number of updates.
+- mistake: Copying a number of epochs from a different setup
+  why: Published values differ by more than a factor of ten. The BERT paper fine-tunes for 2, 3 or 4 epochs; the LoRA paper trains its RoBERTa-base adapters for 25 to 80 epochs depending on the task, and its GPT-3 adapters for 2.
+  fix: Take the value from a source that matches your model, method and data size, and check it against the error on held-out data.
+- mistake: Changing the run length without looking at the learning-rate schedule
+  why: The `Trainer` builds the schedule from the total number of updates. A schedule that falls to zero does so at the **last** update, whatever that number is, so a longer or shorter run changes the learning rate at every point in between.
+  fix: Look at the schedule again after changing the length. See the learning rate warmup and schedule page.
+tags:
+- training
+- compute-budget
+- epochs
+updated: '2026-11-23'
+related:
+- hyperparameter/effective-batch-size
+- hyperparameter/gradient-accumulation
+- hyperparameter/lr-warmup-schedule
+- hyperparameter/learning-rate
 sources:
-  - { url: "https://huggingface.co/docs/transformers/main_classes/trainer", title: "Hugging Face Transformers documentation: Trainer and TrainingArguments", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py", title: "Hugging Face Transformers source: training_args.py (defaults and descriptions)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/trainer.py", title: "Hugging Face Transformers source: trainer.py (how the number of steps is worked out)", trust: 0.9 }
-  - { url: "https://www.deeplearningbook.org/contents/regularization.html", title: "Deep Learning (Goodfellow, Bengio, Courville), chapter 7: Regularization (section 7.8, Early Stopping)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2106.09685", title: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2305.14314", title: "QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)", trust: 0.9 }
+- url: https://huggingface.co/docs/transformers/main_classes/trainer
+  title: 'Hugging Face Transformers documentation: Trainer and TrainingArguments'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+  title: 'Hugging Face Transformers source: training_args.py (defaults and descriptions)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/trainer.py
+  title: 'Hugging Face Transformers source: trainer.py (how the number of steps is worked out)'
+  trust: 0.9
+- url: https://www.deeplearningbook.org/contents/regularization.html
+  title: 'Deep Learning (Goodfellow, Bengio, Courville), chapter 7: Regularization (section 7.8, Early Stopping)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models (2024)
+  trust: 0.9
+- url: https://arxiv.org/abs/2106.09685
+  title: 'LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2305.14314
+  title: 'QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)'
+  trust: 0.9
 ---
 
 ## Definition

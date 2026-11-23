@@ -2,7 +2,7 @@
 id: organization/baai
 type: organization
 slug: baai
-schema_version: 1.1
+schema_version: 3.1
 title: Beijing Academy of Artificial Intelligence
 name: Beijing Academy of Artificial Intelligence
 website: https://huggingface.co/BAAI

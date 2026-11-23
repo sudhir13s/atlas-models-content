@@ -2,7 +2,7 @@
 id: organization/<slug>
 type: organization
 slug: <slug>
-schema_version: 1.1
+schema_version: 3.1              # the schema's current version; the schema refuses any other
 title: "<Organization Name>"
 name: "<Organization Name>"
 kind: company                    # lab | company | foundation | community

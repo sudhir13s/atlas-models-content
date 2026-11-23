@@ -2,7 +2,7 @@
 id: task/<slug>
 type: task
 slug: <slug>
-schema_version: 1.0
+schema_version: 3.1              # the schema's current version; the schema refuses any other
 title: "<Task Name>"
 group: task-group/<slug>
 parent: task/<slug>             # optional: only for a narrower task under a broader one

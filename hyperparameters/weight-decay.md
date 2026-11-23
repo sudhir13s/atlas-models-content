@@ -2,26 +2,33 @@
 id: hyperparameter/weight-decay
 type: hyperparameter
 slug: weight-decay
-schema_version: 2.2
-title: "Weight Decay"
+schema_version: 3.1
+title: Weight Decay
 name: weight_decay
 context: training
 priority: 8
 importance: important
-goals: [training, finetuning]
-models: [llm, vision, audio, diffusion, rl]
-range: "0 — 0.3"
-controls: "How strongly every weight of a model is pulled back toward zero at each training update: zero means no pull, larger values shrink the weights faster."
+goals:
+- training
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+- rl
+range: 0 — 0.3
+controls: 'How strongly every weight of a model is pulled back toward zero at each training update: zero means no pull, larger values shrink the weights faster.'
 effects:
   decrease:
-    - "Each update shrinks the weights by a smaller share"
-    - "Weights are freer to grow large"
-    - "At 0 the pull toward zero is switched off"
+  - Each update shrinks the weights by a smaller share
+  - Weights are freer to grow large
+  - At 0 the pull toward zero is switched off
   increase:
-    - "Each update shrinks the weights by a larger share"
-    - "Weights stay smaller"
-    - "A weight the training data stops pushing fades toward zero sooner"
-    - "Stronger regularization: the model is held back more from fitting the training data exactly"
+  - Each update shrinks the weights by a larger share
+  - Weights stay smaller
+  - A weight the training data stops pushing fades toward zero sooner
+  - 'Stronger regularization: the model is held back more from fitting the training data exactly'
 scale:
   min: 0
   max: 0.5
@@ -29,78 +36,81 @@ scale:
   typical_max: 0.3
   spacing: linear
 typical_values:
-  - setting: "Hugging Face Transformers: default of TrainingArguments (no weight decay)"
-    value: "0.0"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py"
-  - setting: "PyTorch: default of the AdamW optimizer"
-    value: "0.01"
-    source: "https://github.com/pytorch/pytorch/blob/main/torch/optim/adamw.py"
-  - setting: "BERT, training from scratch (Adam optimizer, written as L2 weight decay)"
-    value: "0.01"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "GPT-3, training from scratch, all model sizes"
-    value: "0.1"
-    source: "https://arxiv.org/abs/2005.14165"
-  - setting: "LLaMA, training from scratch (AdamW optimizer)"
-    value: "0.1"
-    source: "https://arxiv.org/abs/2302.13971"
-  - setting: "Vision Transformer, training from scratch on ImageNet (its smallest training set)"
-    value: "0.3"
-    source: "https://arxiv.org/abs/2010.11929"
+- setting: 'Hugging Face Transformers: default of TrainingArguments (no weight decay)'
+  value: '0.0'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+- setting: 'PyTorch: default of the AdamW optimizer'
+  value: '0.01'
+  source: https://github.com/pytorch/pytorch/blob/main/torch/optim/adamw.py
+- setting: BERT, training from scratch (Adam optimizer, written as L2 weight decay)
+  value: '0.01'
+  source: https://arxiv.org/abs/1810.04805
+- setting: GPT-3, training from scratch, all model sizes
+  value: '0.1'
+  source: https://arxiv.org/abs/2005.14165
+- setting: LLaMA, training from scratch (AdamW optimizer)
+  value: '0.1'
+  source: https://arxiv.org/abs/2302.13971
+- setting: Vision Transformer, training from scratch on ImageNet (its smallest training set)
+  value: '0.3'
+  source: https://arxiv.org/abs/2010.11929
 mistakes:
-  - mistake: "Passing weight_decay to Adam and expecting the behaviour of AdamW"
-    why: >-
-      In PyTorch, `torch.optim.Adam(weight_decay=...)` adds the weight to the **gradient**
-      (an L2 penalty), while `torch.optim.AdamW` shrinks the **weight itself**. Loshchilov and
-      Hutter prove that the two are **not equivalent** for Adam: Adam rescales every gradient,
-      and the penalty gets rescaled with it. Part C of the worked example shows a case where the
-      L2 form moves the weight by the same amount whether the setting is 0.1 or 0.01.
-    fix: >-
-      Use `torch.optim.AdamW`, or `torch.optim.Adam(..., decoupled_weight_decay=True)`. The
-      default optimizer of Hugging Face `TrainingArguments` is already AdamW.
-  - mistake: "Assuming some weight decay is applied when none was set"
-    why: >-
-      The defaults disagree. PyTorch's AdamW defaults to **0.01**, but Hugging Face
-      `TrainingArguments` defaults to **0.0** and the Trainer passes its own value to the
-      optimizer, so a Trainer run that never sets `weight_decay` trains with **no decay**. PyTorch's
-      plain Adam also defaults to 0.
-    fix: >-
-      Set `weight_decay` explicitly and record it. The published values in the table on this page
-      are 0.01 (BERT, RoBERTa) and 0.1 (GPT-3, LLaMA).
-  - mistake: "Copying a weight decay value without the learning rate and run length it was used with"
-    why: >-
-      In PyTorch's AdamW each update multiplies a weight by **1 − learning rate × weight decay**,
-      so the same setting pulls ten times more weakly at a ten times smaller learning rate. The
-      AdamW paper also found that the best value depends on the length of the run: the more passes
-      over the data, the **smaller** the weight decay should be.
-    fix: >-
-      Take the weight decay together with the learning rate, schedule and number of updates of the
-      source, and treat it as a starting point to test when any of those change. The AdamW paper
-      proposes a "normalized weight decay" that divides out the run length.
-  - mistake: "Building the optimizer by hand and decaying every parameter"
-    why: >-
-      The Hugging Face Trainer does **not** decay everything: it puts biases and normalization-layer
-      parameters (names containing `bias`, `layernorm`, `rmsnorm` or `norm`) in a second group with
-      weight decay 0.0. `torch.optim.AdamW(model.parameters(), ...)` has no such rule and decays
-      **all** parameters, so the same number gives a different run.
-    fix: >-
-      Pass two parameter groups to the optimizer, as the Trainer does: one with the chosen weight
-      decay and one, holding biases and normalization parameters, with `weight_decay: 0.0`.
-tags: [training, regularization, adamw]
-updated: 2026-11-23
-related: [hyperparameter/learning-rate, hyperparameter/dropout, hyperparameter/training-duration, hyperparameter/adam-beta2]
+- mistake: Passing weight_decay to Adam and expecting the behaviour of AdamW
+  why: 'In PyTorch, `torch.optim.Adam(weight_decay=...)` adds the weight to the **gradient** (an L2 penalty), while `torch.optim.AdamW` shrinks the **weight itself**. Loshchilov and Hutter prove that the two are **not equivalent** for Adam: Adam rescales every gradient, and the penalty gets rescaled with it. Part C of the worked example shows a case where the L2 form moves the weight by the same amount whether the setting is 0.1 or 0.01.'
+  fix: Use `torch.optim.AdamW`, or `torch.optim.Adam(..., decoupled_weight_decay=True)`. The default optimizer of Hugging Face `TrainingArguments` is already AdamW.
+- mistake: Assuming some weight decay is applied when none was set
+  why: The defaults disagree. PyTorch's AdamW defaults to **0.01**, but Hugging Face `TrainingArguments` defaults to **0.0** and the Trainer passes its own value to the optimizer, so a Trainer run that never sets `weight_decay` trains with **no decay**. PyTorch's plain Adam also defaults to 0.
+  fix: Set `weight_decay` explicitly and record it. The published values in the table on this page are 0.01 (BERT, RoBERTa) and 0.1 (GPT-3, LLaMA).
+- mistake: Copying a weight decay value without the learning rate and run length it was used with
+  why: 'In PyTorch''s AdamW each update multiplies a weight by **1 − learning rate × weight decay**, so the same setting pulls ten times more weakly at a ten times smaller learning rate. The AdamW paper also found that the best value depends on the length of the run: the more passes over the data, the **smaller** the weight decay should be.'
+  fix: Take the weight decay together with the learning rate, schedule and number of updates of the source, and treat it as a starting point to test when any of those change. The AdamW paper proposes a "normalized weight decay" that divides out the run length.
+- mistake: Building the optimizer by hand and decaying every parameter
+  why: 'The Hugging Face Trainer does **not** decay everything: it puts biases and normalization-layer parameters (names containing `bias`, `layernorm`, `rmsnorm` or `norm`) in a second group with weight decay 0.0. `torch.optim.AdamW(model.parameters(), ...)` has no such rule and decays **all** parameters, so the same number gives a different run.'
+  fix: 'Pass two parameter groups to the optimizer, as the Trainer does: one with the chosen weight decay and one, holding biases and normalization parameters, with `weight_decay: 0.0`.'
+tags:
+- training
+- regularization
+- adamw
+updated: '2026-11-23'
+related:
+- hyperparameter/learning-rate
+- hyperparameter/dropout
+- hyperparameter/training-duration
+- hyperparameter/adam-beta2
 sources:
-  - { url: "https://arxiv.org/abs/1711.05101", title: "Decoupled Weight Decay Regularization (Loshchilov and Hutter, 2019), the AdamW paper", trust: 0.9 }
-  - { url: "https://github.com/pytorch/pytorch/blob/main/torch/optim/adamw.py", title: "PyTorch source: torch/optim/adamw.py (AdamW defaults and algorithm)", trust: 0.9 }
-  - { url: "https://github.com/pytorch/pytorch/blob/main/torch/optim/adam.py", title: "PyTorch source: torch/optim/adam.py (Adam defaults, L2 penalty and decoupled decay code)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py", title: "Hugging Face Transformers source: training_args.py (TrainingArguments defaults)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/trainer.py", title: "Hugging Face Transformers source: trainer.py (parameter groups with and without weight decay)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1907.11692", title: "RoBERTa: A Robustly Optimized BERT Pretraining Approach (Liu et al., 2019)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2005.14165", title: "Language Models are Few-Shot Learners (Brown et al., 2020), the GPT-3 paper", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2010.11929", title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020), the Vision Transformer paper", trust: 0.9 }
+- url: https://arxiv.org/abs/1711.05101
+  title: Decoupled Weight Decay Regularization (Loshchilov and Hutter, 2019), the AdamW paper
+  trust: 0.9
+- url: https://github.com/pytorch/pytorch/blob/main/torch/optim/adamw.py
+  title: 'PyTorch source: torch/optim/adamw.py (AdamW defaults and algorithm)'
+  trust: 0.9
+- url: https://github.com/pytorch/pytorch/blob/main/torch/optim/adam.py
+  title: 'PyTorch source: torch/optim/adam.py (Adam defaults, L2 penalty and decoupled decay code)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+  title: 'Hugging Face Transformers source: training_args.py (TrainingArguments defaults)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/trainer.py
+  title: 'Hugging Face Transformers source: trainer.py (parameter groups with and without weight decay)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1907.11692
+  title: 'RoBERTa: A Robustly Optimized BERT Pretraining Approach (Liu et al., 2019)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2005.14165
+  title: Language Models are Few-Shot Learners (Brown et al., 2020), the GPT-3 paper
+  trust: 0.9
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models (2024)
+  trust: 0.9
+- url: https://arxiv.org/abs/2010.11929
+  title: 'An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020), the Vision Transformer paper'
+  trust: 0.9
 ---
 
 ## Definition

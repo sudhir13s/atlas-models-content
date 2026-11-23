@@ -2,38 +2,117 @@
 id: parameter-calculator/rnn-lstm
 type: parameter-calculator
 slug: rnn-lstm
-schema_version: 1.0
-title: "Recurrent Network / LSTM Parameters"
+schema_version: 3.1
+title: Recurrent Network / LSTM Parameters
 arch: rnn
 order: 5
 color_key: rnn
 components:
-  - { name: "hidden_size (h)", rank: 1, importance: critical, badge: "Per Layer", formula: "params ≈ 4 × (h² + h·input + h); the h² term dominates", range: "128 → 2048" }
-  - { name: "input_size (x)", rank: 2, importance: critical, badge: "Per Layer", formula: "each gate has an h × input weight block", range: "embedding / feature dim" }
-  - { name: "gate count (LSTM = 4, GRU = 3, RNN = 1)", rank: 3, importance: architectural, badge: "Per Layer", formula: "flat multiplier on the whole layer", range: "1 → 4" }
-  - { name: "input gate (i): W_ii, W_hi, b_i", rank: 4, importance: important, badge: "Per Gate", formula: "h·x + h·h + h", range: "≈ h(x+h)" }
-  - { name: "forget gate (f): W_if, W_hf, b_f", rank: 5, importance: important, badge: "Per Gate", formula: "h·x + h·h + h", range: "≈ h(x+h)" }
-  - { name: "cell/candidate gate (g): W_ig, W_hg, b_g", rank: 6, importance: important, badge: "Per Gate", formula: "h·x + h·h + h", range: "≈ h(x+h)" }
-  - { name: "output gate (o): W_io, W_ho, b_o", rank: 7, importance: important, badge: "Per Gate", formula: "h·x + h·h + h", range: "≈ h(x+h)" }
-  - { name: "gate biases", rank: 8, importance: optional, badge: "Per Gate", formula: "h per gate (PyTorch stores 2 bias vectors → 2h)", range: "4h or 8h" }
-  - { name: "num_layers (stacked depth)", rank: 9, importance: important, badge: "Structure", formula: "layer 2+ take input_size = hidden_size", range: "1 → 4" }
-  - { name: "token embedding table", rank: 10, importance: important, badge: "Embedding", formula: "vocab × input_size (when inputs are tokens)", range: "V·x" }
-  - { name: "output projection (head)", rank: 11, importance: important, badge: "Head", formula: "hidden × n_out + n_out", range: "task-dependent" }
-  - { name: "bidirectional", rank: 12, importance: optional, badge: "Structure", formula: "doubles params (a forward and a backward RNN)", range: "1× or 2×" }
+- name: hidden_size (h)
+  rank: 1
+  importance: critical
+  badge: Per Layer
+  formula: params ≈ 4 × (h² + h·input + h); the h² term dominates
+  range: 128 → 2048
+- name: input_size (x)
+  rank: 2
+  importance: critical
+  badge: Per Layer
+  formula: each gate has an h × input weight block
+  range: embedding / feature dim
+- name: gate count (LSTM = 4, GRU = 3, RNN = 1)
+  rank: 3
+  importance: architectural
+  badge: Per Layer
+  formula: flat multiplier on the whole layer
+  range: 1 → 4
+- name: 'input gate (i): W_ii, W_hi, b_i'
+  rank: 4
+  importance: important
+  badge: Per Gate
+  formula: h·x + h·h + h
+  range: ≈ h(x+h)
+- name: 'forget gate (f): W_if, W_hf, b_f'
+  rank: 5
+  importance: important
+  badge: Per Gate
+  formula: h·x + h·h + h
+  range: ≈ h(x+h)
+- name: 'cell/candidate gate (g): W_ig, W_hg, b_g'
+  rank: 6
+  importance: important
+  badge: Per Gate
+  formula: h·x + h·h + h
+  range: ≈ h(x+h)
+- name: 'output gate (o): W_io, W_ho, b_o'
+  rank: 7
+  importance: important
+  badge: Per Gate
+  formula: h·x + h·h + h
+  range: ≈ h(x+h)
+- name: gate biases
+  rank: 8
+  importance: optional
+  badge: Per Gate
+  formula: h per gate (PyTorch stores 2 bias vectors → 2h)
+  range: 4h or 8h
+- name: num_layers (stacked depth)
+  rank: 9
+  importance: important
+  badge: Structure
+  formula: layer 2+ take input_size = hidden_size
+  range: 1 → 4
+- name: token embedding table
+  rank: 10
+  importance: important
+  badge: Embedding
+  formula: vocab × input_size (when inputs are tokens)
+  range: V·x
+- name: output projection (head)
+  rank: 11
+  importance: important
+  badge: Head
+  formula: hidden × n_out + n_out
+  range: task-dependent
+- name: bidirectional
+  rank: 12
+  importance: optional
+  badge: Structure
+  formula: doubles params (a forward and a backward RNN)
+  range: 1× or 2×
 worked_example:
-  label: "Single LSTM layer (input 100, hidden 256)"
-  config: { inputSize: 100, hiddenSize: 256, gates: 4, numLayers: 1, bidirectional: false, bias: true }
+  label: Single LSTM layer (input 100, hidden 256)
+  config:
+    inputSize: 100
+    hiddenSize: 256
+    gates: 4
+    num_layers: 1
+    bidirectional: false
+    bias: true
   sources:
-    - { url: "https://www.bioinf.jku.at/publications/older/2604.pdf", title: "Long Short-Term Memory (Hochreiter & Schmidhuber, 1997)", trust: 0.95 }
-tags: [rnn, lstm, recurrent, parameters]
-updated: 2026-07-17
+  - url: https://www.bioinf.jku.at/publications/older/2604.pdf
+    title: Long Short-Term Memory (Hochreiter & Schmidhuber, 1997)
+    trust: 0.95
+tags:
+- rnn
+- lstm
+- recurrent
+- parameters
+updated: '2026-07-17'
 sources:
-  - { url: "https://www.bioinf.jku.at/publications/older/2604.pdf", title: "Long Short-Term Memory (Hochreiter & Schmidhuber, 1997)", trust: 0.95 }
-  - { url: "https://colah.github.io/posts/2015-08-Understanding-LSTMs/", title: "Understanding LSTM Networks (Olah, 2015)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1412.3555", title: "Empirical Evaluation of Gated Recurrent Neural Networks (Chung et al., 2014)", trust: 0.9 }
+- url: https://www.bioinf.jku.at/publications/older/2604.pdf
+  title: Long Short-Term Memory (Hochreiter & Schmidhuber, 1997)
+  trust: 0.95
+- url: https://colah.github.io/posts/2015-08-Understanding-LSTMs/
+  title: Understanding LSTM Networks (Olah, 2015)
+  trust: 0.9
+- url: https://arxiv.org/abs/1412.3555
+  title: Empirical Evaluation of Gated Recurrent Neural Networks (Chung et al., 2014)
+  trust: 0.9
 ---
 
 ## Overview
+
 A recurrent layer processes a sequence one step at a time, maintaining a hidden state that carries
 information forward. Its parameter count is set entirely by two numbers — the input dimension and the
 hidden dimension — and by how many gate matrices the cell uses. A vanilla RNN has one, a GRU has
@@ -46,6 +125,7 @@ every timestep. This weight-sharing across time is the recurrent analogue of a C
 across space, and it is what lets an LSTM handle arbitrarily long sequences with a fixed budget.
 
 ## Components
+
 - **hidden_size (h)** is the dominant lever. Because each gate contains an `h × h` recurrent block,
   the count grows with `h²` — doubling the hidden size roughly quadruples the parameters.
 - **input_size (x)** contributes an `h × x` block per gate; for a stacked LSTM, layers beyond the
@@ -66,6 +146,7 @@ per gate, adding `4h` more; the single-bias form above is the standard textbook 
 replaces the 4 with 3; a vanilla RNN with 1.
 
 ## Worked Example
+
 A single LSTM layer with `input_size = 100`, `hidden_size = 256` (`config` above):
 
 $$P = 4 \times 256 \times (100 + 256 + 1) = 4 \times 256 \times 357 = \mathbf{365\,568}$$

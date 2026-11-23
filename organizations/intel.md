@@ -2,7 +2,7 @@
 id: organization/intel
 type: organization
 slug: intel
-schema_version: 1.1
+schema_version: 3.1
 title: Intel
 name: Intel
 website: https://huggingface.co/Intel

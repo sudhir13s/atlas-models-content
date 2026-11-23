@@ -2,23 +2,26 @@
 id: parameter/num-hidden-layers
 type: parameter
 slug: num-hidden-layers
-schema_version: 2.9
-title: "Number of Hidden Layers (Depth)"
+schema_version: 3.1
+title: Number of Hidden Layers (Depth)
 name: num_hidden_layers
 priority: 1
 importance: critical
-applies_to: [llm, transformer, moe]
-range: "6 — 126"
-controls: "How many transformer blocks are stacked one after another: the model's depth."
+applies_to:
+- llm
+- transformer
+- moe
+range: 6 — 126
+controls: 'How many transformer blocks are stacked one after another: the model''s depth.'
 effects:
   decrease:
-    - "Fewer parameters: the per-layer count is removed once for every layer taken away"
-    - "Less computation per token, which passes through fewer blocks"
-    - "In the original Transformer's tests, 2 layers scored 23.7 BLEU against 25.8 for 6"
+  - 'Fewer parameters: the per-layer count is removed once for every layer taken away'
+  - Less computation per token, which passes through fewer blocks
+  - In the original Transformer's tests, 2 layers scored 23.7 BLEU against 25.8 for 6
   increase:
-    - "More parameters, in a straight line: each layer adds the same count"
-    - "More computation per token"
-    - "In the original Transformer's tests, 8 layers scored 25.5 BLEU with 80 million parameters, against 25.8 for 6 with 65 million"
+  - 'More parameters, in a straight line: each layer adds the same count'
+  - More computation per token
+  - In the original Transformer's tests, 8 layers scored 25.5 BLEU with 80 million parameters, against 25.8 for 6 with 65 million
 scale:
   min: 1
   max: 256
@@ -26,69 +29,105 @@ scale:
   typical_max: 126
   spacing: log
 typical_values:
-  - setting: "Original Transformer, encoder and decoder each (Vaswani et al.)"
-    value: "6"
-    source: "https://arxiv.org/abs/1706.03762"
-  - setting: "BERT-base (config.json)"
-    value: "12"
-    source: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json"
-  - setting: "Qwen3-0.6B (config.json)"
-    value: "28"
-    source: "https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/config.json"
-  - setting: "Llama 3 8B (Llama 3 paper, Table 3)"
-    value: "32"
-    source: "https://arxiv.org/abs/2407.21783"
-  - setting: "Qwen3-8B (config.json)"
-    value: "36"
-    source: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json"
-  - setting: "Qwen3-32B (config.json)"
-    value: "64"
-    source: "https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json"
-  - setting: "Llama 3 70B (Llama 3 paper, Table 3)"
-    value: "80"
-    source: "https://arxiv.org/abs/2407.21783"
-  - setting: "Llama 3 405B (Llama 3 paper, Table 3)"
-    value: "126"
-    source: "https://arxiv.org/abs/2407.21783"
+- setting: Original Transformer, encoder and decoder each (Vaswani et al.)
+  value: '6'
+  source: https://arxiv.org/abs/1706.03762
+- setting: BERT-base (config.json)
+  value: '12'
+  source: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+- setting: Qwen3-0.6B (config.json)
+  value: '28'
+  source: https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/config.json
+- setting: Llama 3 8B (Llama 3 paper, Table 3)
+  value: '32'
+  source: https://arxiv.org/abs/2407.21783
+- setting: Qwen3-8B (config.json)
+  value: '36'
+  source: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+- setting: Qwen3-32B (config.json)
+  value: '64'
+  source: https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json
+- setting: Llama 3 70B (Llama 3 paper, Table 3)
+  value: '80'
+  source: https://arxiv.org/abs/2407.21783
+- setting: Llama 3 405B (Llama 3 paper, Table 3)
+  value: '126'
+  source: https://arxiv.org/abs/2407.21783
 mistakes:
-  - mistake: "Expecting half the layers to give half the parameters"
-    why: >-
-      The embedding table and the output head do not depend on depth. Qwen3-8B has **8,190,735,360**
-      parameters with 36 layers; with 18 layers the count is **4,717,699,584**, 58% of it, because
-      1,244,659,712 of them sit in the embedding and the head.
-    fix: "Subtract the embedding and head first; only the rest scales with the number of layers."
-  - mistake: "Reading depth as the measure of a model's ability"
-    why: >-
-      Kaplan et al. found loss depends **very weakly** on depth when the number of non-embedding
-      parameters is fixed; only models with fewer than 2 layers or extreme depth-to-width ratios
-      left the common trend.
-    fix: "Compare total or non-embedding parameter counts before comparing depth."
-  - mistake: "Counting the original Transformer as 6 layers in all"
-    why: >-
-      Vaswani et al. use **6 layers in the encoder and 6 in the decoder**. A decoder-only model such
-      as Qwen3 has one stack, and num_hidden_layers counts its blocks.
-    fix: "Check whether a model has one stack or two before comparing layer counts."
-related: [parameter/hidden-size, parameter/intermediate-size-ffn, parameter/vocab-size]
+- mistake: Expecting half the layers to give half the parameters
+  why: The embedding table and the output head do not depend on depth. Qwen3-8B has **8,190,735,360** parameters with 36 layers; with 18 layers the count is **4,717,699,584**, 58% of it, because 1,244,659,712 of them sit in the embedding and the head.
+  fix: Subtract the embedding and head first; only the rest scales with the number of layers.
+- mistake: Reading depth as the measure of a model's ability
+  why: Kaplan et al. found loss depends **very weakly** on depth when the number of non-embedding parameters is fixed; only models with fewer than 2 layers or extreme depth-to-width ratios left the common trend.
+  fix: Compare total or non-embedding parameter counts before comparing depth.
+- mistake: Counting the original Transformer as 6 layers in all
+  why: Vaswani et al. use **6 layers in the encoder and 6 in the decoder**. A decoder-only model such as Qwen3 has one stack, and num_hidden_layers counts its blocks.
+  fix: Check whether a model has one stack or two before comparing layer counts.
+related:
+- parameter/hidden-size
+- parameter/intermediate-size-ffn
+- parameter/vocab-size
 visual:
   kind: count_sweep
-  model: { name: "Qwen3-8B", vocab_size: 151936, hidden_size: 4096, intermediate_size: 12288, num_hidden_layers: 36, num_attention_heads: 32, num_key_value_heads: 8, head_dim: 128, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: true }
-  vary: num_hidden_layers
-  values: [12, 24, 36, 48, 64]
+  model:
+    name: Qwen3-8B
+    vocabulary_size: 151936
+    hidden_size: 4096
+    intermediate_size: 12288
+    num_layers: 36
+    attention_heads: 32
+    kv_heads: 8
+    head_size: 128
+    tie_word_embeddings: false
+    ffn_matrices: 3
+    qk_norm: true
+  vary: num_layers
+  values:
+  - 12
+  - 24
+  - 36
+  - 48
+  - 64
   measure: total
-  caption: "The total parameters of Qwen3-8B, computed from its config.json, if only num_hidden_layers changed. The model's own 36 layers are marked and give its published total; the other depths are not real Qwen3 models."
-tags: [llm, transformer, depth, structure, parameters]
-updated: 2026-11-23
+  caption: The total parameters of Qwen3-8B, computed from its config.json, if only num_hidden_layers changed. The model's own 36 layers are marked and give its published total; the other depths are not real Qwen3 models.
+tags:
+- llm
+- transformer
+- depth
+- structure
+- parameters
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json", title: "Qwen3-8B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B", title: "Qwen3-8B model card", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py", title: "Hugging Face Transformers source: modeling_qwen3.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py", title: "Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json", title: "Qwen3-32B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/config.json", title: "Qwen3-0.6B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json", title: "BERT-base uncased configuration (config.json)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (Llama Team, 2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2001.08361", title: "Scaling Laws for Neural Language Models (Kaplan et al., 2020)", trust: 0.9 }
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+  title: Qwen3-8B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-8B
+  title: Qwen3-8B model card
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py
+  title: 'Hugging Face Transformers source: modeling_qwen3.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py
+  title: 'Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)'
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-32B/blob/main/config.json
+  title: Qwen3-32B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/Qwen/Qwen3-0.6B/blob/main/config.json
+  title: Qwen3-0.6B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+  title: BERT-base uncased configuration (config.json)
+  trust: 0.95
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models (Llama Team, 2024)
+  trust: 0.9
+- url: https://arxiv.org/abs/2001.08361
+  title: Scaling Laws for Neural Language Models (Kaplan et al., 2020)
+  trust: 0.9
 ---
 
 ## Definition

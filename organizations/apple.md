@@ -2,7 +2,7 @@
 id: organization/apple
 type: organization
 slug: apple
-schema_version: 1.1
+schema_version: 3.1
 title: Apple
 name: Apple
 kind: company

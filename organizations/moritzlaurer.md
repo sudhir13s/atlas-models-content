@@ -2,7 +2,7 @@
 id: organization/moritzlaurer
 type: organization
 slug: moritzlaurer
-schema_version: 1.1
+schema_version: 3.1
 title: Moritz Borrett-Laurer (formerly Laurer)
 name: Moritz Borrett-Laurer (formerly Laurer)
 website: https://huggingface.co/MoritzLaurer

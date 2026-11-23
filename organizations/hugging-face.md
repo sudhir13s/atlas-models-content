@@ -2,7 +2,7 @@
 id: organization/hugging-face
 type: organization
 slug: hugging-face
-schema_version: 1.1
+schema_version: 3.1
 title: Hugging Face
 name: Hugging Face
 kind: company

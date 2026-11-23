@@ -2,7 +2,7 @@
 id: concept/gelu-gaussian-error-linear-unit
 type: concept
 slug: gelu-gaussian-error-linear-unit
-schema_version: 1.2
+schema_version: 3.1
 title: GELU (Gaussian Error Linear Unit)
 category: activation
 code: gelu

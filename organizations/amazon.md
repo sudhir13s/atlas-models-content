@@ -2,7 +2,7 @@
 id: organization/amazon
 type: organization
 slug: amazon
-schema_version: 1.1
+schema_version: 3.1
 title: Amazon
 name: Amazon
 website: https://huggingface.co/amazon

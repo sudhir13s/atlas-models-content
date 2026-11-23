@@ -2,27 +2,34 @@
 id: hyperparameter/lr-warmup-schedule
 type: hyperparameter
 slug: lr-warmup-schedule
-schema_version: 2.2
-title: "Learning Rate Warmup and Schedule"
+schema_version: 3.1
+title: Learning Rate Warmup and Schedule
 name: warmup_steps
 context: training
 priority: 4
 importance: critical
-goals: [training, finetuning]
-models: [llm, vision, audio, diffusion, rl]
-range: "0 — 30,000 updates"
-controls: "How many updates the learning rate takes to climb from zero to its highest value at the start of training (the warmup), and the shape of its fall after that (the schedule)."
+goals:
+- training
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+- rl
+range: 0 — 30,000 updates
+controls: How many updates the learning rate takes to climb from zero to its highest value at the start of training (the warmup), and the shape of its fall after that (the schedule).
 effects:
   decrease:
-    - "The learning rate reaches its peak after fewer updates"
-    - "The first updates are larger"
-    - "At 0 the first update already uses the full learning rate (the Hugging Face default)"
-    - "Goyal et al.: with no warmup, a batch of 8,192 images trained to a higher error"
+  - The learning rate reaches its peak after fewer updates
+  - The first updates are larger
+  - At 0 the first update already uses the full learning rate (the Hugging Face default)
+  - 'Goyal et al.: with no warmup, a batch of 8,192 images trained to a higher error'
   increase:
-    - "The learning rate takes more updates to reach its peak"
-    - "The first updates are smaller"
-    - "In a run of fixed length, the fall starts later and is steeper"
-    - "Longer than the run itself, and the peak is never reached"
+  - The learning rate takes more updates to reach its peak
+  - The first updates are smaller
+  - In a run of fixed length, the fall starts later and is steeper
+  - Longer than the run itself, and the peak is never reached
 scale:
   min: 0
   max: 40000
@@ -30,92 +37,107 @@ scale:
   typical_max: 30000
   spacing: linear
 typical_values:
-  - setting: "Hugging Face Transformers: default of TrainingArguments (no warmup)"
-    value: "0"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py"
-  - setting: "LLaMA, training from scratch, then a cosine fall to 10% of the peak"
-    value: "2,000"
-    source: "https://arxiv.org/abs/2302.13971"
-  - setting: "Original Transformer, of 100,000 updates for the base model"
-    value: "4,000"
-    source: "https://arxiv.org/abs/1706.03762"
-  - setting: "Llama 3 405B, of 1,200,000 updates, then a cosine fall to 8e-7"
-    value: "8,000"
-    source: "https://arxiv.org/abs/2407.21783"
-  - setting: "BERT, training from scratch, of 1,000,000 updates, then a straight-line fall"
-    value: "10,000"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "RoBERTa-large, training from scratch, of 500,000 updates, then a straight-line fall"
-    value: "30,000"
-    source: "https://arxiv.org/abs/1907.11692"
+- setting: 'Hugging Face Transformers: default of TrainingArguments (no warmup)'
+  value: '0'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+- setting: LLaMA, training from scratch, then a cosine fall to 10% of the peak
+  value: 2,000
+  source: https://arxiv.org/abs/2302.13971
+- setting: Original Transformer, of 100,000 updates for the base model
+  value: 4,000
+  source: https://arxiv.org/abs/1706.03762
+- setting: Llama 3 405B, of 1,200,000 updates, then a cosine fall to 8e-7
+  value: 8,000
+  source: https://arxiv.org/abs/2407.21783
+- setting: BERT, training from scratch, of 1,000,000 updates, then a straight-line fall
+  value: 10,000
+  source: https://arxiv.org/abs/1810.04805
+- setting: RoBERTa-large, training from scratch, of 500,000 updates, then a straight-line fall
+  value: 30,000
+  source: https://arxiv.org/abs/1907.11692
 mistakes:
-  - mistake: "Relying on the defaults and getting no warmup"
-    why: >-
-      Hugging Face `TrainingArguments` defaults to `warmup_steps=0` and `lr_scheduler_type="linear"`:
-      the run starts at the **full learning rate** and falls in a straight line to zero. Every model
-      in the table on this page used a warmup.
-    fix: >-
-      Set `warmup_steps` and `lr_scheduler_type` explicitly, taking both from the recipe you follow.
-  - mistake: "Writing 1.0 to mean the whole run, or using warmup_ratio on a current version"
-    why: >-
-      In the current Transformers source, `warmup_steps` is read as a **share of the run only when
-      it is below 1**; from 1 up it is a **count of updates**, so `warmup_steps=1.0` means a single
-      warmup update. Version 4.57 had a separate `warmup_ratio` argument; the current
-      `TrainingArguments` has none.
-    fix: >-
-      Write a share as a number below 1 (`warmup_steps=0.06` for 6%) and a count as a whole number
-      (`warmup_steps=500`). Check which arguments your installed version accepts.
-  - mistake: "Copying a warmup length from a run of a very different length"
-    why: >-
-      A count of updates means something only next to the length of its run: BERT's 10,000 warmup
-      updates are **1%** of its 1,000,000. In a fine-tuning run of 2,000 updates the same 10,000 would
-      be longer than the run, and in the Hugging Face schedules the learning rate would still be
-      rising when training stops.
-    fix: >-
-      Convert the source's warmup into a **share** of its run (the table under How It Works gives
-      them) and apply that share to your run, or use the share form of `warmup_steps`. RoBERTa
-      fine-tuned with a warmup of 6%.
-  - mistake: "Choosing \"cosine\" and expecting the learning rate to stop at a floor"
-    why: >-
-      In Hugging Face, `"cosine"` falls **all the way to zero**. LLaMA and GPT-3 stopped their cosine
-      fall at **10%** of the peak, and Llama 3 405B at 8e-7, one hundredth of its 8e-5 peak.
-    fix: >-
-      Use `lr_scheduler_type="cosine_with_min_lr"` with `lr_scheduler_kwargs={"min_lr_rate": 0.1}`
-      for a floor at 10% of the peak, as in the figure.
-  - mistake: "Warming up with a low constant learning rate instead of a gradual rise"
-    why: >-
-      Goyal et al. compared both at a batch of 8,192 images. A low constant rate for the first epochs
-      "is not sufficient", and switching from it to the full rate can make the training error jump:
-      the final validation error was **25.88%**, against **23.74%** with a gradual warmup and 24.84% with none.
-    fix: >-
-      Use a **gradual** (straight-line) warmup from zero, which is what every Hugging Face schedule
-      with a warmup does.
+- mistake: Relying on the defaults and getting no warmup
+  why: 'Hugging Face `TrainingArguments` defaults to `warmup_steps=0` and `lr_scheduler_type="linear"`: the run starts at the **full learning rate** and falls in a straight line to zero. Every model in the table on this page used a warmup.'
+  fix: Set `warmup_steps` and `lr_scheduler_type` explicitly, taking both from the recipe you follow.
+- mistake: Writing 1.0 to mean the whole run, or using warmup_ratio on a current version
+  why: In the current Transformers source, `warmup_steps` is read as a **share of the run only when it is below 1**; from 1 up it is a **count of updates**, so `warmup_steps=1.0` means a single warmup update. Version 4.57 had a separate `warmup_ratio` argument; the current `TrainingArguments` has none.
+  fix: Write a share as a number below 1 (`warmup_steps=0.06` for 6%) and a count as a whole number (`warmup_steps=500`). Check which arguments your installed version accepts.
+- mistake: Copying a warmup length from a run of a very different length
+  why: 'A count of updates means something only next to the length of its run: BERT''s 10,000 warmup updates are **1%** of its 1,000,000. In a fine-tuning run of 2,000 updates the same 10,000 would be longer than the run, and in the Hugging Face schedules the learning rate would still be rising when training stops.'
+  fix: Convert the source's warmup into a **share** of its run (the table under How It Works gives them) and apply that share to your run, or use the share form of `warmup_steps`. RoBERTa fine-tuned with a warmup of 6%.
+- mistake: Choosing "cosine" and expecting the learning rate to stop at a floor
+  why: In Hugging Face, `"cosine"` falls **all the way to zero**. LLaMA and GPT-3 stopped their cosine fall at **10%** of the peak, and Llama 3 405B at 8e-7, one hundredth of its 8e-5 peak.
+  fix: 'Use `lr_scheduler_type="cosine_with_min_lr"` with `lr_scheduler_kwargs={"min_lr_rate": 0.1}` for a floor at 10% of the peak, as in the figure.'
+- mistake: Warming up with a low constant learning rate instead of a gradual rise
+  why: 'Goyal et al. compared both at a batch of 8,192 images. A low constant rate for the first epochs "is not sufficient", and switching from it to the full rate can make the training error jump: the final validation error was **25.88%**, against **23.74%** with a gradual warmup and 24.84% with none.'
+  fix: Use a **gradual** (straight-line) warmup from zero, which is what every Hugging Face schedule with a warmup does.
 visual:
   kind: schedule
   peak: 0.0003
   warmup_steps: 200
   total_steps: 2000
   final_ratio: 0.1
-  curves: [linear, cosine, inverse_sqrt]
-  marks: [100, 200, 650, 1100, 2000]
-  caption: "The learning rate at every update of a 2,000-update run, for three schedules of Hugging Face Transformers. Each rises in a straight line to 3e-4 (the peak LLaMA reports for its 6.7 billion parameter model) over the first 200 updates. The cosine curve stops at 10% of the peak, as LLaMA's did (\"cosine_with_min_lr\" with min_lr_rate 0.1). The run length and the warmup length are example values chosen so the warmup is visible. The marked updates are the ones the worked example computes."
-tags: [training, learning-rate, scheduler, warmup]
-updated: 2026-11-23
-related: [hyperparameter/learning-rate, hyperparameter/effective-batch-size, hyperparameter/training-duration]
+  curves:
+  - linear
+  - cosine
+  - inverse_sqrt
+  marks:
+  - 100
+  - 200
+  - 650
+  - 1100
+  - 2000
+  caption: The learning rate at every update of a 2,000-update run, for three schedules of Hugging Face Transformers. Each rises in a straight line to 3e-4 (the peak LLaMA reports for its 6.7 billion parameter model) over the first 200 updates. The cosine curve stops at 10% of the peak, as LLaMA's did ("cosine_with_min_lr" with min_lr_rate 0.1). The run length and the warmup length are example values chosen so the warmup is visible. The marked updates are the ones the worked example computes.
+tags:
+- training
+- learning-rate
+- scheduler
+- warmup
+updated: '2026-11-23'
+related:
+- hyperparameter/learning-rate
+- hyperparameter/effective-batch-size
+- hyperparameter/training-duration
 sources:
-  - { url: "https://arxiv.org/abs/1706.02677", title: "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour (Goyal et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1608.03983", title: "SGDR: Stochastic Gradient Descent with Warm Restarts (Loshchilov and Hutter, 2017)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/optimization.py", title: "Hugging Face Transformers source: optimization.py (schedule formulas)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py", title: "Hugging Face Transformers source: training_args.py (warmup_steps and lr_scheduler_type)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/v4.57.0/src/transformers/training_args.py", title: "Hugging Face Transformers v4.57.0 source: training_args.py (warmup_ratio)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/trainer_utils.py", title: "Hugging Face Transformers source: trainer_utils.py (SchedulerType names)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1907.11692", title: "RoBERTa: A Robustly Optimized BERT Pretraining Approach (Liu et al., 2019)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2005.14165", title: "Language Models are Few-Shot Learners (Brown et al., 2020), the GPT-3 paper", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2010.11929", title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020), the Vision Transformer paper", trust: 0.9 }
+- url: https://arxiv.org/abs/1706.02677
+  title: 'Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour (Goyal et al., 2017)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/1608.03983
+  title: 'SGDR: Stochastic Gradient Descent with Warm Restarts (Loshchilov and Hutter, 2017)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/optimization.py
+  title: 'Hugging Face Transformers source: optimization.py (schedule formulas)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+  title: 'Hugging Face Transformers source: training_args.py (warmup_steps and lr_scheduler_type)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/v4.57.0/src/transformers/training_args.py
+  title: 'Hugging Face Transformers v4.57.0 source: training_args.py (warmup_ratio)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/trainer_utils.py
+  title: 'Hugging Face Transformers source: trainer_utils.py (SchedulerType names)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1907.11692
+  title: 'RoBERTa: A Robustly Optimized BERT Pretraining Approach (Liu et al., 2019)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2005.14165
+  title: Language Models are Few-Shot Learners (Brown et al., 2020), the GPT-3 paper
+  trust: 0.9
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models (2024)
+  trust: 0.9
+- url: https://arxiv.org/abs/2010.11929
+  title: 'An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020), the Vision Transformer paper'
+  trust: 0.9
 ---
 
 ## Definition

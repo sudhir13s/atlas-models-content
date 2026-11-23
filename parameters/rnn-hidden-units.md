@@ -2,22 +2,23 @@
 id: parameter/rnn-hidden-units
 type: parameter
 slug: rnn-hidden-units
-schema_version: 2.9
-title: "Hidden Units (hidden_size)"
+schema_version: 3.1
+title: Hidden Units (hidden_size)
 name: hidden_size
 priority: 1
 importance: critical
-applies_to: [rnn]
-range: "6 — 1,000"
-controls: "How many numbers the recurrent state holds: the size of the vector each layer carries from one step of the sequence to the next."
+applies_to:
+- rnn
+range: 6 — 1,000
+controls: 'How many numbers the recurrent state holds: the size of the vector each layer carries from one step of the sequence to the next.'
 effects:
   decrease:
-    - "Fewer parameters: each weight block holds hidden × (input + hidden) weights"
-    - "A smaller state to carry information from step to step"
-    - "At equal parameter budgets, Chung et al. used 36 LSTM units against 100 plain tanh units"
+  - 'Fewer parameters: each weight block holds hidden × (input + hidden) weights'
+  - A smaller state to carry information from step to step
+  - At equal parameter budgets, Chung et al. used 36 LSTM units against 100 plain tanh units
   increase:
-    - "Parameters grow faster than in a straight line because of the hidden × hidden part: for an LSTM layer reading 1,000 numbers, 8,000,000 weights at 1,000 units, 24,000,000 at 2,000"
-    - "A larger state: Sutskever et al.'s 4 layers of 1,000 cells represent a sentence with 8,000 numbers"
+  - 'Parameters grow faster than in a straight line because of the hidden × hidden part: for an LSTM layer reading 1,000 numbers, 8,000,000 weights at 1,000 units, 24,000,000 at 2,000'
+  - 'A larger state: Sutskever et al.''s 4 layers of 1,000 cells represent a sentence with 8,000 numbers'
 scale:
   min: 4
   max: 4096
@@ -25,63 +26,82 @@ scale:
   typical_max: 1000
   spacing: log
 typical_values:
-  - setting: "LSTM 1997, Experiment 1: 3 memory cell blocks of 2 cells (Hochreiter and Schmidhuber)"
-    value: "6"
-    source: "http://www.bioinf.jku.at/publications/older/2604.pdf"
-  - setting: "Chung et al., LSTM for music modelling, about 19,800 parameters"
-    value: "36"
-    source: "https://arxiv.org/abs/1412.3555"
-  - setting: "Chung et al., LSTM for speech signal modelling, about 169,100 parameters"
-    value: "195"
-    source: "https://arxiv.org/abs/1412.3555"
-  - setting: "Cho et al., encoder of the RNN Encoder–Decoder (gated units)"
-    value: "1000"
-    source: "https://arxiv.org/abs/1406.1078"
-  - setting: "Sutskever et al., each of 4 LSTM layers"
-    value: "1000"
-    source: "https://arxiv.org/abs/1409.3215"
+- setting: 'LSTM 1997, Experiment 1: 3 memory cell blocks of 2 cells (Hochreiter and Schmidhuber)'
+  value: '6'
+  source: http://www.bioinf.jku.at/publications/older/2604.pdf
+- setting: Chung et al., LSTM for music modelling, about 19,800 parameters
+  value: '36'
+  source: https://arxiv.org/abs/1412.3555
+- setting: Chung et al., LSTM for speech signal modelling, about 169,100 parameters
+  value: '195'
+  source: https://arxiv.org/abs/1412.3555
+- setting: Cho et al., encoder of the RNN Encoder–Decoder (gated units)
+  value: '1000'
+  source: https://arxiv.org/abs/1406.1078
+- setting: Sutskever et al., each of 4 LSTM layers
+  value: '1000'
+  source: https://arxiv.org/abs/1409.3215
 mistakes:
-  - mistake: "Assuming that doubling hidden_size quadruples the layer"
-    why: >-
-      Only the hidden × hidden part grows four-fold; the hidden × input part doubles. For an LSTM layer
-      reading 1,000 numbers, 1,000 units have **8,000,000** weights and 2,000 units **24,000,000**: three
-      times, not four.
-    fix: "Compute blocks × hidden × (input + hidden), as in the figure."
-  - mistake: "Comparing cells at the same hidden_size as if they cost the same"
-    why: >-
-      Chung et al. matched parameters, not units: about 20,000 parameters meant **36** LSTM units,
-      **46** GRU units or **100** tanh units for music; about 169,000 meant 195, 227 and 400 for speech.
-    fix: "When comparing cells, compare parameter counts as well as hidden sizes."
-  - mistake: "Expecting a paper's count to match PyTorch's"
-    why: >-
-      PyTorch stores two bias vectors per layer, b_ih and b_hh; its source says the second is "included
-      for CuDNN compatibility" and only one is needed. Papers often leave biases out: one of Sutskever et
-      al.'s layers is 8,000,000 weights, while PyTorch's LSTM of the same size holds **8,008,000**.
-    fix: "Say which bias convention a count uses."
-  - mistake: "Reading the 1997 LSTM's hidden units as cells with their own gates"
-    why: >-
-      In the 1997 paper, S memory cells form a "memory cell block" that shares one input gate and one
-      output gate. In PyTorch's LSTM every one of the hidden_size units has its own gates.
-    fix: "Count gates per block for the 1997 networks, per unit for PyTorch."
-related: [parameter/rnn-cell-type, parameter/rnn-num-layers, parameter/rnn-gates, parameter/rnn-bidirectional]
+- mistake: Assuming that doubling hidden_size quadruples the layer
+  why: 'Only the hidden × hidden part grows four-fold; the hidden × input part doubles. For an LSTM layer reading 1,000 numbers, 1,000 units have **8,000,000** weights and 2,000 units **24,000,000**: three times, not four.'
+  fix: Compute blocks × hidden × (input + hidden), as in the figure.
+- mistake: Comparing cells at the same hidden_size as if they cost the same
+  why: 'Chung et al. matched parameters, not units: about 20,000 parameters meant **36** LSTM units, **46** GRU units or **100** tanh units for music; about 169,000 meant 195, 227 and 400 for speech.'
+  fix: When comparing cells, compare parameter counts as well as hidden sizes.
+- mistake: Expecting a paper's count to match PyTorch's
+  why: 'PyTorch stores two bias vectors per layer, b_ih and b_hh; its source says the second is "included for CuDNN compatibility" and only one is needed. Papers often leave biases out: one of Sutskever et al.''s layers is 8,000,000 weights, while PyTorch''s LSTM of the same size holds **8,008,000**.'
+  fix: Say which bias convention a count uses.
+- mistake: Reading the 1997 LSTM's hidden units as cells with their own gates
+  why: In the 1997 paper, S memory cells form a "memory cell block" that shares one input gate and one output gate. In PyTorch's LSTM every one of the hidden_size units has its own gates.
+  fix: Count gates per block for the 1997 networks, per unit for PyTorch.
+related:
+- parameter/rnn-cell-type
+- parameter/rnn-num-layers
+- parameter/rnn-gates
+- parameter/rnn-bidirectional
 visual:
   kind: recurrent_sweep
   cells:
-    - { label: "LSTM", gates: 4 }
+  - label: LSTM
+    gates: 4
   input_size: 1000
-  hidden_sizes: [250, 500, 750, 1000, 1500, 2000]
+  hidden_sizes:
+  - 250
+  - 500
+  - 750
+  - 1000
+  - 1500
+  - 2000
   marked: 1000
   biases: 0
-  caption: "Weights of one LSTM layer reading 1,000 numbers per step, as hidden_size changes; marked: the 1,000 cells of each layer of Sutskever et al., which also used 1,000-number word embeddings. Biases are left out, as the paper's count of 32M weights for 4 layers leaves them out."
-tags: [rnn, lstm, recurrent, hidden-state, width, parameters]
-updated: 2026-11-23
+  caption: 'Weights of one LSTM layer reading 1,000 numbers per step, as hidden_size changes; marked: the 1,000 cells of each layer of Sutskever et al., which also used 1,000-number word embeddings. Biases are left out, as the paper''s count of 32M weights for 4 layers leaves them out.'
+tags:
+- rnn
+- lstm
+- recurrent
+- hidden-state
+- width
+- parameters
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/1409.3215", title: "Sequence to Sequence Learning with Neural Networks (Sutskever, Vinyals & Le, arXiv:1409.3215)", trust: 0.95 }
-  - { url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html", title: "PyTorch documentation: torch.nn.LSTM", trust: 0.9 }
-  - { url: "https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/rnn.py", title: "PyTorch source: torch/nn/modules/rnn.py", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1412.3555", title: "Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling (Chung, Gulcehre, Cho & Bengio, arXiv:1412.3555)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1406.1078", title: "Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation (Cho et al., arXiv:1406.1078)", trust: 0.95 }
-  - { url: "http://www.bioinf.jku.at/publications/older/2604.pdf", title: "Long Short-Term Memory (Hochreiter & Schmidhuber, Neural Computation 9(8), 1997)", trust: 0.95 }
+- url: https://arxiv.org/abs/1409.3215
+  title: Sequence to Sequence Learning with Neural Networks (Sutskever, Vinyals & Le, arXiv:1409.3215)
+  trust: 0.95
+- url: https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html
+  title: 'PyTorch documentation: torch.nn.LSTM'
+  trust: 0.9
+- url: https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/rnn.py
+  title: 'PyTorch source: torch/nn/modules/rnn.py'
+  trust: 0.9
+- url: https://arxiv.org/abs/1412.3555
+  title: Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling (Chung, Gulcehre, Cho & Bengio, arXiv:1412.3555)
+  trust: 0.95
+- url: https://arxiv.org/abs/1406.1078
+  title: Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation (Cho et al., arXiv:1406.1078)
+  trust: 0.95
+- url: http://www.bioinf.jku.at/publications/older/2604.pdf
+  title: Long Short-Term Memory (Hochreiter & Schmidhuber, Neural Computation 9(8), 1997)
+  trust: 0.95
 ---
 
 ## Definition

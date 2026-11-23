@@ -2,7 +2,7 @@
 id: organization/ibm-granite
 type: organization
 slug: ibm-granite
-schema_version: 1.1
+schema_version: 3.1
 title: IBM Granite
 name: IBM Granite
 website: https://huggingface.co/ibm-granite

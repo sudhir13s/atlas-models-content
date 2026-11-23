@@ -2,7 +2,7 @@
 id: organization/prior-labs
 type: organization
 slug: prior-labs
-schema_version: 1.1
+schema_version: 3.1
 title: Prior Labs
 name: Prior Labs
 website: https://huggingface.co/Prior-Labs

@@ -2,7 +2,7 @@
 id: concept/layer-normalization
 type: concept
 slug: layer-normalization
-schema_version: 1.2
+schema_version: 3.1
 title: Layer Normalization
 category: normalization
 code: LayerNorm

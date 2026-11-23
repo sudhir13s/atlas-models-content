@@ -2,7 +2,7 @@
 id: organization/microsoft
 type: organization
 slug: microsoft
-schema_version: 1.1
+schema_version: 3.1
 title: Microsoft
 name: Microsoft
 kind: company

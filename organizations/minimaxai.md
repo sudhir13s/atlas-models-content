@@ -2,7 +2,7 @@
 id: organization/minimaxai
 type: organization
 slug: minimaxai
-schema_version: 1.1
+schema_version: 3.1
 title: MiniMax
 name: MiniMax
 website: https://huggingface.co/MiniMaxAI

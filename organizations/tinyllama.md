@@ -2,7 +2,7 @@
 id: organization/tinyllama
 type: organization
 slug: tinyllama
-schema_version: 1.1
+schema_version: 3.1
 title: TinyLlama
 name: TinyLlama
 kind: community

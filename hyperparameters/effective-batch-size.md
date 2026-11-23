@@ -2,28 +2,35 @@
 id: hyperparameter/effective-batch-size
 type: hyperparameter
 slug: effective-batch-size
-schema_version: 2.2
-title: "Effective Batch Size"
+schema_version: 3.1
+title: Effective Batch Size
 name: effective_batch_size
 context: training
 priority: 2
 importance: critical
-goals: [training, finetuning]
-models: [llm, vision, audio, diffusion, rl]
-range: "8 — 8,192 examples per update"
-controls: "How many training examples are averaged into each single change of the model: the batch on one device, multiplied by the number of devices and by the gradient accumulation steps."
+goals:
+- training
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+- rl
+range: 8 — 8,192 examples per update
+controls: 'How many training examples are averaged into each single change of the model: the batch on one device, multiplied by the number of devices and by the gradient accumulation steps.'
 effects:
   decrease:
-    - "Fewer examples are averaged into each update"
-    - "Updates fluctuate more from one to the next"
-    - "More updates for each pass over the data"
-    - "Less memory, fewer devices or fewer accumulated batches needed"
+  - Fewer examples are averaged into each update
+  - Updates fluctuate more from one to the next
+  - More updates for each pass over the data
+  - Less memory, fewer devices or fewer accumulated batches needed
   increase:
-    - "More examples are averaged into each update"
-    - "Updates fluctuate less from one to the next"
-    - "Fewer updates for each pass over the data"
-    - "The learning rate tuned for the smaller batch may no longer fit"
-    - "Past a limit, accuracy falls (about 8,000 images in Goyal et al.)"
+  - More examples are averaged into each update
+  - Updates fluctuate less from one to the next
+  - Fewer updates for each pass over the data
+  - The learning rate tuned for the smaller batch may no longer fit
+  - Past a limit, accuracy falls (about 8,000 images in Goyal et al.)
 scale:
   min: 1
   max: 65536
@@ -31,76 +38,84 @@ scale:
   typical_max: 8192
   spacing: log
 typical_values:
-  - setting: "Hugging Face Transformers defaults on one device (per-device batch 8, accumulation 1)"
-    value: "8"
-    source: "https://huggingface.co/docs/transformers/main_classes/trainer"
-  - setting: "BERT, fine-tuning on a task: batch sizes the paper lists"
-    value: "16 or 32"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "QLoRA, fine-tuning LLaMA: 16 for the 7B and 13B models, up to 64 for the 65B model"
-    value: "16 to 64"
-    source: "https://arxiv.org/abs/2305.14314"
-  - setting: "LoRA paper, all GPT-3 experiments"
-    value: "128"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "BERT, training from scratch (sequences of 512 tokens)"
-    value: "256"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "ResNet-50 on ImageNet: the largest batch Goyal et al. trained with no loss of accuracy"
-    value: "8,192"
-    source: "https://arxiv.org/abs/1706.02677"
+- setting: Hugging Face Transformers defaults on one device (per-device batch 8, accumulation 1)
+  value: '8'
+  source: https://huggingface.co/docs/transformers/main_classes/trainer
+- setting: 'BERT, fine-tuning on a task: batch sizes the paper lists'
+  value: 16 or 32
+  source: https://arxiv.org/abs/1810.04805
+- setting: 'QLoRA, fine-tuning LLaMA: 16 for the 7B and 13B models, up to 64 for the 65B model'
+  value: 16 to 64
+  source: https://arxiv.org/abs/2305.14314
+- setting: LoRA paper, all GPT-3 experiments
+  value: '128'
+  source: https://arxiv.org/abs/2106.09685
+- setting: BERT, training from scratch (sequences of 512 tokens)
+  value: '256'
+  source: https://arxiv.org/abs/1810.04805
+- setting: 'ResNet-50 on ImageNet: the largest batch Goyal et al. trained with no loss of accuracy'
+  value: 8,192
+  source: https://arxiv.org/abs/1706.02677
 mistakes:
-  - mistake: "Reading only the per-device batch size"
-    why: >-
-      `per_device_train_batch_size` is **one of three factors**. Hugging Face Transformers
-      defines the effective batch as per-device batch × devices × gradient accumulation steps.
-      A per-device batch of 4 on 2 devices with 16 accumulation steps is an effective batch of
-      128, not 4.
-    fix: >-
-      Multiply the three, or read the line the `Trainer` logs at the start of a run: "Total train
-      batch size (w. parallel, distributed & accumulation)".
-  - mistake: "Changing the effective batch and leaving the learning rate alone"
-    why: >-
-      The two work as a pair. Goyal et al. trained ResNet-50 with 8,192 images per batch: with
-      the learning rate left at the value tuned for 256 images (0.1), the error was **41.67%**;
-      with the learning rate scaled up 32 times (3.2), it was **23.74%**, against 23.60% for the
-      256-image baseline.
-    fix: >-
-      Apply their **linear scaling rule** as a starting point and test it: when the batch is
-      multiplied by k, multiply the learning rate by k. They showed it for SGD on image
-      classification, together with a warmup.
-  - mistake: "Assuming a larger batch is always at least as good"
-    why: >-
-      Goyal et al. report that the batch cannot be scaled indefinitely: results were stable up to
-      about 8,000 images, and beyond that accuracy degraded rapidly (error 24.79% at 16,000
-      images). Smith et al. note that when the batch size is increased the test accuracy often
-      falls.
-    fix: >-
-      Treat the effective batch as a setting to test, with the learning rate adjusted alongside
-      it, and compare the results on held-out data.
-  - mistake: "Comparing batch sizes that are counted in different units"
-    why: >-
-      Papers on language models often count **tokens**, not sequences. BERT's batch of 256
-      sequences is 128,000 tokens; LLaMA reports 4M tokens. Set side by side as bare numbers,
-      256 and 4,000,000 say nothing.
-    fix: >-
-      Convert to one unit first: tokens per update = sequences per update × tokens per sequence.
-tags: [training, batch-size, optimization]
-updated: 2026-11-23
-related: [hyperparameter/gradient-accumulation, hyperparameter/learning-rate, hyperparameter/lr-warmup-schedule, hyperparameter/training-duration]
+- mistake: Reading only the per-device batch size
+  why: '`per_device_train_batch_size` is **one of three factors**. Hugging Face Transformers defines the effective batch as per-device batch × devices × gradient accumulation steps. A per-device batch of 4 on 2 devices with 16 accumulation steps is an effective batch of 128, not 4.'
+  fix: 'Multiply the three, or read the line the `Trainer` logs at the start of a run: "Total train batch size (w. parallel, distributed & accumulation)".'
+- mistake: Changing the effective batch and leaving the learning rate alone
+  why: 'The two work as a pair. Goyal et al. trained ResNet-50 with 8,192 images per batch: with the learning rate left at the value tuned for 256 images (0.1), the error was **41.67%**; with the learning rate scaled up 32 times (3.2), it was **23.74%**, against 23.60% for the 256-image baseline.'
+  fix: 'Apply their **linear scaling rule** as a starting point and test it: when the batch is multiplied by k, multiply the learning rate by k. They showed it for SGD on image classification, together with a warmup.'
+- mistake: Assuming a larger batch is always at least as good
+  why: 'Goyal et al. report that the batch cannot be scaled indefinitely: results were stable up to about 8,000 images, and beyond that accuracy degraded rapidly (error 24.79% at 16,000 images). Smith et al. note that when the batch size is increased the test accuracy often falls.'
+  fix: Treat the effective batch as a setting to test, with the learning rate adjusted alongside it, and compare the results on held-out data.
+- mistake: Comparing batch sizes that are counted in different units
+  why: Papers on language models often count **tokens**, not sequences. BERT's batch of 256 sequences is 128,000 tokens; LLaMA reports 4M tokens. Set side by side as bare numbers, 256 and 4,000,000 say nothing.
+  fix: 'Convert to one unit first: tokens per update = sequences per update × tokens per sequence.'
+tags:
+- training
+- batch-size
+- optimization
+updated: '2026-11-23'
+related:
+- hyperparameter/gradient-accumulation
+- hyperparameter/learning-rate
+- hyperparameter/lr-warmup-schedule
+- hyperparameter/training-duration
 sources:
-  - { url: "https://huggingface.co/docs/transformers/main_classes/trainer", title: "Hugging Face Transformers documentation: Trainer and TrainingArguments", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py", title: "Hugging Face Transformers source: training_args.py (defaults and descriptions)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/trainer.py", title: "Hugging Face Transformers source: trainer.py (total train batch size)", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/2.15/notes/amp_examples.html", title: "PyTorch documentation: Automatic Mixed Precision examples (Gradient accumulation)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.02677", title: "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour (Goyal et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1711.00489", title: "Don't Decay the Learning Rate, Increase the Batch Size (Smith et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2407.21783", title: "The Llama 3 Herd of Models (2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2106.09685", title: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2305.14314", title: "QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)", trust: 0.9 }
+- url: https://huggingface.co/docs/transformers/main_classes/trainer
+  title: 'Hugging Face Transformers documentation: Trainer and TrainingArguments'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+  title: 'Hugging Face Transformers source: training_args.py (defaults and descriptions)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/trainer.py
+  title: 'Hugging Face Transformers source: trainer.py (total train batch size)'
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/2.15/notes/amp_examples.html
+  title: 'PyTorch documentation: Automatic Mixed Precision examples (Gradient accumulation)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.02677
+  title: 'Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour (Goyal et al., 2017)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1711.00489
+  title: Don't Decay the Learning Rate, Increase the Batch Size (Smith et al., 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models (2024)
+  trust: 0.9
+- url: https://arxiv.org/abs/2106.09685
+  title: 'LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2305.14314
+  title: 'QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)'
+  trust: 0.9
 ---
 
 ## Definition

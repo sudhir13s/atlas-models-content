@@ -2,26 +2,28 @@
 id: hyperparameter/num-beams
 type: hyperparameter
 slug: num-beams
-schema_version: 2.2
-title: "Number of Beams"
+schema_version: 3.1
+title: Number of Beams
 name: num_beams
 context: inference
 priority: 7
 importance: optional
-goals: [inference]
-models: [llm]
-range: "1 — 12"
-controls: "How many candidate texts a language model keeps writing side by side before it returns the one with the highest overall probability: 1 keeps a single text, higher values keep several."
+goals:
+- inference
+models:
+- llm
+range: 1 — 12
+controls: 'How many candidate texts a language model keeps writing side by side before it returns the one with the highest overall probability: 1 keeps a single text, higher values keep several.'
 effects:
   decrease:
-    - "Fewer candidate texts are kept at each step"
-    - "Less computation and memory per generated word"
-    - "At 1 there is no beam search: one text is written word by word"
+  - Fewer candidate texts are kept at each step
+  - Less computation and memory per generated word
+  - 'At 1 there is no beam search: one text is written word by word'
   increase:
-    - "More candidate texts are kept at each step"
-    - "A text with a higher overall probability can be found"
-    - "The model runs on that many texts at every step"
-    - "Past a point, quality has been measured to drop"
+  - More candidate texts are kept at each step
+  - A text with a higher overall probability can be found
+  - The model runs on that many texts at every step
+  - Past a point, quality has been measured to drop
 scale:
   min: 1
   max: 100
@@ -29,97 +31,109 @@ scale:
   typical_max: 12
   spacing: log
 typical_values:
-  - setting: "Hugging Face Transformers: used when the model's generation_config.json sets no value (no beam search)"
-    value: "1"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py"
-  - setting: "Original Transformer (Vaswani et al., 2017), machine translation, with length penalty 0.6"
-    value: "4"
-    source: "https://arxiv.org/abs/1706.03762"
-  - setting: "facebook/bart-large-cnn: value in the model's own generation_config.json"
-    value: "4"
-    source: "https://huggingface.co/facebook/bart-large-cnn/blob/main/generation_config.json"
-  - setting: "Helsinki-NLP/opus-mt-en-de: value in the model's own generation_config.json"
-    value: "4"
-    source: "https://huggingface.co/Helsinki-NLP/opus-mt-en-de/blob/main/generation_config.json"
-  - setting: "google/pegasus-xsum: value in the model's own generation_config.json"
-    value: "8"
-    source: "https://huggingface.co/google/pegasus-xsum/blob/main/generation_config.json"
-  - setting: "Sutskever et al. (2014), machine translation with LSTMs: the largest beam in the paper's results (it also reports 1 and 2)"
-    value: "12"
-    source: "https://arxiv.org/abs/1409.3215"
+- setting: 'Hugging Face Transformers: used when the model''s generation_config.json sets no value (no beam search)'
+  value: '1'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+- setting: Original Transformer (Vaswani et al., 2017), machine translation, with length penalty 0.6
+  value: '4'
+  source: https://arxiv.org/abs/1706.03762
+- setting: 'facebook/bart-large-cnn: value in the model''s own generation_config.json'
+  value: '4'
+  source: https://huggingface.co/facebook/bart-large-cnn/blob/main/generation_config.json
+- setting: 'Helsinki-NLP/opus-mt-en-de: value in the model''s own generation_config.json'
+  value: '4'
+  source: https://huggingface.co/Helsinki-NLP/opus-mt-en-de/blob/main/generation_config.json
+- setting: 'google/pegasus-xsum: value in the model''s own generation_config.json'
+  value: '8'
+  source: https://huggingface.co/google/pegasus-xsum/blob/main/generation_config.json
+- setting: 'Sutskever et al. (2014), machine translation with LSTMs: the largest beam in the paper''s results (it also reports 1 and 2)'
+  value: '12'
+  source: https://arxiv.org/abs/1409.3215
 mistakes:
-  - mistake: "Using beam search for open-ended writing such as stories or chat"
-    why: >-
-      Beam search looks for the **most probable** text, and for open-ended writing the most
-      probable text is not the best one. Holtzman et al. find that decoding which maximizes
-      probability gives text that is "bland, incoherent, or gets stuck in repetitive loops", and
-      their example with a beam of 32 ends in such a loop. Fan et al. report that beam search
-      "tends to produce common phrases and repetitive text" in story generation.
-    fix: >-
-      Keep `num_beams=1` and sample (`do_sample=True` with `top_p` or `top_k`) for open-ended
-      text. The Transformers documentation describes beam search as "best suited for
-      input-grounded tasks", such as describing an image or speech recognition.
-  - mistake: "Assuming more beams always give a better result"
-    why: >-
-      Koehn and Knowles measured translation quality at beam sizes from 1 to 1,000 for eight
-      language pairs. Quality rose at first and then **fell**: "in almost all cases, worse
-      translations are found beyond an optimal beam size setting". They name the main cause:
-      "shorter translations under wider beams".
-    fix: >-
-      Start from the value the model ships with (4 for bart-large-cnn and opus-mt-en-de) and
-      measure before going higher. Sutskever et al. found that "a beam of size 2
-      provides most of the benefits of beam search" for their system.
-  - mistake: "Raising num_beams without budgeting for the cost"
-    why: >-
-      Every beam is a text of its own that the model has to continue. In Transformers the batch
-      that goes through the model at each step holds **`num_beams` sequences per input**, so the
-      work per generated token grows with the number of beams.
-    fix: >-
-      Treat `num_beams=4` as about four texts generated at once, and check time and memory
-      before using it on long outputs or large batches.
-  - mistake: "Asking for more returned texts than there are beams"
-    why: >-
-      Beam search ends with `num_beams` finished candidates and can return only those.
-      Transformers raises a `ValueError` when `num_return_sequences` is larger than `num_beams`.
-    fix: >-
-      Set `num_beams` at least as high as `num_return_sequences`.
+- mistake: Using beam search for open-ended writing such as stories or chat
+  why: Beam search looks for the **most probable** text, and for open-ended writing the most probable text is not the best one. Holtzman et al. find that decoding which maximizes probability gives text that is "bland, incoherent, or gets stuck in repetitive loops", and their example with a beam of 32 ends in such a loop. Fan et al. report that beam search "tends to produce common phrases and repetitive text" in story generation.
+  fix: Keep `num_beams=1` and sample (`do_sample=True` with `top_p` or `top_k`) for open-ended text. The Transformers documentation describes beam search as "best suited for input-grounded tasks", such as describing an image or speech recognition.
+- mistake: Assuming more beams always give a better result
+  why: 'Koehn and Knowles measured translation quality at beam sizes from 1 to 1,000 for eight language pairs. Quality rose at first and then **fell**: "in almost all cases, worse translations are found beyond an optimal beam size setting". They name the main cause: "shorter translations under wider beams".'
+  fix: Start from the value the model ships with (4 for bart-large-cnn and opus-mt-en-de) and measure before going higher. Sutskever et al. found that "a beam of size 2 provides most of the benefits of beam search" for their system.
+- mistake: Raising num_beams without budgeting for the cost
+  why: Every beam is a text of its own that the model has to continue. In Transformers the batch that goes through the model at each step holds **`num_beams` sequences per input**, so the work per generated token grows with the number of beams.
+  fix: Treat `num_beams=4` as about four texts generated at once, and check time and memory before using it on long outputs or large batches.
+- mistake: Asking for more returned texts than there are beams
+  why: Beam search ends with `num_beams` finished candidates and can return only those. Transformers raises a `ValueError` when `num_return_sequences` is larger than `num_beams`.
+  fix: Set `num_beams` at least as high as `num_return_sequences`.
 visual:
   kind: beams
-  prompt: "The weather is"
+  prompt: The weather is
   num_beams: 2
   tree:
-    - token: "very"
-      probability: 0.5
-      next:
-        - { token: "nice", probability: 0.4 }
-        - { token: "cold", probability: 0.3 }
-        - { token: "hot", probability: 0.3 }
-    - token: "sunny"
+  - token: very
+    probability: 0.5
+    next:
+    - token: nice
       probability: 0.4
-      next:
-        - { token: "today", probability: 0.9 }
-        - { token: "and", probability: 0.1 }
-    - token: "bad"
+    - token: cold
+      probability: 0.3
+    - token: hot
+      probability: 0.3
+  - token: sunny
+    probability: 0.4
+    next:
+    - token: today
+      probability: 0.9
+    - token: and
       probability: 0.1
-      next:
-        - { token: "today", probability: 0.6 }
-        - { token: "again", probability: 0.4 }
-  caption: "Two steps of beam search with 2 beams after \"The weather is\". Step 1: the probability of each first word; the 2 most likely are kept. Step 2: the probability of each pair of words built on them (the two steps multiplied). The probabilities are made up for this figure, not taken from a model."
-tags: [inference, decoding, beam-search]
-updated: 2026-11-23
-related: [hyperparameter/do-sample, hyperparameter/max-new-tokens, hyperparameter/min-new-tokens]
+  - token: bad
+    probability: 0.1
+    next:
+    - token: today
+      probability: 0.6
+    - token: again
+      probability: 0.4
+  caption: 'Two steps of beam search with 2 beams after "The weather is". Step 1: the probability of each first word; the 2 most likely are kept. Step 2: the probability of each pair of words built on them (the two steps multiplied). The probabilities are made up for this figure, not taken from a model.'
+tags:
+- inference
+- decoding
+- beam-search
+updated: '2026-11-23'
+related:
+- hyperparameter/do-sample
+- hyperparameter/max-new-tokens
+- hyperparameter/min-new-tokens
 sources:
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py", title: "Hugging Face Transformers source: generation/utils.py (beam search)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py", title: "Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: decoding modes, defaults, checks)", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/generation_strategies", title: "Hugging Face Transformers documentation: Generation strategies", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1409.3215", title: "Sequence to Sequence Learning with Neural Networks (Sutskever, Vinyals, Le, 2014)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03872", title: "Six Challenges for Neural Machine Translation (Koehn and Knowles, 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1904.09751", title: "The Curious Case of Neural Text Degeneration (Holtzman et al., 2019)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1805.04833", title: "Hierarchical Neural Story Generation (Fan, Lewis, Dauphin, 2018)", trust: 0.9 }
-  - { url: "https://huggingface.co/facebook/bart-large-cnn/blob/main/generation_config.json", title: "facebook/bart-large-cnn: generation_config.json", trust: 0.9 }
-  - { url: "https://huggingface.co/Helsinki-NLP/opus-mt-en-de/blob/main/generation_config.json", title: "Helsinki-NLP/opus-mt-en-de: generation_config.json", trust: 0.9 }
-  - { url: "https://huggingface.co/google/pegasus-xsum/blob/main/generation_config.json", title: "google/pegasus-xsum: generation_config.json", trust: 0.9 }
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py
+  title: 'Hugging Face Transformers source: generation/utils.py (beam search)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+  title: 'Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: decoding modes, defaults, checks)'
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/generation_strategies
+  title: 'Hugging Face Transformers documentation: Generation strategies'
+  trust: 0.9
+- url: https://arxiv.org/abs/1409.3215
+  title: Sequence to Sequence Learning with Neural Networks (Sutskever, Vinyals, Le, 2014)
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03872
+  title: Six Challenges for Neural Machine Translation (Koehn and Knowles, 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/1904.09751
+  title: The Curious Case of Neural Text Degeneration (Holtzman et al., 2019)
+  trust: 0.9
+- url: https://arxiv.org/abs/1805.04833
+  title: Hierarchical Neural Story Generation (Fan, Lewis, Dauphin, 2018)
+  trust: 0.9
+- url: https://huggingface.co/facebook/bart-large-cnn/blob/main/generation_config.json
+  title: 'facebook/bart-large-cnn: generation_config.json'
+  trust: 0.9
+- url: https://huggingface.co/Helsinki-NLP/opus-mt-en-de/blob/main/generation_config.json
+  title: 'Helsinki-NLP/opus-mt-en-de: generation_config.json'
+  trust: 0.9
+- url: https://huggingface.co/google/pegasus-xsum/blob/main/generation_config.json
+  title: 'google/pegasus-xsum: generation_config.json'
+  trust: 0.9
 ---
 
 ## Definition

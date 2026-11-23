@@ -2,7 +2,7 @@
 id: milestone/2020-scaling-laws-vit-diffusion
 type: milestone
 slug: 2020-scaling-laws-vit-diffusion
-schema_version: 1.2
+schema_version: 3.1
 title: Scaling Laws + ViT + Diffusion
 year: 2020
 order: 6

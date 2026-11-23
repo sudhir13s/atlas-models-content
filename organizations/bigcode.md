@@ -2,7 +2,7 @@
 id: organization/bigcode
 type: organization
 slug: bigcode
-schema_version: 1.1
+schema_version: 3.1
 title: BigCode
 name: BigCode
 kind: community

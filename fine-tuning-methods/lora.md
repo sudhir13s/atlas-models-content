@@ -2,71 +2,73 @@
 id: fine-tuning-method/lora
 type: fine-tuning-method
 slug: lora
-schema_version: 2.8
-title: "LoRA (Low-Rank Adaptation)"
+schema_version: 3.1
+title: LoRA (Low-Rank Adaptation)
 method_type: peft
 memory_profile: low
-summary: "Keep the trained model frozen and learn, for chosen weight matrices, a small change built from two thin matrices."
-when_to_use: "When many task-specific versions of one large model are needed and storage, training memory or switching between tasks must stay small."
-related_hyperparameters: [hyperparameter/lora-r, hyperparameter/lora-alpha, hyperparameter/target-modules, hyperparameter/learning-rate]
+summary: Keep the trained model frozen and learn, for chosen weight matrices, a small change built from two thin matrices.
+when_to_use: When many task-specific versions of one large model are needed and storage, training memory or switching between tasks must stay small.
+related_hyperparameters:
+- hyperparameter/lora-r
+- hyperparameter/lora-alpha
+- hyperparameter/target-modules
+- hyperparameter/learning-rate
 profile:
-  trains: "Two small matrices per adapted weight matrix; every original weight stays frozen"
-  models_in_training: "One: the frozen model with the small matrices added"
-  data: "Input and target pairs for the task"
-  stages: "One"
-  source: "https://arxiv.org/abs/2106.09685"
+  trains: Two small matrices per adapted weight matrix; every original weight stays frozen
+  models_in_training: 'One: the frozen model with the small matrices added'
+  data: Input and target pairs for the task
+  stages: One
+  source: https://arxiv.org/abs/2106.09685
 typical_values:
-  - setting: "LoRA paper: GPT-3 175B, the two parameter budgets (Wq and Wv adapted)"
-    value: "r = 1 (4.7M) or r = 8 (37.7M)"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "LoRA paper: GPT-3 175B, learning rate (AdamW, batch size 128, 2 epochs)"
-    value: "2e-4"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "LoRA paper: GPT-2 on E2E, WebNLG and DART (Wq and Wv adapted)"
-    value: "r = 4, α = 32, learning rate 2e-4"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "LoRA paper: how α is chosen"
-    value: "set to the first r tried, then not tuned"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "QLoRA paper: LLaMA 7B to 65B, LoRA on every linear layer"
-    value: "r = 64, α = 16"
-    source: "https://arxiv.org/abs/2305.14314"
+- setting: 'LoRA paper: GPT-3 175B, the two parameter budgets (Wq and Wv adapted)'
+  value: r = 1 (4.7M) or r = 8 (37.7M)
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'LoRA paper: GPT-3 175B, learning rate (AdamW, batch size 128, 2 epochs)'
+  value: 2e-4
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'LoRA paper: GPT-2 on E2E, WebNLG and DART (Wq and Wv adapted)'
+  value: r = 4, α = 32, learning rate 2e-4
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'LoRA paper: how α is chosen'
+  value: set to the first r tried, then not tuned
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'QLoRA paper: LLaMA 7B to 65B, LoRA on every linear layer'
+  value: r = 64, α = 16
+  source: https://arxiv.org/abs/2305.14314
 mistakes:
-  - mistake: "Spending the budget on a higher rank for one matrix"
-    why: >-
-      With the same **18 million** trainable numbers on GPT-3 175B, the LoRA paper's Table 5 gives
-      **70.4** on WikiSQL for Wq alone at r = 8 and **73.7** for Wq and Wv at r = 4. The QLoRA
-      authors could not match full fine-tuning on large models with LoRA on the query and value
-      matrices only.
-    fix: >-
-      Spread the adapters over more matrices before raising r; see the target modules and LoRA rank
-      pages.
-  - mistake: "Expecting memory to fall as much as the trainable numbers"
-    why: >-
-      On GPT-3 175B the paper cuts trainable parameters about **10,000 times** but training memory
-      only about **3 times** (**1.2 TB to 350 GB**): the frozen weights are still held. For LLaMA 7B
-      at batch size 1, QLoRA measured **567 MB** of LoRA input gradients against **26 MB** of LoRA
-      weights.
-    fix: >-
-      Budget memory for the frozen model and the activations first; shrinking r saves little.
-  - mistake: "Assuming the adapter slows inference"
-    why: >-
-      The paper computes and stores **W = W₀ + BA** after training, so inference runs one matrix
-      per layer, as before. Its stated limitation is different: once merged, inputs for tasks with
-      different A and B cannot share one forward pass.
-    fix: >-
-      Merge for a single task; keep the adapters separate when one batch must serve several tasks.
+- mistake: Spending the budget on a higher rank for one matrix
+  why: With the same **18 million** trainable numbers on GPT-3 175B, the LoRA paper's Table 5 gives **70.4** on WikiSQL for Wq alone at r = 8 and **73.7** for Wq and Wv at r = 4. The QLoRA authors could not match full fine-tuning on large models with LoRA on the query and value matrices only.
+  fix: Spread the adapters over more matrices before raising r; see the target modules and LoRA rank pages.
+- mistake: Expecting memory to fall as much as the trainable numbers
+  why: 'On GPT-3 175B the paper cuts trainable parameters about **10,000 times** but training memory only about **3 times** (**1.2 TB to 350 GB**): the frozen weights are still held. For LLaMA 7B at batch size 1, QLoRA measured **567 MB** of LoRA input gradients against **26 MB** of LoRA weights.'
+  fix: Budget memory for the frozen model and the activations first; shrinking r saves little.
+- mistake: Assuming the adapter slows inference
+  why: 'The paper computes and stores **W = W₀ + BA** after training, so inference runs one matrix per layer, as before. Its stated limitation is different: once merged, inputs for tasks with different A and B cannot share one forward pass.'
+  fix: Merge for a single task; keep the adapters separate when one batch must serve several tasks.
 visual:
   kind: adapter_size
   rows: 12288
   columns: 12288
-  ranks: [1, 2, 4, 8, 64]
-  caption: "One 12,288 × 12,288 attention matrix of GPT-3 175B, the size the LoRA paper treats each of Wq, Wk, Wv and Wo as, against LoRA's two matrices at five ranks. Computed from r × (d + k); the ranks are the ones in the paper's Table 6."
-tags: [fine-tuning, peft, lora, adapters]
-updated: 2026-11-23
+  ranks:
+  - 1
+  - 2
+  - 4
+  - 8
+  - 64
+  caption: One 12,288 × 12,288 attention matrix of GPT-3 175B, the size the LoRA paper treats each of Wq, Wk, Wv and Wo as, against LoRA's two matrices at five ranks. Computed from r × (d + k); the ranks are the ones in the paper's Table 6.
+tags:
+- fine-tuning
+- peft
+- lora
+- adapters
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/2106.09685", title: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2305.14314", title: "QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)", trust: 0.9 }
+- url: https://arxiv.org/abs/2106.09685
+  title: 'LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2305.14314
+  title: 'QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)'
+  trust: 0.9
 ---
 
 ## Definition

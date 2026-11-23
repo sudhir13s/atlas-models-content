@@ -2,7 +2,7 @@
 id: organization/autogluon
 type: organization
 slug: autogluon
-schema_version: 1.1
+schema_version: 3.1
 title: Autogluon
 name: Autogluon
 website: https://huggingface.co/autogluon

@@ -2,7 +2,7 @@
 id: organization/naver-clova-ix
 type: organization
 slug: naver-clova-ix
-schema_version: 1.1
+schema_version: 3.1
 title: NAVER CLOVA INFORMATION EXTRACTION
 name: NAVER CLOVA INFORMATION EXTRACTION
 website: https://huggingface.co/naver-clova-ix

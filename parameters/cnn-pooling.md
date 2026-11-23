@@ -2,22 +2,23 @@
 id: parameter/cnn-pooling
 type: parameter
 slug: cnn-pooling
-schema_version: 2.9
-title: "Pooling (Max / Average)"
+schema_version: 3.1
+title: Pooling (Max / Average)
 name: pool_size
 priority: 8
 importance: optional
-applies_to: [cnn]
-range: "2 — 7"
-controls: "The size of the window that pooling summarises into one number, by its largest value (max) or its mean (average); in PyTorch the kernel_size of MaxPool2d or AvgPool2d."
+applies_to:
+- cnn
+range: 2 — 7
+controls: The size of the window that pooling summarises into one number, by its largest value (max) or its mean (average); in PyTorch the kernel_size of MaxPool2d or AvgPool2d.
 effects:
   decrease:
-    - "Each output summarises fewer values, so more detail survives"
-    - "With the stride equal to the size, a smaller window shrinks the map less"
+  - Each output summarises fewer values, so more detail survives
+  - With the stride equal to the size, a smaller window shrinks the map less
   increase:
-    - "Each output summarises more values; the stride, not the size alone, sets the output size"
-    - "AlexNet's overlapping 3 × 3 windows at stride 2 reduced top-1 and top-5 error by 0.4% and 0.3% against 2 × 2 windows at stride 2, which give an output of the same size"
-    - "A window as large as the map (global average pooling) leaves one number per channel: ResNet's head then needs 2,049,000 parameters, VGG's fully connected head 123,642,856"
+  - Each output summarises more values; the stride, not the size alone, sets the output size
+  - AlexNet's overlapping 3 × 3 windows at stride 2 reduced top-1 and top-5 error by 0.4% and 0.3% against 2 × 2 windows at stride 2, which give an output of the same size
+  - 'A window as large as the map (global average pooling) leaves one number per channel: ResNet''s head then needs 2,049,000 parameters, VGG''s fully connected head 123,642,856'
 scale:
   min: 1
   max: 8
@@ -25,65 +26,117 @@ scale:
   typical_max: 7
   spacing: linear
 typical_values:
-  - setting: "LeNet-5, sub-sampling layers S2 and S4: average, times a learned coefficient, plus a bias (LeCun et al., 1998)"
-    value: "2"
-    source: "http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf"
-  - setting: "VGG, max pooling with stride 2 (VGG paper)"
-    value: "2"
-    source: "https://arxiv.org/abs/1409.1556"
-  - setting: "AlexNet, overlapping max pooling with stride 2 (AlexNet paper)"
-    value: "3"
-    source: "https://proceedings.neurips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html"
-  - setting: "ResNet, max pooling after conv1, stride 2 (ResNet paper, Table 1)"
-    value: "3"
-    source: "https://arxiv.org/abs/1512.03385"
-  - setting: "ResNet, global average pooling over the last 7 × 7 maps (ResNet paper)"
-    value: "7"
-    source: "https://arxiv.org/abs/1512.03385"
+- setting: 'LeNet-5, sub-sampling layers S2 and S4: average, times a learned coefficient, plus a bias (LeCun et al., 1998)'
+  value: '2'
+  source: http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf
+- setting: VGG, max pooling with stride 2 (VGG paper)
+  value: '2'
+  source: https://arxiv.org/abs/1409.1556
+- setting: AlexNet, overlapping max pooling with stride 2 (AlexNet paper)
+  value: '3'
+  source: https://proceedings.neurips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html
+- setting: ResNet, max pooling after conv1, stride 2 (ResNet paper, Table 1)
+  value: '3'
+  source: https://arxiv.org/abs/1512.03385
+- setting: ResNet, global average pooling over the last 7 × 7 maps (ResNet paper)
+  value: '7'
+  source: https://arxiv.org/abs/1512.03385
 mistakes:
-  - mistake: "Assuming pooling never has parameters"
-    why: >-
-      PyTorch's MaxPool2d and AvgPool2d have none. LeNet-5's sub-sampling did: each unit averages its
-      four inputs, multiplies by a trainable coefficient and adds a trainable bias, so S2 has **12**
-      parameters for its 6 maps and S4 **32** for 16.
-    fix: "Check what the layer computes; count 2 per map for LeNet-style sub-sampling."
-  - mistake: "Thinking pooling makes the network blind to position"
-    why: >-
-      LeCun et al. describe sub-sampling as reducing the precision with which positions are encoded and
-      the sensitivity to shifts, not removing it; the CNN architecture page shows a one-cell shift that
-      pooling absorbs and one that it does not.
-    fix: "Expect some tolerance to small shifts, not invariance."
-  - mistake: "Assuming the output is the input divided by the window size"
-    why: >-
-      The output side is ⌊(i + 2p − size) ÷ stride⌋ + 1, and PyTorch's stride defaults to the window
-      size. On the figure's 5 × 5 grid, 2 × 2 at stride 2 and 3 × 3 at stride 2 both give **2 × 2**,
-      which is how AlexNet compared them at "equivalent dimensions".
-    fix: "Compute the size from window, stride and padding."
-related: [parameter/cnn-conv-stride, parameter/cnn-kernel-size, parameter/cnn-num-conv-layers]
+- mistake: Assuming pooling never has parameters
+  why: 'PyTorch''s MaxPool2d and AvgPool2d have none. LeNet-5''s sub-sampling did: each unit averages its four inputs, multiplies by a trainable coefficient and adds a trainable bias, so S2 has **12** parameters for its 6 maps and S4 **32** for 16.'
+  fix: Check what the layer computes; count 2 per map for LeNet-style sub-sampling.
+- mistake: Thinking pooling makes the network blind to position
+  why: LeCun et al. describe sub-sampling as reducing the precision with which positions are encoded and the sensitivity to shifts, not removing it; the CNN architecture page shows a one-cell shift that pooling absorbs and one that it does not.
+  fix: Expect some tolerance to small shifts, not invariance.
+- mistake: Assuming the output is the input divided by the window size
+  why: The output side is ⌊(i + 2p − size) ÷ stride⌋ + 1, and PyTorch's stride defaults to the window size. On the figure's 5 × 5 grid, 2 × 2 at stride 2 and 3 × 3 at stride 2 both give **2 × 2**, which is how AlexNet compared them at "equivalent dimensions".
+  fix: Compute the size from window, stride and padding.
+related:
+- parameter/cnn-conv-stride
+- parameter/cnn-kernel-size
+- parameter/cnn-num-conv-layers
 visual:
   kind: pooling
   image:
-    - [1, 3, 2, 0, 1]
-    - [4, 6, 1, 2, 0]
-    - [0, 2, 5, 7, 3]
-    - [1, 1, 3, 4, 2]
-    - [2, 0, 1, 3, 6]
+  - - 1
+    - 3
+    - 2
+    - 0
+    - 1
+  - - 4
+    - 6
+    - 1
+    - 2
+    - 0
+  - - 0
+    - 2
+    - 5
+    - 7
+    - 3
+  - - 1
+    - 1
+    - 3
+    - 4
+    - 2
+  - - 2
+    - 0
+    - 1
+    - 3
+    - 6
   panels:
-    - { label: "Max 2 × 2, stride 2", size: 2, stride: 2, mode: max, window: { row: 1, column: 2 } }
-    - { label: "Mean 2 × 2, stride 2", size: 2, stride: 2, mode: average, window: { row: 1, column: 2 } }
-    - { label: "Max 3 × 3, stride 2", size: 3, stride: 2, mode: max, window: { row: 1, column: 2 } }
-  caption: "One 5 × 5 grid pooled three ways, the window of output cell (1, 2) outlined: 2 × 2 windows at stride 2 do not overlap and drop the last row and column; 3 × 3 windows at stride 2 overlap by one cell, as in AlexNet, and give the same 2 × 2 output. The grid is an example, not from a trained model."
-tags: [cnn, pooling, downsampling, vision]
-updated: 2026-11-23
+  - label: Max 2 × 2, stride 2
+    size: 2
+    stride: 2
+    mode: max
+    window:
+      row: 1
+      column: 2
+  - label: Mean 2 × 2, stride 2
+    size: 2
+    stride: 2
+    mode: average
+    window:
+      row: 1
+      column: 2
+  - label: Max 3 × 3, stride 2
+    size: 3
+    stride: 2
+    mode: max
+    window:
+      row: 1
+      column: 2
+  caption: 'One 5 × 5 grid pooled three ways, the window of output cell (1, 2) outlined: 2 × 2 windows at stride 2 do not overlap and drop the last row and column; 3 × 3 windows at stride 2 overlap by one cell, as in AlexNet, and give the same 2 × 2 output. The grid is an example, not from a trained model.'
+tags:
+- cnn
+- pooling
+- downsampling
+- vision
+updated: '2026-11-23'
 sources:
-  - { url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html", title: "PyTorch documentation: torch.nn.MaxPool2d", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.AvgPool2d.html", title: "PyTorch documentation: torch.nn.AvgPool2d", trust: 0.9 }
-  - { url: "http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf", title: "Gradient-Based Learning Applied to Document Recognition (LeCun, Bottou, Bengio & Haffner, Proceedings of the IEEE 86(11), 1998)", trust: 0.95 }
-  - { url: "https://proceedings.neurips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html", title: "ImageNet Classification with Deep Convolutional Neural Networks (Krizhevsky, Sutskever & Hinton, NeurIPS 2012)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1409.1556", title: "Very Deep Convolutional Networks for Large-Scale Image Recognition (Simonyan & Zisserman, arXiv:1409.1556)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1512.03385", title: "Deep Residual Learning for Image Recognition (He, Zhang, Ren & Sun, arXiv:1512.03385)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1312.4400", title: "Network In Network (Lin, Chen & Yan, arXiv:1312.4400)", trust: 0.9 }
-  - { url: "https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py", title: "torchvision source: models/resnet.py", trust: 0.9 }
+- url: https://docs.pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html
+  title: 'PyTorch documentation: torch.nn.MaxPool2d'
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/stable/generated/torch.nn.AvgPool2d.html
+  title: 'PyTorch documentation: torch.nn.AvgPool2d'
+  trust: 0.9
+- url: http://yann.lecun.com/exdb/publis/pdf/lecun-01a.pdf
+  title: Gradient-Based Learning Applied to Document Recognition (LeCun, Bottou, Bengio & Haffner, Proceedings of the IEEE 86(11), 1998)
+  trust: 0.95
+- url: https://proceedings.neurips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html
+  title: ImageNet Classification with Deep Convolutional Neural Networks (Krizhevsky, Sutskever & Hinton, NeurIPS 2012)
+  trust: 0.95
+- url: https://arxiv.org/abs/1409.1556
+  title: Very Deep Convolutional Networks for Large-Scale Image Recognition (Simonyan & Zisserman, arXiv:1409.1556)
+  trust: 0.95
+- url: https://arxiv.org/abs/1512.03385
+  title: Deep Residual Learning for Image Recognition (He, Zhang, Ren & Sun, arXiv:1512.03385)
+  trust: 0.95
+- url: https://arxiv.org/abs/1312.4400
+  title: Network In Network (Lin, Chen & Yan, arXiv:1312.4400)
+  trust: 0.9
+- url: https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py
+  title: 'torchvision source: models/resnet.py'
+  trust: 0.9
 ---
 
 ## Definition

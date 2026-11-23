@@ -2,7 +2,7 @@
 id: organization/deepset
 type: organization
 slug: deepset
-schema_version: 1.1
+schema_version: 3.1
 title: deepset
 name: deepset
 website: https://huggingface.co/deepset

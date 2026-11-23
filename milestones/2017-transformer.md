@@ -2,7 +2,7 @@
 id: milestone/2017-transformer
 type: milestone
 slug: 2017-transformer
-schema_version: 1.2
+schema_version: 3.1
 title: Transformer
 year: 2017
 order: 4

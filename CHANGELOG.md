@@ -5,6 +5,48 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Schema 3.1 for every type but `model`: strict schemas, real versions, no stored reverse link (breaking)
+
+All 254 records of the twelve other types were converted by the consumer's
+`atlas migrate models-reference-restructure`. The conversion only moved, renamed, derived or
+deleted: no value was added that a record did not hold, and `updated` was left alone because no
+fact changed. Every record is now written by the one writer, so `updated` is a quoted date in
+every file.
+
+- **Changed** to strict: no unknown field at the top level of any type, in `sources[]`, or inside
+  the blocks of fixed shape (`permissions`, `analogy`, `narrative`, `key_equation`,
+  `notable_models[]`, `resources[]`, `learn_first[]`, `components[]`, `worked_example`). No
+  record held an undeclared field.
+- **Changed** `schema_version` to a constant of each schema (`3.1`); a record with any other value
+  is refused. The records said `1.0`, `1.1`, `1.2`, `2.2`, `2.5`, `2.6`, `2.7`, `2.8` or `2.9`.
+- **Removed** `license.models_using` (12 records). It listed 13 models where 136 name a licence
+  (Apache 2.0 listed none of its 81, MIT one of its 34). A consumer reads the list from the
+  models' own `license` field.
+- **Removed** `architecture-era.key_models` (63 entries on 21 records): it repeated
+  `notable_models` in fewer words, 48 entries word for word and 15 worded differently.
+  `notable_models` is the one list. Two of its 86 entries name a catalog record and are now
+  `model: model/<slug>` (`DeepSeek-R1`, `DeepSeek-V3`); the other 84 stay `name`.
+- **Changed** `architecture-era.learn_first[]`: an entry names a record by `id` in place of a
+  site route in `href`. 29 routes to an architecture page became `architecture-era/<slug>`; the
+  36 routes under `/learn/concepts/`, pages that never existed and have no record, are removed
+  and their `label` and `tag` kept.
+- **Changed** the names of transformer facts to the ones a model record's `fingerprint` uses:
+  in a parameter `visual`'s configuration (`vocab_size` → `vocabulary_size`, `num_hidden_layers`
+  → `num_layers`, `num_attention_heads` → `attention_heads`, `num_key_value_heads` → `kv_heads`,
+  `head_dim` → `head_size`, also as a `vary` value and on `rope_rotation`; 15 records) and in a
+  calculator's `worked_example.config` (`numLayers`, `hiddenDim`, `ffnDim`, `vocabSize`,
+  `attentionHeads`, `kvHeads`, `headDim`, `activation`; 22 keys on 6 of the 9 records). A Mamba
+  configuration keeps the keys of its reference code; a calculator input that is not a
+  transformer fact keeps its own name.
+- **Removed** fields no record held: `hyperparameter.starting_value`, `if_increased`,
+  `if_decreased` and `common_mistake`; `architecture-era.diagram_url`, `eli5`,
+  `long_description` and `build_steps`; `parameter-calculator.diagram_url`;
+  `fine-tuning-method.diagram_url`.
+- **Kept** as written, because no one record has the name: the 42 `concept.example_models`
+  (model families such as "Llama" or "GPT-2").
+- **Consumers must** read a licence's models from the links that point at it, a notable model's
+  name from the record `model` names, and the configuration keys above under their new names.
+
 ### Schema 3.0 for `model`: every fact once, real kinds, strict schema (breaking)
 
 All 188 `model` records were converted by the consumer's `atlas migrate model-restructure`. The

@@ -2,7 +2,7 @@
 id: concept/<slug>
 type: concept
 slug: <slug>
-schema_version: 1.2
+schema_version: 3.1              # the schema's current version; the schema refuses any other
 title: "<Concept name, with its abbreviation in brackets>"
 category: attention             # attention | positional-encoding | normalization | activation
 code: <value>                   # what a model fingerprint carries for this concept, e.g. GQA

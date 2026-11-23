@@ -2,9 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://theaiatlas.dev/schema/models/task-group.schema.json",
   "title": "task-group",
+  "unevaluatedProperties": false,
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "properties": {
     "type": { "const": "task-group" },
+    "schema_version": { "const": 3.1 },
     "order": { "type": "integer", "minimum": 1, "description": "display position among task groups, 1 first" },
     "summary": { "type": "string", "minLength": 1, "description": "one line: what kind of job the tasks in this group do" }
   },

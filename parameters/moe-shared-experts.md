@@ -2,23 +2,24 @@
 id: parameter/moe-shared-experts
 type: parameter
 slug: moe-shared-experts
-schema_version: 2.9
-title: "Shared Experts (n_shared_experts)"
+schema_version: 3.1
+title: Shared Experts (n_shared_experts)
 name: n_shared_experts
 priority: 4
 importance: important
-applies_to: [moe]
-range: "0 — 4"
-controls: "How many experts every token passes through regardless of the router, on top of the routed experts it is sent to."
+applies_to:
+- moe
+range: 0 — 4
+controls: How many experts every token passes through regardless of the router, on top of the routed experts it is sent to.
 effects:
   decrease:
-    - "Fewer always-used parameters per token: one expert less in every MoE layer"
-    - "With none, as in Mixtral and Qwen3-MoE, every expert is routed"
-    - "DeepSeekMoE found that removing the shared expert and routing to one more raised Pile loss from 1.808 to 2.414"
+  - 'Fewer always-used parameters per token: one expert less in every MoE layer'
+  - With none, as in Mixtral and Qwen3-MoE, every expert is routed
+  - DeepSeekMoE found that removing the shared expert and routing to one more raised Pile loss from 1.808 to 2.414
   increase:
-    - "More parameters that every token uses: each shared expert counts in both the total and the active count"
-    - "DeepSeekMoE cut the routed experts per token by the same number to keep computation constant"
-    - "In its ablation, 1, 2 and 4 shared experts of 64 gave Pile losses of 1.808, 1.806 and 1.811"
+  - 'More parameters that every token uses: each shared expert counts in both the total and the active count'
+  - DeepSeekMoE cut the routed experts per token by the same number to keep computation constant
+  - In its ablation, 1, 2 and 4 shared experts of 64 gave Pile losses of 1.808, 1.806 and 1.811
 scale:
   min: 0
   max: 8
@@ -26,55 +27,78 @@ scale:
   typical_max: 4
   spacing: linear
 typical_values:
-  - setting: "Mixtral-8x7B, all 8 experts routed (Mixtral paper)"
-    value: "0"
-    source: "https://arxiv.org/abs/2401.04088"
-  - setting: "Qwen3-30B-A3B, which excludes shared experts (Qwen3 report)"
-    value: "0"
-    source: "https://arxiv.org/abs/2505.09388"
-  - setting: "DeepSeek-V3, with 256 routed experts (config.json)"
-    value: "1"
-    source: "https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json"
-  - setting: "DeepSeek-V2-Lite, with 64 routed experts (config.json)"
-    value: "2"
-    source: "https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat/blob/main/config.json"
-  - setting: "DeepSeekMoE 145B, with 128 routed experts (DeepSeekMoE paper)"
-    value: "4"
-    source: "https://arxiv.org/abs/2401.06066"
+- setting: Mixtral-8x7B, all 8 experts routed (Mixtral paper)
+  value: '0'
+  source: https://arxiv.org/abs/2401.04088
+- setting: Qwen3-30B-A3B, which excludes shared experts (Qwen3 report)
+  value: '0'
+  source: https://arxiv.org/abs/2505.09388
+- setting: DeepSeek-V3, with 256 routed experts (config.json)
+  value: '1'
+  source: https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json
+- setting: DeepSeek-V2-Lite, with 64 routed experts (config.json)
+  value: '2'
+  source: https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat/blob/main/config.json
+- setting: DeepSeekMoE 145B, with 128 routed experts (DeepSeekMoE paper)
+  value: '4'
+  source: https://arxiv.org/abs/2401.06066
 mistakes:
-  - mistake: "Thinking shared experts are chosen by the router"
-    why: >-
-      DeepSeekMoE assigns every token to the shared experts deterministically, regardless of the router.
-      In Transformers' DeepSeek-V3 code the shared block runs on every token and its output is added to
-      the routed experts'.
-    fix: "Count shared experts as always active."
-  - mistake: "Assuming a shared expert adds computation on top of the same routing"
-    why: >-
-      In DeepSeekMoE the routed experts used per token were reduced by the number of shared experts to
-      keep the computation constant. DeepSeek-V3's paper says that, at decoding, each token in effect
-      selects **9** experts, the shared one treated as a routed one.
-    fix: "Compare models by active parameters, counting shared and routed experts together."
-  - mistake: "Counting n_shared_experts as separate blocks"
-    why: >-
-      Transformers' DeepSeek-V3 code builds one feed-forward block of width moe_intermediate_size ×
-      n_shared_experts. Its parameters equal n_shared_experts experts, but it is one block.
-    fix: "Count the shared parameters as n_shared_experts × 3 × hidden_size × moe_intermediate_size."
-related: [parameter/moe-num-experts, parameter/moe-top-k, parameter/moe-expert-ffn-size]
+- mistake: Thinking shared experts are chosen by the router
+  why: DeepSeekMoE assigns every token to the shared experts deterministically, regardless of the router. In Transformers' DeepSeek-V3 code the shared block runs on every token and its output is added to the routed experts'.
+  fix: Count shared experts as always active.
+- mistake: Assuming a shared expert adds computation on top of the same routing
+  why: In DeepSeekMoE the routed experts used per token were reduced by the number of shared experts to keep the computation constant. DeepSeek-V3's paper says that, at decoding, each token in effect selects **9** experts, the shared one treated as a routed one.
+  fix: Compare models by active parameters, counting shared and routed experts together.
+- mistake: Counting n_shared_experts as separate blocks
+  why: Transformers' DeepSeek-V3 code builds one feed-forward block of width moe_intermediate_size × n_shared_experts. Its parameters equal n_shared_experts experts, but it is one block.
+  fix: Count the shared parameters as n_shared_experts × 3 × hidden_size × moe_intermediate_size.
+related:
+- parameter/moe-num-experts
+- parameter/moe-top-k
+- parameter/moe-expert-ffn-size
 visual:
   kind: expert_layer
-  model: { name: "DeepSeek-V3", hidden_size: 7168, moe_intermediate_size: 2048, n_routed_experts: 256, num_experts_per_tok: 8, n_shared_experts: 1 }
-  caption: "One of DeepSeek-V3's 58 mixture-of-experts layers, computed from its config.json: what is stored, and what each token uses. The single shared expert is a sliver of the stored layer but one ninth of the experts each token runs."
-tags: [moe, mixture-of-experts, shared-expert, routing, parameters, sparse]
-updated: 2026-11-23
+  model:
+    name: DeepSeek-V3
+    hidden_size: 7168
+    moe_intermediate_size: 2048
+    n_routed_experts: 256
+    num_experts_per_tok: 8
+    n_shared_experts: 1
+  caption: 'One of DeepSeek-V3''s 58 mixture-of-experts layers, computed from its config.json: what is stored, and what each token uses. The single shared expert is a sliver of the stored layer but one ninth of the experts each token runs.'
+tags:
+- moe
+- mixture-of-experts
+- shared-expert
+- routing
+- parameters
+- sparse
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/2401.06066", title: "DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models (Dai et al., 2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2412.19437", title: "DeepSeek-V3 Technical Report (DeepSeek-AI, 2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2401.04088", title: "Mixtral of Experts (Jiang et al., 2024)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2505.09388", title: "Qwen3 Technical Report (Qwen Team, 2025)", trust: 0.9 }
-  - { url: "https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json", title: "DeepSeek-V3 configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat/blob/main/config.json", title: "DeepSeek-V2-Lite-Chat configuration (config.json)", trust: 0.95 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/deepseek_v3/modeling_deepseek_v3.py", title: "Hugging Face Transformers source: modeling_deepseek_v3.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py", title: "Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)", trust: 0.9 }
+- url: https://arxiv.org/abs/2401.06066
+  title: 'DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models (Dai et al., 2024)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2412.19437
+  title: DeepSeek-V3 Technical Report (DeepSeek-AI, 2024)
+  trust: 0.9
+- url: https://arxiv.org/abs/2401.04088
+  title: Mixtral of Experts (Jiang et al., 2024)
+  trust: 0.95
+- url: https://arxiv.org/abs/2505.09388
+  title: Qwen3 Technical Report (Qwen Team, 2025)
+  trust: 0.9
+- url: https://huggingface.co/deepseek-ai/DeepSeek-V3/blob/main/config.json
+  title: DeepSeek-V3 configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat/blob/main/config.json
+  title: DeepSeek-V2-Lite-Chat configuration (config.json)
+  trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/deepseek_v3/modeling_deepseek_v3.py
+  title: 'Hugging Face Transformers source: modeling_deepseek_v3.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py
+  title: 'Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)'
+  trust: 0.9
 ---
 
 ## Definition

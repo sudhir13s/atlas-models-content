@@ -2,7 +2,7 @@
 id: concept/root-mean-square-normalization-rmsnorm
 type: concept
 slug: root-mean-square-normalization-rmsnorm
-schema_version: 1.2
+schema_version: 3.1
 title: Root Mean Square Normalization (RMSNorm)
 category: normalization
 code: RMSNorm

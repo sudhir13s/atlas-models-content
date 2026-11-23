@@ -2,7 +2,7 @@
 id: milestone/<year>-<slug>
 type: milestone
 slug: <year>-<slug>
-schema_version: 1.2
+schema_version: 3.1              # the schema's current version; the schema refuses any other
 title: "<The event, as a short phrase>"
 year: <year>
 order: 1                        # position in the timeline

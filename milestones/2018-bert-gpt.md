@@ -2,7 +2,7 @@
 id: milestone/2018-bert-gpt
 type: milestone
 slug: 2018-bert-gpt
-schema_version: 1.2
+schema_version: 3.1
 title: BERT + GPT
 year: 2018
 order: 5

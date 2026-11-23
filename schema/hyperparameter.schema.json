@@ -2,9 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://theaiatlas.dev/schema/models/hyperparameter.schema.json",
   "title": "hyperparameter",
+  "unevaluatedProperties": false,
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "properties": {
     "type": { "const": "hyperparameter" },
+    "schema_version": { "const": 3.1 },
     "name": { "type": "string", "description": "exact config key, e.g. learning_rate" },
     "context": { "type": "string", "enum": ["training", "inference"], "description": "which ranked list this belongs to" },
     "priority": { "type": "integer", "minimum": 1, "description": "criticality rank within its context; 1 = most impactful" },
@@ -12,11 +14,7 @@
     "goals": { "type": "array", "items": { "type": "string", "enum": ["training", "finetuning", "inference", "architecture"] } },
     "models": { "type": "array", "items": { "type": "string", "enum": ["llm", "vision", "audio", "diffusion", "rl"] } },
     "range": { "type": "string" },
-    "starting_value": { "type": "string", "description": "schema 1.0 form; a 2.2 record uses typical_values" },
     "controls": { "type": "string", "description": "one plain-language sentence saying what the setting is; the page prints it under the title" },
-    "if_increased": { "type": "string", "description": "schema 1.0 form; a 2.2 record uses effects.increase" },
-    "if_decreased": { "type": "string", "description": "schema 1.0 form; a 2.2 record uses effects.decrease" },
-    "common_mistake": { "type": "string", "description": "schema 1.0 form; a 2.2 record uses mistakes" },
     "effects": { "$ref": "#/$defs/effects" },
     "scale": { "$ref": "#/$defs/scale" },
     "options": {

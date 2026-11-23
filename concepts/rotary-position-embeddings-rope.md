@@ -2,7 +2,7 @@
 id: concept/rotary-position-embeddings-rope
 type: concept
 slug: rotary-position-embeddings-rope
-schema_version: 1.2
+schema_version: 3.1
 title: Rotary Position Embeddings (RoPE)
 category: positional-encoding
 code: RoPE

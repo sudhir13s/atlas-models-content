@@ -2,7 +2,7 @@
 id: organization/baidu
 type: organization
 slug: baidu
-schema_version: 1.1
+schema_version: 3.1
 title: BAIDU
 name: BAIDU
 website: https://huggingface.co/baidu

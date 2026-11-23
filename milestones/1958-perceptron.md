@@ -2,7 +2,7 @@
 id: milestone/1958-perceptron
 type: milestone
 slug: 1958-perceptron
-schema_version: 1.2
+schema_version: 3.1
 title: Perceptron
 year: 1958
 order: 1

@@ -2,7 +2,7 @@
 id: concept/multi-head-attention-mha
 type: concept
 slug: multi-head-attention-mha
-schema_version: 1.2
+schema_version: 3.1
 title: Multi-Head Attention (MHA)
 category: attention
 code: MHA

@@ -2,7 +2,7 @@
 id: organization/m-a-p
 type: organization
 slug: m-a-p
-schema_version: 1.1
+schema_version: 3.1
 title: Multimodal Art Projection
 name: Multimodal Art Projection
 website: https://huggingface.co/m-a-p

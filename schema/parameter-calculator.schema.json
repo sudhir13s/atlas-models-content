@@ -2,18 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://theaiatlas.dev/schema/models/parameter-calculator.schema.json",
   "title": "parameter-calculator",
+  "unevaluatedProperties": false,
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "properties": {
     "type": { "const": "parameter-calculator" },
+    "schema_version": { "const": 3.1 },
     "arch": { "type": "string", "enum": ["llm", "cnn", "rnn", "gan", "diffusion", "moe", "ssm", "mlp", "hybrid"] },
     "order": { "type": "integer", "description": "section order on the parameter-calculators view" },
     "color_key": { "type": "string" },
-    "diagram_url": { "type": "string" },
     "components": {
       "type": "array",
       "description": "structural knobs of this architecture, ranked by importance (rank 1 = most impactful)",
       "items": {
-        "type": "object",
+        "type": "object", "unevaluatedProperties": false,
         "required": ["name", "rank", "formula"],
         "properties": {
           "name": { "type": "string" },
@@ -26,11 +27,17 @@
       }
     },
     "worked_example": {
-      "type": "object",
+      "type": "object", "unevaluatedProperties": false,
       "required": ["label", "config"],
       "properties": {
         "label": { "type": "string" },
-        "config": { "type": "object" },
+        "config": {
+          "type": "object",
+          "description": "the calculator's inputs for this example. A transformer fact takes the name a model record's fingerprint gives it (num_layers, hidden_size, intermediate_size, vocabulary_size, attention_heads, kv_heads, head_size, activation_function, normalization); any other input keeps the calculator's own name",
+          "propertyNames": {
+            "not": { "enum": ["numLayers", "hiddenDim", "ffnDim", "vocabSize", "attentionHeads", "kvHeads", "headDim", "activation"] }
+          }
+        },
         "sources": { "type": "array", "items": { "$ref": "_shared.schema.json#/$defs/source" } }
       }
     }

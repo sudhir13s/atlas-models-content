@@ -2,7 +2,7 @@
 id: concept/learned-position-embeddings
 type: concept
 slug: learned-position-embeddings
-schema_version: 1.2
+schema_version: 3.1
 title: Learned Position Embeddings
 category: positional-encoding
 code: Learned

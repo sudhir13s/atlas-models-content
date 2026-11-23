@@ -2,7 +2,7 @@
 id: organization/dslim
 type: organization
 slug: dslim
-schema_version: 1.1
+schema_version: 3.1
 title: dslim
 name: dslim
 website: https://huggingface.co/dslim

@@ -2,7 +2,7 @@
 id: concept/multi-query-attention-mqa
 type: concept
 slug: multi-query-attention-mqa
-schema_version: 1.2
+schema_version: 3.1
 title: Multi-Query Attention (MQA)
 category: attention
 code: MQA

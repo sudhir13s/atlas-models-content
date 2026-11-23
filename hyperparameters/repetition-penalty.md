@@ -2,25 +2,27 @@
 id: hyperparameter/repetition-penalty
 type: hyperparameter
 slug: repetition-penalty
-schema_version: 2.2
-title: "Repetition Penalty"
+schema_version: 3.1
+title: Repetition Penalty
 name: repetition_penalty
 context: inference
 priority: 4
 importance: important
-goals: [inference]
-models: [llm]
-range: "1.0 — 1.2"
-controls: "How strongly a language model is discouraged from reusing words that are already in the text: 1.0 changes nothing, higher values make every word that has already appeared less likely to be picked again."
+goals:
+- inference
+models:
+- llm
+range: 1.0 — 1.2
+controls: 'How strongly a language model is discouraged from reusing words that are already in the text: 1.0 changes nothing, higher values make every word that has already appeared less likely to be picked again.'
 effects:
   decrease:
-    - "Words already in the text are held back less"
-    - "At 1.0 there is no penalty at all"
-    - "Below 1.0 the effect flips: repeated words become more likely"
+  - Words already in the text are held back less
+  - At 1.0 there is no penalty at all
+  - 'Below 1.0 the effect flips: repeated words become more likely'
   increase:
-    - "Words already in the text become less likely to be picked again"
-    - "Loops of the same phrase are broken more often"
-    - "Every word that has appeared is hit, including common words and words from the prompt"
+  - Words already in the text become less likely to be picked again
+  - Loops of the same phrase are broken more often
+  - Every word that has appeared is hit, including common words and words from the prompt
 scale:
   min: 0.8
   max: 1.6
@@ -28,68 +30,76 @@ scale:
   typical_max: 1.2
   spacing: linear
 typical_values:
-  - setting: "Hugging Face Transformers: used when the model's generation_config.json sets no value (no penalty)"
-    value: "1.0"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py"
-  - setting: "Keskar et al. (2019), CTRL: the value the paper that introduced the penalty reports, used with greedy decoding (written as about 1.2)"
-    value: "1.2"
-    source: "https://arxiv.org/abs/1909.05858"
-  - setting: "Qwen2.5-7B-Instruct: value in the model's own generation_config.json"
-    value: "1.05"
-    source: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json"
+- setting: 'Hugging Face Transformers: used when the model''s generation_config.json sets no value (no penalty)'
+  value: '1.0'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+- setting: 'Keskar et al. (2019), CTRL: the value the paper that introduced the penalty reports, used with greedy decoding (written as about 1.2)'
+  value: '1.2'
+  source: https://arxiv.org/abs/1909.05858
+- setting: 'Qwen2.5-7B-Instruct: value in the model''s own generation_config.json'
+  value: '1.05'
+  source: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json
 mistakes:
-  - mistake: "Expecting a word to be penalised more each time it is repeated"
-    why: >-
-      The penalty does not count. The Transformers documentation states that it "is applied at
-      most once per token": a word that has appeared ten times gets the same reduction as a word
-      that has appeared once.
-    fix: >-
-      Treat the setting as an on/off mark per word ("has it appeared or not"), with the value
-      setting how large the one reduction is.
-  - mistake: "Forgetting that the prompt counts as text that has already appeared"
-    why: >-
-      For decoder-only models (most LLMs), Transformers states that "the considered tokens
-      include the prompt by default". Words you gave the model and want back in the answer
-      (a name, a term, a quoted phrase) are penalised from the first generated token on.
-    fix: >-
-      Lower the value, or build a `RepetitionPenaltyLogitsProcessor` yourself with
-      `prompt_ignore_length` set to the prompt's length and pass it as `logits_processor`, as the
-      example in the library's documentation does.
-  - mistake: "Raising the value well above the published ones to stop every repetition"
-    why: >-
-      The penalty hits **every** token that has appeared, not only the looping phrase. Ordinary
-      text needs the same small words and punctuation again and again, and each of them is
-      pushed down too. Keskar et al. report about **1.2** as "a good balance between truthful
-      generation and lack of repetition", and note that the approach works only if the model
-      "has learned a sufficiently reliable distribution".
-    fix: >-
-      Start from the value the model ships with (1.05 for Qwen2.5-7B-Instruct) or from the 1.2
-      of the CTRL paper, and raise it in small steps while reading the output.
-  - mistake: "Passing a whole number such as 2 instead of 2.0"
-    why: >-
-      The filter class of Transformers checks that the penalty is a **float** greater than 0 and
-      raises a `ValueError` ("has to be a strictly positive float") for anything else, including
-      the integer `2`.
-    fix: >-
-      Write the value with a decimal point: `repetition_penalty=1.2`.
+- mistake: Expecting a word to be penalised more each time it is repeated
+  why: 'The penalty does not count. The Transformers documentation states that it "is applied at most once per token": a word that has appeared ten times gets the same reduction as a word that has appeared once.'
+  fix: Treat the setting as an on/off mark per word ("has it appeared or not"), with the value setting how large the one reduction is.
+- mistake: Forgetting that the prompt counts as text that has already appeared
+  why: For decoder-only models (most LLMs), Transformers states that "the considered tokens include the prompt by default". Words you gave the model and want back in the answer (a name, a term, a quoted phrase) are penalised from the first generated token on.
+  fix: Lower the value, or build a `RepetitionPenaltyLogitsProcessor` yourself with `prompt_ignore_length` set to the prompt's length and pass it as `logits_processor`, as the example in the library's documentation does.
+- mistake: Raising the value well above the published ones to stop every repetition
+  why: The penalty hits **every** token that has appeared, not only the looping phrase. Ordinary text needs the same small words and punctuation again and again, and each of them is pushed down too. Keskar et al. report about **1.2** as "a good balance between truthful generation and lack of repetition", and note that the approach works only if the model "has learned a sufficiently reliable distribution".
+  fix: Start from the value the model ships with (1.05 for Qwen2.5-7B-Instruct) or from the 1.2 of the CTRL paper, and raise it in small steps while reading the output.
+- mistake: Passing a whole number such as 2 instead of 2.0
+  why: The filter class of Transformers checks that the penalty is a **float** greater than 0 and raises a `ValueError` ("has to be a strictly positive float") for anything else, including the integer `2`.
+  fix: 'Write the value with a decimal point: `repetition_penalty=1.2`.'
 visual:
   kind: distribution
-  tokens: ["green", "blue", "deep", "sky"]
-  logits: [2, 1, 0, -1]
+  tokens:
+  - green
+  - blue
+  - deep
+  - sky
+  logits:
+  - 2
+  - 1
+  - 0
+  - -1
   penalty:
     value: 1.2
-    repeated: ["blue", "sky"]
-  caption: "Four candidate next words for \"The sky is blue and the sea is\" with scores 2, 1, 0 and -1, before and after a repetition penalty of 1.2. \"blue\" and \"sky\" are already in the text. The scores are made up for this figure, not taken from a model; every probability is computed from them as under Calculation."
-tags: [inference, sampling, decoding, repetition]
-updated: 2026-11-23
-related: [hyperparameter/temperature, hyperparameter/top-p, hyperparameter/top-k, hyperparameter/do-sample]
+    repeated:
+    - blue
+    - sky
+  caption: Four candidate next words for "The sky is blue and the sea is" with scores 2, 1, 0 and -1, before and after a repetition penalty of 1.2. "blue" and "sky" are already in the text. The scores are made up for this figure, not taken from a model; every probability is computed from them as under Calculation.
+tags:
+- inference
+- sampling
+- decoding
+- repetition
+updated: '2026-11-23'
+related:
+- hyperparameter/temperature
+- hyperparameter/top-p
+- hyperparameter/top-k
+- hyperparameter/do-sample
 sources:
-  - { url: "https://arxiv.org/abs/1909.05858", title: "CTRL: A Conditional Transformer Language Model for Controllable Generation (Keskar et al., 2019)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/logits_process.py", title: "Hugging Face Transformers source: logits_process.py (RepetitionPenaltyLogitsProcessor)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py", title: "Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: parameters and defaults)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py", title: "Hugging Face Transformers source: generation/utils.py (when the penalty is applied)", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/llm_tutorial", title: "Hugging Face Transformers documentation: Text generation (common options)", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json", title: "Qwen2.5-7B-Instruct: generation_config.json", trust: 0.9 }
+- url: https://arxiv.org/abs/1909.05858
+  title: 'CTRL: A Conditional Transformer Language Model for Controllable Generation (Keskar et al., 2019)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/logits_process.py
+  title: 'Hugging Face Transformers source: logits_process.py (RepetitionPenaltyLogitsProcessor)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+  title: 'Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: parameters and defaults)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py
+  title: 'Hugging Face Transformers source: generation/utils.py (when the penalty is applied)'
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/llm_tutorial
+  title: 'Hugging Face Transformers documentation: Text generation (common options)'
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json
+  title: 'Qwen2.5-7B-Instruct: generation_config.json'
+  trust: 0.9
 ---
 
 ## Definition

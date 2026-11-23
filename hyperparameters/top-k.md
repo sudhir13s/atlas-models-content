@@ -2,27 +2,29 @@
 id: hyperparameter/top-k
 type: hyperparameter
 slug: top-k
-schema_version: 2.2
-title: "Top-k Sampling"
+schema_version: 3.1
+title: Top-k Sampling
 name: top_k
 context: inference
 priority: 5
 importance: important
-goals: [inference]
-models: [llm]
-range: "10 — 50"
-controls: "How many of the most likely next words a language model is allowed to choose from: only the k best-scoring candidates stay in the draw, all others are removed."
+goals:
+- inference
+models:
+- llm
+range: 10 — 50
+controls: 'How many of the most likely next words a language model is allowed to choose from: only the k best-scoring candidates stay in the draw, all others are removed.'
 effects:
   decrease:
-    - "Fewer candidate words stay in the draw"
-    - "Output is more focused and more predictable"
-    - "Too low, and text turns bland or starts to repeat"
-    - "At 1 only the single most likely word is left"
+  - Fewer candidate words stay in the draw
+  - Output is more focused and more predictable
+  - Too low, and text turns bland or starts to repeat
+  - At 1 only the single most likely word is left
   increase:
-    - "More candidate words stay in the draw"
-    - "Output is more varied"
-    - "Too high, and unsuitable words get picked more often"
-    - "At the size of the vocabulary nothing is removed"
+  - More candidate words stay in the draw
+  - Output is more varied
+  - Too high, and unsuitable words get picked more often
+  - At the size of the vocabulary nothing is removed
 scale:
   min: 1
   max: 1000
@@ -30,74 +32,82 @@ scale:
   typical_max: 50
   spacing: log
 typical_values:
-  - setting: "Hugging Face Transformers: used when the model's generation_config.json sets no value"
-    value: "50"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py"
-  - setting: "Fan et al. (2018), story generation with top-k random sampling"
-    value: "10"
-    source: "https://arxiv.org/abs/1805.04833"
-  - setting: "Holtzman et al. (2019), GPT-2 Large: one of the two top-k settings the paper compares against (the other is 640)"
-    value: "40"
-    source: "https://arxiv.org/abs/1904.09751"
-  - setting: "Qwen2.5-7B-Instruct: value in the model's own generation_config.json (with top_p 0.8 and temperature 0.7)"
-    value: "20"
-    source: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json"
-  - setting: "Qwen3-8B: value in the model's own generation_config.json (with top_p 0.95 and temperature 0.6)"
-    value: "20"
-    source: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/generation_config.json"
+- setting: 'Hugging Face Transformers: used when the model''s generation_config.json sets no value'
+  value: '50'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+- setting: Fan et al. (2018), story generation with top-k random sampling
+  value: '10'
+  source: https://arxiv.org/abs/1805.04833
+- setting: 'Holtzman et al. (2019), GPT-2 Large: one of the two top-k settings the paper compares against (the other is 640)'
+  value: '40'
+  source: https://arxiv.org/abs/1904.09751
+- setting: 'Qwen2.5-7B-Instruct: value in the model''s own generation_config.json (with top_p 0.8 and temperature 0.7)'
+  value: '20'
+  source: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json
+- setting: 'Qwen3-8B: value in the model''s own generation_config.json (with top_p 0.95 and temperature 0.6)'
+  value: '20'
+  source: https://huggingface.co/Qwen/Qwen3-8B/blob/main/generation_config.json
 mistakes:
-  - mistake: "Setting top_k while sampling is switched off"
-    why: >-
-      Top-k only decides **which tokens may be drawn at random**. Hugging Face Transformers
-      applies it only when `do_sample=True`; with the default `do_sample=False` the library takes
-      the most likely token and the value of `top_k` changes nothing. The library logs a warning
-      that the flag "is only used in sample-based generation modes".
-    fix: >-
-      Pass `do_sample=True` together with `top_k`, or check that the model's
-      `generation_config.json` already switches sampling on.
-  - mistake: "Assuming there is no top-k filter because none was set"
-    why: >-
-      Transformers falls back to **`top_k=50`** when neither you nor the model's configuration
-      sets a value. Switching sampling on with `do_sample=True` alone therefore already limits the
-      draw to the 50 best-scoring tokens.
-    fix: >-
-      To sample with no top-k filter, pass **`top_k=0`**: the library adds the filter only when the
-      value is not 0. Then let `top_p` or the temperature shape the draw.
-  - mistake: "Relying on one fixed k for every word of the text"
-    why: >-
-      The number of sensible next words changes from step to step. Holtzman et al. show both
-      cases: sometimes tens or hundreds of words are reasonable, sometimes almost all the
-      probability sits on one or two. A **small k** then risks "bland or generic text"; a **large
-      k** lets in "inappropriate candidates" whose chance of being picked goes **up** when the
-      kept probabilities are rescaled.
-    fix: >-
-      Use `top_p`, which keeps more or fewer tokens depending on how sure the model is, alone or
-      together with a moderate `top_k` (Qwen2.5-7B-Instruct ships `top_k=20` with `top_p=0.8`).
-  - mistake: "Expecting exactly k tokens to survive"
-    why: >-
-      The library removes every token whose score is **below the k-th highest score**. Tokens
-      that tie with the k-th one are all kept, so more than k can remain. When `top_p` is also
-      set, it runs **after** top-k and can remove more, so fewer than k can remain.
-    fix: >-
-      Read `top_k` as an upper limit on the candidates in normal cases, not as an exact count.
+- mistake: Setting top_k while sampling is switched off
+  why: Top-k only decides **which tokens may be drawn at random**. Hugging Face Transformers applies it only when `do_sample=True`; with the default `do_sample=False` the library takes the most likely token and the value of `top_k` changes nothing. The library logs a warning that the flag "is only used in sample-based generation modes".
+  fix: Pass `do_sample=True` together with `top_k`, or check that the model's `generation_config.json` already switches sampling on.
+- mistake: Assuming there is no top-k filter because none was set
+  why: Transformers falls back to **`top_k=50`** when neither you nor the model's configuration sets a value. Switching sampling on with `do_sample=True` alone therefore already limits the draw to the 50 best-scoring tokens.
+  fix: 'To sample with no top-k filter, pass **`top_k=0`**: the library adds the filter only when the value is not 0. Then let `top_p` or the temperature shape the draw.'
+- mistake: Relying on one fixed k for every word of the text
+  why: 'The number of sensible next words changes from step to step. Holtzman et al. show both cases: sometimes tens or hundreds of words are reasonable, sometimes almost all the probability sits on one or two. A **small k** then risks "bland or generic text"; a **large k** lets in "inappropriate candidates" whose chance of being picked goes **up** when the kept probabilities are rescaled.'
+  fix: Use `top_p`, which keeps more or fewer tokens depending on how sure the model is, alone or together with a moderate `top_k` (Qwen2.5-7B-Instruct ships `top_k=20` with `top_p=0.8`).
+- mistake: Expecting exactly k tokens to survive
+  why: The library removes every token whose score is **below the k-th highest score**. Tokens that tie with the k-th one are all kept, so more than k can remain. When `top_p` is also set, it runs **after** top-k and can remove more, so fewer than k can remain.
+  fix: Read `top_k` as an upper limit on the candidates in normal cases, not as an exact count.
 visual:
   kind: distribution
-  tokens: ["blue", "clear", "falling", "green", "loud"]
-  logits: [3, 2, 1, 0, -1]
+  tokens:
+  - blue
+  - clear
+  - falling
+  - green
+  - loud
+  logits:
+  - 3
+  - 2
+  - 1
+  - 0
+  - -1
   truncate:
     top_k: 2
-  caption: "Five candidate next words for \"The sky is\" with scores 3, 2, 1, 0 and -1, before and after top_k = 2. The scores are made up for this figure, not taken from a model; every probability is computed from them as under Calculation."
-tags: [inference, sampling, decoding]
-updated: 2026-11-23
-related: [hyperparameter/do-sample, hyperparameter/top-p, hyperparameter/temperature]
+  caption: Five candidate next words for "The sky is" with scores 3, 2, 1, 0 and -1, before and after top_k = 2. The scores are made up for this figure, not taken from a model; every probability is computed from them as under Calculation.
+tags:
+- inference
+- sampling
+- decoding
+updated: '2026-11-23'
+related:
+- hyperparameter/do-sample
+- hyperparameter/top-p
+- hyperparameter/temperature
 sources:
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/logits_process.py", title: "Hugging Face Transformers source: logits_process.py (TopKLogitsWarper)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py", title: "Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: parameters, defaults, warnings)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py", title: "Hugging Face Transformers source: generation/utils.py (which filters are applied, and in what order)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1805.04833", title: "Hierarchical Neural Story Generation (Fan, Lewis, Dauphin, 2018)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1904.09751", title: "The Curious Case of Neural Text Degeneration (Holtzman et al., 2019)", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json", title: "Qwen2.5-7B-Instruct: generation_config.json", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/generation_config.json", title: "Qwen3-8B: generation_config.json", trust: 0.9 }
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/logits_process.py
+  title: 'Hugging Face Transformers source: logits_process.py (TopKLogitsWarper)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/configuration_utils.py
+  title: 'Hugging Face Transformers source: generation/configuration_utils.py (GenerationConfig: parameters, defaults, warnings)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py
+  title: 'Hugging Face Transformers source: generation/utils.py (which filters are applied, and in what order)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1805.04833
+  title: Hierarchical Neural Story Generation (Fan, Lewis, Dauphin, 2018)
+  trust: 0.9
+- url: https://arxiv.org/abs/1904.09751
+  title: The Curious Case of Neural Text Degeneration (Holtzman et al., 2019)
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/generation_config.json
+  title: 'Qwen2.5-7B-Instruct: generation_config.json'
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-8B/blob/main/generation_config.json
+  title: 'Qwen3-8B: generation_config.json'
+  trust: 0.9
 ---
 
 ## Definition

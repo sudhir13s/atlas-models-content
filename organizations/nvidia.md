@@ -2,7 +2,7 @@
 id: organization/nvidia
 type: organization
 slug: nvidia
-schema_version: 1.1
+schema_version: 3.1
 title: NVIDIA
 name: NVIDIA
 kind: company

@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://theaiatlas.dev/schema/models/task.schema.json",
   "title": "task",
+  "unevaluatedProperties": false,
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "$defs": {
     "modality": {
@@ -28,6 +29,7 @@
   },
   "properties": {
     "type": { "const": "task" },
+    "schema_version": { "const": 3.1 },
     "group": {
       "type": "string",
       "pattern": "^task-group/[a-z0-9]+(?:-[a-z0-9]+)*$",

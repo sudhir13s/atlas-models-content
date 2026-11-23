@@ -2,7 +2,7 @@
 id: organization/openvla
 type: organization
 slug: openvla
-schema_version: 1.1
+schema_version: 3.1
 title: OpenVLA Collaboration
 name: OpenVLA Collaboration
 website: https://huggingface.co/openvla

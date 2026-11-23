@@ -2,7 +2,7 @@
 id: organization/bigscience
 type: organization
 slug: bigscience
-schema_version: 1.1
+schema_version: 3.1
 title: BigScience
 name: BigScience
 kind: community

@@ -2,7 +2,7 @@
 id: organization/briaai
 type: organization
 slug: briaai
-schema_version: 1.1
+schema_version: 3.1
 title: BRIA AI
 name: BRIA AI
 website: https://huggingface.co/briaai

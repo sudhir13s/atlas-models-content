@@ -2,89 +2,134 @@
 id: parameter/activation-function
 type: parameter
 slug: activation-function
-schema_version: 2.9
-title: "Activation Function (SwiGLU / GELU)"
+schema_version: 3.1
+title: Activation Function (SwiGLU / GELU)
 name: hidden_act
 priority: 12
 importance: optional
-applies_to: [llm, transformer, moe]
-range: "silu · gelu · gelu_new · relu"
-controls: "The non-linear function inside each feed-forward block; whether the block is gated, which adds a third matrix, is set by the model's code."
+applies_to:
+- llm
+- transformer
+- moe
+range: silu · gelu · gelu_new · relu
+controls: The non-linear function inside each feed-forward block; whether the block is gated, which adds a third matrix, is set by the model's code.
 options:
-  - value: "silu"
-    effect: "x·σ(x). In Qwen3, Mixtral and DeepSeek-V3 it gates a three-matrix block (SwiGLU): 3 × hidden_size × intermediate_size per layer."
-  - value: "gelu"
-    effect: "x·Φ(x) with the exact error function, as in BERT; in its two-matrix block, 2 × hidden_size × intermediate_size."
-  - value: "gelu_new"
-    effect: "The tanh approximation of GELU, as in GPT-2; within 0.0005 of the exact GELU between −4 and 4."
-  - value: "relu"
-    effect: "max(0, x), the original Transformer's choice; 0 for every negative input."
+- value: silu
+  effect: 'x·σ(x). In Qwen3, Mixtral and DeepSeek-V3 it gates a three-matrix block (SwiGLU): 3 × hidden_size × intermediate_size per layer.'
+- value: gelu
+  effect: x·Φ(x) with the exact error function, as in BERT; in its two-matrix block, 2 × hidden_size × intermediate_size.
+- value: gelu_new
+  effect: The tanh approximation of GELU, as in GPT-2; within 0.0005 of the exact GELU between −4 and 4.
+- value: relu
+  effect: max(0, x), the original Transformer's choice; 0 for every negative input.
 typical_values:
-  - setting: "Original Transformer: FFN(x) = max(0, xW₁ + b₁)W₂ + b₂ (Vaswani et al.)"
-    value: "relu"
-    source: "https://arxiv.org/abs/1706.03762"
-  - setting: "BERT-base uncased (config.json)"
-    value: "gelu"
-    source: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json"
-  - setting: "GPT-2, activation_function (config.json)"
-    value: "gelu_new"
-    source: "https://huggingface.co/openai-community/gpt2/blob/main/config.json"
-  - setting: "Qwen3-8B, gated (config.json)"
-    value: "silu"
-    source: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json"
-  - setting: "Mixtral-8x7B, gated experts (config.json)"
-    value: "silu"
-    source: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json"
+- setting: 'Original Transformer: FFN(x) = max(0, xW₁ + b₁)W₂ + b₂ (Vaswani et al.)'
+  value: relu
+  source: https://arxiv.org/abs/1706.03762
+- setting: BERT-base uncased (config.json)
+  value: gelu
+  source: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+- setting: GPT-2, activation_function (config.json)
+  value: gelu_new
+  source: https://huggingface.co/openai-community/gpt2/blob/main/config.json
+- setting: Qwen3-8B, gated (config.json)
+  value: silu
+  source: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+- setting: Mixtral-8x7B, gated experts (config.json)
+  value: silu
+  source: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json
 mistakes:
-  - mistake: "Reading hidden_act as a sign that the block is gated"
-    why: >-
-      The key names the function only. Transformers' Qwen3 code applies it to the gate projection and
-      multiplies by the up projection, three matrices; BERT's code applies its gelu between two
-      matrices. The same key can mean either block.
-    fix: "Read the model's code, or count its feed-forward matrices, to know whether it is gated."
-  - mistake: "Treating gelu and gelu_new as the same function"
-    why: >-
-      Transformers maps gelu to the exact x·Φ(x) and gelu_new to the tanh approximation from the GELU
-      paper, which GPT-2 uses. At x = 1 they give **0.8413** and **0.8412**; the gap stays under
-      **0.0005** between −4 and 4.
-    fix: "Keep the name a checkpoint was trained with."
-  - mistake: "Thinking Swish and SiLU are different functions"
-    why: >-
-      The Swish paper defines x·σ(βx) and notes that with β = 1 it equals the SiLU; Transformers maps
-      both swish and silu to SiLU. The GELU paper names x·σ(x) the Sigmoid Linear Unit.
-    fix: "Read swish and silu as the same function in configurations."
-  - mistake: "Comparing a gated and a plain block at the same intermediate_size"
-    why: >-
-      A gated block has three matrices. Shazeer cut d_ff from **3072** to **2048** to match parameters
-      and computation, and then measured log-perplexity **1.636** for SwiGLU against **1.677** for
-      ReLU and **1.679** for GELU (lower is better).
-    fix: "Match parameters, not intermediate_size, when comparing activations."
-related: [parameter/intermediate-size-ffn, parameter/moe-expert-ffn-size, parameter/hidden-size]
+- mistake: Reading hidden_act as a sign that the block is gated
+  why: The key names the function only. Transformers' Qwen3 code applies it to the gate projection and multiplies by the up projection, three matrices; BERT's code applies its gelu between two matrices. The same key can mean either block.
+  fix: Read the model's code, or count its feed-forward matrices, to know whether it is gated.
+- mistake: Treating gelu and gelu_new as the same function
+  why: Transformers maps gelu to the exact x·Φ(x) and gelu_new to the tanh approximation from the GELU paper, which GPT-2 uses. At x = 1 they give **0.8413** and **0.8412**; the gap stays under **0.0005** between −4 and 4.
+  fix: Keep the name a checkpoint was trained with.
+- mistake: Thinking Swish and SiLU are different functions
+  why: The Swish paper defines x·σ(βx) and notes that with β = 1 it equals the SiLU; Transformers maps both swish and silu to SiLU. The GELU paper names x·σ(x) the Sigmoid Linear Unit.
+  fix: Read swish and silu as the same function in configurations.
+- mistake: Comparing a gated and a plain block at the same intermediate_size
+  why: A gated block has three matrices. Shazeer cut d_ff from **3072** to **2048** to match parameters and computation, and then measured log-perplexity **1.636** for SwiGLU against **1.677** for ReLU and **1.679** for GELU (lower is better).
+  fix: Match parameters, not intermediate_size, when comparing activations.
+related:
+- parameter/intermediate-size-ffn
+- parameter/moe-expert-ffn-size
+- parameter/hidden-size
 visual:
   kind: activation_curves
-  functions: [relu, gelu, gelu_new, silu]
-  range: { min: -4, max: 4 }
-  marks: [-2, -1, 0, 1, 2]
-  caption: "The four activations as Hugging Face Transformers computes them, over inputs from −4 to 4, with the values at five inputs tabulated. The inputs are an example range, not values from a trained model."
-tags: [llm, transformer, activation, swiglu, gelu, ffn, parameters]
-updated: 2026-11-23
+  functions:
+  - relu
+  - gelu
+  - gelu_new
+  - silu
+  range:
+    min: -4
+    max: 4
+  marks:
+  - -2
+  - -1
+  - 0
+  - 1
+  - 2
+  caption: The four activations as Hugging Face Transformers computes them, over inputs from −4 to 4, with the values at five inputs tabulated. The inputs are an example range, not values from a trained model.
+tags:
+- llm
+- transformer
+- activation
+- swiglu
+- gelu
+- ffn
+- parameters
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/1606.08415", title: "Gaussian Error Linear Units (GELUs) (Hendrycks & Gimpel, 2016)", trust: 0.85 }
-  - { url: "https://arxiv.org/abs/1710.05941", title: "Searching for Activation Functions (Ramachandran et al., 2017)", trust: 0.85 }
-  - { url: "https://arxiv.org/abs/1702.03118", title: "Sigmoid-Weighted Linear Units for Neural Network Function Approximation in Reinforcement Learning (Elfwing et al., 2017)", trust: 0.85 }
-  - { url: "https://arxiv.org/abs/2002.05202", title: "GLU Variants Improve Transformer (Shazeer, 2020)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2505.09388", title: "Qwen3 Technical Report (Qwen Team, 2025)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/activations.py", title: "Hugging Face Transformers source: activations.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py", title: "Hugging Face Transformers source: modeling_qwen3.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/modeling_bert.py", title: "Hugging Face Transformers source: modeling_bert.py", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/deepseek_v3/modeling_deepseek_v3.py", title: "Hugging Face Transformers source: modeling_deepseek_v3.py", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2401.04088", title: "Mixtral of Experts (Jiang et al., 2024)", trust: 0.95 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py", title: "Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)", trust: 0.9 }
-  - { url: "https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json", title: "Qwen3-8B configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json", title: "BERT-base uncased configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/openai-community/gpt2/blob/main/config.json", title: "GPT-2 configuration (config.json)", trust: 0.95 }
-  - { url: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json", title: "Mixtral-8x7B-Instruct-v0.1 configuration (config.json)", trust: 0.95 }
+- url: https://arxiv.org/abs/1606.08415
+  title: Gaussian Error Linear Units (GELUs) (Hendrycks & Gimpel, 2016)
+  trust: 0.85
+- url: https://arxiv.org/abs/1710.05941
+  title: Searching for Activation Functions (Ramachandran et al., 2017)
+  trust: 0.85
+- url: https://arxiv.org/abs/1702.03118
+  title: Sigmoid-Weighted Linear Units for Neural Network Function Approximation in Reinforcement Learning (Elfwing et al., 2017)
+  trust: 0.85
+- url: https://arxiv.org/abs/2002.05202
+  title: GLU Variants Improve Transformer (Shazeer, 2020)
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.95
+- url: https://arxiv.org/abs/2505.09388
+  title: Qwen3 Technical Report (Qwen Team, 2025)
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/activations.py
+  title: 'Hugging Face Transformers source: activations.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3/modeling_qwen3.py
+  title: 'Hugging Face Transformers source: modeling_qwen3.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/modeling_bert.py
+  title: 'Hugging Face Transformers source: modeling_bert.py'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/deepseek_v3/modeling_deepseek_v3.py
+  title: 'Hugging Face Transformers source: modeling_deepseek_v3.py'
+  trust: 0.9
+- url: https://arxiv.org/abs/2401.04088
+  title: Mixtral of Experts (Jiang et al., 2024)
+  trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/utils/auto_docstring.py
+  title: 'Hugging Face Transformers source: configuration argument descriptions (auto_docstring.py)'
+  trust: 0.9
+- url: https://huggingface.co/Qwen/Qwen3-8B/blob/main/config.json
+  title: Qwen3-8B configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/google-bert/bert-base-uncased/blob/main/config.json
+  title: BERT-base uncased configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/openai-community/gpt2/blob/main/config.json
+  title: GPT-2 configuration (config.json)
+  trust: 0.95
+- url: https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/blob/main/config.json
+  title: Mixtral-8x7B-Instruct-v0.1 configuration (config.json)
+  trust: 0.95
 ---
 
 ## Definition

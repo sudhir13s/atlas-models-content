@@ -2,84 +2,95 @@
 id: fine-tuning-method/qlora
 type: fine-tuning-method
 slug: qlora
-schema_version: 2.8
-title: "QLoRA (Quantized Low-Rank Adaptation)"
+schema_version: 3.1
+title: QLoRA (Quantized Low-Rank Adaptation)
 method_type: peft
 memory_profile: low
-summary: "Store the frozen model in 4-bit numbers and train LoRA adapters through it, so fine-tuning a 65-billion-parameter model fits on one 48 GB GPU."
-when_to_use: "When the frozen model in 16-bit numbers does not fit in GPU memory but its 4-bit copy with LoRA adapters does."
-related_hyperparameters: [hyperparameter/lora-r, hyperparameter/lora-alpha, hyperparameter/target-modules, hyperparameter/learning-rate]
+summary: Store the frozen model in 4-bit numbers and train LoRA adapters through it, so fine-tuning a 65-billion-parameter model fits on one 48 GB GPU.
+when_to_use: When the frozen model in 16-bit numbers does not fit in GPU memory but its 4-bit copy with LoRA adapters does.
+related_hyperparameters:
+- hyperparameter/lora-r
+- hyperparameter/lora-alpha
+- hyperparameter/target-modules
+- hyperparameter/learning-rate
 profile:
-  trains: "LoRA's two small matrices on every linear layer; the base is frozen in 4-bit NF4"
-  models_in_training: "One: the 4-bit frozen model with 16-bit adapters"
-  data: "Input and target pairs for the task"
-  stages: "One"
-  source: "https://arxiv.org/abs/2305.14314"
+  trains: LoRA's two small matrices on every linear layer; the base is frozen in 4-bit NF4
+  models_in_training: 'One: the 4-bit frozen model with 16-bit adapters'
+  data: Input and target pairs for the task
+  stages: One
+  source: https://arxiv.org/abs/2305.14314
 typical_values:
-  - setting: "QLoRA paper: LoRA rank and α, LoRA on every linear layer"
-    value: "r = 64, α = 16"
-    source: "https://arxiv.org/abs/2305.14314"
-  - setting: "QLoRA paper: learning rate, LLaMA 7B and 13B / 33B and 65B (constant schedule)"
-    value: "2e-4 / 1e-4"
-    source: "https://arxiv.org/abs/2305.14314"
-  - setting: "QLoRA paper: LoRA dropout in its Guanaco training, models up to 13B / 33B and 65B (Appendix B.2)"
-    value: "0.1 / 0.05"
-    source: "https://arxiv.org/abs/2305.14314"
-  - setting: "QLoRA paper: Adam β2; maximum gradient norm"
-    value: "0.999; 0.3"
-    source: "https://arxiv.org/abs/2305.14314"
-  - setting: "QLoRA paper: block size of the weights / of the quantization constants"
-    value: "64 / 256"
-    source: "https://arxiv.org/abs/2305.14314"
-  - setting: "QLoRA paper: storage / computation number types"
-    value: "4-bit NormalFloat (NF4) / BFloat16"
-    source: "https://arxiv.org/abs/2305.14314"
+- setting: 'QLoRA paper: LoRA rank and α, LoRA on every linear layer'
+  value: r = 64, α = 16
+  source: https://arxiv.org/abs/2305.14314
+- setting: 'QLoRA paper: learning rate, LLaMA 7B and 13B / 33B and 65B (constant schedule)'
+  value: 2e-4 / 1e-4
+  source: https://arxiv.org/abs/2305.14314
+- setting: 'QLoRA paper: LoRA dropout in its Guanaco training, models up to 13B / 33B and 65B (Appendix B.2)'
+  value: 0.1 / 0.05
+  source: https://arxiv.org/abs/2305.14314
+- setting: 'QLoRA paper: Adam β2; maximum gradient norm'
+  value: 0.999; 0.3
+  source: https://arxiv.org/abs/2305.14314
+- setting: 'QLoRA paper: block size of the weights / of the quantization constants'
+  value: 64 / 256
+  source: https://arxiv.org/abs/2305.14314
+- setting: 'QLoRA paper: storage / computation number types'
+  value: 4-bit NormalFloat (NF4) / BFloat16
+  source: https://arxiv.org/abs/2305.14314
 mistakes:
-  - mistake: "Adding LoRA to the query and value matrices only"
-    why: >-
-      With LoRA on the query and value projections, the standard practice from the LoRA paper, the
-      QLoRA authors could not match full fine-tuning on large base models. They found the total
-      number of adapters the most critical LoRA setting, and LoRA on **all linear layers**
-      necessary to match it (their Figure 2, LLaMA 7B on Alpaca).
-    fix: "Put adapters on every linear layer of the transformer blocks."
-  - mistake: "Shrinking r to save memory"
-    why: >-
-      For LLaMA 7B at batch size 1 the paper measured LoRA weights of **26 MB** against LoRA input
-      gradients of **567 MB** (18 MB per sequence with gradient checkpointing) and a 4-bit base of
-      **5,048 MB**. With LoRA on all layers it found r **unrelated to final performance**.
-    fix: "Keep a moderate r; use gradient checkpointing, which is where the memory goes."
-  - mistake: "Using plain 4-bit floats instead of NF4"
-    why: >-
-      In the paper's Table 4 (LLaMA 7B to 65B, 5-shot MMLU), 4-bit floats averaged **52.2** and NF4
-      with double quantization **53.1**, against **53.0** for 16-bit BFloat16: the authors report FP4
-      about one percentage point behind.
-    fix: "Use NF4 with double quantization, the paper's setting for every experiment."
-  - mistake: "Reading the memory figures as a limit for any batch"
-    why: >-
-      The paper's Figure 6 totals are for batch size **1**, sequence length **512** and gradient
-      checkpointing. It notes that a larger batch or a long sequence can make the activation
-      gradients consume a considerable amount of memory, and that the 33B model needs paged
-      optimizers to fit 24 GB.
-    fix: "Measure at your own batch size and sequence length, and keep paged optimizers on."
+- mistake: Adding LoRA to the query and value matrices only
+  why: With LoRA on the query and value projections, the standard practice from the LoRA paper, the QLoRA authors could not match full fine-tuning on large base models. They found the total number of adapters the most critical LoRA setting, and LoRA on **all linear layers** necessary to match it (their Figure 2, LLaMA 7B on Alpaca).
+  fix: Put adapters on every linear layer of the transformer blocks.
+- mistake: Shrinking r to save memory
+  why: For LLaMA 7B at batch size 1 the paper measured LoRA weights of **26 MB** against LoRA input gradients of **567 MB** (18 MB per sequence with gradient checkpointing) and a 4-bit base of **5,048 MB**. With LoRA on all layers it found r **unrelated to final performance**.
+  fix: Keep a moderate r; use gradient checkpointing, which is where the memory goes.
+- mistake: Using plain 4-bit floats instead of NF4
+  why: 'In the paper''s Table 4 (LLaMA 7B to 65B, 5-shot MMLU), 4-bit floats averaged **52.2** and NF4 with double quantization **53.1**, against **53.0** for 16-bit BFloat16: the authors report FP4 about one percentage point behind.'
+  fix: Use NF4 with double quantization, the paper's setting for every experiment.
+- mistake: Reading the memory figures as a limit for any batch
+  why: The paper's Figure 6 totals are for batch size **1**, sequence length **512** and gradient checkpointing. It notes that a larger batch or a long sequence can make the activation gradients consume a considerable amount of memory, and that the 33B model needs paged optimizers to fit 24 GB.
+  fix: Measure at your own batch size and sequence length, and keep paged optimizers on.
 visual:
   kind: memory_bars
   panels:
-    - title: "Fine-tuning LLaMA 65B"
-      bars:
-        - { label: "16-bit, full", gigabytes: 780, is_lower_bound: true }
-        - { label: "QLoRA", gigabytes: 45.0, is_lower_bound: false }
-    - title: "QLoRA training memory by LLaMA size"
-      bars:
-        - { label: "7B", gigabytes: 6.9, is_lower_bound: false }
-        - { label: "13B", gigabytes: 11.3, is_lower_bound: false }
-        - { label: "33B", gigabytes: 24.7, is_lower_bound: false }
-        - { label: "65B", gigabytes: 45.0, is_lower_bound: false }
-  caption: "Published figures from the QLoRA paper: more than 780 GB for regular 16-bit fine-tuning of LLaMA 65B (Introduction), and the total QLoRA training memory per LLaMA size at batch size 1, sequence length 512, with gradient checkpointing (Figure 6)."
-tags: [fine-tuning, peft, qlora, quantization, lora]
-updated: 2026-11-23
+  - title: Fine-tuning LLaMA 65B
+    bars:
+    - label: 16-bit, full
+      gigabytes: 780
+      is_lower_bound: true
+    - label: QLoRA
+      gigabytes: 45.0
+      is_lower_bound: false
+  - title: QLoRA training memory by LLaMA size
+    bars:
+    - label: 7B
+      gigabytes: 6.9
+      is_lower_bound: false
+    - label: 13B
+      gigabytes: 11.3
+      is_lower_bound: false
+    - label: 33B
+      gigabytes: 24.7
+      is_lower_bound: false
+    - label: 65B
+      gigabytes: 45.0
+      is_lower_bound: false
+  caption: 'Published figures from the QLoRA paper: more than 780 GB for regular 16-bit fine-tuning of LLaMA 65B (Introduction), and the total QLoRA training memory per LLaMA size at batch size 1, sequence length 512, with gradient checkpointing (Figure 6).'
+tags:
+- fine-tuning
+- peft
+- qlora
+- quantization
+- lora
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/2305.14314", title: "QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2106.09685", title: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)", trust: 0.9 }
+- url: https://arxiv.org/abs/2305.14314
+  title: 'QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2106.09685
+  title: 'LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)'
+  trust: 0.9
 ---
 
 ## Definition

@@ -2,26 +2,33 @@
 id: hyperparameter/gradient-clipping
 type: hyperparameter
 slug: gradient-clipping
-schema_version: 2.2
-title: "Gradient Clipping"
+schema_version: 3.1
+title: Gradient Clipping
 name: max_grad_norm
 context: training
 priority: 9
 importance: important
-goals: [training, finetuning]
-models: [llm, vision, audio, diffusion, rl]
-range: "1 — 45"
-controls: "The largest overall size the combined gradient may have at one training update: a larger gradient is shrunk to this size, keeping its direction, before the model is changed."
+goals:
+- training
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+- rl
+range: 1 — 45
+controls: 'The largest overall size the combined gradient may have at one training update: a larger gradient is shrunk to this size, keeping its direction, before the model is changed.'
 effects:
   decrease:
-    - "Clipping starts at smaller gradient sizes, so it acts on more updates"
-    - "Large updates are cut down further; their direction is kept"
-    - "Very small values shrink almost every update to the same size"
-    - "In the Hugging Face Trainer, 0 switches clipping off altogether"
+  - Clipping starts at smaller gradient sizes, so it acts on more updates
+  - Large updates are cut down further; their direction is kept
+  - Very small values shrink almost every update to the same size
+  - In the Hugging Face Trainer, 0 switches clipping off altogether
   increase:
-    - "Clipping acts only on rarer, larger gradients"
-    - "A sudden very large gradient passes with less reduction"
-    - "Above every gradient size the run produces, clipping never acts"
+  - Clipping acts only on rarer, larger gradients
+  - A sudden very large gradient passes with less reduction
+  - Above every gradient size the run produces, clipping never acts
 scale:
   min: 0.1
   max: 100
@@ -29,79 +36,69 @@ scale:
   typical_max: 45
   spacing: log
 typical_values:
-  - setting: "Hugging Face Transformers: default of TrainingArguments"
-    value: "1.0"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py"
-  - setting: "GPT-3, training from scratch, all model sizes (global norm)"
-    value: "1.0"
-    source: "https://arxiv.org/abs/2005.14165"
-  - setting: "LLaMA, training from scratch"
-    value: "1.0"
-    source: "https://arxiv.org/abs/2302.13971"
-  - setting: "Vision Transformer: fine-tuning, and training from scratch on ImageNet (global norm)"
-    value: "1"
-    source: "https://arxiv.org/abs/2010.11929"
-  - setting: "Pascanu et al.: recurrent networks on their synthetic long-memory tasks"
-    value: "6"
-    source: "https://arxiv.org/abs/1211.5063"
-  - setting: "Pascanu et al.: character-level language model, loss summed over 200-step sequences"
-    value: "45"
-    source: "https://arxiv.org/abs/1211.5063"
+- setting: 'Hugging Face Transformers: default of TrainingArguments'
+  value: '1.0'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+- setting: GPT-3, training from scratch, all model sizes (global norm)
+  value: '1.0'
+  source: https://arxiv.org/abs/2005.14165
+- setting: LLaMA, training from scratch
+  value: '1.0'
+  source: https://arxiv.org/abs/2302.13971
+- setting: 'Vision Transformer: fine-tuning, and training from scratch on ImageNet (global norm)'
+  value: '1'
+  source: https://arxiv.org/abs/2010.11929
+- setting: 'Pascanu et al.: recurrent networks on their synthetic long-memory tasks'
+  value: '6'
+  source: https://arxiv.org/abs/1211.5063
+- setting: 'Pascanu et al.: character-level language model, loss summed over 200-step sequences'
+  value: '45'
+  source: https://arxiv.org/abs/1211.5063
 mistakes:
-  - mistake: "Assuming clipping is on, or off, without checking the training loop"
-    why: >-
-      The two common setups differ. The Hugging Face `Trainer` clips at **1.0 by default** and skips
-      clipping only when `max_grad_norm` is 0. A hand-written PyTorch loop does **no clipping at
-      all** unless it calls `torch.nn.utils.clip_grad_norm_` itself.
-    fix: >-
-      Decide on a value and set it explicitly: `max_grad_norm` in `TrainingArguments`, or a call to
-      `clip_grad_norm_(model.parameters(), max_norm)` in your own loop.
-  - mistake: "Copying a threshold without the scale of the loss it was tuned for"
-    why: >-
-      The size of the gradient depends on how the loss is computed. Pascanu et al. used a threshold
-      of **8** for music models whose loss is averaged over the sequence, and **45** for a language
-      model whose loss is **summed** over 200 steps. A threshold far below the usual gradient size
-      shrinks every update; one far above it never acts.
-    fix: >-
-      Follow their heuristic: look at the **average gradient norm over a large number of updates**
-      and choose the threshold from that. The Hugging Face `Trainer` logs the norm before clipping
-      as `grad_norm`.
-  - mistake: "Clipping in the wrong place in the update"
-    why: >-
-      Clipping acts on the gradients that the backward pass has just computed, and must run before
-      the optimizer uses them. Called before `loss.backward()` it sees the previous gradients or none; called
-      after `optimizer.step()` the model has already moved by the unclipped amount.
-    fix: >-
-      Use the order the Hugging Face documentation states: backward pass, then clipping, then the
-      optimizer step.
-  - mistake: "Using clip_grad_value_ when clip_grad_norm_ was meant"
-    why: >-
-      `clip_grad_value_` caps **each number separately** at a fixed size, which can change the
-      direction of the gradient. Pascanu et al. describe this element-wise form (from Mikolov) and
-      chose instead to rescale the **whole gradient**, which keeps its direction. Part C of the
-      worked example shows the difference.
-    fix: >-
-      Use `clip_grad_norm_` (what `max_grad_norm` controls) unless an element-wise cap is what you
-      intend.
-  - mistake: "Expecting clipping to repair a gradient that is already infinite or not a number"
-    why: >-
-      Clipping divides by the gradient's size. When that size is infinite or "not a number", no
-      rescaling gives usable values. PyTorch does not stop by default: `error_if_nonfinite` is
-      `False`.
-    fix: >-
-      Pass `error_if_nonfinite=True` to `clip_grad_norm_` to get an error at the step where it
-      happens, and look for the cause in the data or the learning rate.
-tags: [training, stability, gradient]
-updated: 2026-11-23
-related: [hyperparameter/learning-rate]
+- mistake: Assuming clipping is on, or off, without checking the training loop
+  why: The two common setups differ. The Hugging Face `Trainer` clips at **1.0 by default** and skips clipping only when `max_grad_norm` is 0. A hand-written PyTorch loop does **no clipping at all** unless it calls `torch.nn.utils.clip_grad_norm_` itself.
+  fix: 'Decide on a value and set it explicitly: `max_grad_norm` in `TrainingArguments`, or a call to `clip_grad_norm_(model.parameters(), max_norm)` in your own loop.'
+- mistake: Copying a threshold without the scale of the loss it was tuned for
+  why: The size of the gradient depends on how the loss is computed. Pascanu et al. used a threshold of **8** for music models whose loss is averaged over the sequence, and **45** for a language model whose loss is **summed** over 200 steps. A threshold far below the usual gradient size shrinks every update; one far above it never acts.
+  fix: 'Follow their heuristic: look at the **average gradient norm over a large number of updates** and choose the threshold from that. The Hugging Face `Trainer` logs the norm before clipping as `grad_norm`.'
+- mistake: Clipping in the wrong place in the update
+  why: Clipping acts on the gradients that the backward pass has just computed, and must run before the optimizer uses them. Called before `loss.backward()` it sees the previous gradients or none; called after `optimizer.step()` the model has already moved by the unclipped amount.
+  fix: 'Use the order the Hugging Face documentation states: backward pass, then clipping, then the optimizer step.'
+- mistake: Using clip_grad_value_ when clip_grad_norm_ was meant
+  why: '`clip_grad_value_` caps **each number separately** at a fixed size, which can change the direction of the gradient. Pascanu et al. describe this element-wise form (from Mikolov) and chose instead to rescale the **whole gradient**, which keeps its direction. Part C of the worked example shows the difference.'
+  fix: Use `clip_grad_norm_` (what `max_grad_norm` controls) unless an element-wise cap is what you intend.
+- mistake: Expecting clipping to repair a gradient that is already infinite or not a number
+  why: 'Clipping divides by the gradient''s size. When that size is infinite or "not a number", no rescaling gives usable values. PyTorch does not stop by default: `error_if_nonfinite` is `False`.'
+  fix: Pass `error_if_nonfinite=True` to `clip_grad_norm_` to get an error at the step where it happens, and look for the cause in the data or the learning rate.
+tags:
+- training
+- stability
+- gradient
+updated: '2026-11-23'
+related:
+- hyperparameter/learning-rate
 sources:
-  - { url: "https://arxiv.org/abs/1211.5063", title: "On the difficulty of training Recurrent Neural Networks (Pascanu, Mikolov, Bengio, 2013)", trust: 0.9 }
-  - { url: "https://github.com/pytorch/pytorch/blob/main/torch/nn/utils/clip_grad.py", title: "PyTorch source: torch/nn/utils/clip_grad.py (clip_grad_norm_ and clip_grad_value_)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py", title: "Hugging Face Transformers source: training_args.py (max_grad_norm default and description)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/trainer.py", title: "Hugging Face Transformers source: trainer.py (when clipping runs, grad_norm logging)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2005.14165", title: "Language Models are Few-Shot Learners (Brown et al., 2020), the GPT-3 paper", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2302.13971", title: "LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2010.11929", title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020), the Vision Transformer paper", trust: 0.9 }
+- url: https://arxiv.org/abs/1211.5063
+  title: On the difficulty of training Recurrent Neural Networks (Pascanu, Mikolov, Bengio, 2013)
+  trust: 0.9
+- url: https://github.com/pytorch/pytorch/blob/main/torch/nn/utils/clip_grad.py
+  title: 'PyTorch source: torch/nn/utils/clip_grad.py (clip_grad_norm_ and clip_grad_value_)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+  title: 'Hugging Face Transformers source: training_args.py (max_grad_norm default and description)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/trainer.py
+  title: 'Hugging Face Transformers source: trainer.py (when clipping runs, grad_norm logging)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2005.14165
+  title: Language Models are Few-Shot Learners (Brown et al., 2020), the GPT-3 paper
+  trust: 0.9
+- url: https://arxiv.org/abs/2302.13971
+  title: 'LLaMA: Open and Efficient Foundation Language Models (Touvron et al., 2023)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2010.11929
+  title: 'An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020), the Vision Transformer paper'
+  trust: 0.9
 ---
 
 ## Definition

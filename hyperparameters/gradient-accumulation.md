@@ -2,27 +2,34 @@
 id: hyperparameter/gradient-accumulation
 type: hyperparameter
 slug: gradient-accumulation
-schema_version: 2.2
-title: "Gradient Accumulation"
+schema_version: 3.1
+title: Gradient Accumulation
 name: gradient_accumulation_steps
 context: training
 priority: 11
 importance: important
-goals: [training, finetuning]
-models: [llm, vision, audio, diffusion, rl]
-range: "1 — 40"
-controls: "How many small batches of examples a training run works through before it changes the model once: a way to get the effect of a large batch on a machine that can only hold a small one."
+goals:
+- training
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+- rl
+range: 1 — 40
+controls: 'How many small batches of examples a training run works through before it changes the model once: a way to get the effect of a large batch on a machine that can only hold a small one.'
 effects:
   decrease:
-    - "Fewer small batches go into each update"
-    - "Each update needs fewer passes through the model"
-    - "The effective batch shrinks unless the per-device batch or the device count grows"
-    - "At 1: the model is updated after every batch"
+  - Fewer small batches go into each update
+  - Each update needs fewer passes through the model
+  - The effective batch shrinks unless the per-device batch or the device count grows
+  - 'At 1: the model is updated after every batch'
   increase:
-    - "More small batches are averaged into each update"
-    - "The effective batch grows with no extra memory"
-    - "Each update needs that many passes through the model"
-    - "Fewer updates for each pass over the data"
+  - More small batches are averaged into each update
+  - The effective batch grows with no extra memory
+  - Each update needs that many passes through the model
+  - Fewer updates for each pass over the data
 scale:
   min: 1
   max: 128
@@ -30,66 +37,69 @@ scale:
   typical_max: 40
   spacing: log
 typical_values:
-  - setting: "Hugging Face Transformers: default of TrainingArguments"
-    value: "1"
-    source: "https://huggingface.co/docs/transformers/main_classes/trainer"
-  - setting: "QLoRA training script: default, with a per-device batch of 1"
-    value: "16"
-    source: "https://github.com/artidoro/qlora/blob/main/qlora.py"
-  - setting: "Alpaca-LoRA training script: default on one device (batch_size 128 divided by micro_batch_size 4)"
-    value: "32"
-    source: "https://github.com/tloen/alpaca-lora/blob/main/finetune.py"
-  - setting: "nanoGPT training script: default on one process (written as 5 * 8), with batches of 12 sequences"
-    value: "40"
-    source: "https://github.com/karpathy/nanoGPT/blob/master/train.py"
+- setting: 'Hugging Face Transformers: default of TrainingArguments'
+  value: '1'
+  source: https://huggingface.co/docs/transformers/main_classes/trainer
+- setting: 'QLoRA training script: default, with a per-device batch of 1'
+  value: '16'
+  source: https://github.com/artidoro/qlora/blob/main/qlora.py
+- setting: 'Alpaca-LoRA training script: default on one device (batch_size 128 divided by micro_batch_size 4)'
+  value: '32'
+  source: https://github.com/tloen/alpaca-lora/blob/main/finetune.py
+- setting: 'nanoGPT training script: default on one process (written as 5 * 8), with batches of 12 sequences'
+  value: '40'
+  source: https://github.com/karpathy/nanoGPT/blob/master/train.py
 mistakes:
-  - mistake: "Raising the accumulation steps and treating the run as otherwise unchanged"
-    why: >-
-      Accumulation **multiplies the effective batch**: Hugging Face Transformers defines it as
-      per-device batch × devices × accumulation steps. The batch size and the learning rate work
-      as a pair: Goyal et al. kept the same accuracy from 256 to 8,192 images per batch only by
-      scaling the learning rate together with the batch size.
-    fix: >-
-      Work out the effective batch before and after the change. If it changed, test the learning
-      rate again. Goyal et al. give one tested starting point, shown for SGD on image
-      classification: multiply the learning rate by the same factor as the batch.
-  - mistake: "Reading logging_steps, eval_steps, save_steps or max_steps as a number of batches"
-    why: >-
-      The Hugging Face `Trainer` raises its step counter **once per optimizer update**, not once
-      per batch. With 8 accumulation steps, `logging_steps=10` means every 80 batches, and
-      `max_steps=1000` means 8,000 batches.
-    fix: >-
-      Count in updates. To keep an interval the same in batches, divide it by the accumulation
-      steps when you raise them.
-  - mistake: "In a hand-written loop, adding up the gradients without dividing the loss"
-    why: >-
-      PyTorch **adds** each new gradient to the stored one. Without a division, N accumulated
-      batches give a gradient N times as large as the average, and the update is N times as big.
-      The PyTorch example divides the loss by the number of accumulated batches before each
-      backward pass; the `Trainer` and nanoGPT do the same.
-    fix: >-
-      Divide each batch's loss by the accumulation steps, and call `optimizer.step()` and
-      `optimizer.zero_grad()` only after the last batch of the group.
-  - mistake: "Expecting accumulation to make training faster"
-    why: >-
-      It saves **memory**, not time. An update with N accumulation steps still runs N forward
-      and backward passes; they happen one after another instead of side by side.
-    fix: >-
-      Use it when the batch you want does not fit in memory. When it does fit, a larger
-      per-device batch reaches the same effective batch in fewer passes.
-tags: [training, memory, batch-size]
-updated: 2026-11-23
-related: [hyperparameter/effective-batch-size, hyperparameter/learning-rate, hyperparameter/training-duration, hyperparameter/gradient-clipping]
+- mistake: Raising the accumulation steps and treating the run as otherwise unchanged
+  why: 'Accumulation **multiplies the effective batch**: Hugging Face Transformers defines it as per-device batch × devices × accumulation steps. The batch size and the learning rate work as a pair: Goyal et al. kept the same accuracy from 256 to 8,192 images per batch only by scaling the learning rate together with the batch size.'
+  fix: 'Work out the effective batch before and after the change. If it changed, test the learning rate again. Goyal et al. give one tested starting point, shown for SGD on image classification: multiply the learning rate by the same factor as the batch.'
+- mistake: Reading logging_steps, eval_steps, save_steps or max_steps as a number of batches
+  why: The Hugging Face `Trainer` raises its step counter **once per optimizer update**, not once per batch. With 8 accumulation steps, `logging_steps=10` means every 80 batches, and `max_steps=1000` means 8,000 batches.
+  fix: Count in updates. To keep an interval the same in batches, divide it by the accumulation steps when you raise them.
+- mistake: In a hand-written loop, adding up the gradients without dividing the loss
+  why: PyTorch **adds** each new gradient to the stored one. Without a division, N accumulated batches give a gradient N times as large as the average, and the update is N times as big. The PyTorch example divides the loss by the number of accumulated batches before each backward pass; the `Trainer` and nanoGPT do the same.
+  fix: Divide each batch's loss by the accumulation steps, and call `optimizer.step()` and `optimizer.zero_grad()` only after the last batch of the group.
+- mistake: Expecting accumulation to make training faster
+  why: It saves **memory**, not time. An update with N accumulation steps still runs N forward and backward passes; they happen one after another instead of side by side.
+  fix: Use it when the batch you want does not fit in memory. When it does fit, a larger per-device batch reaches the same effective batch in fewer passes.
+tags:
+- training
+- memory
+- batch-size
+updated: '2026-11-23'
+related:
+- hyperparameter/effective-batch-size
+- hyperparameter/learning-rate
+- hyperparameter/training-duration
+- hyperparameter/gradient-clipping
 sources:
-  - { url: "https://huggingface.co/docs/transformers/main_classes/trainer", title: "Hugging Face Transformers documentation: Trainer and TrainingArguments", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py", title: "Hugging Face Transformers source: training_args.py (defaults and descriptions)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/trainer.py", title: "Hugging Face Transformers source: trainer.py (the training loop)", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/2.15/notes/amp_examples.html", title: "PyTorch documentation: Automatic Mixed Precision examples (Gradient accumulation)", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/2.15/generated/torch.optim.Optimizer.zero_grad.html", title: "PyTorch documentation: torch.optim.Optimizer.zero_grad", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.02677", title: "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour (Goyal et al., 2017)", trust: 0.9 }
-  - { url: "https://github.com/artidoro/qlora/blob/main/qlora.py", title: "QLoRA training script (qlora.py)", trust: 0.85 }
-  - { url: "https://github.com/tloen/alpaca-lora/blob/main/finetune.py", title: "Alpaca-LoRA training script (finetune.py)", trust: 0.8 }
-  - { url: "https://github.com/karpathy/nanoGPT/blob/master/train.py", title: "nanoGPT training script (train.py)", trust: 0.85 }
+- url: https://huggingface.co/docs/transformers/main_classes/trainer
+  title: 'Hugging Face Transformers documentation: Trainer and TrainingArguments'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+  title: 'Hugging Face Transformers source: training_args.py (defaults and descriptions)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/trainer.py
+  title: 'Hugging Face Transformers source: trainer.py (the training loop)'
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/2.15/notes/amp_examples.html
+  title: 'PyTorch documentation: Automatic Mixed Precision examples (Gradient accumulation)'
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/2.15/generated/torch.optim.Optimizer.zero_grad.html
+  title: 'PyTorch documentation: torch.optim.Optimizer.zero_grad'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.02677
+  title: 'Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour (Goyal et al., 2017)'
+  trust: 0.9
+- url: https://github.com/artidoro/qlora/blob/main/qlora.py
+  title: QLoRA training script (qlora.py)
+  trust: 0.85
+- url: https://github.com/tloen/alpaca-lora/blob/main/finetune.py
+  title: Alpaca-LoRA training script (finetune.py)
+  trust: 0.8
+- url: https://github.com/karpathy/nanoGPT/blob/master/train.py
+  title: nanoGPT training script (train.py)
+  trust: 0.85
 ---
 
 ## Definition

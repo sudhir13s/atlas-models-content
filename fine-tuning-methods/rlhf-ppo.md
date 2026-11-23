@@ -2,85 +2,102 @@
 id: fine-tuning-method/rlhf-ppo
 type: fine-tuning-method
 slug: rlhf-ppo
-schema_version: 2.8
-title: "RLHF with PPO"
+schema_version: 3.1
+title: RLHF with PPO
 method_type: rlhf
 memory_profile: high
-summary: "Train a reward model on people's rankings of answers, then improve the language model with PPO to earn more reward, minus a penalty for drifting from the supervised model."
-when_to_use: "When you want to optimise a learned reward on new prompts during training and can run four models: the policy, a frozen reference, the reward model and a value model."
-related_hyperparameters: [hyperparameter/learning-rate, hyperparameter/effective-batch-size]
+summary: Train a reward model on people's rankings of answers, then improve the language model with PPO to earn more reward, minus a penalty for drifting from the supervised model.
+when_to_use: 'When you want to optimise a learned reward on new prompts during training and can run four models: the policy, a frozen reference, the reward model and a value model.'
+related_hyperparameters:
+- hyperparameter/learning-rate
+- hyperparameter/effective-batch-size
 profile:
-  trains: "The policy, and a value model that estimates expected reward"
-  models_in_training: "Four: policy and value model (trained), SFT reference and reward model (frozen)"
-  data: "Written demonstrations, rankings of sampled answers, and prompts without answers"
-  stages: "Three: supervised fine-tuning, reward model, PPO"
-  source: "https://arxiv.org/abs/2203.02155"
+  trains: The policy, and a value model that estimates expected reward
+  models_in_training: 'Four: policy and value model (trained), SFT reference and reward model (frozen)'
+  data: Written demonstrations, rankings of sampled answers, and prompts without answers
+  stages: 'Three: supervised fine-tuning, reward model, PPO'
+  source: https://arxiv.org/abs/2203.02155
 typical_values:
-  - setting: "InstructGPT: KL reward coefficient β"
-    value: "0.02"
-    source: "https://arxiv.org/abs/2203.02155"
-  - setting: "InstructGPT: pre-training coefficient γ (PPO-ptx; 0 for plain PPO)"
-    value: "27.8"
-    source: "https://arxiv.org/abs/2203.02155"
-  - setting: "InstructGPT: PPO clip ratio; batch size; minibatch size"
-    value: "0.2; 512; 64"
-    source: "https://arxiv.org/abs/2203.02155"
-  - setting: "InstructGPT: episodes; unique prompts"
-    value: "256k; about 31k"
-    source: "https://arxiv.org/abs/2203.02155"
-  - setting: "InstructGPT: reward model size; learning rate; epochs"
-    value: "6B; 9e-6; 1"
-    source: "https://arxiv.org/abs/2203.02155"
-  - setting: "InstructGPT: value model learning rate, 1.3B and 6B policies / 175B policy"
-    value: "9e-6 / 5e-6"
-    source: "https://arxiv.org/abs/2203.02155"
-  - setting: "InstructGPT: policy learning rates scanned for 1.3B and 6B models"
-    value: "2.55e-6 to 2.55e-5"
-    source: "https://arxiv.org/abs/2203.02155"
-  - setting: "Ziegler et al.: target KL, descriptiveness / sentiment tasks (GPT-2 774M)"
-    value: "6 nats / 10 nats"
-    source: "https://arxiv.org/abs/1909.08593"
-  - setting: "PPO paper: clip ε compared on its benchmark (best score at 0.2)"
-    value: "0.1, 0.2, 0.3"
-    source: "https://arxiv.org/abs/1707.06347"
+- setting: 'InstructGPT: KL reward coefficient β'
+  value: '0.02'
+  source: https://arxiv.org/abs/2203.02155
+- setting: 'InstructGPT: pre-training coefficient γ (PPO-ptx; 0 for plain PPO)'
+  value: '27.8'
+  source: https://arxiv.org/abs/2203.02155
+- setting: 'InstructGPT: PPO clip ratio; batch size; minibatch size'
+  value: 0.2; 512; 64
+  source: https://arxiv.org/abs/2203.02155
+- setting: 'InstructGPT: episodes; unique prompts'
+  value: 256k; about 31k
+  source: https://arxiv.org/abs/2203.02155
+- setting: 'InstructGPT: reward model size; learning rate; epochs'
+  value: 6B; 9e-6; 1
+  source: https://arxiv.org/abs/2203.02155
+- setting: 'InstructGPT: value model learning rate, 1.3B and 6B policies / 175B policy'
+  value: 9e-6 / 5e-6
+  source: https://arxiv.org/abs/2203.02155
+- setting: 'InstructGPT: policy learning rates scanned for 1.3B and 6B models'
+  value: 2.55e-6 to 2.55e-5
+  source: https://arxiv.org/abs/2203.02155
+- setting: 'Ziegler et al.: target KL, descriptiveness / sentiment tasks (GPT-2 774M)'
+  value: 6 nats / 10 nats
+  source: https://arxiv.org/abs/1909.08593
+- setting: 'PPO paper: clip ε compared on its benchmark (best score at 0.2)'
+  value: 0.1, 0.2, 0.3
+  source: https://arxiv.org/abs/1707.06347
 mistakes:
-  - mistake: "Leaving out the KL penalty"
-    why: >-
-      Ziegler et al. show a model fine-tuned without it producing **gibberish** that still scores
-      well, even with an entropy bonus (their Table 10). InstructGPT's labelers rated models trained
-      with a KL coefficient of **0** and of **2** poorly; the best values were about **0.01 to 0.02**.
-    fix: "Keep the penalty; InstructGPT's β = 0.02 is a published starting point."
-  - mistake: "Raising β to stop losses on other benchmarks"
-    why: >-
-      InstructGPT's PPO models lost ground on public datasets such as SQuADv2 and DROP. Raising the
-      KL coefficient to **2.0**, 100 times the default, still did not fix these losses.
-    fix: "Mix pre-training updates into PPO, as InstructGPT's PPO-ptx does with γ = 27.8."
-  - mistake: "Using too large a learning rate for the policy"
-    why: >-
-      In InstructGPT's scan for 1.3B and 6B models, every PPO run without the pre-training mix
-      **diverged** at learning rates above **8.05e-6**; with the mix, training was less sensitive to
-      the learning rate.
-    fix: "Scan small learning rates and judge them by human or reward-model evaluation."
-  - mistake: "Training the reward model for several epochs"
-    why: >-
-      InstructGPT's reward model overfit quickly when trained for more than one epoch, and Ziegler et
-      al. also use a single epoch to avoid overfitting their small amount of human data.
-    fix: "Train the reward model for one epoch over the comparisons."
+- mistake: Leaving out the KL penalty
+  why: Ziegler et al. show a model fine-tuned without it producing **gibberish** that still scores well, even with an entropy bonus (their Table 10). InstructGPT's labelers rated models trained with a KL coefficient of **0** and of **2** poorly; the best values were about **0.01 to 0.02**.
+  fix: Keep the penalty; InstructGPT's β = 0.02 is a published starting point.
+- mistake: Raising β to stop losses on other benchmarks
+  why: InstructGPT's PPO models lost ground on public datasets such as SQuADv2 and DROP. Raising the KL coefficient to **2.0**, 100 times the default, still did not fix these losses.
+  fix: Mix pre-training updates into PPO, as InstructGPT's PPO-ptx does with γ = 27.8.
+- mistake: Using too large a learning rate for the policy
+  why: In InstructGPT's scan for 1.3B and 6B models, every PPO run without the pre-training mix **diverged** at learning rates above **8.05e-6**; with the mix, training was less sensitive to the learning rate.
+  fix: Scan small learning rates and judge them by human or reward-model evaluation.
+- mistake: Training the reward model for several epochs
+  why: InstructGPT's reward model overfit quickly when trained for more than one epoch, and Ziegler et al. also use a single epoch to avoid overfitting their small amount of human data.
+  fix: Train the reward model for one epoch over the comparisons.
 visual:
   kind: kl_reward
   score: 1.5
-  betas: [0.02, 2.0]
-  policy: [0.5, 0.3, 0.8, 0.9]
-  reference: [0.25, 0.4, 0.8, 0.6]
-  caption: "One four-token answer: ln(policy ÷ reference) at each token, and the reward model's score of 1.5 minus β times their sum, for InstructGPT's β = 0.02 and for 2.0, 100 times larger, which its authors also tested. The probabilities and the score are an example, not from a trained model."
-tags: [fine-tuning, rlhf, ppo, alignment, reward-model]
-updated: 2026-11-23
+  betas:
+  - 0.02
+  - 2.0
+  policy:
+  - 0.5
+  - 0.3
+  - 0.8
+  - 0.9
+  reference:
+  - 0.25
+  - 0.4
+  - 0.8
+  - 0.6
+  caption: 'One four-token answer: ln(policy ÷ reference) at each token, and the reward model''s score of 1.5 minus β times their sum, for InstructGPT''s β = 0.02 and for 2.0, 100 times larger, which its authors also tested. The probabilities and the score are an example, not from a trained model.'
+tags:
+- fine-tuning
+- rlhf
+- ppo
+- alignment
+- reward-model
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/2203.02155", title: "Training language models to follow instructions with human feedback (InstructGPT, Ouyang et al., 2022)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1707.06347", title: "Proximal Policy Optimization Algorithms (Schulman et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1909.08593", title: "Fine-Tuning Language Models from Human Preferences (Ziegler et al., 2019)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1910.02054", title: "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models (Rajbhandari et al., 2019)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2305.18290", title: "Direct Preference Optimization: Your Language Model is Secretly a Reward Model (Rafailov et al., 2023)", trust: 0.9 }
+- url: https://arxiv.org/abs/2203.02155
+  title: Training language models to follow instructions with human feedback (InstructGPT, Ouyang et al., 2022)
+  trust: 0.95
+- url: https://arxiv.org/abs/1707.06347
+  title: Proximal Policy Optimization Algorithms (Schulman et al., 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/1909.08593
+  title: Fine-Tuning Language Models from Human Preferences (Ziegler et al., 2019)
+  trust: 0.9
+- url: https://arxiv.org/abs/1910.02054
+  title: 'ZeRO: Memory Optimizations Toward Training Trillion Parameter Models (Rajbhandari et al., 2019)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2305.18290
+  title: 'Direct Preference Optimization: Your Language Model is Secretly a Reward Model (Rafailov et al., 2023)'
+  trust: 0.9
 ---
 
 ## Definition

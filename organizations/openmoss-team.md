@@ -2,7 +2,7 @@
 id: organization/openmoss-team
 type: organization
 slug: openmoss-team
-schema_version: 1.1
+schema_version: 3.1
 title: OpenMOSS
 name: OpenMOSS
 website: https://huggingface.co/OpenMOSS-Team

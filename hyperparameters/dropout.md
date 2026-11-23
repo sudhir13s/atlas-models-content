@@ -2,27 +2,33 @@
 id: hyperparameter/dropout
 type: hyperparameter
 slug: dropout
-schema_version: 2.2
-title: "Dropout"
+schema_version: 3.1
+title: Dropout
 name: dropout
 context: training
 priority: 13
 importance: optional
-goals: [training, finetuning]
-models: [llm, vision, audio, rl]
-range: "0 — 0.5"
-controls: "The share of a layer's outputs that are switched off at random at every training step, so the network cannot depend on any one of them; at evaluation nothing is switched off."
+goals:
+- training
+- finetuning
+models:
+- llm
+- vision
+- audio
+- rl
+range: 0 — 0.5
+controls: The share of a layer's outputs that are switched off at random at every training step, so the network cannot depend on any one of them; at evaluation nothing is switched off.
 effects:
   decrease:
-    - "Fewer outputs are switched off at each training step"
-    - "Weaker regularization: more room to fit the training data too exactly"
-    - "Less noise in each update, so training needs fewer updates"
-    - "At 0 dropout is off and the layer passes everything through"
+  - Fewer outputs are switched off at each training step
+  - 'Weaker regularization: more room to fit the training data too exactly'
+  - Less noise in each update, so training needs fewer updates
+  - At 0 dropout is off and the layer passes everything through
   increase:
-    - "More outputs are switched off at each training step"
-    - "Stronger regularization against overfitting"
-    - "Noisier updates: Srivastava et al. report 2 to 3 times longer training"
-    - "Too high, and the network underfits: the training error rises too"
+  - More outputs are switched off at each training step
+  - Stronger regularization against overfitting
+  - 'Noisier updates: Srivastava et al. report 2 to 3 times longer training'
+  - 'Too high, and the network underfits: the training error rises too'
 scale:
   min: 0
   max: 1
@@ -30,82 +36,74 @@ scale:
   typical_max: 0.5
   spacing: linear
 typical_values:
-  - setting: "PyTorch: default of torch.nn.Dropout (also the share of hidden units Srivastava et al. drop)"
-    value: "0.5"
-    source: "https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/dropout.py"
-  - setting: "Srivastava et al.: input units with real-valued inputs such as image patches (they keep 80%)"
-    value: "0.2"
-    source: "https://jmlr.org/papers/v15/srivastava14a.html"
-  - setting: "Original Transformer, big model, English-to-German translation"
-    value: "0.3"
-    source: "https://arxiv.org/abs/1706.03762"
-  - setting: "BERT, all layers, in training from scratch and in fine-tuning"
-    value: "0.1"
-    source: "https://arxiv.org/abs/1810.04805"
-  - setting: "Vision Transformer, training from scratch on JFT-300M (its largest data set)"
-    value: "0.0"
-    source: "https://arxiv.org/abs/2010.11929"
-  - setting: "Hugging Face Transformers: default attention_dropout of LlamaConfig"
-    value: "0.0"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/configuration_llama.py"
+- setting: 'PyTorch: default of torch.nn.Dropout (also the share of hidden units Srivastava et al. drop)'
+  value: '0.5'
+  source: https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/dropout.py
+- setting: 'Srivastava et al.: input units with real-valued inputs such as image patches (they keep 80%)'
+  value: '0.2'
+  source: https://jmlr.org/papers/v15/srivastava14a.html
+- setting: Original Transformer, big model, English-to-German translation
+  value: '0.3'
+  source: https://arxiv.org/abs/1706.03762
+- setting: BERT, all layers, in training from scratch and in fine-tuning
+  value: '0.1'
+  source: https://arxiv.org/abs/1810.04805
+- setting: Vision Transformer, training from scratch on JFT-300M (its largest data set)
+  value: '0.0'
+  source: https://arxiv.org/abs/2010.11929
+- setting: 'Hugging Face Transformers: default attention_dropout of LlamaConfig'
+  value: '0.0'
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/configuration_llama.py
 mistakes:
-  - mistake: "Reading the p of the dropout paper as the p of PyTorch"
-    why: >-
-      The two use the same letter for **opposite things**. In Srivastava et al., p is the
-      probability of **keeping** a unit ("p = 1, implies no dropout"). In PyTorch, `p` of
-      `torch.nn.Dropout` is the probability of an element being **zeroed**. The paper's input-layer
-      value of 0.8 copied into PyTorch as `p=0.8` switches off 80% of the inputs instead of 20%.
-    fix: >-
-      Convert: PyTorch `p` = **1 − the paper's p**. The paper's 0.5 for hidden units stays 0.5; its
-      0.8 for inputs becomes `p=0.2`. When a source does not say which convention it uses, check
-      whether its "p" is described as kept or dropped.
-  - mistake: "Evaluating or serving a model that is still in training mode"
-    why: >-
-      PyTorch's dropout layer zeroes elements only while the module is in training mode; in
-      evaluation mode it "simply computes an identity function". A model left in training mode
-      keeps switching outputs off at random, so the same input gives a **different answer on every
-      call**.
-    fix: >-
-      Call `model.eval()` before evaluating or serving (it is the same as `model.train(False)`)
-      and `model.train()` before training resumes.
-  - mistake: "Raising the dropout rate without making the layer wider"
-    why: >-
-      With dropout, only a share of a layer's units is present at each step. Srivastava et al. found
-      that a small keep probability on a layer of fixed size led to **underfitting**: the training
-      error was high too (their Figure 9a). When they enlarged the layers to keep the expected
-      number of present units fixed, the error at a keep probability of 0.1 fell from 2.7% to 1.7%.
-    fix: >-
-      Follow their heuristic: if n units are right for a layer without dropout, use **at least
-      n / (keep probability)** units with dropout. In PyTorch terms that is n / (1 − p).
-  - mistake: "Copying a dropout rate from a recipe trained on a much smaller or much larger data set"
-    why: >-
-      The benefit depends on the amount of data. Srivastava et al. found no improvement on their
-      two smallest MNIST subsets (100 and 500 examples), a gain that grew with more data "up to a
-      point and then declines". The Vision Transformer authors used dropout **0.1** on ImageNet and
-      ImageNet-21k but **0.0** on JFT-300M, their largest data set.
-    fix: >-
-      Take the rate together with the data set size it was tuned for, and compare training and
-      validation error before keeping it: dropout is there for the gap between the two.
-  - mistake: "Expecting a dropout run to finish in the same number of updates"
-    why: >-
-      Srivastava et al. report that a dropout network typically takes **2 to 3 times longer** to
-      train than a standard network of the same architecture, because each update trains a
-      different random sub-network and the updates are very noisy.
-    fix: >-
-      Budget more updates when adding dropout, and compare runs at their best validation error, not
-      at the same step count.
-tags: [training, regularization, dropout]
-updated: 2026-11-23
-related: [hyperparameter/weight-decay, hyperparameter/training-duration, hyperparameter/learning-rate]
+- mistake: Reading the p of the dropout paper as the p of PyTorch
+  why: The two use the same letter for **opposite things**. In Srivastava et al., p is the probability of **keeping** a unit ("p = 1, implies no dropout"). In PyTorch, `p` of `torch.nn.Dropout` is the probability of an element being **zeroed**. The paper's input-layer value of 0.8 copied into PyTorch as `p=0.8` switches off 80% of the inputs instead of 20%.
+  fix: 'Convert: PyTorch `p` = **1 − the paper''s p**. The paper''s 0.5 for hidden units stays 0.5; its 0.8 for inputs becomes `p=0.2`. When a source does not say which convention it uses, check whether its "p" is described as kept or dropped.'
+- mistake: Evaluating or serving a model that is still in training mode
+  why: PyTorch's dropout layer zeroes elements only while the module is in training mode; in evaluation mode it "simply computes an identity function". A model left in training mode keeps switching outputs off at random, so the same input gives a **different answer on every call**.
+  fix: Call `model.eval()` before evaluating or serving (it is the same as `model.train(False)`) and `model.train()` before training resumes.
+- mistake: Raising the dropout rate without making the layer wider
+  why: 'With dropout, only a share of a layer''s units is present at each step. Srivastava et al. found that a small keep probability on a layer of fixed size led to **underfitting**: the training error was high too (their Figure 9a). When they enlarged the layers to keep the expected number of present units fixed, the error at a keep probability of 0.1 fell from 2.7% to 1.7%.'
+  fix: 'Follow their heuristic: if n units are right for a layer without dropout, use **at least n / (keep probability)** units with dropout. In PyTorch terms that is n / (1 − p).'
+- mistake: Copying a dropout rate from a recipe trained on a much smaller or much larger data set
+  why: The benefit depends on the amount of data. Srivastava et al. found no improvement on their two smallest MNIST subsets (100 and 500 examples), a gain that grew with more data "up to a point and then declines". The Vision Transformer authors used dropout **0.1** on ImageNet and ImageNet-21k but **0.0** on JFT-300M, their largest data set.
+  fix: 'Take the rate together with the data set size it was tuned for, and compare training and validation error before keeping it: dropout is there for the gap between the two.'
+- mistake: Expecting a dropout run to finish in the same number of updates
+  why: Srivastava et al. report that a dropout network typically takes **2 to 3 times longer** to train than a standard network of the same architecture, because each update trains a different random sub-network and the updates are very noisy.
+  fix: Budget more updates when adding dropout, and compare runs at their best validation error, not at the same step count.
+tags:
+- training
+- regularization
+- dropout
+updated: '2026-11-23'
+related:
+- hyperparameter/weight-decay
+- hyperparameter/training-duration
+- hyperparameter/learning-rate
 sources:
-  - { url: "https://jmlr.org/papers/v15/srivastava14a.html", title: "Dropout: A Simple Way to Prevent Neural Networks from Overfitting (Srivastava, Hinton, Krizhevsky, Sutskever, Salakhutdinov; JMLR 2014)", trust: 0.9 }
-  - { url: "https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/dropout.py", title: "PyTorch source: torch/nn/modules/dropout.py (torch.nn.Dropout default and scaling)", trust: 0.9 }
-  - { url: "https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/module.py", title: "PyTorch source: torch/nn/modules/module.py (Module.eval and Module.train)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1810.04805", title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/configuration_bert.py", title: "Hugging Face Transformers source: configuration_bert.py (BertConfig dropout defaults)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2010.11929", title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020), the Vision Transformer paper", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/configuration_llama.py", title: "Hugging Face Transformers source: configuration_llama.py (LlamaConfig attention_dropout default)", trust: 0.9 }
+- url: https://jmlr.org/papers/v15/srivastava14a.html
+  title: 'Dropout: A Simple Way to Prevent Neural Networks from Overfitting (Srivastava, Hinton, Krizhevsky, Sutskever, Salakhutdinov; JMLR 2014)'
+  trust: 0.9
+- url: https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/dropout.py
+  title: 'PyTorch source: torch/nn/modules/dropout.py (torch.nn.Dropout default and scaling)'
+  trust: 0.9
+- url: https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/module.py
+  title: 'PyTorch source: torch/nn/modules/module.py (Module.eval and Module.train)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1706.03762
+  title: Attention Is All You Need (Vaswani et al., 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/1810.04805
+  title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (Devlin et al., 2018)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/configuration_bert.py
+  title: 'Hugging Face Transformers source: configuration_bert.py (BertConfig dropout defaults)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2010.11929
+  title: 'An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (Dosovitskiy et al., 2020), the Vision Transformer paper'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/configuration_llama.py
+  title: 'Hugging Face Transformers source: configuration_llama.py (LlamaConfig attention_dropout default)'
+  trust: 0.9
 ---
 
 ## Definition

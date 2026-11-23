@@ -2,7 +2,7 @@
 id: organization/sshleifer
 type: organization
 slug: sshleifer
-schema_version: 1.1
+schema_version: 3.1
 title: Sam Shleifer
 name: Sam Shleifer
 website: https://huggingface.co/sshleifer

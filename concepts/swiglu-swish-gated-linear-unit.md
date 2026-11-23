@@ -2,7 +2,7 @@
 id: concept/swiglu-swish-gated-linear-unit
 type: concept
 slug: swiglu-swish-gated-linear-unit
-schema_version: 1.2
+schema_version: 3.1
 title: SwiGLU (Swish-Gated Linear Unit)
 category: activation
 code: swiglu

@@ -2,104 +2,125 @@
 id: hyperparameter/precision
 type: hyperparameter
 slug: precision
-schema_version: 2.2
-title: "Training Precision"
+schema_version: 3.1
+title: Training Precision
 name: bf16
 context: training
 priority: 10
 importance: important
-goals: [training, finetuning]
-models: [llm, vision, audio, diffusion, rl]
-range: "fp32 | fp16 | bf16 | int8 | 4-bit (NF4)"
-controls: "How many bits each number inside the model is stored and computed with during training: fewer bits take less memory, at the cost of how finely and how widely numbers can be written."
+goals:
+- training
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+- rl
+range: fp32 | fp16 | bf16 | int8 | 4-bit (NF4)
+controls: 'How many bits each number inside the model is stored and computed with during training: fewer bits take less memory, at the cost of how finely and how widely numbers can be written.'
 effects:
   decrease:
-    - "Each stored number takes fewer bytes"
-    - "The model, and the batch, take less memory"
-    - "Numbers are rounded more coarsely"
-    - "With fp16, small gradients can round to zero unless the loss is scaled"
+  - Each stored number takes fewer bytes
+  - The model, and the batch, take less memory
+  - Numbers are rounded more coarsely
+  - With fp16, small gradients can round to zero unless the loss is scaled
   increase:
-    - "Each stored number takes more bytes"
-    - "The model takes more memory"
-    - "Numbers are written more finely and over a wider span"
-    - "At fp32 no loss scaling is needed"
+  - Each stored number takes more bytes
+  - The model takes more memory
+  - Numbers are written more finely and over a wider span
+  - At fp32 no loss scaling is needed
 options:
-  - value: "fp32"
-    effect: "Every number uses 32 bits (4 bytes). The PyTorch default. Widest span and finest steps of the formats here, and the most memory."
-  - value: "fp16"
-    effect: "Mixed precision with 16-bit floats (2 bytes): 5 exponent bits, 10 significand bits. Largest value 65,504, so the loss must be scaled to keep small gradients from rounding to zero."
-  - value: "bf16"
-    effect: "Mixed precision with 16-bit brain floats (2 bytes): 8 exponent bits, 7 significand bits. Same span as fp32, coarser steps; Hugging Face notes no loss scaling is required."
-  - value: "int8"
-    effect: "The frozen base weights are stored as 8-bit integers (1 byte) through bitsandbytes, which halves their memory. Only added parameters, such as LoRA adapters, can be trained."
-  - value: "4-bit (NF4)"
-    effect: "The frozen base weights are stored in 4 bits (half a byte), the QLoRA method, and computed in bf16. Only added parameters, such as LoRA adapters, can be trained."
+- value: fp32
+  effect: Every number uses 32 bits (4 bytes). The PyTorch default. Widest span and finest steps of the formats here, and the most memory.
+- value: fp16
+  effect: 'Mixed precision with 16-bit floats (2 bytes): 5 exponent bits, 10 significand bits. Largest value 65,504, so the loss must be scaled to keep small gradients from rounding to zero.'
+- value: bf16
+  effect: 'Mixed precision with 16-bit brain floats (2 bytes): 8 exponent bits, 7 significand bits. Same span as fp32, coarser steps; Hugging Face notes no loss scaling is required.'
+- value: int8
+  effect: The frozen base weights are stored as 8-bit integers (1 byte) through bitsandbytes, which halves their memory. Only added parameters, such as LoRA adapters, can be trained.
+- value: 4-bit (NF4)
+  effect: The frozen base weights are stored in 4 bits (half a byte), the QLoRA method, and computed in bf16. Only added parameters, such as LoRA adapters, can be trained.
 typical_values:
-  - setting: "PyTorch: default data type of a new tensor"
-    value: "fp32"
-    source: "https://docs.pytorch.org/docs/2.15/tensors.html"
-  - setting: "Hugging Face Transformers: default of TrainingArguments (fp16 = False, bf16 = False)"
-    value: "mixed precision off"
-    source: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py"
-  - setting: "Mixed Precision Training (Micikevicius et al.): weights, activations and gradients in half precision, with a single-precision master copy of the weights and loss scaling"
-    value: "fp16 + fp32 master copy"
-    source: "https://arxiv.org/abs/1710.03740"
-  - setting: "Alpaca-LoRA training script: base model loaded in 8 bits with torch_dtype float16, and fp16 = True for training"
-    value: "int8 base + fp16"
-    source: "https://github.com/tloen/alpaca-lora/blob/main/finetune.py"
-  - setting: "QLoRA (Dettmers et al.): base model stored in 4-bit NormalFloat, computed in BFloat16"
-    value: "4-bit NF4 base + bf16"
-    source: "https://arxiv.org/abs/2305.14314"
+- setting: 'PyTorch: default data type of a new tensor'
+  value: fp32
+  source: https://docs.pytorch.org/docs/2.15/tensors.html
+- setting: 'Hugging Face Transformers: default of TrainingArguments (fp16 = False, bf16 = False)'
+  value: mixed precision off
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+- setting: 'Mixed Precision Training (Micikevicius et al.): weights, activations and gradients in half precision, with a single-precision master copy of the weights and loss scaling'
+  value: fp16 + fp32 master copy
+  source: https://arxiv.org/abs/1710.03740
+- setting: 'Alpaca-LoRA training script: base model loaded in 8 bits with torch_dtype float16, and fp16 = True for training'
+  value: int8 base + fp16
+  source: https://github.com/tloen/alpaca-lora/blob/main/finetune.py
+- setting: 'QLoRA (Dettmers et al.): base model stored in 4-bit NormalFloat, computed in BFloat16'
+  value: 4-bit NF4 base + bf16
+  source: https://arxiv.org/abs/2305.14314
 mistakes:
-  - mistake: "Training in fp16 without loss scaling"
-    why: >-
-      The PyTorch documentation explains that gradient values with small magnitudes **may not be
-      representable in float16**: they **flush to zero** ("underflow"), and the update for those
-      weights is lost. The smallest normal fp16 number is about 0.000061 (torch.finfo).
-    fix: >-
-      In a hand-written PyTorch loop, use gradient scaling with fp16 (`torch.amp.GradScaler`), or
-      use bf16, which Hugging Face describes as needing **no loss scaling**.
-  - mistake: "Running a model that was trained in bf16 in fp16"
-    why: >-
-      fp16 cannot hold a number above **65,504**. The PyTorch documentation warns that most
-      bf16-pretrained models cannot operate in that range, and that gradients then **overflow**
-      instead of underflow.
-    fix: >-
-      Keep a bf16-trained model in bf16 (or fp32). Hugging Face advises considering BF16 instead of
-      FP16 if your hardware supports it.
-  - mistake: "Setting both fp16 and bf16 to True"
-    why: >-
-      They are two choices for the same thing. Hugging Face `TrainingArguments` refuses the
-      combination with the error "At most one of fp16 and bf16 can be True, but not both".
-    fix: "Pick one 16-bit format and set only that flag."
-  - mistake: "Trying to train the 8-bit or 4-bit weights themselves"
-    why: >-
-      The Hugging Face bitsandbytes documentation states that 8 and 4-bit training is **only
-      supported for training extra parameters**. The quantized base weights stay frozen.
-    fix: >-
-      Add trainable adapters on top, for example LoRA through the PEFT library, as QLoRA does.
-  - mistake: "Leaving the 4-bit compute type at its default"
-    why: >-
-      In bitsandbytes 4-bit loading, the **compute data type defaults to float32**. The Hugging
-      Face documentation says to change it to bf16 to speed up computation; QLoRA computes in
-      BFloat16.
-    fix: "Pass `bnb_4bit_compute_dtype=torch.bfloat16` in `BitsAndBytesConfig`."
-tags: [training, precision, mixed-precision, quantization, memory]
-updated: 2026-11-23
-related: [hyperparameter/lora-r, hyperparameter/target-modules, hyperparameter/gradient-accumulation]
+- mistake: Training in fp16 without loss scaling
+  why: 'The PyTorch documentation explains that gradient values with small magnitudes **may not be representable in float16**: they **flush to zero** ("underflow"), and the update for those weights is lost. The smallest normal fp16 number is about 0.000061 (torch.finfo).'
+  fix: In a hand-written PyTorch loop, use gradient scaling with fp16 (`torch.amp.GradScaler`), or use bf16, which Hugging Face describes as needing **no loss scaling**.
+- mistake: Running a model that was trained in bf16 in fp16
+  why: fp16 cannot hold a number above **65,504**. The PyTorch documentation warns that most bf16-pretrained models cannot operate in that range, and that gradients then **overflow** instead of underflow.
+  fix: Keep a bf16-trained model in bf16 (or fp32). Hugging Face advises considering BF16 instead of FP16 if your hardware supports it.
+- mistake: Setting both fp16 and bf16 to True
+  why: They are two choices for the same thing. Hugging Face `TrainingArguments` refuses the combination with the error "At most one of fp16 and bf16 can be True, but not both".
+  fix: Pick one 16-bit format and set only that flag.
+- mistake: Trying to train the 8-bit or 4-bit weights themselves
+  why: The Hugging Face bitsandbytes documentation states that 8 and 4-bit training is **only supported for training extra parameters**. The quantized base weights stay frozen.
+  fix: Add trainable adapters on top, for example LoRA through the PEFT library, as QLoRA does.
+- mistake: Leaving the 4-bit compute type at its default
+  why: In bitsandbytes 4-bit loading, the **compute data type defaults to float32**. The Hugging Face documentation says to change it to bf16 to speed up computation; QLoRA computes in BFloat16.
+  fix: Pass `bnb_4bit_compute_dtype=torch.bfloat16` in `BitsAndBytesConfig`.
+tags:
+- training
+- precision
+- mixed-precision
+- quantization
+- memory
+updated: '2026-11-23'
+related:
+- hyperparameter/lora-r
+- hyperparameter/target-modules
+- hyperparameter/gradient-accumulation
 sources:
-  - { url: "https://docs.pytorch.org/docs/2.15/tensor_attributes.html", title: "PyTorch documentation: Tensor attributes (torch.dtype bit layouts)", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/2.15/tensors.html", title: "PyTorch documentation: torch.Tensor (default dtype)", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/2.15/type_info.html", title: "PyTorch documentation: torch.finfo", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/2.15/amp.html", title: "PyTorch documentation: Automatic Mixed Precision package (torch.amp)", trust: 0.9 }
-  - { url: "https://docs.cloud.google.com/tpu/docs/bfloat16", title: "Google Cloud TPU documentation: The bfloat16 numerical format", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/main_classes/trainer", title: "Hugging Face Transformers documentation: Trainer and TrainingArguments", trust: 0.9 }
-  - { url: "https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py", title: "Hugging Face Transformers source: training_args.py (fp16, bf16 and their check)", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/quantization/bitsandbytes", title: "Hugging Face Transformers documentation: bitsandbytes quantization", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1710.03740", title: "Mixed Precision Training (Micikevicius et al., 2017)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2305.14314", title: "QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)", trust: 0.9 }
-  - { url: "https://github.com/tloen/alpaca-lora/blob/main/finetune.py", title: "Alpaca-LoRA training script (finetune.py)", trust: 0.8 }
-  - { url: "https://huggingface.co/huggyllama/llama-7b/blob/main/config.json", title: "LLaMA 7B (huggyllama conversion): config.json", trust: 0.8 }
+- url: https://docs.pytorch.org/docs/2.15/tensor_attributes.html
+  title: 'PyTorch documentation: Tensor attributes (torch.dtype bit layouts)'
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/2.15/tensors.html
+  title: 'PyTorch documentation: torch.Tensor (default dtype)'
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/2.15/type_info.html
+  title: 'PyTorch documentation: torch.finfo'
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/2.15/amp.html
+  title: 'PyTorch documentation: Automatic Mixed Precision package (torch.amp)'
+  trust: 0.9
+- url: https://docs.cloud.google.com/tpu/docs/bfloat16
+  title: 'Google Cloud TPU documentation: The bfloat16 numerical format'
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/main_classes/trainer
+  title: 'Hugging Face Transformers documentation: Trainer and TrainingArguments'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/training_args.py
+  title: 'Hugging Face Transformers source: training_args.py (fp16, bf16 and their check)'
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/quantization/bitsandbytes
+  title: 'Hugging Face Transformers documentation: bitsandbytes quantization'
+  trust: 0.9
+- url: https://arxiv.org/abs/1710.03740
+  title: Mixed Precision Training (Micikevicius et al., 2017)
+  trust: 0.9
+- url: https://arxiv.org/abs/2305.14314
+  title: 'QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)'
+  trust: 0.9
+- url: https://github.com/tloen/alpaca-lora/blob/main/finetune.py
+  title: Alpaca-LoRA training script (finetune.py)
+  trust: 0.8
+- url: https://huggingface.co/huggyllama/llama-7b/blob/main/config.json
+  title: 'LLaMA 7B (huggyllama conversion): config.json'
+  trust: 0.8
 ---
 
 ## Definition

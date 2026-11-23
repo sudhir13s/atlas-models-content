@@ -2,7 +2,7 @@
 id: organization/compvis
 type: organization
 slug: compvis
-schema_version: 1.1
+schema_version: 3.1
 title: CompVis
 name: CompVis
 website: https://huggingface.co/CompVis

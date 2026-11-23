@@ -2,7 +2,7 @@
 id: organization/depth-anything
 type: organization
 slug: depth-anything
-schema_version: 1.1
+schema_version: 3.1
 title: Depth Aything
 name: Depth Aything
 website: https://huggingface.co/depth-anything

@@ -2,7 +2,7 @@
 id: concept/silu-swish
 type: concept
 slug: silu-swish
-schema_version: 1.2
+schema_version: 3.1
 title: SiLU / Swish
 category: activation
 code: silu

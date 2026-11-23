@@ -14,7 +14,7 @@
       "description": "stable identity of the form <type>/<slug>"
     },
     "source": {
-      "type": "object",
+      "type": "object", "unevaluatedProperties": false,
       "required": ["url", "title"],
       "properties": {
         "url": { "type": "string", "format": "uri" },

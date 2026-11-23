@@ -2,7 +2,7 @@
 id: organization/magic-leap-community
 type: organization
 slug: magic-leap-community
-schema_version: 1.1
+schema_version: 3.1
 title: Magic Leap Community
 name: Magic Leap Community
 website: https://huggingface.co/magic-leap-community

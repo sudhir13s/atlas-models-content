@@ -2,7 +2,7 @@
 id: organization/black-forest-labs
 type: organization
 slug: black-forest-labs
-schema_version: 1.1
+schema_version: 3.1
 title: Black Forest Labs
 name: Black Forest Labs
 website: https://huggingface.co/black-forest-labs

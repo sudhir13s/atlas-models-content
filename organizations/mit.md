@@ -2,7 +2,7 @@
 id: organization/mit
 type: organization
 slug: mit
-schema_version: 1.1
+schema_version: 3.1
 title: Massachusetts Institute of Technology
 name: Massachusetts Institute of Technology
 website: https://huggingface.co/MIT

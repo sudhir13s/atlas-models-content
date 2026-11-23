@@ -2,9 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://theaiatlas.dev/schema/models/parameter.schema.json",
   "title": "parameter",
+  "unevaluatedProperties": false,
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "properties": {
     "type": { "const": "parameter" },
+    "schema_version": { "const": 3.1 },
     "name": { "type": "string", "description": "exact config key, e.g. num_hidden_layers" },
     "importance": { "type": "string", "enum": ["critical", "important", "optional"] },
     "priority": { "type": "integer", "minimum": 1, "description": "criticality rank; 1 = most impactful" },
@@ -69,16 +71,16 @@
       "type": "object",
       "description": "the keys of a decoder-only transformer's config.json that set its parameter count, copied from the named model's configuration",
       "additionalProperties": false,
-      "required": ["name", "vocab_size", "hidden_size", "intermediate_size", "num_hidden_layers", "num_attention_heads", "num_key_value_heads", "head_dim", "tie_word_embeddings", "ffn_matrices", "qk_norm"],
+      "required": ["name", "vocabulary_size", "hidden_size", "intermediate_size", "num_layers", "attention_heads", "kv_heads", "head_size", "tie_word_embeddings", "ffn_matrices", "qk_norm"],
       "properties": {
         "name": { "type": "string", "minLength": 1 },
-        "vocab_size": { "type": "integer", "minimum": 1 },
+        "vocabulary_size": { "type": "integer", "minimum": 1 },
         "hidden_size": { "type": "integer", "minimum": 1 },
         "intermediate_size": { "type": "integer", "minimum": 1 },
-        "num_hidden_layers": { "type": "integer", "minimum": 1 },
-        "num_attention_heads": { "type": "integer", "minimum": 1 },
-        "num_key_value_heads": { "type": "integer", "minimum": 1 },
-        "head_dim": { "type": "integer", "minimum": 1 },
+        "num_layers": { "type": "integer", "minimum": 1 },
+        "attention_heads": { "type": "integer", "minimum": 1 },
+        "kv_heads": { "type": "integer", "minimum": 1 },
+        "head_size": { "type": "integer", "minimum": 1 },
         "tie_word_embeddings": { "type": "boolean" },
         "ffn_matrices": { "type": "integer", "enum": [2, 3], "description": "3 for a gated FFN (gate, up, down), 2 for a plain MLP" },
         "qk_norm": { "type": "boolean", "description": "a query and a key norm of head_dim weights in every layer, as in Qwen3" }
@@ -92,7 +94,7 @@
       "properties": {
         "kind": { "const": "count_sweep" },
         "model": { "$ref": "#/$defs/decoder_config" },
-        "vary": { "type": "string", "enum": ["width", "num_hidden_layers", "intermediate_size", "vocab_size"] },
+        "vary": { "type": "string", "enum": ["width", "num_layers", "intermediate_size", "vocabulary_size"] },
         "values": { "type": "array", "minItems": 2, "maxItems": 10, "items": { "type": "number", "exclusiveMinimum": 0 } },
         "measure": { "type": "string", "enum": ["per_layer", "total"] },
         "caption": { "$ref": "#/$defs/caption" }

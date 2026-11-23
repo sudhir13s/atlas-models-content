@@ -2,7 +2,7 @@
 id: organization/google-deepmind
 type: organization
 slug: google-deepmind
-schema_version: 1.1
+schema_version: 3.1
 title: Google DeepMind
 name: Google DeepMind
 kind: lab

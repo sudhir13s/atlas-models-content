@@ -2,39 +2,130 @@
 id: parameter-calculator/ssm-mamba
 type: parameter-calculator
 slug: ssm-mamba
-schema_version: 1.0
-title: "State-Space Model / Mamba Parameters"
+schema_version: 3.1
+title: State-Space Model / Mamba Parameters
 arch: ssm
 order: 3
 color_key: ssm
 components:
-  - { name: "d_model (width)", rank: 1, importance: critical, badge: "Structure", formula: "block cost ≈ 3E × d_model² (in/out projections)", range: "768 → 4096" }
-  - { name: "expand factor (E)", rank: 2, importance: critical, badge: "Per Block", formula: "d_inner = expand × d_model; scales every inner op", range: "2 (default)" }
-  - { name: "num_hidden_layers (depth)", rank: 3, importance: critical, badge: "Structure", formula: "total = layers × per-block params", range: "24 → 64" }
-  - { name: "in_proj (input + gate)", rank: 4, importance: critical, badge: "Per Block", formula: "d_model × 2·d_inner (SSM path + gating path)", range: "2E·d² (dominant)" }
-  - { name: "out_proj", rank: 5, importance: critical, badge: "Per Block", formula: "d_inner × d_model", range: "E·d² (dominant)" }
-  - { name: "token embedding table", rank: 6, importance: important, badge: "Embedding", formula: "vocab_size × d_model (tied → doubles as head)", range: "V = 50k+" }
-  - { name: "A parameter (A_log state matrix)", rank: 7, importance: important, badge: "Per Block", formula: "d_inner × d_state (only stored SSM tensor besides D)", range: "d_inner·N" }
-  - { name: "d_state (N, SSM memory)", rank: 8, importance: important, badge: "Per Block", formula: "sizes A, and B/C inside x_proj; mostly runtime state", range: "16 → 128" }
-  - { name: "x_proj (selective Δ, B, C)", rank: 9, importance: important, badge: "Per Block", formula: "d_inner × (dt_rank + 2·d_state)", range: "small" }
-  - { name: "dt_proj + dt_rank (Δ projection)", rank: 10, importance: optional, badge: "Per Block", formula: "dt_rank × d_inner; dt_rank ≈ ceil(d_model/16)", range: "auto" }
-  - { name: "conv1d (short depthwise causal conv)", rank: 11, importance: optional, badge: "Per Block", formula: "d_inner × d_conv (+ d_inner bias)", range: "d_conv 3 → 4" }
-  - { name: "D (skip connection)", rank: 12, importance: optional, badge: "Per Block", formula: "d_inner (per-channel skip scalar)", range: "d_inner" }
-  - { name: "gating branch (z, SiLU)", rank: 13, importance: architectural, badge: "Per Block", formula: "0 extra — it is the second half of in_proj", range: "n/a" }
-  - { name: "RMSNorm (per block + final)", rank: 14, importance: optional, badge: "Per Block", formula: "≈ (L+1)·d_model", range: "tiny" }
+- name: d_model (width)
+  rank: 1
+  importance: critical
+  badge: Structure
+  formula: block cost ≈ 3E × d_model² (in/out projections)
+  range: 768 → 4096
+- name: expand factor (E)
+  rank: 2
+  importance: critical
+  badge: Per Block
+  formula: d_inner = expand × d_model; scales every inner op
+  range: 2 (default)
+- name: num_hidden_layers (depth)
+  rank: 3
+  importance: critical
+  badge: Structure
+  formula: total = layers × per-block params
+  range: 24 → 64
+- name: in_proj (input + gate)
+  rank: 4
+  importance: critical
+  badge: Per Block
+  formula: d_model × 2·d_inner (SSM path + gating path)
+  range: 2E·d² (dominant)
+- name: out_proj
+  rank: 5
+  importance: critical
+  badge: Per Block
+  formula: d_inner × d_model
+  range: E·d² (dominant)
+- name: token embedding table
+  rank: 6
+  importance: important
+  badge: Embedding
+  formula: vocab_size × d_model (tied → doubles as head)
+  range: V = 50k+
+- name: A parameter (A_log state matrix)
+  rank: 7
+  importance: important
+  badge: Per Block
+  formula: d_inner × d_state (only stored SSM tensor besides D)
+  range: d_inner·N
+- name: d_state (N, SSM memory)
+  rank: 8
+  importance: important
+  badge: Per Block
+  formula: sizes A, and B/C inside x_proj; mostly runtime state
+  range: 16 → 128
+- name: x_proj (selective Δ, B, C)
+  rank: 9
+  importance: important
+  badge: Per Block
+  formula: d_inner × (dt_rank + 2·d_state)
+  range: small
+- name: dt_proj + dt_rank (Δ projection)
+  rank: 10
+  importance: optional
+  badge: Per Block
+  formula: dt_rank × d_inner; dt_rank ≈ ceil(d_model/16)
+  range: auto
+- name: conv1d (short depthwise causal conv)
+  rank: 11
+  importance: optional
+  badge: Per Block
+  formula: d_inner × d_conv (+ d_inner bias)
+  range: d_conv 3 → 4
+- name: D (skip connection)
+  rank: 12
+  importance: optional
+  badge: Per Block
+  formula: d_inner (per-channel skip scalar)
+  range: d_inner
+- name: gating branch (z, SiLU)
+  rank: 13
+  importance: architectural
+  badge: Per Block
+  formula: 0 extra — it is the second half of in_proj
+  range: n/a
+- name: RMSNorm (per block + final)
+  rank: 14
+  importance: optional
+  badge: Per Block
+  formula: ≈ (L+1)·d_model
+  range: tiny
 worked_example:
-  label: "Mamba-130M"
-  config: { dModel: 768, numLayers: 24, expand: 2, dInner: 1536, dState: 16, dtRank: 48, dConv: 4, vocabSize: 50280, normalization: RMSNorm, tiedEmbeddings: true }
+  label: Mamba-130M
+  config:
+    dModel: 768
+    num_layers: 24
+    expand: 2
+    dInner: 1536
+    dState: 16
+    dtRank: 48
+    dConv: 4
+    vocabulary_size: 50280
+    normalization: RMSNorm
+    tiedEmbeddings: true
   sources:
-    - { url: "https://arxiv.org/abs/2312.00752", title: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces (Gu & Dao, 2023)", trust: 0.95 }
-tags: [ssm, mamba, state-space, parameters]
-updated: 2026-07-17
+  - url: https://arxiv.org/abs/2312.00752
+    title: 'Mamba: Linear-Time Sequence Modeling with Selective State Spaces (Gu & Dao, 2023)'
+    trust: 0.95
+tags:
+- ssm
+- mamba
+- state-space
+- parameters
+updated: '2026-07-17'
 sources:
-  - { url: "https://arxiv.org/abs/2312.00752", title: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces (Gu & Dao, 2023)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2111.00396", title: "Efficiently Modeling Long Sequences with Structured State Spaces (S4, Gu et al., 2021)", trust: 0.9 }
+- url: https://arxiv.org/abs/2312.00752
+  title: 'Mamba: Linear-Time Sequence Modeling with Selective State Spaces (Gu & Dao, 2023)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2111.00396
+  title: Efficiently Modeling Long Sequences with Structured State Spaces (S4, Gu et al., 2021)
+  trust: 0.9
 ---
 
 ## Overview
+
 A state-space model replaces attention with a linear recurrence: it carries a hidden state of size
 `d_state` and updates it token by token, giving O(sequence length) time and O(1) memory per step
 instead of attention's quadratic cost. Mamba makes the recurrence **selective** — the state-update
@@ -47,6 +138,7 @@ the default `expand = 2`, these two projections cost about `6 × d_model²` per 
 tensors (Δ, A, B, C, D, the short conv) are comparatively small.
 
 ## Components
+
 - **d_model** is the model width and the single biggest lever: block cost grows with `d_model²`.
 - **expand (E)** sets `d_inner = E × d_model` (the SSM works in this widened space). The dominant
   projections cost `2E·d_model²` (in) + `E·d_model²` (out) = `3E·d_model²`; with E=2 that is `6·d_model²`.
@@ -69,6 +161,7 @@ The first and last terms ($2d\,d_i + d_i d = 3E d^2$) dominate. Full model:
 $\text{Total} = V d + L\,P_\text{block} + \text{norms} + (V d\ \text{if untied})$.
 
 ## Worked Example
+
 Mamba-130M (`config` above: $d=768$, $E=2 \Rightarrow d_i=1536$, $N=16$, $r=48$, $c=4$, $L=24$,
 $V=50280$, tied embeddings).
 

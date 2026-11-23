@@ -2,7 +2,7 @@
 id: organization/ehcalabres
 type: organization
 slug: ehcalabres
-schema_version: 1.1
+schema_version: 3.1
 title: Enrique Hernández Calabrés
 name: Enrique Hernández Calabrés
 website: https://huggingface.co/ehcalabres

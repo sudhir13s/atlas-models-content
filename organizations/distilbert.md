@@ -2,7 +2,7 @@
 id: organization/distilbert
 type: organization
 slug: distilbert
-schema_version: 1.1
+schema_version: 3.1
 title: DistilBERT community
 name: DistilBERT community
 website: https://huggingface.co/distilbert

@@ -2,15 +2,17 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://theaiatlas.dev/schema/models/license.schema.json",
   "title": "license",
+  "unevaluatedProperties": false,
   "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
   "properties": {
     "type": { "const": "license" },
+    "schema_version": { "const": 3.1 },
     "name": { "type": "string" },
     "spdx_id": { "type": "string" },
     "category": { "type": "string", "enum": ["permissive", "copyleft", "restricted", "custom"] },
     "url": { "type": "string", "format": "uri" },
     "permissions": {
-      "type": "object",
+      "type": "object", "unevaluatedProperties": false,
       "properties": {
         "commercial_use": { "type": "boolean" },
         "modification": { "type": "boolean" },
@@ -23,7 +25,6 @@
     },
     "conditions": { "type": "array", "items": { "type": "string" } },
     "limitations": { "type": "array", "items": { "type": "string" } },
-    "models_using": { "type": "array", "items": { "type": "string" }, "description": "FKs → model/<slug>" },
     "summary": { "type": "string" }
   },
   "required": ["name", "category", "permissions", "summary"]

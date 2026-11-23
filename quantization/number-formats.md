@@ -2,80 +2,204 @@
 id: quantization-topic/number-formats
 type: quantization-topic
 slug: number-formats
-schema_version: 2.6
-title: "Number Formats and What Quantization Is"
+schema_version: 3.1
+title: Number Formats and What Quantization Is
 order: 1
-summary: "How a model's weights are stored as numbers, and how quantization stores each weight in fewer bits by mapping it onto a few whole numbers."
+summary: How a model's weights are stored as numbers, and how quantization stores each weight in fewer bits by mapping it onto a few whole numbers.
 visuals:
-  - kind: bit_layout
-    section: "How A Number Is Stored"
-    formats:
-      - name: "FP32"
-        fields: [{ role: sign, bits: 1 }, { role: exponent, bits: 8 }, { role: mantissa, bits: 23 }]
-      - name: "FP16"
-        fields: [{ role: sign, bits: 1 }, { role: exponent, bits: 5 }, { role: mantissa, bits: 10 }]
-      - name: "BF16"
-        fields: [{ role: sign, bits: 1 }, { role: exponent, bits: 8 }, { role: mantissa, bits: 7 }]
-      - name: "INT8"
-        fields: [{ role: integer, bits: 8 }]
-      - name: "4-bit"
-        fields: [{ role: integer, bits: 4 }]
-    caption: "One weight in each format, one square per bit. A row's length is the memory one weight takes."
-  - kind: affine_example
-    section: "How Quantization Works"
+- kind: bit_layout
+  section: How A Number Is Stored
+  formats:
+  - name: FP32
+    fields:
+    - role: sign
+      bits: 1
+    - role: exponent
+      bits: 8
+    - role: mantissa
+      bits: 23
+  - name: FP16
+    fields:
+    - role: sign
+      bits: 1
+    - role: exponent
+      bits: 5
+    - role: mantissa
+      bits: 10
+  - name: BF16
+    fields:
+    - role: sign
+      bits: 1
+    - role: exponent
+      bits: 8
+    - role: mantissa
+      bits: 7
+  - name: INT8
+    fields:
+    - role: integer
+      bits: 8
+  - name: 4-bit
+    fields:
+    - role: integer
+      bits: 4
+  caption: One weight in each format, one square per bit. A row's length is the memory one weight takes.
+- kind: affine_example
+  section: How Quantization Works
+  bits: 4
+  weights:
+  - 0.23
+  - -0.6
+  - 0.46
+  - 0.9
+  caption: Four example weights, not from a trained model, quantized to 4 bits (the whole numbers 0 to 15) with one scale and zero point, then turned back into decimals.
+- kind: model_memory
+  section: Memory At Each Precision
+  model: model/llama-3-1-8b-instruct
+  precisions:
+  - label: 32-bit
+    bits: 32
+  - label: 16-bit
+    bits: 16
+  - label: 8-bit
+    bits: 8
+  - label: 4-bit
     bits: 4
-    weights: [0.23, -0.6, 0.46, 0.9]
-    caption: "Four example weights, not from a trained model, quantized to 4 bits (the whole numbers 0 to 15) with one scale and zero point, then turned back into decimals."
-  - kind: model_memory
-    section: "Memory At Each Precision"
-    model: model/llama-3-1-8b-instruct
-    precisions:
-      - { label: "32-bit", bits: 32 }
-      - { label: "16-bit", bits: 16 }
-      - { label: "8-bit", bits: 8 }
-      - { label: "4-bit", bits: 4 }
-    caption: "The weights of Llama 3.1 8B Instruct at 32 bits (FP32), 16 bits (FP16 or BF16), 8 bits (INT8) and 4 bits: its parameter count × bits per weight ÷ 8, in gigabytes (1 GB = 1,000,000,000 bytes). Weights only."
+  caption: 'The weights of Llama 3.1 8B Instruct at 32 bits (FP32), 16 bits (FP16 or BF16), 8 bits (INT8) and 4 bits: its parameter count × bits per weight ÷ 8, in gigabytes (1 GB = 1,000,000,000 bytes). Weights only.'
 tables:
-  - section: "The Formats Side By Side"
-    title: "The formats side by side"
-    columns: ["Format", "Total bits", "How the bits are split", "Bytes per weight (bits ÷ 8)"]
-    rows:
-      - { cells: ["FP32 (single precision)", "32", "1 sign, 8 exponent, 23 mantissa", "4"], source: "https://www.intel.com/content/dam/develop/external/us/en/documents/bf16-hardware-numerics-definition-white-paper.pdf" }
-      - { cells: ["FP16 (half precision)", "16", "1 sign, 5 exponent, 10 mantissa", "2"], source: "https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html" }
-      - { cells: ["BF16 (bfloat16)", "16", "1 sign, 8 exponent, 7 mantissa", "2"], source: "https://cloud.google.com/blog/products/ai-machine-learning/bfloat16-the-secret-to-high-performance-on-cloud-tpus" }
-      - { cells: ["INT8", "8", "a whole number from −128 to 127", "1"], source: "https://huggingface.co/docs/transformers/quantization/concept_guide" }
-      - { cells: ["4-bit integer", "4", "one of 16 whole numbers", "0.5"], source: "https://huggingface.co/docs/transformers/quantization/concept_guide" }
-  - section: "What Is Lost"
-    title: "Perplexity increase per llama.cpp file type"
-    columns: ["File type", "Perplexity increase on Llama-3-8B"]
-    rows:
-      - { cells: ["Q8_0", "+0.0026"], source: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp" }
-      - { cells: ["Q6_K", "+0.0217"], source: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp" }
-      - { cells: ["Q5_K_M", "+0.0569"], source: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp" }
-      - { cells: ["Q5_K_S", "+0.1049"], source: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp" }
-      - { cells: ["Q4_K_M", "+0.1754"], source: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp" }
-      - { cells: ["Q4_K_S", "+0.2689"], source: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp" }
-      - { cells: ["Q4_0", "+0.4685"], source: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp" }
-      - { cells: ["Q3_K_M", "+0.6569"], source: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp" }
-      - { cells: ["Q3_K_S", "+1.6321"], source: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp" }
-      - { cells: ["Q2_K", "+3.5199"], source: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp" }
-tags: [quantization, precision, number-formats, memory]
-updated: 2026-11-23
-related: [quantization-topic/reading-quantized-file-names, hyperparameter/precision, model/llama-3-1-8b-instruct]
+- section: The Formats Side By Side
+  title: The formats side by side
+  columns:
+  - Format
+  - Total bits
+  - How the bits are split
+  - Bytes per weight (bits ÷ 8)
+  rows:
+  - cells:
+    - FP32 (single precision)
+    - '32'
+    - 1 sign, 8 exponent, 23 mantissa
+    - '4'
+    source: https://www.intel.com/content/dam/develop/external/us/en/documents/bf16-hardware-numerics-definition-white-paper.pdf
+  - cells:
+    - FP16 (half precision)
+    - '16'
+    - 1 sign, 5 exponent, 10 mantissa
+    - '2'
+    source: https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html
+  - cells:
+    - BF16 (bfloat16)
+    - '16'
+    - 1 sign, 8 exponent, 7 mantissa
+    - '2'
+    source: https://cloud.google.com/blog/products/ai-machine-learning/bfloat16-the-secret-to-high-performance-on-cloud-tpus
+  - cells:
+    - INT8
+    - '8'
+    - a whole number from −128 to 127
+    - '1'
+    source: https://huggingface.co/docs/transformers/quantization/concept_guide
+  - cells:
+    - 4-bit integer
+    - '4'
+    - one of 16 whole numbers
+    - '0.5'
+    source: https://huggingface.co/docs/transformers/quantization/concept_guide
+- section: What Is Lost
+  title: Perplexity increase per llama.cpp file type
+  columns:
+  - File type
+  - Perplexity increase on Llama-3-8B
+  rows:
+  - cells:
+    - Q8_0
+    - '+0.0026'
+    source: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+  - cells:
+    - Q6_K
+    - '+0.0217'
+    source: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+  - cells:
+    - Q5_K_M
+    - '+0.0569'
+    source: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+  - cells:
+    - Q5_K_S
+    - '+0.1049'
+    source: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+  - cells:
+    - Q4_K_M
+    - '+0.1754'
+    source: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+  - cells:
+    - Q4_K_S
+    - '+0.2689'
+    source: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+  - cells:
+    - Q4_0
+    - '+0.4685'
+    source: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+  - cells:
+    - Q3_K_M
+    - '+0.6569'
+    source: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+  - cells:
+    - Q3_K_S
+    - '+1.6321'
+    source: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+  - cells:
+    - Q2_K
+    - '+3.5199'
+    source: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+tags:
+- quantization
+- precision
+- number-formats
+- memory
+updated: '2026-11-23'
+related:
+- quantization-topic/reading-quantized-file-names
+- hyperparameter/precision
+- model/llama-3-1-8b-instruct
 sources:
-  - { url: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md", title: "llama.cpp quantize README: tools/quantize/README.md (llama-quantize)", trust: 0.95 }
-  - { url: "https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp", title: "llama.cpp quantize.cpp: the list of file types (tools/quantize/quantize.cpp)", trust: 0.95 }
-  - { url: "https://github.com/ggml-org/llama.cpp/blob/master/ggml/src/ggml-common.h", title: "llama.cpp ggml-common.h: quantized block layouts (ggml/src/ggml-common.h)", trust: 0.95 }
-  - { url: "https://github.com/ggml-org/llama.cpp/blob/master/src/llama-quant.cpp", title: "llama.cpp llama-quant.cpp: which tensors each file type keeps at more bits (src/llama-quant.cpp)", trust: 0.95 }
-  - { url: "https://huggingface.co/docs/hub/gguf", title: "Hugging Face Hub GGUF documentation (quantization types)", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/quantization/concept_guide", title: "Hugging Face Transformers quantization concepts", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/quantization/bitsandbytes", title: "Hugging Face Transformers bitsandbytes documentation", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/transformers/perplexity", title: "Hugging Face Transformers perplexity documentation (Perplexity of fixed-length models)", trust: 0.9 }
-  - { url: "https://www.intel.com/content/dam/develop/external/us/en/documents/bf16-hardware-numerics-definition-white-paper.pdf", title: "Intel: BFLOAT16 – Hardware Numerics Definition (white paper, 2018)", trust: 0.95 }
-  - { url: "https://cloud.google.com/blog/products/ai-machine-learning/bfloat16-the-secret-to-high-performance-on-cloud-tpus", title: "Google Cloud blog: BFloat16, the secret to high performance on Cloud TPUs", trust: 0.9 }
-  - { url: "https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html", title: "NVIDIA documentation: Train With Mixed Precision", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/2.15/tensor_attributes.html", title: "PyTorch documentation: Tensor attributes (torch.dtype bit layouts)", trust: 0.9 }
-  - { url: "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct", title: "Meta Llama 3.1 8B Instruct model card (Hugging Face)", trust: 0.9 }
+- url: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/README.md
+  title: 'llama.cpp quantize README: tools/quantize/README.md (llama-quantize)'
+  trust: 0.95
+- url: https://github.com/ggml-org/llama.cpp/blob/master/tools/quantize/quantize.cpp
+  title: 'llama.cpp quantize.cpp: the list of file types (tools/quantize/quantize.cpp)'
+  trust: 0.95
+- url: https://github.com/ggml-org/llama.cpp/blob/master/ggml/src/ggml-common.h
+  title: 'llama.cpp ggml-common.h: quantized block layouts (ggml/src/ggml-common.h)'
+  trust: 0.95
+- url: https://github.com/ggml-org/llama.cpp/blob/master/src/llama-quant.cpp
+  title: 'llama.cpp llama-quant.cpp: which tensors each file type keeps at more bits (src/llama-quant.cpp)'
+  trust: 0.95
+- url: https://huggingface.co/docs/hub/gguf
+  title: Hugging Face Hub GGUF documentation (quantization types)
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/quantization/concept_guide
+  title: Hugging Face Transformers quantization concepts
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/quantization/bitsandbytes
+  title: Hugging Face Transformers bitsandbytes documentation
+  trust: 0.9
+- url: https://huggingface.co/docs/transformers/perplexity
+  title: Hugging Face Transformers perplexity documentation (Perplexity of fixed-length models)
+  trust: 0.9
+- url: https://www.intel.com/content/dam/develop/external/us/en/documents/bf16-hardware-numerics-definition-white-paper.pdf
+  title: 'Intel: BFLOAT16 – Hardware Numerics Definition (white paper, 2018)'
+  trust: 0.95
+- url: https://cloud.google.com/blog/products/ai-machine-learning/bfloat16-the-secret-to-high-performance-on-cloud-tpus
+  title: 'Google Cloud blog: BFloat16, the secret to high performance on Cloud TPUs'
+  trust: 0.9
+- url: https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html
+  title: 'NVIDIA documentation: Train With Mixed Precision'
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/2.15/tensor_attributes.html
+  title: 'PyTorch documentation: Tensor attributes (torch.dtype bit layouts)'
+  trust: 0.9
+- url: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
+  title: Meta Llama 3.1 8B Instruct model card (Hugging Face)
+  trust: 0.9
 ---
 
 ## What It Is

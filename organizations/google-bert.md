@@ -2,7 +2,7 @@
 id: organization/google-bert
 type: organization
 slug: google-bert
-schema_version: 1.1
+schema_version: 3.1
 title: BERT community
 name: BERT community
 website: https://huggingface.co/google-bert

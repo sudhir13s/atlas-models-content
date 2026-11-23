@@ -2,7 +2,7 @@
 id: organization/speechbrain
 type: organization
 slug: speechbrain
-schema_version: 1.1
+schema_version: 3.1
 title: SpeechBrain
 name: SpeechBrain
 website: https://huggingface.co/speechbrain

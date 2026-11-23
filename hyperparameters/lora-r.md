@@ -2,27 +2,32 @@
 id: hyperparameter/lora-r
 type: hyperparameter
 slug: lora-r
-schema_version: 2.2
-title: "LoRA Rank (r)"
+schema_version: 3.1
+title: LoRA Rank (r)
 name: r
 context: training
 priority: 5
 importance: critical
-goals: [finetuning]
-models: [llm, vision, audio, diffusion]
-range: "1 — 64"
-controls: "The size of the two small matrices that LoRA trains in place of a large frozen one: a higher rank gives the adapter more numbers to learn, a lower rank fewer."
+goals:
+- finetuning
+models:
+- llm
+- vision
+- audio
+- diffusion
+range: 1 — 64
+controls: 'The size of the two small matrices that LoRA trains in place of a large frozen one: a higher rank gives the adapter more numbers to learn, a lower rank fewer.'
 effects:
   decrease:
-    - "Fewer trainable numbers in each adapter, in proportion to r"
-    - "A smaller adapter file to store"
-    - "Less learning capacity"
-    - "In the LoRA paper, a rank as small as 1 sufficed for adapting Wq and Wv on its test tasks"
+  - Fewer trainable numbers in each adapter, in proportion to r
+  - A smaller adapter file to store
+  - Less learning capacity
+  - In the LoRA paper, a rank as small as 1 sufficed for adapting Wq and Wv on its test tasks
   increase:
-    - "More trainable numbers in each adapter, in proportion to r"
-    - "A larger adapter file to store"
-    - "More learning capacity"
-    - "With the alpha / r scale, the adapter's output is divided by a larger number"
+  - More trainable numbers in each adapter, in proportion to r
+  - A larger adapter file to store
+  - More learning capacity
+  - With the alpha / r scale, the adapter's output is divided by a larger number
 scale:
   min: 1
   max: 256
@@ -30,67 +35,75 @@ scale:
   typical_max: 64
   spacing: log
 typical_values:
-  - setting: "Hugging Face PEFT: default of LoraConfig"
-    value: "8"
-    source: "https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py"
-  - setting: "LoRA paper: GPT-3 175B, the smaller budget of 4.7 million parameters (Wq and Wv adapted)"
-    value: "1"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "LoRA paper: GPT-2 on text generation tasks (Wq and Wv adapted)"
-    value: "4"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "LoRA paper: RoBERTa base and large, and DeBERTa XXL, on GLUE tasks (Wq and Wv adapted)"
-    value: "8"
-    source: "https://arxiv.org/abs/2106.09685"
-  - setting: "Alpaca-LoRA training script: default (q_proj and v_proj adapted)"
-    value: "8"
-    source: "https://github.com/tloen/alpaca-lora/blob/main/finetune.py"
-  - setting: "QLoRA: LLaMA fine-tuning, LoRA on all linear layers"
-    value: "64"
-    source: "https://arxiv.org/abs/2305.14314"
+- setting: 'Hugging Face PEFT: default of LoraConfig'
+  value: '8'
+  source: https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py
+- setting: 'LoRA paper: GPT-3 175B, the smaller budget of 4.7 million parameters (Wq and Wv adapted)'
+  value: '1'
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'LoRA paper: GPT-2 on text generation tasks (Wq and Wv adapted)'
+  value: '4'
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'LoRA paper: RoBERTa base and large, and DeBERTa XXL, on GLUE tasks (Wq and Wv adapted)'
+  value: '8'
+  source: https://arxiv.org/abs/2106.09685
+- setting: 'Alpaca-LoRA training script: default (q_proj and v_proj adapted)'
+  value: '8'
+  source: https://github.com/tloen/alpaca-lora/blob/main/finetune.py
+- setting: 'QLoRA: LLaMA fine-tuning, LoRA on all linear layers'
+  value: '64'
+  source: https://arxiv.org/abs/2305.14314
 mistakes:
-  - mistake: "Assuming a larger rank always gives a better model"
-    why: >-
-      In the LoRA paper's Table 6 (GPT-3 175B), adapting Wq and Wv at **r = 64** scored 73.5 on
-      WikiSQL against **73.8 at r = 8** and 73.4 at r = 1. The authors conclude that a **rank as
-      small as one suffices** for adapting Wq and Wv on those datasets. QLoRA reports that **LoRA r
-      is unrelated to final performance** when LoRA is used on all layers.
-    fix: >-
-      Start from a small rank such as the PEFT default of 8, and raise it only when a comparison on
-      your own evaluation shows a gain.
-  - mistake: "Spending the parameter budget on rank instead of on more weight matrices"
-    why: >-
-      With the same budget of 18 million parameters on GPT-3, the LoRA paper's Table 5 gives
-      **70.4** on WikiSQL for Wq alone at r = 8, and **73.7** for Wq and Wv at r = 4. QLoRA calls the
-      total number of LoRA adapters the most critical LoRA hyperparameter.
-    fix: >-
-      Spread the adapters over more matrices before raising the rank; see the target modules page.
-  - mistake: "Raising r and leaving lora_alpha unchanged"
-    why: >-
-      The adapter's output is multiplied by **lora_alpha / r** (LoRA paper; PEFT's default). Doubling
-      r with the same alpha halves that multiplier. Kalajdzievski reports that this factor slows
-      learning at higher ranks, so that there is **little to no difference** compared with low ranks.
-    fix: >-
-      Decide alpha together with r (see the LoRA alpha page), or set `use_rslora=True` in PEFT,
-      which divides by the square root of r instead.
-  - mistake: "Counting the adapter's size as r times the matrix size"
-    why: >-
-      The two small matrices hold **r × (d + k)** numbers, not r × d × k. For a 12,288 by 12,288
-      matrix of GPT-3 at r = 8 that is 196,608 numbers, not 1.2 billion.
-    fix: "Use the formula under Calculation, summed over every adapted matrix and layer."
-tags: [finetuning, lora, peft, rank]
-updated: 2026-11-23
-related: [hyperparameter/lora-alpha, hyperparameter/target-modules, hyperparameter/learning-rate]
+- mistake: Assuming a larger rank always gives a better model
+  why: In the LoRA paper's Table 6 (GPT-3 175B), adapting Wq and Wv at **r = 64** scored 73.5 on WikiSQL against **73.8 at r = 8** and 73.4 at r = 1. The authors conclude that a **rank as small as one suffices** for adapting Wq and Wv on those datasets. QLoRA reports that **LoRA r is unrelated to final performance** when LoRA is used on all layers.
+  fix: Start from a small rank such as the PEFT default of 8, and raise it only when a comparison on your own evaluation shows a gain.
+- mistake: Spending the parameter budget on rank instead of on more weight matrices
+  why: With the same budget of 18 million parameters on GPT-3, the LoRA paper's Table 5 gives **70.4** on WikiSQL for Wq alone at r = 8, and **73.7** for Wq and Wv at r = 4. QLoRA calls the total number of LoRA adapters the most critical LoRA hyperparameter.
+  fix: Spread the adapters over more matrices before raising the rank; see the target modules page.
+- mistake: Raising r and leaving lora_alpha unchanged
+  why: The adapter's output is multiplied by **lora_alpha / r** (LoRA paper; PEFT's default). Doubling r with the same alpha halves that multiplier. Kalajdzievski reports that this factor slows learning at higher ranks, so that there is **little to no difference** compared with low ranks.
+  fix: Decide alpha together with r (see the LoRA alpha page), or set `use_rslora=True` in PEFT, which divides by the square root of r instead.
+- mistake: Counting the adapter's size as r times the matrix size
+  why: The two small matrices hold **r × (d + k)** numbers, not r × d × k. For a 12,288 by 12,288 matrix of GPT-3 at r = 8 that is 196,608 numbers, not 1.2 billion.
+  fix: Use the formula under Calculation, summed over every adapted matrix and layer.
+tags:
+- finetuning
+- lora
+- peft
+- rank
+updated: '2026-11-23'
+related:
+- hyperparameter/lora-alpha
+- hyperparameter/target-modules
+- hyperparameter/learning-rate
 sources:
-  - { url: "https://arxiv.org/abs/2106.09685", title: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2305.14314", title: "QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2312.03732", title: "A Rank Stabilization Scaling Factor for Fine-Tuning with LoRA (Kalajdzievski, 2023)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2005.14165", title: "Language Models are Few-Shot Learners (Brown et al., 2020)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py", title: "Hugging Face PEFT source: LoraConfig (defaults)", trust: 0.9 }
-  - { url: "https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/layer.py", title: "Hugging Face PEFT source: LoRA layer (lora_A, lora_B, scaling)", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/peft/developer_guides/lora", title: "Hugging Face PEFT documentation: LoRA", trust: 0.9 }
-  - { url: "https://huggingface.co/docs/peft/quicktour", title: "Hugging Face PEFT documentation: Quicktour (print_healthcheck)", trust: 0.9 }
-  - { url: "https://github.com/tloen/alpaca-lora/blob/main/finetune.py", title: "Alpaca-LoRA training script (finetune.py)", trust: 0.8 }
+- url: https://arxiv.org/abs/2106.09685
+  title: 'LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2305.14314
+  title: 'QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2312.03732
+  title: A Rank Stabilization Scaling Factor for Fine-Tuning with LoRA (Kalajdzievski, 2023)
+  trust: 0.9
+- url: https://arxiv.org/abs/2005.14165
+  title: Language Models are Few-Shot Learners (Brown et al., 2020)
+  trust: 0.9
+- url: https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/config.py
+  title: 'Hugging Face PEFT source: LoraConfig (defaults)'
+  trust: 0.9
+- url: https://github.com/huggingface/peft/blob/main/src/peft/tuners/lora/layer.py
+  title: 'Hugging Face PEFT source: LoRA layer (lora_A, lora_B, scaling)'
+  trust: 0.9
+- url: https://huggingface.co/docs/peft/developer_guides/lora
+  title: 'Hugging Face PEFT documentation: LoRA'
+  trust: 0.9
+- url: https://huggingface.co/docs/peft/quicktour
+  title: 'Hugging Face PEFT documentation: Quicktour (print_healthcheck)'
+  trust: 0.9
+- url: https://github.com/tloen/alpaca-lora/blob/main/finetune.py
+  title: Alpaca-LoRA training script (finetune.py)
+  trust: 0.8
 ---
 
 ## Definition

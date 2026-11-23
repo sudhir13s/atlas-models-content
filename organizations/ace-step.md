@@ -2,7 +2,7 @@
 id: organization/ace-step
 type: organization
 slug: ace-step
-schema_version: 1.1
+schema_version: 3.1
 title: ACE-Step
 name: ACE-Step
 website: https://huggingface.co/ACE-Step

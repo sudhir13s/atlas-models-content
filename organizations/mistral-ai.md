@@ -2,7 +2,7 @@
 id: organization/mistral-ai
 type: organization
 slug: mistral-ai
-schema_version: 1.1
+schema_version: 3.1
 title: Mistral AI
 name: Mistral AI
 kind: company

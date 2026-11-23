@@ -2,40 +2,131 @@
 id: parameter-calculator/hybrid
 type: parameter-calculator
 slug: hybrid
-schema_version: 1.0
-title: "Hybrid SSM / Attention / MoE Parameters"
+schema_version: 3.1
+title: Hybrid SSM / Attention / MoE Parameters
 arch: hybrid
 order: 9
 color_key: hybrid
 components:
-  - { name: "layer-type ratio (attention : SSM : MoE)", rank: 1, importance: critical, badge: "Structure", formula: "determines how the parameter budget splits across layer kinds", range: "e.g. 1:7 attn:Mamba" }
-  - { name: "num_hidden_layers (total depth)", rank: 2, importance: critical, badge: "Structure", formula: "total = Σ per-layer params over mixed layer types", range: "32 → 72" }
-  - { name: "hidden_size (d_model)", rank: 3, importance: critical, badge: "Structure", formula: "shared width across attention, SSM and MoE layers", range: "2048 → 8192" }
-  - { name: "MoE FFN layers (experts)", rank: 4, importance: critical, badge: "Per MoE Layer", formula: "num_experts × (3 × d × d_ffn); stored, not all active", range: "8 → 16 experts" }
-  - { name: "num_experts / top_k (total vs active)", rank: 5, importance: critical, badge: "Per MoE Layer", formula: "active = top_k × per-expert FFN; total = num_experts × per-expert", range: "top-2 of 16" }
-  - { name: "Mamba (SSM) layers", rank: 6, importance: critical, badge: "Per SSM Layer", formula: "≈ 3E·d² (in/out proj) + small SSM tensors", range: "majority of layers" }
-  - { name: "attention layers (interleaved)", rank: 7, importance: critical, badge: "Per Attn Layer", formula: "Q,O ≈ d² each; K,V shrunk by GQA", range: "the minority (1 in N)" }
-  - { name: "dense FFN layers (non-MoE positions)", rank: 8, importance: important, badge: "Per Layer", formula: "3 × d × d_ffn where MoE is not applied", range: "layers between MoE slots" }
-  - { name: "token embedding table", rank: 9, importance: important, badge: "Embedding", formula: "vocab_size × d_model", range: "V·d" }
-  - { name: "output / unembedding head", rank: 10, importance: important, badge: "Head", formula: "vocab_size × d_model (0 if tied)", range: "0 or V·d" }
-  - { name: "router / gate (per MoE layer)", rank: 11, importance: important, badge: "Per MoE Layer", formula: "d_model × num_experts logits", range: "tiny" }
-  - { name: "MoE placement interval (every-N layers)", rank: 12, importance: architectural, badge: "Structure", formula: "MoE replaces the MLP every e layers; sets expert count", range: "every 1–2 layers" }
-  - { name: "RMSNorm (per layer + final)", rank: 13, importance: optional, badge: "Per Layer", formula: "≈ (2L+1)·d_model", range: "tiny" }
+- name: 'layer-type ratio (attention : SSM : MoE)'
+  rank: 1
+  importance: critical
+  badge: Structure
+  formula: determines how the parameter budget splits across layer kinds
+  range: e.g. 1:7 attn:Mamba
+- name: num_hidden_layers (total depth)
+  rank: 2
+  importance: critical
+  badge: Structure
+  formula: total = Σ per-layer params over mixed layer types
+  range: 32 → 72
+- name: hidden_size (d_model)
+  rank: 3
+  importance: critical
+  badge: Structure
+  formula: shared width across attention, SSM and MoE layers
+  range: 2048 → 8192
+- name: MoE FFN layers (experts)
+  rank: 4
+  importance: critical
+  badge: Per MoE Layer
+  formula: num_experts × (3 × d × d_ffn); stored, not all active
+  range: 8 → 16 experts
+- name: num_experts / top_k (total vs active)
+  rank: 5
+  importance: critical
+  badge: Per MoE Layer
+  formula: active = top_k × per-expert FFN; total = num_experts × per-expert
+  range: top-2 of 16
+- name: Mamba (SSM) layers
+  rank: 6
+  importance: critical
+  badge: Per SSM Layer
+  formula: ≈ 3E·d² (in/out proj) + small SSM tensors
+  range: majority of layers
+- name: attention layers (interleaved)
+  rank: 7
+  importance: critical
+  badge: Per Attn Layer
+  formula: Q,O ≈ d² each; K,V shrunk by GQA
+  range: the minority (1 in N)
+- name: dense FFN layers (non-MoE positions)
+  rank: 8
+  importance: important
+  badge: Per Layer
+  formula: 3 × d × d_ffn where MoE is not applied
+  range: layers between MoE slots
+- name: token embedding table
+  rank: 9
+  importance: important
+  badge: Embedding
+  formula: vocab_size × d_model
+  range: V·d
+- name: output / unembedding head
+  rank: 10
+  importance: important
+  badge: Head
+  formula: vocab_size × d_model (0 if tied)
+  range: 0 or V·d
+- name: router / gate (per MoE layer)
+  rank: 11
+  importance: important
+  badge: Per MoE Layer
+  formula: d_model × num_experts logits
+  range: tiny
+- name: MoE placement interval (every-N layers)
+  rank: 12
+  importance: architectural
+  badge: Structure
+  formula: MoE replaces the MLP every e layers; sets expert count
+  range: every 1–2 layers
+- name: RMSNorm (per layer + final)
+  rank: 13
+  importance: optional
+  badge: Per Layer
+  formula: ≈ (2L+1)·d_model
+  range: tiny
 worked_example:
-  label: "Jamba-v0.1 (52B total / 12B active, approximate split)"
-  config: { hiddenDim: 4096, blockLayers: 8, attentionToMambaRatio: "1:7", moeEveryNLayers: 2, numExperts: 16, topK: 2, ffnDim: 14336, totalParams: "52B", activeParams: "12B" }
+  label: Jamba-v0.1 (52B total / 12B active, approximate split)
+  config:
+    hidden_size: 4096
+    blockLayers: 8
+    attentionToMambaRatio: '1:7'
+    moeEveryNLayers: 2
+    numExperts: 16
+    topK: 2
+    intermediate_size: 14336
+    totalParams: 52B
+    activeParams: 12B
   sources:
-    - { url: "https://arxiv.org/abs/2403.19887", title: "Jamba: A Hybrid Transformer-Mamba Language Model (Lieber et al., 2024)", trust: 0.95 }
-tags: [hybrid, ssm, mamba, transformer, moe, parameters]
-updated: 2026-07-17
+  - url: https://arxiv.org/abs/2403.19887
+    title: 'Jamba: A Hybrid Transformer-Mamba Language Model (Lieber et al., 2024)'
+    trust: 0.95
+tags:
+- hybrid
+- ssm
+- mamba
+- transformer
+- moe
+- parameters
+updated: '2026-07-17'
 sources:
-  - { url: "https://arxiv.org/abs/2403.19887", title: "Jamba: A Hybrid Transformer-Mamba Language Model (Lieber et al., 2024)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2408.12570", title: "Jamba-1.5: Hybrid Transformer-Mamba Models at Scale (Team Jamba, 2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2312.00752", title: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces (Gu & Dao, 2023)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2401.04088", title: "Mixtral of Experts (Jiang et al., 2024)", trust: 0.9 }
+- url: https://arxiv.org/abs/2403.19887
+  title: 'Jamba: A Hybrid Transformer-Mamba Language Model (Lieber et al., 2024)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2408.12570
+  title: 'Jamba-1.5: Hybrid Transformer-Mamba Models at Scale (Team Jamba, 2024)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2312.00752
+  title: 'Mamba: Linear-Time Sequence Modeling with Selective State Spaces (Gu & Dao, 2023)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2401.04088
+  title: Mixtral of Experts (Jiang et al., 2024)
+  trust: 0.9
 ---
 
 ## Overview
+
 A hybrid model interleaves *different kinds of layer* in one stack instead of repeating a single
 block. The archetype is **Jamba**, which alternates **Mamba (SSM) layers**, **Transformer
 attention layers**, and **Mixture-of-Experts FFN layers** — combining Mamba's linear-time
@@ -51,6 +142,7 @@ without a matching rise in per-token FLOPs. Reading a hybrid's parameter count m
 its layers by type first, then summing each bucket.
 
 ## Components
+
 - **Layer-type ratio** is the defining knob: Jamba uses a **1:7 attention-to-Mamba** ratio, so
   most layers are the (relatively small) Mamba blocks and only one in eight is attention.
 - **Mamba layers** cost ~`3E·d²` (dominated by their in/out projections; see the SSM page); at
@@ -75,6 +167,7 @@ Only the MoE term changes between the two (`E F` stored versus `k F` computed); 
 type is dense in both.
 
 ## Worked Example
+
 Jamba-v0.1 (`config` above): `d_model = 4096`, blocks of **8 layers** at a **1:7 attention:Mamba
 ratio**, an MoE FFN in place of the MLP **every 2 layers**, **16 experts**, **top-2** active,
 `d_ffn = 14336`. Per-layer-type costs:

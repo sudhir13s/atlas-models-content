@@ -2,7 +2,7 @@
 id: organization/ultralytics
 type: organization
 slug: ultralytics
-schema_version: 1.1
+schema_version: 3.1
 title: Ultralytics
 name: Ultralytics
 website: https://huggingface.co/Ultralytics

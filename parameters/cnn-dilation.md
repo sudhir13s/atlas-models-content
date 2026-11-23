@@ -2,24 +2,25 @@
 id: parameter/cnn-dilation
 type: parameter
 slug: cnn-dilation
-schema_version: 2.9
-title: "Dilation (Atrous Convolution)"
+schema_version: 3.1
+title: Dilation (Atrous Convolution)
 name: dilation
 priority: 7
 importance: optional
-applies_to: [cnn]
-range: "1 — 24"
-controls: "How far apart the filter's taps are spread: at dilation d, neighbouring weights read cells d apart, so the same filter covers a wider patch."
+applies_to:
+- cnn
+range: 1 — 24
+controls: 'How far apart the filter''s taps are spread: at dilation d, neighbouring weights read cells d apart, so the same filter covers a wider patch.'
 effects:
   decrease:
-    - "A narrower span: a k × k filter covers d × (k − 1) + 1 cells per side"
-    - "At dilation 1 the taps are side by side: an ordinary convolution"
-    - "No change in parameters"
+  - 'A narrower span: a k × k filter covers d × (k − 1) + 1 cells per side'
+  - 'At dilation 1 the taps are side by side: an ordinary convolution'
+  - No change in parameters
   increase:
-    - "A wider span for the same weights: a 3 × 3 filter at dilation 2 spans 5 × 5"
-    - "Stacked, the view grows fast: Yu and Koltun's dilations 1, 1, 2, 4, 8, 16 reach 65 × 65 cells"
-    - "Equal dilations in a row read a checkerboard: at k = 3, d = 2 only 9 of 25 cells (Wang et al.)"
-    - "A smaller output unless the padding grows with it"
+  - 'A wider span for the same weights: a 3 × 3 filter at dilation 2 spans 5 × 5'
+  - 'Stacked, the view grows fast: Yu and Koltun''s dilations 1, 1, 2, 4, 8, 16 reach 65 × 65 cells'
+  - 'Equal dilations in a row read a checkerboard: at k = 3, d = 2 only 9 of 25 cells (Wang et al.)'
+  - A smaller output unless the padding grows with it
 scale:
   min: 1
   max: 32
@@ -27,72 +28,140 @@ scale:
   typical_max: 24
   spacing: log
 typical_values:
-  - setting: "PyTorch Conv2d default, an ordinary convolution (documentation)"
-    value: "1"
-    source: "https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html"
-  - setting: "DeepLab, layers after the last stride is set to 1 in VGG-16 or ResNet-101 (DeepLab paper)"
-    value: "2"
-    source: "https://arxiv.org/abs/1606.00915"
-  - setting: "DeepLab, VGG-16's 7 × 7 fc6 layer as first adapted (DeepLab paper, Table 1)"
-    value: "4"
-    source: "https://arxiv.org/abs/1606.00915"
-  - setting: "DeepLab-LargeFOV, a 3 × 3 fc6 layer (DeepLab paper, Table 1)"
-    value: "12"
-    source: "https://arxiv.org/abs/1606.00915"
-  - setting: "Yu and Koltun's context module, layer 6 (their Table 1)"
-    value: "16"
-    source: "https://arxiv.org/abs/1511.07122"
-  - setting: "DeepLab ASPP-L, the largest of its rates 6, 12, 18, 24 (DeepLab paper)"
-    value: "24"
-    source: "https://arxiv.org/abs/1606.00915"
+- setting: PyTorch Conv2d default, an ordinary convolution (documentation)
+  value: '1'
+  source: https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
+- setting: DeepLab, layers after the last stride is set to 1 in VGG-16 or ResNet-101 (DeepLab paper)
+  value: '2'
+  source: https://arxiv.org/abs/1606.00915
+- setting: DeepLab, VGG-16's 7 × 7 fc6 layer as first adapted (DeepLab paper, Table 1)
+  value: '4'
+  source: https://arxiv.org/abs/1606.00915
+- setting: DeepLab-LargeFOV, a 3 × 3 fc6 layer (DeepLab paper, Table 1)
+  value: '12'
+  source: https://arxiv.org/abs/1606.00915
+- setting: Yu and Koltun's context module, layer 6 (their Table 1)
+  value: '16'
+  source: https://arxiv.org/abs/1511.07122
+- setting: DeepLab ASPP-L, the largest of its rates 6, 12, 18, 24 (DeepLab paper)
+  value: '24'
+  source: https://arxiv.org/abs/1606.00915
 mistakes:
-  - mistake: "Thinking dilation adds weights or computation"
-    why: >-
-      The DeepLab authors write that the number of filter parameters and of operations per position
-      stay constant; Yu and Koltun's Figure 1 has the same parameters in every layer. In DeepLab's Table
-      1, a 3 × 3 fc6 at rate **12** matched the 7 × 7 at rate 4 (**67.64%** mean IOU after CRF) with
-      **20.5M** parameters against **134.3M**, partly because they also kept only 1,024 of the 4,096
-      filters of fc6 and fc7.
-    fix: "Count a dilated layer as an ordinary k × k layer; attribute size changes to the filters."
-  - mistake: "Using the same dilation in every layer"
-    why: >-
-      Wang et al. call this gridding: with k = 3 and dilation 2 in each layer, a unit reads only **9** of
-      the **25** cells of its patch, a checkerboard that loses at least 75% of the information. They use
-      rates such as 1, 2, 3 in a row, with no common factor.
-    fix: "Vary the dilation across consecutive layers so that the patches leave no holes."
-  - mistake: "Calling the dilated convolution itself the à trous algorithm"
-    why: >-
-      PyTorch's documentation says dilation is "also known as the à trous algorithm". Yu and Koltun call
-      this incorrect: the algorithme à trous decomposes a signal at several scales and uses dilated
-      convolutions, but is not the operator itself. They also stress that no dilated filter is built.
-    fix: "Say dilated (or atrous) convolution for the layer."
-related: [parameter/cnn-kernel-size, parameter/cnn-padding, parameter/cnn-conv-stride]
+- mistake: Thinking dilation adds weights or computation
+  why: The DeepLab authors write that the number of filter parameters and of operations per position stay constant; Yu and Koltun's Figure 1 has the same parameters in every layer. In DeepLab's Table 1, a 3 × 3 fc6 at rate **12** matched the 7 × 7 at rate 4 (**67.64%** mean IOU after CRF) with **20.5M** parameters against **134.3M**, partly because they also kept only 1,024 of the 4,096 filters of fc6 and fc7.
+  fix: Count a dilated layer as an ordinary k × k layer; attribute size changes to the filters.
+- mistake: Using the same dilation in every layer
+  why: 'Wang et al. call this gridding: with k = 3 and dilation 2 in each layer, a unit reads only **9** of the **25** cells of its patch, a checkerboard that loses at least 75% of the information. They use rates such as 1, 2, 3 in a row, with no common factor.'
+  fix: Vary the dilation across consecutive layers so that the patches leave no holes.
+- mistake: Calling the dilated convolution itself the à trous algorithm
+  why: 'PyTorch''s documentation says dilation is "also known as the à trous algorithm". Yu and Koltun call this incorrect: the algorithme à trous decomposes a signal at several scales and uses dilated convolutions, but is not the operator itself. They also stress that no dilated filter is built.'
+  fix: Say dilated (or atrous) convolution for the layer.
+related:
+- parameter/cnn-kernel-size
+- parameter/cnn-padding
+- parameter/cnn-conv-stride
 visual:
   kind: conv_geometry
   image:
-    - [3, 1, 0, 2, 1, 0, 2]
-    - [1, 4, 2, 0, 3, 1, 0]
-    - [0, 2, 5, 1, 0, 2, 1]
-    - [2, 0, 1, 3, 2, 0, 3]
-    - [1, 3, 0, 2, 4, 1, 0]
-    - [0, 1, 2, 0, 1, 3, 2]
-    - [2, 0, 1, 3, 0, 2, 1]
+  - - 3
+    - 1
+    - 0
+    - 2
+    - 1
+    - 0
+    - 2
+  - - 1
+    - 4
+    - 2
+    - 0
+    - 3
+    - 1
+    - 0
+  - - 0
+    - 2
+    - 5
+    - 1
+    - 0
+    - 2
+    - 1
+  - - 2
+    - 0
+    - 1
+    - 3
+    - 2
+    - 0
+    - 3
+  - - 1
+    - 3
+    - 0
+    - 2
+    - 4
+    - 1
+    - 0
+  - - 0
+    - 1
+    - 2
+    - 0
+    - 1
+    - 3
+    - 2
+  - - 2
+    - 0
+    - 1
+    - 3
+    - 0
+    - 2
+    - 1
   filter:
-    - [1, 0, 1]
-    - [0, 2, 0]
-    - [1, 0, 1]
+  - - 1
+    - 0
+    - 1
+  - - 0
+    - 2
+    - 0
+  - - 1
+    - 0
+    - 1
   panels:
-    - { label: "Dilation 1", stride: 1, padding: 0, dilation: 1, window: { row: 1, column: 1 } }
-    - { label: "Dilation 2", stride: 1, padding: 0, dilation: 2, window: { row: 1, column: 1 } }
-  caption: "The same 3 × 3 filter on the same 7 × 7 grid at dilation 1 and dilation 2, no padding. At dilation 2 the nine taps (shaded) sit two cells apart and span the outlined 5 × 5 patch, so fewer positions fit: the output shrinks from 5 × 5 to 3 × 3 with the same nine weights. The grid and filter are an example, not from a trained model."
-tags: [cnn, convolution, dilation, atrous, receptive-field, vision]
-updated: 2026-11-23
+  - label: Dilation 1
+    stride: 1
+    padding: 0
+    dilation: 1
+    window:
+      row: 1
+      column: 1
+  - label: Dilation 2
+    stride: 1
+    padding: 0
+    dilation: 2
+    window:
+      row: 1
+      column: 1
+  caption: 'The same 3 × 3 filter on the same 7 × 7 grid at dilation 1 and dilation 2, no padding. At dilation 2 the nine taps (shaded) sit two cells apart and span the outlined 5 × 5 patch, so fewer positions fit: the output shrinks from 5 × 5 to 3 × 3 with the same nine weights. The grid and filter are an example, not from a trained model.'
+tags:
+- cnn
+- convolution
+- dilation
+- atrous
+- receptive-field
+- vision
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/1511.07122", title: "Multi-Scale Context Aggregation by Dilated Convolutions (Yu & Koltun, arXiv:1511.07122)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1606.00915", title: "DeepLab: Semantic Image Segmentation with Deep Convolutional Nets, Atrous Convolution, and Fully Connected CRFs (Chen et al., arXiv:1606.00915)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1702.08502", title: "Understanding Convolution for Semantic Segmentation (Wang et al., arXiv:1702.08502)", trust: 0.9 }
-  - { url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html", title: "PyTorch documentation: torch.nn.Conv2d", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/1603.07285", title: "A guide to convolution arithmetic for deep learning (Dumoulin & Visin, arXiv:1603.07285)", trust: 0.9 }
+- url: https://arxiv.org/abs/1511.07122
+  title: Multi-Scale Context Aggregation by Dilated Convolutions (Yu & Koltun, arXiv:1511.07122)
+  trust: 0.95
+- url: https://arxiv.org/abs/1606.00915
+  title: 'DeepLab: Semantic Image Segmentation with Deep Convolutional Nets, Atrous Convolution, and Fully Connected CRFs (Chen et al., arXiv:1606.00915)'
+  trust: 0.9
+- url: https://arxiv.org/abs/1702.08502
+  title: Understanding Convolution for Semantic Segmentation (Wang et al., arXiv:1702.08502)
+  trust: 0.9
+- url: https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html
+  title: 'PyTorch documentation: torch.nn.Conv2d'
+  trust: 0.9
+- url: https://arxiv.org/abs/1603.07285
+  title: A guide to convolution arithmetic for deep learning (Dumoulin & Visin, arXiv:1603.07285)
+  trust: 0.9
 ---
 
 ## Definition

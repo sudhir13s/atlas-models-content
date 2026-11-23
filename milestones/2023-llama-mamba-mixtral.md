@@ -2,7 +2,7 @@
 id: milestone/2023-llama-mamba-mixtral
 type: milestone
 slug: 2023-llama-mamba-mixtral
-schema_version: 1.2
+schema_version: 3.1
 title: Llama + Mamba + Mixtral
 year: 2023
 order: 8

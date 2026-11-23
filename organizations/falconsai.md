@@ -2,7 +2,7 @@
 id: organization/falconsai
 type: organization
 slug: falconsai
-schema_version: 1.1
+schema_version: 3.1
 title: Falcons.ai
 name: Falcons.ai
 website: https://huggingface.co/Falconsai

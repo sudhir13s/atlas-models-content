@@ -2,7 +2,7 @@
 id: organization/hexgrad
 type: organization
 slug: hexgrad
-schema_version: 1.1
+schema_version: 3.1
 title: hexgrad
 name: hexgrad
 website: https://huggingface.co/hexgrad

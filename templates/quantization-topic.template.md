@@ -2,7 +2,7 @@
 id: quantization-topic/<slug>
 type: quantization-topic
 slug: <slug>
-schema_version: 2.6
+schema_version: 3.1              # the schema's current version; the schema refuses any other
 title: "<Page title>"
 order: 1                        # position in the guide's reading order
 summary: "<One plain sentence: what the page explains.>"

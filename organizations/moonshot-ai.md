@@ -2,7 +2,7 @@
 id: organization/moonshot-ai
 type: organization
 slug: moonshot-ai
-schema_version: 1.1
+schema_version: 3.1
 title: Moonshot AI
 name: Moonshot AI
 kind: company

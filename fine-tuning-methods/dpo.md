@@ -2,73 +2,79 @@
 id: fine-tuning-method/dpo
 type: fine-tuning-method
 slug: dpo
-schema_version: 2.8
-title: "DPO (Direct Preference Optimization)"
+schema_version: 3.1
+title: DPO (Direct Preference Optimization)
 method_type: preference
 memory_profile: medium
-summary: "Train a model on pairs of a preferred and a rejected answer with one classification loss, with no separate reward model and no reinforcement-learning loop."
-when_to_use: "When you have prompts with a preferred and a rejected answer and want the RLHF objective without training a reward model or sampling during training."
-related_hyperparameters: [hyperparameter/learning-rate, hyperparameter/effective-batch-size]
+summary: Train a model on pairs of a preferred and a rejected answer with one classification loss, with no separate reward model and no reinforcement-learning loop.
+when_to_use: When you have prompts with a preferred and a rejected answer and want the RLHF objective without training a reward model or sampling during training.
+related_hyperparameters:
+- hyperparameter/learning-rate
+- hyperparameter/effective-batch-size
 profile:
-  trains: "The policy (the model being aligned)"
-  models_in_training: "Two: the policy and a frozen reference model"
-  data: "Prompts, each with a preferred and a rejected answer"
-  stages: "One, after supervised fine-tuning when an SFT model exists"
-  source: "https://arxiv.org/abs/2305.18290"
+  trains: The policy (the model being aligned)
+  models_in_training: 'Two: the policy and a frozen reference model'
+  data: Prompts, each with a preferred and a rejected answer
+  stages: One, after supervised fine-tuning when an SFT model exists
+  source: https://arxiv.org/abs/2305.18290
 typical_values:
-  - setting: "DPO paper: default β"
-    value: "0.1"
-    source: "https://arxiv.org/abs/2305.18290"
-  - setting: "DPO paper: β for TL;DR summarization"
-    value: "0.5"
-    source: "https://arxiv.org/abs/2305.18290"
-  - setting: "DPO paper: optimizer, learning rate, batch size"
-    value: "RMSprop, 1e-6, 64"
-    source: "https://arxiv.org/abs/2305.18290"
-  - setting: "DPO paper: warmup of the learning rate from 0"
-    value: "150 steps"
-    source: "https://arxiv.org/abs/2305.18290"
-  - setting: "DPO paper: β values swept on the sentiment task"
-    value: "0.05, 0.1, 1, 5"
-    source: "https://arxiv.org/abs/2305.18290"
-  - setting: "ORPO paper: its DPO baselines (β, learning rate, epochs)"
-    value: "0.1, 5e-6, 3"
-    source: "https://arxiv.org/abs/2403.07691"
+- setting: 'DPO paper: default β'
+  value: '0.1'
+  source: https://arxiv.org/abs/2305.18290
+- setting: 'DPO paper: β for TL;DR summarization'
+  value: '0.5'
+  source: https://arxiv.org/abs/2305.18290
+- setting: 'DPO paper: optimizer, learning rate, batch size'
+  value: RMSprop, 1e-6, 64
+  source: https://arxiv.org/abs/2305.18290
+- setting: 'DPO paper: warmup of the learning rate from 0'
+  value: 150 steps
+  source: https://arxiv.org/abs/2305.18290
+- setting: 'DPO paper: β values swept on the sentiment task'
+  value: 0.05, 0.1, 1, 5
+  source: https://arxiv.org/abs/2305.18290
+- setting: 'ORPO paper: its DPO baselines (β, learning rate, epochs)'
+  value: 0.1, 5e-6, 3
+  source: https://arxiv.org/abs/2403.07691
 mistakes:
-  - mistake: "Dropping the weighting and just raising the preferred answer's probability against the rejected one's"
-    why: >-
-      The DPO gradient weights each pair by σ(r̂(rejected) − r̂(chosen)): by **how wrongly** the
-      implicit reward orders the two answers. The authors report that a naive version without this
-      weighting can make the language model **degenerate** (their Appendix Table 3).
-    fix: "Use the full loss of equation 7, with the reference model's log-probabilities."
-  - mistake: "Using a reference model the preference data did not come from"
-    why: >-
-      The preference pairs are usually sampled from the SFT model, so the paper sets π_ref = π_SFT
-      whenever it is available. When it is not, the authors first train the reference on the
-      preferred answers, to reduce the **distribution shift** between the data and π_ref.
-    fix: "Use the model that generated the pairs as the reference, or fine-tune one on the preferred answers first."
-  - mistake: "Training many epochs"
-    why: >-
-      In the ORPO paper's DPO baselines, trained for three epochs, the evaluation loss rose from the
-      third epoch, and in most cases the first or second epoch's checkpoint was the best.
-    fix: "Evaluate after each epoch and keep the best checkpoint."
-  - mistake: "Taking the paper's results as shown for very large models"
-    why: >-
-      The authors evaluate models of up to **6B** parameters and list scaling DPO to models orders of
-      magnitude larger as future work.
-    fix: "Check the results on your own model size and evaluation."
+- mistake: Dropping the weighting and just raising the preferred answer's probability against the rejected one's
+  why: 'The DPO gradient weights each pair by σ(r̂(rejected) − r̂(chosen)): by **how wrongly** the implicit reward orders the two answers. The authors report that a naive version without this weighting can make the language model **degenerate** (their Appendix Table 3).'
+  fix: Use the full loss of equation 7, with the reference model's log-probabilities.
+- mistake: Using a reference model the preference data did not come from
+  why: The preference pairs are usually sampled from the SFT model, so the paper sets π_ref = π_SFT whenever it is available. When it is not, the authors first train the reference on the preferred answers, to reduce the **distribution shift** between the data and π_ref.
+  fix: Use the model that generated the pairs as the reference, or fine-tune one on the preferred answers first.
+- mistake: Training many epochs
+  why: In the ORPO paper's DPO baselines, trained for three epochs, the evaluation loss rose from the third epoch, and in most cases the first or second epoch's checkpoint was the best.
+  fix: Evaluate after each epoch and keep the best checkpoint.
+- mistake: Taking the paper's results as shown for very large models
+  why: The authors evaluate models of up to **6B** parameters and list scaling DPO to models orders of magnitude larger as future work.
+  fix: Check the results on your own model size and evaluation.
 visual:
   kind: dpo_loss
   beta: 0.1
-  policy: { chosen: -18.0, rejected: -21.0 }
-  reference: { chosen: -20.0, rejected: -18.0 }
-  caption: "The implicit reward of each answer and the DPO loss of one pair, computed from the log-probabilities of the worked example with the paper's default β = 0.1. The log-probabilities are an example, not from a trained model."
-tags: [fine-tuning, preference, dpo, alignment]
-updated: 2026-11-23
+  policy:
+    chosen: -18.0
+    rejected: -21.0
+  reference:
+    chosen: -20.0
+    rejected: -18.0
+  caption: The implicit reward of each answer and the DPO loss of one pair, computed from the log-probabilities of the worked example with the paper's default β = 0.1. The log-probabilities are an example, not from a trained model.
+tags:
+- fine-tuning
+- preference
+- dpo
+- alignment
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/2305.18290", title: "Direct Preference Optimization: Your Language Model is Secretly a Reward Model (Rafailov et al., 2023)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2403.07691", title: "ORPO: Monolithic Preference Optimization without Reference Model (Hong et al., 2024)", trust: 0.9 }
-  - { url: "https://arxiv.org/abs/2203.02155", title: "Training language models to follow instructions with human feedback (Ouyang et al., 2022)", trust: 0.9 }
+- url: https://arxiv.org/abs/2305.18290
+  title: 'Direct Preference Optimization: Your Language Model is Secretly a Reward Model (Rafailov et al., 2023)'
+  trust: 0.95
+- url: https://arxiv.org/abs/2403.07691
+  title: 'ORPO: Monolithic Preference Optimization without Reference Model (Hong et al., 2024)'
+  trust: 0.9
+- url: https://arxiv.org/abs/2203.02155
+  title: Training language models to follow instructions with human feedback (Ouyang et al., 2022)
+  trust: 0.9
 ---
 
 ## Definition

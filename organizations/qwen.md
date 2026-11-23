@@ -2,7 +2,7 @@
 id: organization/qwen
 type: organization
 slug: qwen
-schema_version: 1.1
+schema_version: 3.1
 title: Qwen
 name: Qwen
 kind: lab

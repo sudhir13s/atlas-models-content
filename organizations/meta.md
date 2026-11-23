@@ -2,7 +2,7 @@
 id: organization/meta
 type: organization
 slug: meta
-schema_version: 1.1
+schema_version: 3.1
 title: Meta
 name: Meta
 kind: company

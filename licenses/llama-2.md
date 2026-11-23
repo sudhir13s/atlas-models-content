@@ -2,12 +2,12 @@
 id: license/llama-2
 type: license
 slug: llama-2
-schema_version: 1.1
-title: "Llama 2 Community License"
-name: "Llama 2 Community License Agreement"
+schema_version: 3.1
+title: Llama 2 Community License
+name: Llama 2 Community License Agreement
 spdx_id: llama2
 category: custom
-url: "https://www.llama.com/llama2/license/"
+url: https://www.llama.com/llama2/license/
 permissions:
   commercial_use: true
   modification: true
@@ -16,17 +16,32 @@ permissions:
   output_training: false
   patent_grant: false
   private_use: true
-conditions: ["Provide a copy of the agreement to any third party you distribute the materials or derivative works to", "Keep the attribution notice in a Notice text file", "Comply with the Acceptable Use Policy"]
-limitations: ["The materials and their outputs may not be used to improve any other large language model, except Llama 2 and its derivative works", "A separate license from Meta is required if monthly active users exceeded 700 million on the Llama 2 release date", "The Acceptable Use Policy is part of the agreement", "No trademark license", "Provided as is, with no warranty and no liability", "The license ends if you sue Meta over intellectual property in the materials or their outputs"]
-models_using: [model/llama-2-7b-hf]
-summary: "Meta's custom community license for Llama 2: free commercial use, modification and redistribution with a copy of the agreement and an attribution notice, but no use of the model or its outputs to improve other large language models, and a separate license above 700 million monthly active users."
-tags: [license, custom, llama, open-weight]
-updated: 2026-11-19
+conditions:
+- Provide a copy of the agreement to any third party you distribute the materials or derivative works to
+- Keep the attribution notice in a Notice text file
+- Comply with the Acceptable Use Policy
+limitations:
+- The materials and their outputs may not be used to improve any other large language model, except Llama 2 and its derivative works
+- A separate license from Meta is required if monthly active users exceeded 700 million on the Llama 2 release date
+- The Acceptable Use Policy is part of the agreement
+- No trademark license
+- Provided as is, with no warranty and no liability
+- The license ends if you sue Meta over intellectual property in the materials or their outputs
+summary: 'Meta''s custom community license for Llama 2: free commercial use, modification and redistribution with a copy of the agreement and an attribution notice, but no use of the model or its outputs to improve other large language models, and a separate license above 700 million monthly active users.'
+tags:
+- license
+- custom
+- llama
+- open-weight
+updated: '2026-11-19'
 sources:
-  - { url: "https://www.llama.com/llama2/license/", title: "Llama 2 Community License Agreement", trust: 0.95 }
+- url: https://www.llama.com/llama2/license/
+  title: Llama 2 Community License Agreement
+  trust: 0.95
 ---
 
 ## Plain-English
+
 Llama 2 may be used, copied, modified and redistributed worldwide at no charge, including
 commercially. When you hand the materials or a derivative work to someone else you include the
 agreement and keep Meta's attribution notice. This license has no "Built with Llama" display rule and
