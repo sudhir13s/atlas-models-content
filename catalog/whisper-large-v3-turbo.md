@@ -39,7 +39,8 @@ hub_signals:
 aliases:
 - openai/whisper-large-v3-turbo
 lineage:
-  parents: []
+  parents:
+  - model/whisper-large-v3
   children: []
 quotes:
   summary: Whisper large-v3-turbo is a finetuned version of a pruned

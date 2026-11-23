@@ -18,7 +18,7 @@ parameters_active_b: 9.24
 total_parameters: 9241705984
 context_window_tokens: 8192
 summary: Dense decoder-only transformer, ~9.24B parameters, 8K context, using GQA, alternating local/global attention, logit soft-capping, GeGLU, RMSNorm and RoPE.
-why_it_matters: Google's strongest small open model of 2024, and the reference example of alternating local/global attention with attention soft-capping.
+why_it_matters: Google's card says the relatively small size of Gemma models makes it possible to deploy them on a laptop, desktop or your own cloud infrastructure, and the Gemma 2 report says the 9B model was trained with knowledge distillation instead of next-token prediction.
 fingerprint:
   attention_type: GQA
   num_layers: 42
@@ -104,7 +104,7 @@ tags:
 - gqa
 - instruct
 - sliding-window
-updated: '2026-11-20'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google/gemma-2-9b-it
   title: Gemma 2 9B IT — model card
@@ -199,19 +199,18 @@ is wrapped in both pre- and post-RMSNorm.
 
 ## Why It Matters
 
-Gemma 2 9B was Google's answer at the sub-10B open tier, beating Llama 3 8B on most knowledge and
-reasoning benchmarks and shipping with knowledge-distillation-trained weights (the 9B was distilled
-from a larger teacher rather than trained from scratch on tokens alone). Architecturally it is the
-canonical reference for two ideas that later spread widely: interleaving cheap local attention with
-periodic global attention to bound compute, and logit soft-capping to keep attention scores and output
-distributions from saturating. The 256-dimensional heads (larger than the 128 typical of peers) give
-each head more representational capacity.
+Google's model card describes Gemma as a family of lightweight open models built from the same
+research and technology used to create the Gemini models. It says their relatively small size makes
+it possible to deploy them in environments with limited resources, such as a laptop, a desktop or
+your own cloud infrastructure, and that the 9B model was trained on 8 trillion tokens.
+
+The Gemma 2 report says the 2B and 9B models were trained with knowledge distillation instead of
+next-token prediction, and that the architecture interleaves local and global attention and uses
+grouped-query attention. The report's authors claim the resulting models deliver the best
+performance for their size.
 
 ## Notes
 
 The weights are gated on Hugging Face and governed by the custom Gemma Terms of Use (commercial use
-permitted, subject to a prohibited-use policy — see [[license/gemma]]). The 8K context is short by
-2024 standards and is a real constraint for long-document RAG. The benchmark figures above are the
-Gemma 2 report's numbers for the 9B *pretrained base*; the instruction-tuned checkpoint's scores
-differ. Soft-capping must be enabled for faithful inference — some early inference stacks silently
-dropped it, degrading quality. See [[architecture-era/transformer]] for the architecture lineage.
+permitted, subject to a prohibited-use policy — see [[license/gemma]]). See
+[[architecture-era/transformer]] for the architecture lineage.

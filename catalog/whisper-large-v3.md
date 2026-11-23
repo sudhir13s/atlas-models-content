@@ -40,7 +40,8 @@ aliases:
 - openai/whisper-large-v3
 lineage:
   parents: []
-  children: []
+  children:
+  - model/whisper-large-v3-turbo
 quotes:
   summary: Whisper large-v3 has the same architecture as the previous
   intended_use: The primary intended users of these models are AI researchers studying robustness, generalization, capabilities, biases, and constraints of the current model.

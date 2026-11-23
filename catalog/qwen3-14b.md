@@ -15,7 +15,7 @@ tasks:
 - task/text-generation
 parameters_active_b: 14.77
 total_parameters: 14768307200
-context_window_tokens: 40960
+context_window_tokens: 32768
 base_models:
 - name: Qwen/Qwen3-14B-Base
   address: https://huggingface.co/Qwen/Qwen3-14B-Base
@@ -30,7 +30,7 @@ fingerprint:
   head_size: 128
   hidden_size: 5120
   intermediate_size: 17408
-  context_window_tokens: 40960
+  context_window_tokens: 32768
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -67,6 +67,9 @@ quotes:
   summary: Qwen3 is the latest generation of large language models in Qwen series, offering a comprehensive suite of dense and mixture-of-experts (MoE) models.
   what_sets_it_apart: Uniquely support of seamless switching between thinking mode
   running_it: '**DO NOT use greedy decoding**, as it can lead to performance degradation and endless repetitions.'
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - text-generation

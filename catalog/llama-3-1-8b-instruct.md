@@ -18,7 +18,7 @@ parameters_active_b: 8.03
 total_parameters: 8030261248
 context_window_tokens: 131072
 summary: Dense decoder-only transformer, 8B parameters, 128K context, using GQA, SwiGLU, RMSNorm and RoPE.
-why_it_matters: Meta's most-downloaded open small model and the default local baseline at the 8B tier.
+why_it_matters: Meta's card says the Llama 3.1 instruction-tuned text models are optimized for multilingual dialogue and, by Meta's account, outperform many of the available open-source and closed chat models on common industry benchmarks.
 fingerprint:
   attention_type: GQA
   num_layers: 32
@@ -106,7 +106,7 @@ tags:
 - dense
 - gqa
 - instruct
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
   title: Llama 3.1 8B Instruct — model card + config.json
@@ -134,18 +134,21 @@ scaling on top of an 8K-trained base.
 
 ## Why It Matters
 
-It is the default open baseline at the 8B tier — capable enough for real assistants and RAG, small
-enough to run quantized on an M-series laptop or an 8GB GPU. The instruct variant is aligned with
-supervised fine-tuning plus rejection sampling and Direct Preference Optimization (DPO), which
-Llama 3 adopted in place of PPO-based RLHF. Its parameter count verifies against the standard dense
-transformer formula: a 128256×4096 embedding, 32 layers of GQA attention (~41.9M params each) and
+Meta's model card says the Llama 3.1 instruction-tuned text models are optimized for multilingual
+dialogue use cases and, by Meta's account, outperform many of the available open-source and closed
+chat models on common industry benchmarks. The card says the tuned versions use supervised
+fine-tuning (SFT) and reinforcement learning with human feedback (RLHF), and that the Llama 3.1
+licence allows using the models' outputs to improve other models, including synthetic data
+generation and distillation.
+
+The parameter count can be checked against the standard dense transformer formula: a 128256×4096
+embedding, 32 layers of GQA attention (~41.9M params each) and
 SwiGLU FFN (~176.2M each), an untied output head, summing to ≈8.03B, with the feed-forward blocks
 dominating (~70%).
 
 ## Notes
 
-The model is gated on Hugging Face (manual approval). Recommended inference defaults from the model
-card are temperature 0.6 and top_p 0.9. Pretraining used ~15.6T tokens — far past the Chinchilla
-compute-optimal point — deliberately over-training for inference-time efficiency. See
-[[hyperparameter/temperature]] for sampling guidance and [[architecture-era/transformer]] for the
-architecture lineage.
+The model is gated on Hugging Face (manual approval). Meta's card says Llama 3.1 was pretrained on
+about 15 trillion tokens of data from publicly available sources, with a pretraining data cutoff of
+December 2023. See [[hyperparameter/temperature]] for sampling guidance and
+[[architecture-era/transformer]] for the architecture lineage.

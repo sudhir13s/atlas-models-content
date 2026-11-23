@@ -15,7 +15,7 @@ tasks:
 - task/text-generation
 parameters_active_b: 32.76
 total_parameters: 32762123264
-context_window_tokens: 40960
+context_window_tokens: 32768
 summary: Qwen3-32B is a language model from Qwen that reads text and writes text in reply. It belongs to Qwen3, a generation the card describes as a suite of dense and mixture-of-experts (MoE) models, and the card lists it with 32.8 billion parameters. Its context length is 32,768 tokens natively and 131,072 tokens with YaRN, a technique for extending the length a model handles.
 what_sets_it_apart: Qwen says Qwen3 supports switching between a thinking mode, for complex reasoning, maths and coding, and a non-thinking mode, for efficient general dialogue, inside one model. The card also states support for more than 100 languages and dialects, and tool use in both modes.
 running_it: The card says to use Temperature=0.6, TopP=0.95, TopK=20 and MinP=0 in thinking mode, and Temperature=0.7, TopP=0.8, TopK=20 and MinP=0 in non-thinking mode, and not to use greedy decoding. For inputs beyond 32,768 tokens it describes enabling YaRN, and warns that static YaRN may affect performance on shorter texts, so it should be added only when long contexts are needed.
@@ -27,7 +27,7 @@ fingerprint:
   head_size: 128
   hidden_size: 5120
   intermediate_size: 25600
-  context_window_tokens: 40960
+  context_window_tokens: 32768
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -64,6 +64,9 @@ quotes:
   summary: Qwen3 is the latest generation of large language models in Qwen series, offering a comprehensive suite of dense and mixture-of-experts (MoE) models.
   what_sets_it_apart: Uniquely support of seamless switching between thinking mode
   running_it: We advise adding the `rope_scaling` configuration only when processing long contexts is required.
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - text-generation

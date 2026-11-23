@@ -50,7 +50,8 @@ hub_signals:
 aliases:
 - Qwen/Qwen3-Reranker-8B
 lineage:
-  parents: []
+  parents:
+  - model/qwen3-8b-base
   children: []
 quotes:
   summary: 'Model Type: Text Reranking'

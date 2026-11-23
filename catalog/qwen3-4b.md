@@ -15,7 +15,7 @@ tasks:
 - task/text-generation
 parameters_active_b: 4.02
 total_parameters: 4022468096
-context_window_tokens: 40960
+context_window_tokens: 32768
 base_models:
 - name: Qwen/Qwen3-4B-Base
   address: https://huggingface.co/Qwen/Qwen3-4B-Base
@@ -30,7 +30,7 @@ fingerprint:
   head_size: 128
   hidden_size: 2560
   intermediate_size: 9728
-  context_window_tokens: 40960
+  context_window_tokens: 32768
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -61,6 +61,9 @@ quotes:
   summary: offering a comprehensive suite of dense and mixture-of-experts (MoE) models
   what_sets_it_apart: Uniquely support of seamless switching between thinking mode
   running_it: For thinking mode (`enable_thinking=True`), use `Temperature=0.6`, `TopP=0.95`, `TopK=20`, and `MinP=0`.
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - text-generation

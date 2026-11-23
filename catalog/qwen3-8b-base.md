@@ -54,6 +54,7 @@ lineage:
   parents: []
   children:
   - model/qwen3-8b
+  - model/qwen3-reranker-8b
 quotes:
   summary: Qwen3 is the latest generation of large language models in Qwen series, offering a comprehensive suite of dense and mixture-of-experts (MoE) models.
   what_sets_it_apart: Stage 1 focuses on broad language modeling and general knowledge acquisition, Stage 2 improves reasoning skills like STEM, coding, and logical reasoning, and Stage 3 enhances long-context comprehension by extending training sequence lengths up to 32k tokens.

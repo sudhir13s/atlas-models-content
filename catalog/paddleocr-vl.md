@@ -21,7 +21,7 @@ base_models:
   address: https://huggingface.co/baidu/ERNIE-4.5-0.3B-Paddle
 summary: 'PaddleOCR-VL is a document parsing model from PaddlePaddle: it reads an image of a page and recognizes its text, tables, formulas and charts. Its core component is PaddleOCR-VL-0.9B, a vision-language model, meaning a model that reads images and writes text, which joins a NaViT-style dynamic-resolution visual encoder with the ERNIE-4.5-0.3B language model. The card states support for 109 languages.'
 intended_use: The card presents it for document parsing at page level and for recognizing individual elements such as text, tables, formulas and charts. It says the content types it handles include handwritten text and historical documents.
-what_sets_it_apart: 'The card describes a compact design made for resource-efficient inference: a visual encoder that takes images at dynamic high resolution, paired with a lightweight language model, ERNIE-4.5-0.3B. The card lists the 109 languages as covering Chinese, English, Japanese, Latin and Korean, plus Cyrillic, Arabic, Devanagari and Thai scripts.'
+what_sets_it_apart: 'The card describes a compact design made for resource-efficient inference: a visual encoder that takes images at dynamic high resolution, paired with a lightweight language model, ERNIE-4.5-0.3B. The card lists the 109 languages as including Chinese, English, Japanese, Latin and Korean, as well as Russian (Cyrillic script), Arabic, Hindi (Devanagari script) and Thai.'
 fingerprint:
   attention_type: GQA
   num_layers: 18
@@ -87,4 +87,4 @@ The card presents it for document parsing at page level and for recognizing indi
 
 ## What Sets It Apart
 
-The card describes a compact design made for resource-efficient inference: a visual encoder that takes images at dynamic high resolution, paired with a lightweight language model, ERNIE-4.5-0.3B. The card lists the 109 languages as covering Chinese, English, Japanese, Latin and Korean, plus Cyrillic, Arabic, Devanagari and Thai scripts.
+The card describes a compact design made for resource-efficient inference: a visual encoder that takes images at dynamic high resolution, paired with a lightweight language model, ERNIE-4.5-0.3B. The card lists the 109 languages as including Chinese, English, Japanese, Latin and Korean, as well as Russian (Cyrillic script), Arabic, Hindi (Devanagari script) and Thai.

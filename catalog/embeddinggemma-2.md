@@ -14,7 +14,8 @@ tasks:
 - task/embedding-models
 parameters_active_b: 0.74
 total_parameters: 744371512
-context_window_tokens: 262144
+context_window_tokens: 8192
+embedding_dimension: 768
 summary: EmbeddingGemma 2 is an embedding model from Google DeepMind. An embedding model turns an input into a list of numbers, called a vector, so that similar inputs end up close together. This one maps text (including code), images, video and audio into a single 768-dimensional vector space. The card gives 740M total parameters, support for 100+ languages and an 8K-token context window.
 intended_use: The card says it is designed to run on consumer hardware such as mobile devices and laptops, for on-device applications like search, retrieval-augmented generation (RAG), classification and clustering.
 what_sets_it_apart: The card lists these design points. It builds on the architecture of Gemma 4 and puts four input types in one shared vector space. A 270M-parameter text model is paired with vision (170M) and audio (300M) encoders that can be loaded separately, so only the needed input types are loaded. Matryoshka Representation Learning lets the vector be cut to 512, 256 or 128 numbers, which the card says cuts storage by up to 6 times. Short instruction prefixes in the text tune the embedding for a task.
@@ -27,7 +28,7 @@ fingerprint:
   head_size: 256
   hidden_size: 512
   intermediate_size: 2048
-  context_window_tokens: 262144
+  context_window_tokens: 8192
   vocabulary_size: 262144
   normalization: RMSNorm
   positional_encoding: RoPE
@@ -55,6 +56,9 @@ quotes:
   intended_use: Designed to run on consumer hardware such as mobile devices and laptops
   what_sets_it_apart: allowing developers to load only the modalities required for their use case
   running_it: Using the right prefix improves quality; omitting it still works but reduces precision.
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - feature-extraction
 - embedding-gemma2

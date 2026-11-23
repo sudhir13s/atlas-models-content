@@ -13,6 +13,8 @@ architecture_id: architecture-era/transformer
 model_category: language
 tasks:
 - task/text-generation
+parameters_active_b: 6.86
+total_parameters: 6857302016
 context_window_tokens: 2048
 summary: Pythia-6.9B-deduped is an English language model from EleutherAI, one of the Pythia suite of models built to support research into how language models work. It was trained on the Pile after that dataset was globally deduplicated, meaning repeated documents were removed. The card says it only predicts the next token, so it does not answer prompts the way a chat product does.
 intended_use: The card names research on the behavior, functionality and limitations of large language models as the primary use, with intermediate checkpoints stored as branches for controlled experiments. Fine-tuning for deployment is allowed under the Apache 2.0 license, after the user's own risk and bias assessment. The card lists as out of scope any deployment, human-facing interaction, translation or text in other languages, and chatbot or genre-writing use.

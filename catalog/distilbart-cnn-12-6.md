@@ -9,6 +9,7 @@ license: license/apache-2-0
 model_category: language
 tasks:
 - task/summarization
+parameters_active_b: 0.306
 context_window_tokens: 1024
 summary: 'DistilBART CNN 12-6 is a summarization model: it reads a longer text and writes a shorter one. The card is brief. It presents the checkpoint as one of the DistilBART models, tags it English, lists the datasets cnn_dailymail and xsum, and compares it with bart-large-cnn as the baseline. It names no maker; the repository belongs to the sshleifer account on Hugging Face.'
 what_sets_it_apart: The card's table lists the DistilBART variants beside the bart-large-cnn baseline, with their sizes and inference times. It shows distilbart-12-6-cnn at 306 million parameters against 406 million for the baseline, and 307 ms inference time against 381 ms. The card does not describe how the model was made.
