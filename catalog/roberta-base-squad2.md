@@ -12,6 +12,12 @@ tasks:
 parameters_active_b: 0.12
 total_parameters: 124057092
 context_window_tokens: 514
+base_models:
+- name: FacebookAI/roberta-base
+  address: https://huggingface.co/FacebookAI/roberta-base
+summary: 'roberta-base-squad2 is an extractive question answering model from deepset: given a question and a passage, it finds the span of the passage that answers the question. It is the roberta-base language model fine-tuned on the SQuAD2.0 dataset, which includes questions that have no answer in the passage. The card marks the language as English.'
+intended_use: The card names extractive question answering as the task and describes using the model in the Haystack framework to answer questions over documents. Extractive means the answer is copied from the passage rather than written freshly. It also mentions a distilled version, deepset/tinyroberta-squad2, which it says has comparable prediction quality and runs at twice the speed.
+what_sets_it_apart: The card says the model was trained on question and answer pairs that include unanswerable questions, so it is meant to handle passages that do not contain the answer. Training and evaluation both used SQuAD 2.0, on 4 Tesla V100 GPUs.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -45,13 +51,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: It's been trained on question-answer pairs
+  intended_use: You can use this model in Haystack to do extractive question answering on documents.
+  what_sets_it_apart: including unanswerable questions, for the task of Extractive Question Answering
 tags:
 - llm
 - question-answering
 - roberta
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/deepset/roberta-base-squad2
   title: deepset/roberta-base-squad2 — model page (Hugging Face)
@@ -64,4 +74,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+roberta-base-squad2 is an extractive question answering model from deepset: given a question and a passage, it finds the span of the passage that answers the question. It is the roberta-base language model fine-tuned on the SQuAD2.0 dataset, which includes questions that have no answer in the passage. The card marks the language as English.
+
+## Intended Use
+
+The card names extractive question answering as the task and describes using the model in the Haystack framework to answer questions over documents. Extractive means the answer is copied from the passage rather than written freshly. It also mentions a distilled version, deepset/tinyroberta-squad2, which it says has comparable prediction quality and runs at twice the speed.
+
+## What Sets It Apart
+
+The card says the model was trained on question and answer pairs that include unanswerable questions, so it is meant to handle passages that do not contain the answer. Training and evaluation both used SQuAD 2.0, on 4 Tesla V100 GPUs.

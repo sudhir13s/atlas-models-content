@@ -15,6 +15,9 @@ tasks:
 - task/vision-language-models
 total_parameters: 179999981459
 context_window_tokens: 262144
+summary: Qwen3.8-Flash-Next is an experimental preview model from Qwen that reads text, images and video and answers in text. The card says it is a preview of the architecture that will underpin Qwen4, and gives 125B parameters with 6B activated per token, since it is a mixture-of-experts design. Its context is 262,144 tokens natively and extensible up to 1,000,000. The card names Qwen3.8-Flash as the official production version based on it.
+what_sets_it_apart: Qwen lists four changes. Hybrid attention pairs Gated DeltaNet with Qwen Sparse Attention (QSA), which works on micro-blocks of tokens, and the card says this cuts long-context latency. Gated Residual controls information flowing through widened residual streams. N-gram Embedding scales parameters through embeddings indexed by short n-grams. The training recipe applies the Muon and AdamW optimizers to different weights and skips the batch-size warmup.
+running_it: The card says the model thinks by default before replying, and that a direct answer comes from setting enable_thinking to false. It suggests temperature 1.0, top_p 0.95 and top_k 20 for thinking mode, and temperature 0.7, top_p 0.8, top_k 20 and a presence penalty of 1.5 for non-thinking mode. It recommends output limits of 262,144 tokens for reasoning and 131,072 for the final reply. Beyond 262,144 tokens it describes enabling YaRN, a technique for extending context length, and warns that the static form may affect shorter texts. It names SGLang, vLLM and TokenSpeed for serving.
 fingerprint:
   attention_type: GQA
   num_layers: 48
@@ -51,13 +54,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This experimental preview of the architecture that will underpin Qwen4 is built around a fundamental rethinking of how the core components of modern large language models (LLMs) interact at scale.
+  what_sets_it_apart: Rather than selecting individual tokens for processing, QSA operates at the micro-block level.
+  running_it: Qwen3.8-Flash-Next will think by default before responding.
 tags:
 - llm
 - image-text-to-text
 - qwen4-exp
 - moe
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3.8-Flash-Next
   title: Qwen/Qwen3.8-Flash-Next — model page (Hugging Face)
@@ -67,4 +74,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen3.8-Flash-Next is an experimental preview model from Qwen that reads text, images and video and answers in text. The card says it is a preview of the architecture that will underpin Qwen4, and gives 125B parameters with 6B activated per token, since it is a mixture-of-experts design. Its context is 262,144 tokens natively and extensible up to 1,000,000. The card names Qwen3.8-Flash as the official production version based on it.
+
+## What Sets It Apart
+
+Qwen lists four changes. Hybrid attention pairs Gated DeltaNet with Qwen Sparse Attention (QSA), which works on micro-blocks of tokens, and the card says this cuts long-context latency. Gated Residual controls information flowing through widened residual streams. N-gram Embedding scales parameters through embeddings indexed by short n-grams. The training recipe applies the Muon and AdamW optimizers to different weights and skips the batch-size warmup.
+
+## Running It
+
+The card says the model thinks by default before replying, and that a direct answer comes from setting enable_thinking to false. It suggests temperature 1.0, top_p 0.95 and top_k 20 for thinking mode, and temperature 0.7, top_p 0.8, top_k 20 and a presence penalty of 1.5 for non-thinking mode. It recommends output limits of 262,144 tokens for reasoning and 131,072 for the final reply. Beyond 262,144 tokens it describes enabling YaRN, a technique for extending context length, and warns that the static form may affect shorter texts. It names SGLang, vLLM and TokenSpeed for serving.

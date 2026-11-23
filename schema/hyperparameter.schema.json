@@ -147,6 +147,13 @@
             "repeated": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "tokens of `tokens` that are already in the text" }
           }
         },
+        "panel_titles": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "the title of each panel in order, in place of the default titles; for scores that are not next-token scores (router scores, attention scores)"
+        },
         "caption": { "type": "string", "minLength": 1 }
       }
     },

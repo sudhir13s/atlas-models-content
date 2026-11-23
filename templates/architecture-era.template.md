@@ -2,7 +2,7 @@
 id: architecture-era/<slug>
 type: architecture-era
 slug: <slug>
-schema_version: 1.0
+schema_version: 2.5
 title: "<Human Readable Name>"
 name: "<Name>"
 era: scaling                     # early | foundation | scaling | post-transformer
@@ -42,6 +42,25 @@ diagram: |
     A[Input] --> B[...]
 diagram_caption: "<one-line caption>"
 underlying_model_note: "<optional: how a catalog model's whole architecture, shown as a second figure, relates to the idea above; sourced>"
+# ── Schema 2.5 teaching parts (optional; write them together with the How It Works and Worked Example sections) ──
+visual:                          # computed figure for the Worked Example: softmax bars of example scores
+  kind: distribution
+  tokens: ["<item>", "<item>"]   # what is scored: keys of an attention example, experts of a router
+  logits: [<score>, <score>]
+  temperatures: [1]              # or truncate: { top_k: <k> }
+  panel_titles: ["<what this panel shows>"]
+  caption: "<what is drawn, and that the scores are an example>"
+comparison:
+  before: "<the earlier approach>"
+  after: "<this architecture>"
+  rows:
+    - { aspect: "<what is compared>", before: "<earlier>", after: "<this>", source: "<url in sources>" }
+key_numbers:
+  columns: ["<first column>", "<column>"]
+  rows:
+    - { cells: ["<cell>", "<cell>"], source: "<url in sources>" }
+misunderstandings:
+  - { misunderstanding: "<what people often think>", truth: "<what is actually true; Markdown>", source: "<url in sources>" }
 notable_models:
   - { name: "<Model>", year: <YYYY>, note: "<what it proved>" }
 resources:
@@ -60,3 +79,11 @@ sources:
 ## Key Ideas
 - <idea>
 - <idea>
+
+## How It Works
+<Optional (schema 2.5): numbered steps tied to the blocks of the main figure: what goes in, what each
+block does, what comes out; one to three sentences per step, every term defined at first use.>
+
+## Worked Example
+<Optional (schema 2.5): the core computation on tiny numbers, every step numbered with the numbers
+substituted, ending with "What this means". Its inputs are the `visual` scores.>

@@ -15,6 +15,12 @@ tasks:
 - task/text-generation
 total_parameters: 685355329792
 context_window_tokens: 163840
+base_models:
+- name: deepseek-ai/DeepSeek-V3.2-Exp-Base
+  address: https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp-Base
+summary: 'DeepSeek-V3.2 is a large language model from DeepSeek, aimed at reasoning and at agent work, where a model calls tools to finish a task. The model card lists DeepSeek-V3.2-Exp-Base as its base model, so it is a further-trained version of that model. The card names three main ideas behind it: a more efficient attention mechanism, a scaled-up reinforcement learning stage, and a pipeline that generates training data for tool use.'
+what_sets_it_apart: DeepSeek says it introduced DeepSeek Sparse Attention (DSA), an attention method meant to cut the computing cost of long inputs while keeping model quality. It also says it built a large-scale pipeline that synthesizes agent tasks as training data, to bring reasoning into tool-use settings.
+running_it: The card says the chat template changed significantly from earlier versions, with a new format for tool calls and a "thinking with tools" capability. It supplies an encoding folder with Python scripts and tests showing how to turn OpenAI-style messages into model input and parse the output.
 fingerprint:
   attention_type: MLA
   num_layers: 61
@@ -56,13 +62,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: We introduce **DeepSeek-V3.2**, a model that harmonizes high computational efficiency with superior reasoning and agent performance.
+  what_sets_it_apart: We introduce DSA, an efficient attention mechanism that substantially reduces computational complexity while preserving model performance, specifically optimized for long-context scenarios.
+  running_it: DeepSeek-V3.2 introduces significant updates to its chat template compared to prior versions.
 tags:
 - llm
 - text-generation
 - deepseek-v32
 - moe
 - mla
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-V3.2
   title: deepseek-ai/DeepSeek-V3.2 — model page (Hugging Face)
@@ -75,4 +85,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+DeepSeek-V3.2 is a large language model from DeepSeek, aimed at reasoning and at agent work, where a model calls tools to finish a task. The model card lists DeepSeek-V3.2-Exp-Base as its base model, so it is a further-trained version of that model. The card names three main ideas behind it: a more efficient attention mechanism, a scaled-up reinforcement learning stage, and a pipeline that generates training data for tool use.
+
+## What Sets It Apart
+
+DeepSeek says it introduced DeepSeek Sparse Attention (DSA), an attention method meant to cut the computing cost of long inputs while keeping model quality. It also says it built a large-scale pipeline that synthesizes agent tasks as training data, to bring reasoning into tool-use settings.
+
+## Running It
+
+The card says the chat template changed significantly from earlier versions, with a new format for tool calls and a "thinking with tools" capability. It supplies an encoding folder with Python scripts and tests showing how to turn OpenAI-style messages into model input and parse the output.

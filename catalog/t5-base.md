@@ -12,6 +12,9 @@ tasks:
 parameters_active_b: 0.22
 total_parameters: 222903936
 context_window_tokens: 512
+summary: T5 Base is the 220 million parameter checkpoint of T5, the Text-To-Text Transfer Transformer, a language model from Google researchers. T5 treats every language task as text in and text out. The card lists English, French, Romanian and German as its languages.
+intended_use: Quoting the T5 developers, the card says the same model, loss function and hyperparameters can be used on any language task, including machine translation, document summarization, question answering and classification such as sentiment analysis. It gives no out-of-scope uses and says more information is needed.
+what_sets_it_apart: The developers describe reframing all language tasks into one text-to-text format, in contrast to BERT-style models that output only a class label or a span of the input. The card says the model was pre-trained on the C4 corpus (Colossal Clean Crawled Corpus) in a multi-task mixture of unsupervised denoising and supervised tasks, such as sentiment analysis, paraphrasing, natural language inference and question answering.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -44,13 +47,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: T5-Base is the checkpoint with 220 million parameters.
+  intended_use: Our text-to-text framework allows us to use the same model, loss function, and hyperparameters on any NLP task, including machine translation, document summarization, question answering, and classification tasks (e.g., sentiment analysis).
+  what_sets_it_apart: With T5, we propose reframing all NLP tasks into a unified text-to-text-format where the input and output are always text strings
 tags:
 - llm
 - translation
 - t5
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google-t5/t5-base
   title: google-t5/t5-base — model page (Hugging Face)
@@ -87,4 +94,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+T5 Base is the 220 million parameter checkpoint of T5, the Text-To-Text Transfer Transformer, a language model from Google researchers. T5 treats every language task as text in and text out. The card lists English, French, Romanian and German as its languages.
+
+## Intended Use
+
+Quoting the T5 developers, the card says the same model, loss function and hyperparameters can be used on any language task, including machine translation, document summarization, question answering and classification such as sentiment analysis. It gives no out-of-scope uses and says more information is needed.
+
+## What Sets It Apart
+
+The developers describe reframing all language tasks into one text-to-text format, in contrast to BERT-style models that output only a class label or a span of the input. The card says the model was pre-trained on the C4 corpus (Colossal Clean Crawled Corpus) in a multi-task mixture of unsupervised denoising and supervised tasks, such as sentiment analysis, paraphrasing, natural language inference and question answering.

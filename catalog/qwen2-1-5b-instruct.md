@@ -16,6 +16,8 @@ tasks:
 parameters_active_b: 1.54
 total_parameters: 1543714304
 context_window_tokens: 32768
+summary: Qwen2-1.5B-Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned 1.5-billion-parameter model of the Qwen2 series, which means a base model was trained further to follow instructions and hold a conversation. The card says Qwen2 ranges from 0.5 to 72 billion parameters, including a Mixture-of-Experts model, and its metadata lists Qwen2.5-1.5B-Instruct as the newer version.
+what_sets_it_apart: The card says Qwen2 is based on the Transformer architecture with SwiGLU activation, attention QKV bias and grouped-query attention, and has an improved tokenizer adapted to many natural languages and to code. It says the models were post-trained with both supervised fine-tuning and direct preference optimization.
 fingerprint:
   attention_type: GQA
   num_layers: 28
@@ -52,13 +54,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This repo contains the instruction-tuned 1.5B Qwen2 model.
+  what_sets_it_apart: It is based on the Transformer architecture with SwiGLU activation, attention QKV bias, group query attention, etc.
 tags:
 - llm
 - text-generation
 - qwen2
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2-1.5B-Instruct
   title: Qwen/Qwen2-1.5B-Instruct — model page (Hugging Face)
@@ -71,4 +76,10 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen2-1.5B-Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned 1.5-billion-parameter model of the Qwen2 series, which means a base model was trained further to follow instructions and hold a conversation. The card says Qwen2 ranges from 0.5 to 72 billion parameters, including a Mixture-of-Experts model, and its metadata lists Qwen2.5-1.5B-Instruct as the newer version.
+
+## What Sets It Apart
+
+The card says Qwen2 is based on the Transformer architecture with SwiGLU activation, attention QKV bias and grouped-query attention, and has an improved tokenizer adapted to many natural languages and to code. It says the models were post-trained with both supervised fine-tuning and direct preference optimization.

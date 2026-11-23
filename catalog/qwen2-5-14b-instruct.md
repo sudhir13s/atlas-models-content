@@ -16,6 +16,12 @@ tasks:
 parameters_active_b: 14.77
 total_parameters: 14770033664
 context_window_tokens: 32768
+base_models:
+- name: Qwen/Qwen2.5-14B
+  address: https://huggingface.co/Qwen/Qwen2.5-14B
+summary: Qwen2.5 14B Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned 14B member of the Qwen2.5 series, which means the base model was trained further to follow instructions and hold a conversation. The card gives it 14.7 billion parameters, 48 layers and a context of 131,072 tokens, with generation of up to 8192 tokens.
+what_sets_it_apart: Qwen states that, compared with Qwen2, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. The card also states support for over 29 languages.
+running_it: The card says the published config.json is set for a context of up to 32,768 tokens and that longer inputs rely on YaRN, a technique for extending the length a model handles. It notes that vLLM supports only static YaRN, which may affect performance on shorter texts.
 fingerprint:
   attention_type: GQA
   num_layers: 48
@@ -58,13 +64,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: 'Number of Parameters: 14.7B'
+  what_sets_it_apart: Significantly **more knowledge** and has greatly improved capabilities in **coding** and **mathematics**, thanks to our specialized expert models in these domains.
+  running_it: The current `config.json` is set for context length up to 32,768 tokens.
 tags:
 - llm
 - text-generation
 - qwen2
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-14B-Instruct
   title: Qwen/Qwen2.5-14B-Instruct — model page (Hugging Face)
@@ -83,4 +93,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen2.5 14B Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned 14B member of the Qwen2.5 series, which means the base model was trained further to follow instructions and hold a conversation. The card gives it 14.7 billion parameters, 48 layers and a context of 131,072 tokens, with generation of up to 8192 tokens.
+
+## What Sets It Apart
+
+Qwen states that, compared with Qwen2, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. The card also states support for over 29 languages.
+
+## Running It
+
+The card says the published config.json is set for a context of up to 32,768 tokens and that longer inputs rely on YaRN, a technique for extending the length a model handles. It notes that vLLM supports only static YaRN, which may affect performance on shorter texts.

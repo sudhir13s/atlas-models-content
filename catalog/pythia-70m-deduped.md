@@ -16,6 +16,9 @@ tasks:
 parameters_active_b: 0.1
 total_parameters: 95592496
 context_window_tokens: 2048
+summary: Pythia-70M-deduped is the smallest model of the Pythia Scaling Suite from EleutherAI, an English-language Transformer language model with about 70 million parameters. It was trained on a version of the Pile, a large text dataset, from which duplicate documents were removed. The card says the suite was developed to support scientific research on large language models, especially interpretability research.
+intended_use: The card names research on the behavior, functionality and limitations of large language models as the primary use, and says the suite gives a controlled setting for experiments. It says Pythia is not intended for deployment or human-facing interaction, is English-only, and will not follow prompts the way a chat product does because it was not fine-tuned for that.
+what_sets_it_apart: The suite has two sets of eight model sizes, one trained on the Pile and one on the deduplicated Pile, and all sizes are trained on the same data in the same order. The card says 154 intermediate checkpoints per model are hosted as branches, so researchers can study a model at different stages of training.
 fingerprint:
   attention_type: MHA
   num_layers: 6
@@ -49,13 +52,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: The Pythia model suite was designed to promote scientific research on large language models, especially interpretability research.
+  intended_use: The primary intended use of Pythia is research on the behavior, functionality, and limitations of large language models.
+  what_sets_it_apart: All 8 model sizes are trained on the exact same data, in the exact same order.
 tags:
 - llm
 - text-generation
 - gpt-neox
 - dense
 - mha
-updated: '2026-11-20'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/EleutherAI/pythia-70m-deduped
   title: EleutherAI/pythia-70m-deduped — model page (Hugging Face)
@@ -74,4 +81,14 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Pythia-70M-deduped is the smallest model of the Pythia Scaling Suite from EleutherAI, an English-language Transformer language model with about 70 million parameters. It was trained on a version of the Pile, a large text dataset, from which duplicate documents were removed. The card says the suite was developed to support scientific research on large language models, especially interpretability research.
+
+## Intended Use
+
+The card names research on the behavior, functionality and limitations of large language models as the primary use, and says the suite gives a controlled setting for experiments. It says Pythia is not intended for deployment or human-facing interaction, is English-only, and will not follow prompts the way a chat product does because it was not fine-tuned for that.
+
+## What Sets It Apart
+
+The suite has two sets of eight model sizes, one trained on the Pile and one on the deduplicated Pile, and all sizes are trained on the same data in the same order. The card says 154 intermediate checkpoints per model are hosted as branches, so researchers can study a model at different stages of training.

@@ -14,6 +14,10 @@ model_category: language
 tasks:
 - task/text-generation
 context_window_tokens: 2048
+summary: OPT-125M is the smallest model of OPT (Open Pre-trained Transformer), a suite of decoder-only language models from Meta AI that ranges from 125 million to 175 billion parameters. It was first released on May 3rd 2022. It generates text by predicting the next word, and its model card was written by the Hugging Face team from the official card.
+intended_use: The card says this pretrained-only model can be prompted to evaluate downstream tasks and to generate text, and that it can be fine-tuned on a downstream task. The paper excerpt in the card says the suite was shared so that researchers can study large language models, which were otherwise open to only a few well-resourced labs.
+what_sets_it_apart: The card says OPT was pretrained predominantly on English text, with a small amount of non-English data from CommonCrawl, using a causal language modeling objective. It lists a training set of 180 billion tokens from five filtered datasets, among them BookCorpus, The Pile and Reddit data.
+limitations: The card says that because the training data contains a lot of unfiltered content from the internet, the model is strongly biased, and that this bias also affects fine-tuned versions. It quotes Meta AI's note that OPT-175B has limits in bias, safety, generation diversity and hallucination.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -46,13 +50,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: The pretrained-only model can be used for prompting for evaluation of downstream tasks as well as text generation.
+  intended_use: In addition, the model can be fine-tuned on a downstream task using the
+  what_sets_it_apart: OPT was predominantly pretrained with English text, but a small amount of non-English data is still present within the training corpus via CommonCrawl.
+  limitations: 'given that the training data used for this model contains a lot of unfiltered content from the internet, which is far from neutral the model is strongly biased :'
 tags:
 - llm
 - text-generation
 - opt
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/facebook/opt-125m
   title: facebook/opt-125m — model page (Hugging Face)
@@ -71,4 +80,18 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+OPT-125M is the smallest model of OPT (Open Pre-trained Transformer), a suite of decoder-only language models from Meta AI that ranges from 125 million to 175 billion parameters. It was first released on May 3rd 2022. It generates text by predicting the next word, and its model card was written by the Hugging Face team from the official card.
+
+## Intended Use
+
+The card says this pretrained-only model can be prompted to evaluate downstream tasks and to generate text, and that it can be fine-tuned on a downstream task. The paper excerpt in the card says the suite was shared so that researchers can study large language models, which were otherwise open to only a few well-resourced labs.
+
+## What Sets It Apart
+
+The card says OPT was pretrained predominantly on English text, with a small amount of non-English data from CommonCrawl, using a causal language modeling objective. It lists a training set of 180 billion tokens from five filtered datasets, among them BookCorpus, The Pile and Reddit data.
+
+## Limitations
+
+The card says that because the training data contains a lot of unfiltered content from the internet, the model is strongly biased, and that this bias also affects fine-tuned versions. It quotes Meta AI's note that OPT-175B has limits in bias, safety, generation diversity and hallucination.

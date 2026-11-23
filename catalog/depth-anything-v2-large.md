@@ -12,6 +12,8 @@ license_note: cc-by-nc-4.0
 model_category: vision
 tasks:
 - task/depth-estimation
+summary: 'Depth Anything V2 Large is a monocular depth estimation model: from one ordinary photo it predicts a depth map, which says for each pixel how far that point is from the camera. The card says it was trained on 595K synthetic labeled images and more than 62 million real unlabeled images.'
+what_sets_it_apart: The card compares it with its first version and with models built on Stable Diffusion, an image-generation model. It states that V2 gives more fine-grained details than Depth Anything V1, is more robust than V1 and the Stable Diffusion-based models Marigold and Geowizard, and is about 10 times faster and lighter than the Stable Diffusion-based models.
 filters:
   is_gated: false
   pipeline_tag: depth-estimation
@@ -27,9 +29,12 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: Depth Anything V2 is trained from 595K synthetic labeled images and 62M+ real unlabeled images
+  what_sets_it_apart: more efficient (10x faster) and more lightweight than SD-based models
 tags:
 - depth-estimation
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/depth-anything/Depth-Anything-V2-Large
   title: depth-anything/Depth-Anything-V2-Large — model page (Hugging Face)
@@ -39,4 +44,10 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Depth Anything V2 Large is a monocular depth estimation model: from one ordinary photo it predicts a depth map, which says for each pixel how far that point is from the camera. The card says it was trained on 595K synthetic labeled images and more than 62 million real unlabeled images.
+
+## What Sets It Apart
+
+The card compares it with its first version and with models built on Stable Diffusion, an image-generation model. It states that V2 gives more fine-grained details than Depth Anything V1, is more robust than V1 and the Stable Diffusion-based models Marigold and Geowizard, and is about 10 times faster and lighter than the Stable Diffusion-based models.

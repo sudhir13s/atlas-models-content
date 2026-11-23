@@ -17,6 +17,10 @@ tasks:
 - task/tool-calling-models
 total_parameters: 30532122624
 context_window_tokens: 262144
+summary: 'Qwen3-Coder-30B-A3B-Instruct is a code-focused language model from Qwen. It is a mixture-of-experts model: the card gives 30.5 billion parameters in total with 3.3 billion activated per token, using 8 of 128 experts. The card says it supports only non-thinking mode, so it does not write reasoning blocks before its answer.'
+intended_use: The card presents the model for agentic coding, where the model works through programming tasks using tools, and says it works with platforms such as Qwen Code and CLINE. It describes the long context as optimized for repository-scale understanding.
+what_sets_it_apart: Qwen states a native context of 262,144 tokens, extendable to 1 million tokens with YaRN, and a specially designed function call format for agentic coding.
+running_it: The card suggests temperature=0.7, top_p=0.8, top_k=20 and repetition_penalty=1.05, and an output length of 65,536 tokens for most queries. It says Transformers 4.51.0 or later is needed.
 fingerprint:
   attention_type: GQA
   num_layers: 48
@@ -55,13 +59,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This model supports only non-thinking mode
+  intended_use: optimized for repository-scale understanding.
+  what_sets_it_apart: featuring a specially designed function call format.
+  running_it: We suggest using `temperature=0.7`, `top_p=0.8`, `top_k=20`, `repetition_penalty=1.05`.
 tags:
 - llm
 - text-generation
 - qwen3-moe
 - moe
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct
   title: Qwen/Qwen3-Coder-30B-A3B-Instruct — model page (Hugging Face)
@@ -77,4 +86,18 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen3-Coder-30B-A3B-Instruct is a code-focused language model from Qwen. It is a mixture-of-experts model: the card gives 30.5 billion parameters in total with 3.3 billion activated per token, using 8 of 128 experts. The card says it supports only non-thinking mode, so it does not write reasoning blocks before its answer.
+
+## Intended Use
+
+The card presents the model for agentic coding, where the model works through programming tasks using tools, and says it works with platforms such as Qwen Code and CLINE. It describes the long context as optimized for repository-scale understanding.
+
+## What Sets It Apart
+
+Qwen states a native context of 262,144 tokens, extendable to 1 million tokens with YaRN, and a specially designed function call format for agentic coding.
+
+## Running It
+
+The card suggests temperature=0.7, top_p=0.8, top_k=20 and repetition_penalty=1.05, and an output length of 65,536 tokens for most queries. It says Transformers 4.51.0 or later is needed.

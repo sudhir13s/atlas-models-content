@@ -5,6 +5,41 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Schema 2.5 for `architecture-era`: the teaching form (additive)
+
+- **Added** to `architecture-era`: `visual` (a `distribution` figure for the Worked Example),
+  `comparison` (`before`, `after`, `rows[]` of `aspect`, `before`, `after`, `source`),
+  `key_numbers` (`columns`, `rows[]` of `cells`, `source`) and `misunderstandings[]`
+  (`misunderstanding`, `truth`, `source`); optional body sections How It Works and Worked Example
+  after Key Ideas.
+- **Added** `panel_titles` to the `distribution` figure: the title of each panel in order, for
+  scores that are not next-token scores (router scores, attention scores).
+- **Rewritten** in the 2.5 form, every fact from a source fetched for the rewrite: `transformer`
+  and `mixture-of-experts`. `build_steps` and `eli5` removed from both (How It Works replaces
+  them).
+- **Fixed** on `mixture-of-experts`: the figure caption described two of five experts while the
+  figure is DeepSeek-V3 (8 of 256 routed experts plus a shared one); the source Jacobs et al.
+  (1991) added; Mixtral's year 2023 now rests on the Mistral AI announcement.
+- **Fixed** on `transformer`: notable-model notes restated from their papers (GPT's 12-layer
+  decoder-only stack, T5's text-to-text format); the two tutorial pages removed from `sources`
+  (they stay under `resources`); the Vision Transformer limitation and the √d_k reason quoted
+  from the papers.
+
+### Schema 2.2 for `hyperparameter`: options, more computed figures (additive)
+
+- **Added** `options[]` (`value`, `effect`) to `hyperparameter`: the values of a setting with no
+  numeric scale, drawn as one tile per option in place of the axis. Such a record may omit
+  `effects` and `scale`.
+- **Added** to the `distribution` figure: `truncate` (`top_k`, `top_p` or `remove`) and `penalty`
+  (`value`, `repeated`). A record sets exactly one of `temperatures`, `truncate` and `penalty`;
+  `temperatures` is no longer required.
+- **Added** the `beams` figure (`prompt`, `num_beams`, `tree`): two steps of beam search over a
+  small table of probabilities.
+- **Changed** the convention for `typical_values`: a `value` written as one plain number is also
+  marked on the effect scale.
+- **Rewritten** in the 2.2 form, every fact from a source fetched for the rewrite: `top-k`,
+  `top-p`, `repetition-penalty`, `do-sample`, `num-beams`, `max-new-tokens`, `min-new-tokens`.
+
 ### Schema 2.4 for `model` (facts the detail page reads; additive)
 
 - **Added** `embedding_dimension` (integer) to `model`: the vector length an embedding model

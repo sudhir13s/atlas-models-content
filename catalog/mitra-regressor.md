@@ -14,6 +14,9 @@ tasks:
 - task/tabular-regression
 parameters_active_b: 0.08
 total_parameters: 75661313
+summary: Mitra regressor is a tabular foundation model published on Hugging Face by the AutoGluon project. A tabular regression model predicts a number, such as a price, for each row of a table, and a foundation model here means one pre-trained once and then applied to new tables. The card says it is pre-trained purely on synthetic datasets sampled from a mix of random regressors, and it is a 12-layer Transformer of 72 million parameters.
+what_sets_it_apart: The card says Mitra is pre-trained using an in-context learning paradigm, in which the model reads example rows as part of its input instead of being retrained for each table. It also stresses that all of its pre-training data is synthetic, drawn from a mix of random regressors.
+running_it: The card says to install AutoGluon with the mitra extra and call it through TabularPredictor with the MITRA hyperparameters. Its example sets fine_tune to False and fits on a sample of 1000 rows.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -39,11 +42,15 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: Mitra regressor is a tabular foundation model that is pre-trained on purely synthetic datasets sampled from a mix of random regressors.
+  what_sets_it_apart: Mitra is based on a 12-layer Transformer of 72 M parameters, pre-trained by incorporating an in-context learning paradigm.
+  running_it: 'To use Mitra regressor, install AutoGluon by running:'
 tags:
 - tabular-regression
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/autogluon/mitra-regressor
   title: autogluon/mitra-regressor — model page (Hugging Face)
@@ -56,4 +63,14 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Mitra regressor is a tabular foundation model published on Hugging Face by the AutoGluon project. A tabular regression model predicts a number, such as a price, for each row of a table, and a foundation model here means one pre-trained once and then applied to new tables. The card says it is pre-trained purely on synthetic datasets sampled from a mix of random regressors, and it is a 12-layer Transformer of 72 million parameters.
+
+## What Sets It Apart
+
+The card says Mitra is pre-trained using an in-context learning paradigm, in which the model reads example rows as part of its input instead of being retrained for each table. It also stresses that all of its pre-training data is synthetic, drawn from a mix of random regressors.
+
+## Running It
+
+The card says to install AutoGluon with the mitra extra and call it through TabularPredictor with the MITRA hyperparameters. Its example sets fine_tune to False and fits on a sample of 1000 rows.

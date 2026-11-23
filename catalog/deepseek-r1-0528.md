@@ -16,6 +16,9 @@ tasks:
 - task/reasoning-models
 total_parameters: 684531386000
 context_window_tokens: 163840
+summary: DeepSeek-R1-0528 is a reasoning language model from DeepSeek, a minor version upgrade of its DeepSeek R1 model. A reasoning model works through a problem in a long chain of thought before giving its answer. The card says this update deepened the reasoning by using more computing during post-training and adding algorithm changes.
+what_sets_it_apart: DeepSeek says the upgrade improved how deeply the model reasons, and that it also reduces the rate of hallucination (made-up answers), supports function calling better and gives a better experience for vibe coding. The card states that the model now uses more tokens when it thinks, and that DeepSeek also distilled its chain of thought into a smaller model, DeepSeek-R1-0528-Qwen3-8B.
+running_it: The card says a system prompt is now supported, and the model no longer needs the text <think> added at the start of its output to make it reason. For running it locally the card points to the DeepSeek-R1 repository on GitHub.
 fingerprint:
   attention_type: MLA
   num_layers: 61
@@ -56,13 +59,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: The DeepSeek R1 model has undergone a minor version upgrade, with the current version being DeepSeek-R1-0528.
+  what_sets_it_apart: this version also offers a reduced hallucination rate, enhanced support for function calling, and better experience for vibe coding.
+  running_it: System prompt is supported now.
 tags:
 - llm
 - text-generation
 - deepseek-v3
 - moe
 - mla
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-R1-0528
   title: deepseek-ai/DeepSeek-R1-0528 — model page (Hugging Face)
@@ -78,4 +85,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+DeepSeek-R1-0528 is a reasoning language model from DeepSeek, a minor version upgrade of its DeepSeek R1 model. A reasoning model works through a problem in a long chain of thought before giving its answer. The card says this update deepened the reasoning by using more computing during post-training and adding algorithm changes.
+
+## What Sets It Apart
+
+DeepSeek says the upgrade improved how deeply the model reasons, and that it also reduces the rate of hallucination (made-up answers), supports function calling better and gives a better experience for vibe coding. The card states that the model now uses more tokens when it thinks, and that DeepSeek also distilled its chain of thought into a smaller model, DeepSeek-R1-0528-Qwen3-8B.
+
+## Running It
+
+The card says a system prompt is now supported, and the model no longer needs the text <think> added at the start of its output to make it reason. For running it locally the card points to the DeepSeek-R1 repository on GitHub.

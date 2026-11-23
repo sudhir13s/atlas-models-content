@@ -13,6 +13,10 @@ model_category: language
 tasks:
 - task/text-generation
 total_parameters: 3212749824
+summary: 'Llama 3.2 3B Instruct is an instruction-tuned text model from Meta, part of the Llama 3.2 collection of multilingual language models in 1B and 3B sizes (text in, text out). The card lists 3.21 billion parameters and a 128k-token context length. Eight languages are officially supported: English, German, French, Italian, Portuguese, Hindi, Spanish and Thai.'
+intended_use: Meta says Llama 3.2 is intended for commercial and research use in multiple languages. The instruction-tuned text models are meant for assistant-like chat and agentic applications such as knowledge retrieval and summarization, mobile writing assistants, and query and prompt rewriting. Out of scope are uses that break applicable laws, uses prohibited by the Acceptable Use Policy and license, and languages beyond those the card lists as supported.
+what_sets_it_apart: Meta says that for the 1B and 3B models it fed outputs (logits) from the larger Llama 3.1 8B and 70B models into pretraining as token-level targets, and used knowledge distillation after pruning to recover performance. Pretraining used up to 9 trillion tokens with a knowledge cutoff of December 2023. Post-training ran several rounds of supervised fine-tuning, rejection sampling and direct preference optimization.
+running_it: The card says the repository holds two versions, one for the Transformers library and one for the original llama codebase. The Transformers example needs version 4.43.0 or later and runs in bfloat16 precision.
 filters:
   size_category: small
   is_gated: true
@@ -30,10 +34,15 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: The Llama 3.2 collection of multilingual large language models (LLMs) is a collection of pretrained and instruction-tuned generative models in 1B and 3B sizes (text in/text out).
+  intended_use: Llama 3.2 is intended for commercial and research use in multiple languages.
+  what_sets_it_apart: Knowledge distillation was used after pruning to recover performance.
+  running_it: This repository contains two versions of Llama-3.2-3B-Instruct, for use with transformers and with the original llama codebase.
 tags:
 - llm
 - text-generation
-updated: '2026-11-20'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct
   title: meta-llama/Llama-3.2-3B-Instruct — model page (Hugging Face)
@@ -46,4 +55,18 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Llama 3.2 3B Instruct is an instruction-tuned text model from Meta, part of the Llama 3.2 collection of multilingual language models in 1B and 3B sizes (text in, text out). The card lists 3.21 billion parameters and a 128k-token context length. Eight languages are officially supported: English, German, French, Italian, Portuguese, Hindi, Spanish and Thai.
+
+## Intended Use
+
+Meta says Llama 3.2 is intended for commercial and research use in multiple languages. The instruction-tuned text models are meant for assistant-like chat and agentic applications such as knowledge retrieval and summarization, mobile writing assistants, and query and prompt rewriting. Out of scope are uses that break applicable laws, uses prohibited by the Acceptable Use Policy and license, and languages beyond those the card lists as supported.
+
+## What Sets It Apart
+
+Meta says that for the 1B and 3B models it fed outputs (logits) from the larger Llama 3.1 8B and 70B models into pretraining as token-level targets, and used knowledge distillation after pruning to recover performance. Pretraining used up to 9 trillion tokens with a knowledge cutoff of December 2023. Post-training ran several rounds of supervised fine-tuning, rejection sampling and direct preference optimization.
+
+## Running It
+
+The card says the repository holds two versions, one for the Transformers library and one for the original llama codebase. The Transformers example needs version 4.43.0 or later and runs in bfloat16 precision.

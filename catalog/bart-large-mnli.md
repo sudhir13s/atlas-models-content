@@ -12,6 +12,12 @@ tasks:
 parameters_active_b: 0.41
 total_parameters: 407344133
 context_window_tokens: 1024
+base_models:
+- name: facebook/bart-large
+  address: https://huggingface.co/facebook/bart-large
+summary: bart-large-mnli is a text classification model published on Hugging Face under the facebook organization. Its card says it is the bart-large checkpoint (a sequence-to-sequence language model) trained further on MultiNLI (MNLI), a dataset of sentence pairs labelled by whether the second sentence follows from the first. It is mainly used to sort a piece of text into categories you choose at run time, without training a new model.
+intended_use: The card presents the model for zero-shot text classification, meaning classifying text into labels the model was never explicitly trained on. When more than one label can be correct, it says to pass multi_label=True so each label is scored independently.
+what_sets_it_apart: The card explains that it uses a natural language inference (NLI) trick proposed by Yin et al. The text to classify is posed as a premise, a hypothesis such as "This text is about politics." is built from each candidate label, and the model's probabilities for entailment (the premise supports the hypothesis) and contradiction are converted into label probabilities.
 fingerprint:
   num_layers: 12
   hidden_size: 1024
@@ -38,12 +44,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This is the checkpoint for [bart-large](https://huggingface.co/facebook/bart-large) after being trained on the [MultiNLI (MNLI)](https://huggingface.co/datasets/multi_nli) dataset.
+  intended_use: 'If more than one candidate label can be correct, pass `multi_label=True` to calculate each class independently:'
+  what_sets_it_apart: The method works by posing the sequence to be classified as the NLI premise and to construct a hypothesis from each candidate label.
 tags:
 - llm
 - zero-shot-classification
 - bart
 - dense
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/facebook/bart-large-mnli
   title: facebook/bart-large-mnli — model page (Hugging Face)
@@ -62,4 +72,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+bart-large-mnli is a text classification model published on Hugging Face under the facebook organization. Its card says it is the bart-large checkpoint (a sequence-to-sequence language model) trained further on MultiNLI (MNLI), a dataset of sentence pairs labelled by whether the second sentence follows from the first. It is mainly used to sort a piece of text into categories you choose at run time, without training a new model.
+
+## Intended Use
+
+The card presents the model for zero-shot text classification, meaning classifying text into labels the model was never explicitly trained on. When more than one label can be correct, it says to pass multi_label=True so each label is scored independently.
+
+## What Sets It Apart
+
+The card explains that it uses a natural language inference (NLI) trick proposed by Yin et al. The text to classify is posed as a premise, a hypothesis such as "This text is about politics." is built from each candidate label, and the model's probabilities for entailment (the premise supports the hypothesis) and contradiction are converted into label probabilities.

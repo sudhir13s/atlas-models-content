@@ -2,7 +2,7 @@
 id: architecture-era/transformer
 type: architecture-era
 slug: transformer
-schema_version: 1.0
+schema_version: 2.5
 title: "The Transformer"
 name: "Transformer"
 era: scaling
@@ -10,7 +10,7 @@ era_range: "2017–present"
 year: 2017
 family: llm
 core_innovation: "Replace recurrence and convolution with attention, so every position can attend to every other position and computation within a sequence runs in parallel."
-description: "A sequence model built solely on attention mechanisms, with no recurrence or convolution; BERT and GPT are built from its encoder and decoder."
+description: "A neural network for sequences, such as the words of a sentence, in which every word gathers information from every other word through attention, with no recurrence and no convolution."
 key_features: ["Self-attention", "Multi-head attention", "Positional encoding", "Position-wise feed-forward sub-layer", "Parallel computation across positions"]
 key_models: ["Transformer (2017)", "BERT (2018)", "GPT (2018)", "T5 (2019)"]
 paper_title: "Attention Is All You Need (Vaswani et al., 2017)"
@@ -18,46 +18,82 @@ paper_url: "https://arxiv.org/abs/1706.03762"
 influenced_by: [architecture-era/seq2seq, architecture-era/attention-additive]
 led_to: [architecture-era/bert, architecture-era/gpt, architecture-era/vision-transformer]
 
-eli5: "A transformer reads all the words at once instead of one at a time. For every word it asks 'which other words should I pay attention to?' and mixes in their meaning. Stack that trick a few dozen times and the model builds a rich understanding of the whole sentence."
-
 analogy:
-  title: "A room full of people comparing notes"
-  body: "Imagine every word in a sentence is a person in a room holding a note. Instead of whispering down a line — slow, and the message decays; that was the RNN — everyone raises their note at once. Each person looks around, decides whose notes are most relevant to them, and copies a weighted blend into their own. After a few rounds, every note carries the context of the whole room. That simultaneous 'everyone looks at everyone' step is self-attention."
+  title: "A room where everyone reads everyone's notes at once"
+  body: "This is an analogy, not the mechanism. Picture every word of a sentence as a person holding a note. Each person writes a question (the query), a label on their note (the key) and the note itself (the value). Everyone compares their question with every label at the same moment, then copies a blend of the notes, taking most from the best-matching labels. That simultaneous comparison is self-attention; the exact rule is the key equation below."
 
 narrative:
-  motivation: "By 2017 the leading sequence models were recurrent networks (RNNs, LSTMs) that processed a sentence one token at a time. That sequential dependency precluded parallelization within a training example, and information between distant tokens had to pass through many steps. Attention was already used alongside these recurrent networks; the open question was whether attention alone could do the whole job."
-  approach: "Remove recurrence and convolution entirely and build the model from attention plus position-wise feed-forward layers. If every token can attend directly to every other token, the path between any two positions has constant length and the whole sequence can be processed in parallel."
-  solution: "Self-attention lets each token compute a relevance score against every other token and pull in a weighted mix of their values. Multiple 'heads' run in parallel so the model can attend to information from different representation subspaces at once. Because attention alone has no sense of order, a positional encoding is added to the inputs. Blocks of attention + feed-forward, wrapped in residual connections and layer normalization, are stacked into an encoder and a decoder."
-  outcome: "On WMT 2014 translation the authors report 28.4 BLEU (English–German) and 41.8 BLEU (English–French), the latter after 3.5 days on eight GPUs, a small fraction of the training cost of earlier models. BERT (encoder), GPT (decoder) and the Vision Transformer (images) are built from it."
-
-build_steps:
-  - { title: "1. Embed the tokens", detail: "Turn each token into a vector (its learned meaning). This is the residual stream every later layer reads from and writes back to." }
-  - { title: "2. Add position", detail: "Attention is order-blind, so add a positional signal (sine and cosine functions in the original; rotary positional embeddings (RoPE) in LLaMA, for example) so the model knows word 3 came before word 7." }
-  - { title: "3. Project to Q, K, V", detail: "From each token vector compute three views: a Query (what am I looking for?), a Key (what do I offer?), and a Value (what will I hand over if chosen?)." }
-  - { title: "4. Score and mix (self-attention)", detail: "Each Query dot-products with every Key to get relevance scores, softmax turns them into weights, and each token receives a weighted sum of Values. Now every token carries context from the whole sequence." }
-  - { title: "5. Use many heads", detail: "Run steps 3–4 several times in parallel with different learned projections (eight heads in the original), then concatenate, so the model can attend to information from different representation subspaces." }
-  - { title: "6. Feed-forward + residual + norm", detail: "Each position passes through the same feed-forward network; in the original it is two linear transformations with a ReLU in between (512 → 2048 → 512). Each sub-layer is wrapped in a residual connection followed by layer normalization." }
-  - { title: "7. Stack N blocks", detail: "Repeat the attention + feed-forward block: six times in the encoder and six in the decoder of the original. Each decoder block also masks its self-attention so a position sees only earlier ones, and attends over the encoder's output." }
+  motivation: "Recurrent networks, the authors write, had been firmly established as the state of the art in sequence modelling and translation. A recurrent network computes one position after another, and the authors note that this sequential nature precludes parallelization within training examples."
+  approach: "The paper proposes a model based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Every position attends to every other position directly, so a self-attention layer needs a constant number of sequential operations, against a number that grows with sequence length for a recurrent layer (the paper's Table 1)."
+  solution: "Each layer pairs multi-head self-attention with a feed-forward network applied to every position, each wrapped as LayerNorm(x + Sublayer(x)). The encoder and the decoder each stack six such layers. Because the model contains no recurrence and no convolution, sine and cosine positional encodings are added to the input embeddings to give it the order of the tokens."
+  outcome: "On WMT 2014 the authors report 28.4 BLEU for English to German and 41.8 BLEU for English to French, the latter after 3.5 days of training on eight GPUs; the base model trained in about 12 hours. BERT is built from its encoder, GPT from a decoder-only stack, and the Vision Transformer applies it to image patches."
 
 key_equation:
   latex: "\\mathrm{Attention}(Q,K,V)=\\mathrm{softmax}\\!\\left(\\frac{QK^{\\top}}{\\sqrt{d_k}}\\right)V"
-  plain: "Score how well each query matches each key (QKᵀ), scale the scores so they don't blow up, turn them into probabilities with softmax, then take that weighted average of the values. In words: pay attention to the tokens whose keys best match my query, and copy a blend of their values."
+  plain: "In words: compare each token's query with every key (the dot products in QKᵀ), divide those scores by √d_k, turn each token's row of scores into weights that add up to 1 with softmax, and use the weights to average the values V. The worked example above does exactly this by hand for two tokens."
   terms:
-    - { symbol: "Q", meaning: "Queries — what each token is looking for" }
-    - { symbol: "K", meaning: "Keys — what each token offers as a match target" }
-    - { symbol: "V", meaning: "Values — the content each token contributes if attended to" }
-    - { symbol: "d_k", meaning: "key dimension; dividing by its square root keeps the scores in a stable range" }
+    - { symbol: "Q", meaning: "the queries: one row per token, what that token is looking for" }
+    - { symbol: "K", meaning: "the keys: one row per token, what each token is matched on" }
+    - { symbol: "V", meaning: "the values: one row per token, the content a token passes on when it is attended to" }
+    - { symbol: "d_k", meaning: "the length of each query and key; 64 in the paper's base model (512 / 8 heads)" }
+    - { symbol: "softmax", meaning: "turns a row of scores into positive weights that add up to 1: e to the power of each score, divided by the sum of those terms" }
 
 strengths:
-  - "More parallelizable than recurrent models; the authors report significantly less training time."
-  - "A constant number of sequential operations connects any two positions, against O(n) for a recurrent layer."
-  - "For Transformer language models, Kaplan et al. (2020) report loss falling as a power law in model size, data and compute."
-  - "The same architecture applies to images when patches are treated as tokens (Vision Transformer)."
+  - "A self-attention layer connects any two positions with a constant number of sequential operations, against O(n) for a recurrent layer (Table 1 of the paper)."
+  - "The authors report training the base model in about 12 hours and the big model in 3.5 days on eight NVIDIA P100 GPUs."
+  - "Kaplan et al. (2020) report that language-model loss scales as a power law with model size, dataset size and the compute used for training."
+  - "The Vision Transformer applies a pure Transformer directly to sequences of image patches."
 
 weaknesses:
-  - "Self-attention costs O(n²·d) per layer, quadratic in sequence length n, making very long contexts expensive."
-  - "No built-in notion of order: position information must be injected."
-  - "In vision, the Vision Transformer authors report it trails comparable ResNets when trained on mid-sized datasets such as ImageNet without strong regularization."
+  - "Self-attention costs O(n²·d) per layer, which grows with the square of the sequence length n; the paper notes it is faster than a recurrent layer when n is smaller than the vector width d."
+  - "The model has no built-in notion of order, so position information must be added to the inputs."
+  - "The Vision Transformer authors report accuracies a few percentage points below ResNets of comparable size when trained on mid-sized datasets such as ImageNet without strong regularization."
+
+visual:
+  kind: distribution
+  tokens: ["cats", "sleep"]
+  logits: [2, 3]
+  temperatures: [1, 1.4142]
+  panel_titles: ["Raw scores 2 and 3", "Scores divided by √2"]
+  caption: "The attention weights of the token \"sleep\" over the two tokens of the worked example, computed from its scores 2 and 3. Left: softmax of the raw scores. Right: the scores divided by √d_k = √2 ≈ 1.414 first, as the Transformer does. The numbers are an example, not from a trained model."
+
+comparison:
+  before: "Recurrent layer"
+  after: "Self-attention layer"
+  rows:
+    - { aspect: "Can the positions of one training example be computed at the same time?", before: "No: the authors note the sequential nature precludes parallelization within training examples", after: "Yes: a constant number of sequential operations per layer", source: "https://arxiv.org/abs/1706.03762" }
+    - { aspect: "Steps that must run one after another (n tokens)", before: "O(n)", after: "O(1)", source: "https://arxiv.org/abs/1706.03762" }
+    - { aspect: "Longest path between two positions", before: "O(n)", after: "O(1)", source: "https://arxiv.org/abs/1706.03762" }
+    - { aspect: "Work per layer (n tokens, vector width d)", before: "O(n · d²)", after: "O(n² · d)", source: "https://arxiv.org/abs/1706.03762" }
+
+key_numbers:
+  columns: ["Setting", "Base model", "Big model"]
+  rows:
+    - { cells: ["Layers in the encoder, and again in the decoder (N)", "6", "6"], source: "https://arxiv.org/abs/1706.03762" }
+    - { cells: ["Numbers in each token's vector (d_model)", "512", "1024"], source: "https://arxiv.org/abs/1706.03762" }
+    - { cells: ["Inner width of the feed-forward network (d_ff)", "2048", "4096"], source: "https://arxiv.org/abs/1706.03762" }
+    - { cells: ["Attention heads (h)", "8", "16"], source: "https://arxiv.org/abs/1706.03762" }
+    - { cells: ["Length of each head's queries, keys and values (d_k = d_v)", "64", "64"], source: "https://arxiv.org/abs/1706.03762" }
+    - { cells: ["Dropout rate (P_drop)", "0.1", "0.3"], source: "https://arxiv.org/abs/1706.03762" }
+    - { cells: ["Training steps", "100,000", "300,000"], source: "https://arxiv.org/abs/1706.03762" }
+    - { cells: ["Training time on 8 NVIDIA P100 GPUs", "about 12 hours (0.4 s per step)", "3.5 days (1.0 s per step)"], source: "https://arxiv.org/abs/1706.03762" }
+    - { cells: ["Parameters", "65 million", "213 million"], source: "https://arxiv.org/abs/1706.03762" }
+    - { cells: ["BLEU, WMT 2014 English to German", "27.3", "28.4"], source: "https://arxiv.org/abs/1706.03762" }
+    - { cells: ["BLEU, WMT 2014 English to French", "38.1", "41.8"], source: "https://arxiv.org/abs/1706.03762" }
+
+misunderstandings:
+  - misunderstanding: "The Transformer is a decoder-only model like GPT."
+    truth: "The original Transformer was built for translation and has **two stacks**: an encoder of six layers that reads the source sentence and a decoder of six layers that writes the translation while attending over the encoder's output. GPT (2018) later trained a **12-layer decoder-only** Transformer."
+    source: "https://arxiv.org/abs/1706.03762"
+  - misunderstanding: "Attention works out the order of the words by itself."
+    truth: "Attention compares every token with every other token and ignores where they stand. Because the model contains no recurrence and no convolution, the authors **add positional encodings** (sine and cosine values) to the input embeddings. Learned position embeddings gave **nearly identical results** in their tests (Table 3, row E)."
+    source: "https://arxiv.org/abs/1706.03762"
+  - misunderstanding: "Self-attention is cheaper than a recurrent layer at every sequence length."
+    truth: "Per layer, self-attention costs **O(n²·d)** and a recurrent layer **O(n·d²)**. The paper states that self-attention is faster when the sequence length n is **smaller than** the vector width d. For long sequences the n² term dominates."
+    source: "https://arxiv.org/abs/1706.03762"
+  - misunderstanding: "Dividing the scores by the square root of the key length is a cosmetic detail."
+    truth: "The authors give a reason: if the entries of a query and a key are independent with mean 0 and variance 1, their dot product has **variance $d_k$**. For large $d_k$ the scores grow large in magnitude, which pushes softmax into regions where it has **extremely small gradients**. Dividing by $\\sqrt{d_k}$ counteracts this."
+    source: "https://arxiv.org/abs/1706.03762"
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 860 562" role="img" aria-label="The original Transformer: on the left an encoder layer, multi-head self-attention then feed-forward, each followed by Add and Norm, repeated six times; on the right a decoder layer, masked self-attention, attention over the encoder output, and feed-forward, each followed by Add and Norm, repeated six times, then a linear layer and softmax. Embeddings plus positional encoding enter at the bottom and dashed lines are residual connections.">
@@ -155,12 +191,11 @@ diagram_svg: |
 diagram_caption: "The original Transformer: six encoder layers (self-attention, feed-forward) and six decoder layers (masked self-attention, attention over the encoder output, feed-forward), each sub-layer wrapped in a residual and LayerNorm."
 underlying_model_note: "The first figure is the original Transformer, with an encoder stack and a decoder stack. The model drawn below keeps one stack of the same kind of block: attention, then a feed-forward layer, each inside a residual connection."
 notable_models:
-  - { name: "Transformer", year: 2017, note: "The original: an attention-only model that outperformed earlier translation systems on WMT 2014 with less training time." }
-  - { name: "BERT", year: 2018, note: "Took the encoder and pretrained it bidirectionally, reporting new state-of-the-art results on eleven language tasks." }
-  - { name: "GPT", year: 2018, note: "Took the decoder (12 layers, masked self-attention) for generative pretraining followed by fine-tuning on each task." }
-  - { name: "T5", year: 2019, note: "Kept the full encoder-decoder and cast every NLP task as text-to-text." }
-  - { name: "Vision Transformer (ViT)", year: 2020, note: "Applied the same architecture to images by treating patches as tokens." }
-
+  - { name: "Transformer", year: 2017, note: "The original encoder-decoder, built for translation: 28.4 BLEU for English to German and 41.8 BLEU for English to French on WMT 2014." }
+  - { name: "BERT", year: 2018, note: "Bidirectional Encoder Representations from Transformers; its authors report new state-of-the-art results on eleven natural language processing tasks." }
+  - { name: "GPT", year: 2018, note: "A 12-layer decoder-only Transformer with masked self-attention (768-number vectors, 12 heads), pretrained generatively and then fine-tuned on each task." }
+  - { name: "T5", year: 2019, note: "Converts every text-based language problem into a text-to-text format." }
+  - { name: "Vision Transformer (ViT)", year: 2020, note: "A pure Transformer applied directly to sequences of image patches." }
 resources:
   - { kind: blog, title: "The Illustrated Transformer (Jay Alammar)", url: "https://jalammar.github.io/illustrated-transformer/" }
   - { kind: video, title: "Let's build GPT from scratch (Andrej Karpathy)", url: "https://www.youtube.com/watch?v=kCc8FmEb1nY" }
@@ -173,11 +208,9 @@ learn_first:
   - { label: "Softmax & dot products", href: "/learn/concepts/softmax", tag: "Math" }
 
 tags: [transformer, attention, self-attention, foundational, llm]
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
   - { url: "https://arxiv.org/abs/1706.03762", title: "Attention Is All You Need (Vaswani et al., 2017)", trust: 0.98 }
-  - { url: "https://jalammar.github.io/illustrated-transformer/", title: "The Illustrated Transformer (Jay Alammar)", trust: 0.9 }
-  - { url: "https://nlp.seas.harvard.edu/annotated-transformer/", title: "The Annotated Transformer (Harvard NLP)", trust: 0.9 }
   - { url: "https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf", title: "Improving Language Understanding by Generative Pre-Training (Radford et al., 2018)", trust: 0.95 }
   - { url: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf", title: "Language Models are Unsupervised Multitask Learners (Radford et al., 2019)", trust: 0.95 }
   - { url: "https://arxiv.org/abs/2005.14165", title: "Language Models are Few-Shot Learners (Brown et al., 2020)", trust: 0.95 }
@@ -237,20 +270,110 @@ variants:
 ---
 
 ## What Changed
-Recurrent models read a sentence one token at a time, carrying a hidden state forward. That
-sequential dependency **forbids parallelism within a sequence**: step 50 cannot start until step 49
-finishes.
 
-The Transformer (Vaswani et al., 2017) **discards recurrence and convolution**. Every token is
-compared against every other token directly, so any two positions are connected by a constant number
-of operations and the whole sequence is processed in parallel.
+Before the Transformer, the authors write, **recurrent networks** were firmly established as the
+state of the art for sequence modelling and translation. A recurrent network reads a sentence one
+position after another and carries a running summary forward, so step 50 waits for step 49.
+
+How to read the table above (it restates the paper's Table 1):
+
+- **n** is the number of tokens in the sequence; **d** is the number of values in each token's
+  vector (512 in the base model).
+- **O(...)**, read "order of", says how a cost grows: O(n) grows in step with n, O(1) stays the
+  same however long the sequence is.
+- **Steps one after another:** a recurrent layer needs n of them; self-attention needs a fixed
+  number, so all positions of a sentence are computed at the same time.
+- **Longest path:** how many steps information takes to travel between two positions. The
+  authors argue that the shorter these paths, the easier it is to learn long-range dependencies.
+- **The price:** self-attention compares every pair of positions, so its work grows with **n²**.
 
 ## Key Ideas
-- **Self-attention is a soft lookup.** Each token issues a query, matches it against every key, and
-  retrieves a weighted blend of values.
-- **Multiple heads attend to different subspaces.** The authors report that individual heads learn
-  different tasks, many related to the syntactic and semantic structure of sentences.
-- **Position is added, not assumed.** Self-attention has no notion of order, so positional encodings
-  are added to the input embeddings.
+
+- **Self-attention is a soft lookup.** Each token issues a query, matches it against every key,
+  and retrieves a weighted blend of the values.
+- **Several heads run side by side.** The authors write that multi-head attention lets the model
+  jointly attend to information from different representation subspaces at different positions.
+- **Position is added, not assumed.** Positional encodings are added to the input embeddings.
 - **Attention plus feed-forward, stacked.** Each layer pairs attention with a position-wise
-  feed-forward network, both wrapped in residual connections and normalization.
+  feed-forward network, both wrapped in a residual connection and layer normalization.
+
+## How It Works
+
+The figure above has **two stacks**. The encoder (left) reads the whole input sentence; the
+decoder (right) produces the output sentence. Follow the arrows from the bottom.
+
+A **token** is a piece of text, a word or part of a word. A **vector** is a list of numbers; in
+the base model every token is carried as a vector of **512** numbers (called $d_{model}$).
+
+1. **Input embedding.** A learned embedding turns each input token into a vector of 512
+   numbers. The paper multiplies these embedding weights by $\sqrt{512}$.
+2. **Positional encoding (the "+" circle).** Sine and cosine values that depend on the token's
+   position are added to its vector. Without this step the model could not tell word order,
+   because it has no recurrence and no convolution.
+3. **Multi-head attention (encoder).** Every token computes a **query**, a **key** and a
+   **value** from its vector with learned weights. Each query is scored against every key, the
+   scores become weights, and the token receives a weighted blend of all values (the worked
+   example below does this with numbers). The base model runs **8 heads** side by side, each with
+   queries and keys of length 512 / 8 = **64**, and joins their outputs.
+4. **Add & Norm.** The sub-layer's output is added to its input (the dashed **residual
+   connection**) and the sum is normalised: LayerNorm(x + Sublayer(x)).
+5. **Feed-forward.** The same small two-layer network is applied to every position on its own:
+   512 numbers in, 2048 in the middle with a ReLU (negative values set to 0), 512 out. Then
+   another Add & Norm.
+6. **Repeat six times.** Steps 3 to 5 form one encoder layer; the encoder stacks **N = 6** of
+   them. Its final output, one vector per input token, is passed to every decoder layer.
+7. **Masked multi-head attention (decoder).** The decoder's input is the output sentence,
+   shifted one position to the right (as the figure labels it). A **mask** sets the scores of later positions to minus infinity before softmax, so each
+   position attends only to itself and earlier positions and cannot see the future.
+8. **Encoder-decoder attention.** In the decoder's middle attention the **queries** come from
+   the decoder and the **keys and values** from the encoder's output, so each output position
+   can look at every word of the input sentence. A feed-forward network follows; the decoder
+   also stacks **6** layers.
+9. **Linear and softmax.** A linear layer turns the final vector into one score per vocabulary
+   entry (for English to German, a vocabulary of about 37,000 tokens shared by both languages), and softmax turns the scores
+   into the probabilities of the next token. The paper shares one weight matrix between the two
+   embedding layers and this linear layer.
+
+## Worked Example
+
+**Scaled dot-product attention by hand**, for two tokens with queries and keys of length
+$d_k = 2$. The numbers are made up and small so every step can be checked; a real model learns its
+queries, keys and values and, in the base model, uses $d_k = 64$.
+
+Each token has already been turned into a query, a key and a value:
+
+| Token | Query | Key | Value |
+| --- | --- | --- | --- |
+| cats | (1, 0) | (2, 0) | (1, 3) |
+| sleep | (1, 2) | (1, 1) | (5, 1) |
+
+Follow the token **"sleep"**, whose query is (1, 2):
+
+1. **Score it against every key** with a dot product (multiply matching entries, then add):
+   - with "cats": 1 × 2 + 2 × 0 = **2**
+   - with "sleep": 1 × 1 + 2 × 1 = **3**
+2. **Scale:** divide by $\sqrt{d_k} = \sqrt{2}$ ≈ 1.414. The scores become 2 / 1.414 ≈ **1.414** and
+   3 / 1.414 ≈ **2.121**.
+3. **Softmax:** raise e to each score and divide by the total.
+   - $e^{1.414} \approx 4.113$ and $e^{2.121} \approx 8.342$; the total is 12.455.
+   - Weights: 4.113 / 12.455 ≈ **0.330** for "cats" and 8.342 / 12.455 ≈ **0.670** for
+     "sleep". They add up to 1.
+4. **Blend the values** with those weights:
+   - 0.330 × (1, 3) = (0.33, 0.99)
+   - 0.670 × (5, 1) = (3.35, 0.67)
+   - Sum: **(3.68, 1.66)**, the new vector for "sleep".
+
+The same steps for **"cats"** (query (1, 0)): scores 2 and 1, scaled 1.414 and 0.707, weights
+0.670 and 0.330, new vector 0.670 × (1, 3) + 0.330 × (5, 1) = (0.67, 2.01) + (1.65, 0.33) =
+**(2.32, 2.34)**. Written with matrices, both rows are computed at once: QKᵀ = [[2, 1], [2, 3]].
+
+**What the figure shows:** the weights of "sleep" without and with the division by $\sqrt{d_k}$.
+Without it, softmax(2, 3) gives 0.269 and 0.731; with it, 0.330 and 0.670. Dividing by $\sqrt{d_k}$
+evens the weights out. The authors explain why it matters at full size: if the entries of a
+query and a key are independent with mean 0 and variance 1, their dot product has variance $d_k$,
+so at $d_k = 64$ raw scores spread far apart.
+
+**What this means:** every output is a blend of all the value vectors, weighted by how well the
+token's query matches each key. Here "sleep" takes about two thirds of its new vector from its
+own value and one third from "cats". In the base model this runs in 8 heads at once, in every
+attention block of the figure.

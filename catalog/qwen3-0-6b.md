@@ -16,6 +16,12 @@ tasks:
 parameters_active_b: 0.75
 total_parameters: 751632384
 context_window_tokens: 40960
+base_models:
+- name: Qwen/Qwen3-0.6B-Base
+  address: https://huggingface.co/Qwen/Qwen3-0.6B-Base
+summary: Qwen3-0.6B is a language model from Qwen that reads text and writes text in reply. The card lists 0.6B parameters, 28 layers and a context length of 32,768 tokens, and gives the pretraining and post-training stages as its training. It is part of the Qwen3 series, which the card describes as a suite of dense and mixture-of-experts models.
+what_sets_it_apart: Qwen states that a single model can switch between a thinking mode, for complex logical reasoning, math and coding, and a non-thinking mode for efficient general dialogue. The card also lists improved reasoning, human preference alignment, agent abilities that connect to external tools, and support for more than 100 languages and dialects.
+running_it: The card says to use a recent transformers version, since versions older than 4.51.0 fail with a KeyError on the name qwen3. For thinking mode it recommends temperature 0.6, top-p 0.95, top-k 20 and min-p 0, and warns against greedy decoding because it can cause endless repetition. For non-thinking mode it suggests temperature 0.7 and top-p 0.8.
 fingerprint:
   attention_type: GQA
   num_layers: 28
@@ -58,13 +64,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: offering a comprehensive suite of dense and mixture-of-experts (MoE) models
+  what_sets_it_apart: Uniquely support of seamless switching between thinking mode
+  running_it: For thinking mode (`enable_thinking=True`), use `Temperature=0.6`, `TopP=0.95`, `TopK=20`, and `MinP=0`.
 tags:
 - llm
 - text-generation
 - qwen3
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-0.6B
   title: Qwen/Qwen3-0.6B — model page (Hugging Face)
@@ -80,4 +90,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen3-0.6B is a language model from Qwen that reads text and writes text in reply. The card lists 0.6B parameters, 28 layers and a context length of 32,768 tokens, and gives the pretraining and post-training stages as its training. It is part of the Qwen3 series, which the card describes as a suite of dense and mixture-of-experts models.
+
+## What Sets It Apart
+
+Qwen states that a single model can switch between a thinking mode, for complex logical reasoning, math and coding, and a non-thinking mode for efficient general dialogue. The card also lists improved reasoning, human preference alignment, agent abilities that connect to external tools, and support for more than 100 languages and dialects.
+
+## Running It
+
+The card says to use a recent transformers version, since versions older than 4.51.0 fail with a KeyError on the name qwen3. For thinking mode it recommends temperature 0.6, top-p 0.95, top-k 20 and min-p 0, and warns against greedy decoding because it can cause endless repetition. For non-thinking mode it suggests temperature 0.7 and top-p 0.8.

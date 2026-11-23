@@ -15,6 +15,9 @@ tasks:
 parameters_active_b: 1.08
 total_parameters: 1079891456
 context_window_tokens: 2048
+summary: OpenELM-1_1B-Instruct is a small language model from Apple, with 1.1 billion parameters, that was instruction-tuned so it can follow prompts. It belongs to OpenELM, which the card calls a family of Open Efficient Language Models released in pretrained and instruction-tuned versions at 270M, 450M, 1.1B and 3B parameters. The card says the pre-training data totals approximately 1.8 trillion tokens.
+what_sets_it_apart: The card says OpenELM uses a layer-wise scaling strategy to allocate parameters within each layer of the transformer, and credits this for better accuracy. Apple also states that it released the complete framework for data preparation, training, fine-tuning and evaluation, together with checkpoints and training logs, to support open research.
+running_it: 'The card provides a generate_openelm.py script for models loaded from the Hugging Face Hub, run with repetition_penalty=1.2 in its example. It also describes two ways to speed up generation: prompt lookup speculative generation, and an assistant model, a smaller model that drafts tokens for the larger one.'
 fingerprint:
   num_layers: 28
   head_size: 64
@@ -44,12 +47,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: We release both pretrained and instruction tuned models with 270M, 450M, 1.1B and 3B parameters.
+  what_sets_it_apart: OpenELM uses a layer-wise scaling strategy to efficiently allocate parameters within each layer of the transformer model, leading to enhanced accuracy.
+  running_it: Additional arguments to the hugging face generate function can be passed via `generate_kwargs`.
 tags:
 - llm
 - text-generation
 - openelm
 - dense
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/apple/OpenELM-1_1B-Instruct
   title: apple/OpenELM-1_1B-Instruct — model page (Hugging Face)
@@ -65,4 +72,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+OpenELM-1_1B-Instruct is a small language model from Apple, with 1.1 billion parameters, that was instruction-tuned so it can follow prompts. It belongs to OpenELM, which the card calls a family of Open Efficient Language Models released in pretrained and instruction-tuned versions at 270M, 450M, 1.1B and 3B parameters. The card says the pre-training data totals approximately 1.8 trillion tokens.
+
+## What Sets It Apart
+
+The card says OpenELM uses a layer-wise scaling strategy to allocate parameters within each layer of the transformer, and credits this for better accuracy. Apple also states that it released the complete framework for data preparation, training, fine-tuning and evaluation, together with checkpoints and training logs, to support open research.
+
+## Running It
+
+The card provides a generate_openelm.py script for models loaded from the Hugging Face Hub, run with repetition_penalty=1.2 in its example. It also describes two ways to speed up generation: prompt lookup speculative generation, and an assistant model, a smaller model that drafts tokens for the larger one.

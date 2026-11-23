@@ -13,6 +13,9 @@ tasks:
 parameters_active_b: 0.38
 total_parameters: 379988992
 context_window_tokens: 1024
+summary: GPT-2 Medium is the 355-million-parameter version of GPT-2, a language model created and released by OpenAI. It was pretrained on English text with a causal language modeling objective, which means it learns to predict the next word from the words before it, and it is used to generate text.
+intended_use: Quoting OpenAI's GPT-2 model card, the card says the primary intended users are AI researchers and practitioners, who are expected to study the behaviors, capabilities, biases and limits of large generative language models. Secondary uses it lists are writing assistance, creative writing and entertainment such as games and chat bots. OpenAI does not support uses that require the generated text to be true.
+limitations: Quoting OpenAI, the card says language models like GPT-2 do not distinguish fact from fiction and reflect the biases of the data they were trained on. OpenAI does not recommend deploying them in systems that interact with humans unless the deployers first study the biases relevant to their use.
 fingerprint:
   attention_type: MHA
   num_layers: 24
@@ -46,13 +49,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: The model is a pretrained model on English language using a causal language modeling (CLM) objective.
+  intended_use: The primary intended users of these models are AI researchers and practitioners.
+  limitations: Because large-scale language models like GPT-2 do not distinguish fact from fiction, we don’t support use-cases that require the generated text to be true.
 tags:
 - llm
 - text-generation
 - gpt2
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/openai-community/gpt2-medium
   title: openai-community/gpt2-medium — model page (Hugging Face)
@@ -68,4 +75,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+GPT-2 Medium is the 355-million-parameter version of GPT-2, a language model created and released by OpenAI. It was pretrained on English text with a causal language modeling objective, which means it learns to predict the next word from the words before it, and it is used to generate text.
+
+## Intended Use
+
+Quoting OpenAI's GPT-2 model card, the card says the primary intended users are AI researchers and practitioners, who are expected to study the behaviors, capabilities, biases and limits of large generative language models. Secondary uses it lists are writing assistance, creative writing and entertainment such as games and chat bots. OpenAI does not support uses that require the generated text to be true.
+
+## Limitations
+
+Quoting OpenAI, the card says language models like GPT-2 do not distinguish fact from fiction and reflect the biases of the data they were trained on. OpenAI does not recommend deploying them in systems that interact with humans unless the deployers first study the biases relevant to their use.

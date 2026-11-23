@@ -12,6 +12,10 @@ tasks:
 parameters_active_b: 0.11
 total_parameters: 108317193
 context_window_tokens: 512
+summary: 'bert-base-NER is a version of the BERT language model (the cased base size) fine-tuned by its publisher, dslim, for named entity recognition: finding names in text and labelling each as a person, organization, location or miscellaneous. The card says it was fine-tuned on the English CoNLL-2003 dataset, which is built from Reuters news stories.'
+intended_use: 'The card presents it for named entity recognition on English text, used through the Transformers pipeline for token labelling. It marks four entity types: person, organization, location and miscellaneous.'
+what_sets_it_apart: 'The model separates the start of an entity from its continuation, so two names of the same type that sit side by side can be told apart. The card also lists related versions fine-tuned the same way: a larger bert-large-NER, a smaller distilbert-NER and an uncased bert-base variant.'
+limitations: The card says the model is limited by its training data, news articles from a specific span of time, so it may not generalize to other domains. It also notes that the model occasionally tags pieces of words as entities, so results may need post-processing.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -45,13 +49,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: 'It has been trained to recognize four types of entities: location (LOC), organizations (ORG), person (PER) and Miscellaneous (MISC).'
+  intended_use: 'As in the dataset, each token will be classified as one of the following classes:'
+  what_sets_it_apart: The training dataset distinguishes between the beginning and continuation of an entity so that if there are back-to-back entities of the same type, the model can output where the second entity begins.
+  limitations: This model is limited by its training dataset of entity-annotated news articles from a specific span of time.
 tags:
 - llm
 - token-classification
 - bert
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/dslim/bert-base-NER
   title: dslim/bert-base-NER — model page (Hugging Face)
@@ -67,4 +76,18 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+bert-base-NER is a version of the BERT language model (the cased base size) fine-tuned by its publisher, dslim, for named entity recognition: finding names in text and labelling each as a person, organization, location or miscellaneous. The card says it was fine-tuned on the English CoNLL-2003 dataset, which is built from Reuters news stories.
+
+## Intended Use
+
+The card presents it for named entity recognition on English text, used through the Transformers pipeline for token labelling. It marks four entity types: person, organization, location and miscellaneous.
+
+## What Sets It Apart
+
+The model separates the start of an entity from its continuation, so two names of the same type that sit side by side can be told apart. The card also lists related versions fine-tuned the same way: a larger bert-large-NER, a smaller distilbert-NER and an uncased bert-base variant.
+
+## Limitations
+
+The card says the model is limited by its training data, news articles from a specific span of time, so it may not generalize to other domains. It also notes that the model occasionally tags pieces of words as entities, so results may need post-processing.

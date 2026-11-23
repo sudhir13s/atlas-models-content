@@ -15,6 +15,9 @@ tasks:
 - task/text-generation
 total_parameters: 30532122624
 context_window_tokens: 262144
+summary: 'Qwen3-30B-A3B-Instruct-2507 is a language model from Qwen, an updated release of the non-thinking mode of Qwen3-30B-A3B, so it answers directly without writing out its reasoning first. It is a Mixture-of-Experts model, which uses only some of its parameters for each token: 30.5 billion in total with 3.3 billion activated, and a native context of 262,144 tokens.'
+what_sets_it_apart: Qwen lists improvements in instruction following, logical reasoning, text comprehension, mathematics, science, coding and tool use, broader coverage of long-tail knowledge across languages, better alignment with user preferences on open-ended tasks, and stronger 256K long-context understanding. The card says the model supports only non-thinking mode and does not produce thinking blocks.
+running_it: The card suggests Temperature=0.7, TopP=0.8, TopK=20 and MinP=0, and an output length of 16,384 tokens for most queries. It notes that specifying enable_thinking=False is no longer required.
 fingerprint:
   attention_type: GQA
   num_layers: 48
@@ -53,13 +56,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: 'We introduce the updated version of the **Qwen3-30B-A3B non-thinking mode**, named **Qwen3-30B-A3B-Instruct-2507**, featuring the following key enhancements:'
+  what_sets_it_apart: '**Enhanced capabilities** in **256K long-context understanding**.'
+  running_it: We suggest using `Temperature=0.7`, `TopP=0.8`, `TopK=20`, and `MinP=0`.
 tags:
 - llm
 - text-generation
 - qwen3-moe
 - moe
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-30B-A3B-Instruct-2507
   title: Qwen/Qwen3-30B-A3B-Instruct-2507 — model page (Hugging Face)
@@ -87,4 +94,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen3-30B-A3B-Instruct-2507 is a language model from Qwen, an updated release of the non-thinking mode of Qwen3-30B-A3B, so it answers directly without writing out its reasoning first. It is a Mixture-of-Experts model, which uses only some of its parameters for each token: 30.5 billion in total with 3.3 billion activated, and a native context of 262,144 tokens.
+
+## What Sets It Apart
+
+Qwen lists improvements in instruction following, logical reasoning, text comprehension, mathematics, science, coding and tool use, broader coverage of long-tail knowledge across languages, better alignment with user preferences on open-ended tasks, and stronger 256K long-context understanding. The card says the model supports only non-thinking mode and does not produce thinking blocks.
+
+## Running It
+
+The card suggests Temperature=0.7, TopP=0.8, TopK=20 and MinP=0, and an output length of 16,384 tokens for most queries. It notes that specifying enable_thinking=False is no longer required.

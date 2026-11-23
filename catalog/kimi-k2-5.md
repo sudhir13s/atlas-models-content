@@ -14,6 +14,10 @@ tasks:
 - task/vision-language-models
 total_parameters: 1026879376368
 context_window_tokens: 262144
+summary: Kimi K2.5 is an open-source model from moonshotai that takes both images and text and is built for agent work, where a model calls tools and carries out multi-step tasks. The card says it was built by continued pretraining on about 15 trillion mixed visual and text tokens on top of Kimi-K2-Base. It lists a Mixture-of-Experts design with 1T total parameters, 32B activated per token, and a 256K context length.
+intended_use: 'The card describes instant and thinking modes and both conversational and agentic use. One highlighted use is coding with vision: generating code from visual specifications such as UI designs and video workflows, and orchestrating tools for visual data processing. The card says chat with video content is experimental and available only through the official API.'
+what_sets_it_apart: The card describes native multimodality, meaning the model was pretrained on vision and language tokens together rather than having vision added afterward. It also describes an Agent Swarm scheme, in which the model splits a complex task into parallel sub-tasks run by agents it creates on the fly, each specialized for its domain. Its weights use native INT4 quantization, the same method as Kimi-K2-Thinking.
+running_it: For third-party serving with vLLM or SGLang, the card recommends a temperature of 1.0 for Thinking mode and 0.6 for Instant mode, with top_p of 0.95.
 fingerprint:
   attention_type: MLA
   num_layers: 61
@@ -57,13 +61,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: built through continual pretraining on approximately 15 trillion mixed visual and text tokens atop Kimi-K2-Base
+  intended_use: K2.5 generates code from visual specifications (UI designs, video workflows)
+  what_sets_it_apart: It decomposes complex tasks into parallel sub-tasks executed by dynamically instantiated, domain-specific agents.
+  running_it: The recommended `temperature` will be `1.0` for Thinking mode and `0.6` for Instant mode.
 tags:
 - llm
 - image-text-to-text
 - kimi-k25
 - moe
 - mla
-updated: '2026-11-20'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/moonshotai/Kimi-K2.5
   title: moonshotai/Kimi-K2.5 — model page (Hugging Face)
@@ -76,4 +85,18 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Kimi K2.5 is an open-source model from moonshotai that takes both images and text and is built for agent work, where a model calls tools and carries out multi-step tasks. The card says it was built by continued pretraining on about 15 trillion mixed visual and text tokens on top of Kimi-K2-Base. It lists a Mixture-of-Experts design with 1T total parameters, 32B activated per token, and a 256K context length.
+
+## Intended Use
+
+The card describes instant and thinking modes and both conversational and agentic use. One highlighted use is coding with vision: generating code from visual specifications such as UI designs and video workflows, and orchestrating tools for visual data processing. The card says chat with video content is experimental and available only through the official API.
+
+## What Sets It Apart
+
+The card describes native multimodality, meaning the model was pretrained on vision and language tokens together rather than having vision added afterward. It also describes an Agent Swarm scheme, in which the model splits a complex task into parallel sub-tasks run by agents it creates on the fly, each specialized for its domain. Its weights use native INT4 quantization, the same method as Kimi-K2-Thinking.
+
+## Running It
+
+For third-party serving with vLLM or SGLang, the card recommends a temperature of 1.0 for Thinking mode and 0.6 for Instant mode, with top_p of 0.95.

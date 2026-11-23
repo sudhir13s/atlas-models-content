@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.4",
+  "schema_version": "2.5",
   "shared": "schema/_shared.schema.json",
   "types": {
     "model": {
@@ -27,7 +27,8 @@
       "folder": "architectures",
       "schema": "schema/architecture-era.schema.json",
       "id_prefix": "architecture-era/",
-      "sections": ["What Changed", "Key Ideas"]
+      "sections": ["What Changed", "Key Ideas"],
+      "optional_sections": ["How It Works", "Worked Example"]
     },
     "parameter": {
       "folder": "parameters",

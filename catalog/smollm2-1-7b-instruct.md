@@ -16,6 +16,13 @@ tasks:
 parameters_active_b: 1.71
 total_parameters: 1711376384
 context_window_tokens: 8192
+base_models:
+- name: HuggingFaceTB/SmolLM2-1.7B
+  address: https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B
+summary: SmolLM2-1.7B-Instruct is the instruction-tuned 1.7-billion-parameter model of SmolLM2, a family of compact language models from Hugging Face that the card says are light enough to run on-device. The card says the base model was trained on 11 trillion tokens, and the instruct version was then trained further to follow instructions.
+intended_use: The card says the instruct model supports tasks such as text rewriting, summarization and function calling, and that the models in the family can solve a wide range of tasks while being light enough to run on a device.
+what_sets_it_apart: The card says the 1.7B model improves on its predecessor SmolLM1-1.7B in instruction following, knowledge, reasoning and mathematics. The instruct version was built with supervised fine-tuning on public and self-curated datasets, followed by Direct Preference Optimization, a method that teaches the model from ranked answer pairs, using UltraFeedback.
+limitations: The card says SmolLM2 models mainly understand and produce English, and their output may not always be factually accurate, logically consistent or free of bias from the training data. They should be treated as assistive tools rather than definitive sources, and important information should be verified.
 fingerprint:
   attention_type: MHA
   num_layers: 24
@@ -52,13 +59,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: 'SmolLM2 is a family of compact language models available in three size: 135M, 360M, and 1.7B parameters.'
+  intended_use: The instruct model additionally supports tasks such as text rewriting, summarization and function calling
+  what_sets_it_apart: We developed the instruct version through supervised fine-tuning (SFT) using a combination of public datasets and our own curated datasets.
+  limitations: SmolLM2 models primarily understand and generate content in English.
 tags:
 - llm
 - text-generation
 - llama
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct
   title: HuggingFaceTB/SmolLM2-1.7B-Instruct — model page (Hugging Face)
@@ -74,4 +86,18 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+SmolLM2-1.7B-Instruct is the instruction-tuned 1.7-billion-parameter model of SmolLM2, a family of compact language models from Hugging Face that the card says are light enough to run on-device. The card says the base model was trained on 11 trillion tokens, and the instruct version was then trained further to follow instructions.
+
+## Intended Use
+
+The card says the instruct model supports tasks such as text rewriting, summarization and function calling, and that the models in the family can solve a wide range of tasks while being light enough to run on a device.
+
+## What Sets It Apart
+
+The card says the 1.7B model improves on its predecessor SmolLM1-1.7B in instruction following, knowledge, reasoning and mathematics. The instruct version was built with supervised fine-tuning on public and self-curated datasets, followed by Direct Preference Optimization, a method that teaches the model from ranked answer pairs, using UltraFeedback.
+
+## Limitations
+
+The card says SmolLM2 models mainly understand and produce English, and their output may not always be factually accurate, logically consistent or free of bias from the training data. They should be treated as assistive tools rather than definitive sources, and important information should be verified.

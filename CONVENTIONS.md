@@ -31,7 +31,7 @@ numeric config) so it stays machine-parseable.
 - `tags`: lowercase, hyphen-separated.
 - `updated`: ISO date (`YYYY-MM-DD`).
 - `sources[]`: `{ url, title, trust }` — `trust` in `[0,1]`. Open-source-first; cite, do not copy.
-- `schema_version`: the `major.minor` the file was authored against (currently `2.4`).
+- `schema_version`: the `major.minor` the file was authored against (currently `2.5`).
 
 ## Body sections
 
@@ -56,10 +56,22 @@ numeric config) so it stays machine-parseable.
   - **Schema 1.0 (the records not yet converted).** `starting_value`, `if_increased`,
     `if_decreased`, `common_mistake`; body sections Definition → What to look for → Calculation →
     Example.
+  - **The effect scale.** A numeric setting gives `scale` (`min`, `max`, the typical band,
+    `spacing`); the consumer draws the axis in three zones (below typical, the band, above typical)
+    with tick values, and marks on it every `typical_values` row whose `value` is one plain number
+    inside the scale (`0.9`, `50`, `1e-3`). Write such a value as the bare number and put the
+    context in `setting`; a range or several values in one row stays in the table only. A setting
+    with no numeric scale (a switch, a named choice) gives `options` (`value`, `effect`) instead of
+    `scale`, and may leave `effects` out; the consumer draws one tile per option.
   - **Figures are computed, never drawn by hand.** `visual.kind` is `schedule` (the learning rate
-    at every step) or `distribution` (next-token probabilities at several temperatures); the
-    consumer computes every point from the values in the record. A value that is an example and
-    not a published one is named as such in `caption`.
+    at every step), `distribution` (next-token probabilities of a few example scores) or `beams`
+    (two steps of beam search over a small table of probabilities); the consumer computes every
+    point from the values in the record. A `distribution` sets exactly one of `temperatures` (one
+    panel per temperature), `truncate` (`top_k`, `top_p` or `remove`: before and after candidates
+    are removed) and `penalty` (`value`, `repeated`: before and after the repetition penalty), each
+    computed as Hugging Face Transformers does. The optional `panel_titles` replace the default
+    panel titles, for scores that are not next-token scores. A value that is an example and not a
+    published one is named as such in `caption`.
   - **Write for a newcomer, in depth.** Explain each term in plain words at first use, spell out
     acronyms, say in words what a formula computes before showing it, and mark an analogy as an
     analogy. A section is as long as understanding needs; break it into short paragraphs, bullets,
@@ -74,7 +86,25 @@ numeric config) so it stays machine-parseable.
 - **parameter** — one file per architecture family (`arch`), with a ranked `components[]` list and a
   `worked_example.config` the consumer live-computes. Body explains each component + the master formula.
 - **architecture-era** — carries `led_to[]` / `influenced_by[]` (IDs) forming the evolution DAG,
-  plus `era`, `year`, `family`. Body sections: What Changed → Key Ideas.
+  plus `era`, `year`, `family`. Body sections: What Changed → Key Ideas, then the optional
+  How It Works → Worked Example. A record is written in one of two forms:
+  - **Schema 2.5 (the teaching form; write new and revised records this way).** The page is
+    visual-first: `description` is one plain sentence saying what the architecture is → the main
+    figure → How It Works (numbered steps tied to the figure's blocks: what goes in, what each
+    block does, what comes out) → Worked Example (the figure `visual` computes, then the core
+    computation on tiny numbers, every step numbered and recomputed, closing with "What this
+    means") → `key_equation` → `comparison` (a table of what changed from the approach before,
+    with the What Changed section explaining it) → `key_numbers` (the configuration the original
+    paper or named models publish) → `misunderstandings` (two to four, each corrected from a
+    source) → analogy, strengths and limitations, story → `notable_models` and `sources`.
+    `build_steps` and `eli5` are left out: How It Works replaces both.
+  - **Earlier records** keep `build_steps` and `eli5`; their pages are unchanged until converted.
+  - **`visual`** is a `distribution` figure (see hyperparameter): softmax bars of the example's
+    scores (attention scores, router scores), with `panel_titles` naming each panel. The scores
+    are the Worked Example's inputs and the caption says they are an example.
+  - **Every row has its source.** Each `comparison` row, `key_numbers` row and misunderstanding
+    names one entry of `sources`, fetched for the record; findings are attributed to who reports
+    them, and no number is written from memory.
 - **model** — one record per base model. Carries the `fingerprint`, `organization` and `license`
   (IDs; `license_note` names a licence with no record), `variants[]` (quantised or repackaged copies:
   name, format, address, publisher), `aliases[]`, `hub_signals` and lineage (benchmark values live in `score-sheet` records of

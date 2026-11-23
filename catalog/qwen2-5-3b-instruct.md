@@ -16,6 +16,11 @@ tasks:
 parameters_active_b: 3.09
 total_parameters: 3085938688
 context_window_tokens: 32768
+base_models:
+- name: Qwen/Qwen2.5-3B
+  address: https://huggingface.co/Qwen/Qwen2.5-3B
+summary: Qwen2.5 3B Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned member of the Qwen2.5 series at the 3B size (3.09 billion parameters), which means the base model was trained further to follow instructions and hold a conversation. The card says the Qwen2.5 series ranges from 0.5 to 72 billion parameters.
+what_sets_it_apart: Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. The card also states support for a context of up to 128K tokens and for over 29 languages.
 fingerprint:
   attention_type: GQA
   num_layers: 36
@@ -52,13 +57,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This repo contains the instruction-tuned 3B Qwen2.5 model
+  what_sets_it_apart: Significantly **more knowledge** and has greatly improved capabilities in **coding** and **mathematics**, thanks to our specialized expert models in these domains.
 tags:
 - llm
 - text-generation
 - qwen2
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-3B-Instruct
   title: Qwen/Qwen2.5-3B-Instruct — model page (Hugging Face)
@@ -74,4 +82,10 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen2.5 3B Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned member of the Qwen2.5 series at the 3B size (3.09 billion parameters), which means the base model was trained further to follow instructions and hold a conversation. The card says the Qwen2.5 series ranges from 0.5 to 72 billion parameters.
+
+## What Sets It Apart
+
+Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. The card also states support for a context of up to 128K tokens and for over 29 languages.

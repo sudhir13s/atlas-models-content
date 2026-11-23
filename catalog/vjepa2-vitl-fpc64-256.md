@@ -14,6 +14,9 @@ tasks:
 - task/video-understanding
 parameters_active_b: 0.33
 total_parameters: 325971328
+summary: V-JEPA 2 is a video understanding model developed by FAIR at Meta. The card says it extends the pre-training objectives of the earlier V-JEPA model, and describes it as a model that represents videos and images as features for tasks such as classification and retrieval.
+intended_use: The card says V-JEPA 2 is intended to represent any video or image, in order to do video classification and retrieval or to act as a video encoder for vision-language models (VLMs).
+running_it: The card says to sample the number of frames according to the model, and that this checkpoint uses 64 frames. It asks for the latest Transformers, installed from the GitHub repository.
 fingerprint:
   attention_type: MHA
   num_layers: 24
@@ -42,12 +45,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: developed by FAIR, Meta
+  intended_use: V-JEPA 2 is intended to represent any video (and image) to perform video classification, retrieval, or as a video encoder for VLMs.
+  running_it: To load a video, sample the number of frames according to the model. For this model, we use 64.
 tags:
 - video-classification
 - vjepa2
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/facebook/vjepa2-vitl-fpc64-256
   title: facebook/vjepa2-vitl-fpc64-256 — model page (Hugging Face)
@@ -57,4 +64,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+V-JEPA 2 is a video understanding model developed by FAIR at Meta. The card says it extends the pre-training objectives of the earlier V-JEPA model, and describes it as a model that represents videos and images as features for tasks such as classification and retrieval.
+
+## Intended Use
+
+The card says V-JEPA 2 is intended to represent any video or image, in order to do video classification and retrieval or to act as a video encoder for vision-language models (VLMs).
+
+## Running It
+
+The card says to sample the number of frames according to the model, and that this checkpoint uses 64 frames. It asks for the latest Transformers, installed from the GitHub repository.

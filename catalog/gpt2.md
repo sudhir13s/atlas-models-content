@@ -13,6 +13,9 @@ tasks:
 parameters_active_b: 0.14
 total_parameters: 137022720
 context_window_tokens: 1024
+summary: GPT-2 is an English language model from OpenAI that writes text by repeatedly predicting the next word. This is the smallest version of GPT-2, with 124M parameters. The card says it was pretrained on a very large corpus of English text with a causal language modeling objective, and that the Hugging Face team extended the model card written by the release team.
+intended_use: 'The card says the raw model can be used for text generation or fine-tuned for a downstream task, and that it is best at what it was pretrained for: generating text from a prompt.'
+what_sets_it_apart: The card describes self-supervised pretraining on raw text with no human labels, where the target is the same text shifted one token to the right. A mask inside the model makes the prediction for each token use only the tokens before it, never the ones after. The card says this lets the model learn an internal representation of English that can also supply features for other tasks.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -46,13 +49,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: version of GPT-2, with 124M parameters.
+  intended_use: You can use the raw model for text generation or fine-tune it to a downstream task.
+  what_sets_it_apart: was trained to guess the next word in sentences
 tags:
 - llm
 - text-generation
 - gpt2
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/openai-community/gpt2
   title: openai-community/gpt2 — model page (Hugging Face)
@@ -65,4 +72,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+GPT-2 is an English language model from OpenAI that writes text by repeatedly predicting the next word. This is the smallest version of GPT-2, with 124M parameters. The card says it was pretrained on a very large corpus of English text with a causal language modeling objective, and that the Hugging Face team extended the model card written by the release team.
+
+## Intended Use
+
+The card says the raw model can be used for text generation or fine-tuned for a downstream task, and that it is best at what it was pretrained for: generating text from a prompt.
+
+## What Sets It Apart
+
+The card describes self-supervised pretraining on raw text with no human labels, where the target is the same text shifted one token to the right. A mask inside the model makes the prediction for each token use only the tokens before it, never the ones after. The card says this lets the model learn an internal representation of English that can also supply features for other tasks.

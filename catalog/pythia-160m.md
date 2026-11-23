@@ -16,6 +16,10 @@ tasks:
 parameters_active_b: 0.21
 total_parameters: 212654688
 context_window_tokens: 2048
+summary: Pythia-160M is a 160-million-parameter English language model from EleutherAI, part of the Pythia Scaling Suite, a collection built to support research on large language models, especially interpretability research (understanding how they work inside). This version was trained on the Pile, a large public text dataset.
+intended_use: EleutherAI says the primary intended use is research on the behavior, functionality and limitations of large language models, in a controlled setting. Out-of-scope uses are deployment as a product or in human-facing interactions, translation or text in languages other than English, and use as a chatbot like ChatGPT, since it was not fine-tuned to follow instructions.
+what_sets_it_apart: The card says all eight Pythia sizes were trained on the exact same data in the exact same order. Each size has two models, one trained on the Pile and one trained on the Pile after global deduplication, and each model has 154 intermediate checkpoints hosted as branches on Hugging Face.
+limitations: The card says never to rely on the model to produce factually accurate output. The Pile is known to contain profanity and offensive text, so the model may produce socially unacceptable text even when the prompt is not offensive, and the card advises a human to curate any outputs shown to others.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -49,13 +53,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: The Pythia model suite was deliberately designed to promote scientific research on large language models, especially interpretability research.
+  intended_use: The primary intended use of Pythia is research on the behavior, functionality, and limitations of large language models.
+  what_sets_it_apart: All 8 model sizes are trained on the exact same data, in the exact same order.
+  limitations: Never rely on Pythia-160M to produce factually accurate output.
 tags:
 - llm
 - text-generation
 - gpt-neox
 - dense
 - mha
-updated: '2026-11-20'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/EleutherAI/pythia-160m
   title: EleutherAI/pythia-160m — model page (Hugging Face)
@@ -74,4 +83,18 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Pythia-160M is a 160-million-parameter English language model from EleutherAI, part of the Pythia Scaling Suite, a collection built to support research on large language models, especially interpretability research (understanding how they work inside). This version was trained on the Pile, a large public text dataset.
+
+## Intended Use
+
+EleutherAI says the primary intended use is research on the behavior, functionality and limitations of large language models, in a controlled setting. Out-of-scope uses are deployment as a product or in human-facing interactions, translation or text in languages other than English, and use as a chatbot like ChatGPT, since it was not fine-tuned to follow instructions.
+
+## What Sets It Apart
+
+The card says all eight Pythia sizes were trained on the exact same data in the exact same order. Each size has two models, one trained on the Pile and one trained on the Pile after global deduplication, and each model has 154 intermediate checkpoints hosted as branches on Hugging Face.
+
+## Limitations
+
+The card says never to rely on the model to produce factually accurate output. The Pile is known to contain profanity and offensive text, so the model may produce socially unacceptable text even when the prompt is not offensive, and the card advises a human to curate any outputs shown to others.

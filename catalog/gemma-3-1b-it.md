@@ -13,6 +13,13 @@ model_category: language
 tasks:
 - task/text-generation
 total_parameters: 999885952
+base_models:
+- name: google/gemma-3-1b-pt
+  address: https://huggingface.co/google/gemma-3-1b-pt
+summary: Gemma 3 1B IT is the instruction-tuned 1-billion-parameter size of Gemma 3, a family of open models from Google DeepMind. Instruction-tuned means the pre-trained model, google/gemma-3-1b-pt, was trained further to follow instructions and hold a conversation. The family card lists support for over 140 languages and gives the 1B size a 32K-token input and output context. The Hugging Face card is gated, so this text follows Google's own Gemma 3 model card.
+intended_use: Google's card lists uses its creators considered, and says the list is not comprehensive. They include text generation (poems, scripts, code, marketing copy, email drafts), chatbots, text summarization and image data extraction, plus research and education uses such as language learning tools and exploring large bodies of text. The card points to the Gemma Prohibited Use Policy for uses that are not allowed.
+what_sets_it_apart: The card gives size-specific facts. The 1B size was trained on 2 trillion tokens of text, against 4, 12 and 14 trillion for the 4B, 12B and 27B sizes, and its context is 32K tokens against 128K for those larger sizes. The training data has a knowledge cutoff of August 2024 and includes web documents, code and content in over 140 languages.
+limitations: The card says the models may generate incorrect or outdated facts because they are not knowledge bases. It adds that they work better on tasks with clear prompts than on open-ended or highly complex ones, may miss nuance, sarcasm or figurative language, may lack common sense, and reflect gaps and biases in their training data.
 filters:
   size_category: tiny
   is_gated: true
@@ -29,10 +36,15 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: Total input context of 128K tokens for the 4B, 12B, and 27B sizes, and 32K tokens for the 1B and 270M sizes.
+  intended_use: 'Text Summarization: Generate concise summaries of a text corpus, research papers, or reports.'
+  what_sets_it_apart: the 1B with 2 trillion tokens, and the 270M with 6 trillion tokens.
+  limitations: They may generate incorrect or outdated factual statements.
 tags:
 - llm
 - text-generation
-updated: '2026-11-20'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google/gemma-3-1b-it
   title: google/gemma-3-1b-it — model page (Hugging Face)
@@ -121,6 +133,23 @@ sources:
 - url: https://arxiv.org/abs/2312.11805
   title: arXiv:2312.11805
   trust: 0.95
+- url: https://ai.google.dev/gemma/docs/core/model_card_3
+  title: Gemma 3 model card (Google AI for Developers)
+  trust: 0.95
 ---
 
+## Summary
 
+Gemma 3 1B IT is the instruction-tuned 1-billion-parameter size of Gemma 3, a family of open models from Google DeepMind. Instruction-tuned means the pre-trained model, google/gemma-3-1b-pt, was trained further to follow instructions and hold a conversation. The family card lists support for over 140 languages and gives the 1B size a 32K-token input and output context. The Hugging Face card is gated, so this text follows Google's own Gemma 3 model card.
+
+## Intended Use
+
+Google's card lists uses its creators considered, and says the list is not comprehensive. They include text generation (poems, scripts, code, marketing copy, email drafts), chatbots, text summarization and image data extraction, plus research and education uses such as language learning tools and exploring large bodies of text. The card points to the Gemma Prohibited Use Policy for uses that are not allowed.
+
+## What Sets It Apart
+
+The card gives size-specific facts. The 1B size was trained on 2 trillion tokens of text, against 4, 12 and 14 trillion for the 4B, 12B and 27B sizes, and its context is 32K tokens against 128K for those larger sizes. The training data has a knowledge cutoff of August 2024 and includes web documents, code and content in over 140 languages.
+
+## Limitations
+
+The card says the models may generate incorrect or outdated facts because they are not knowledge bases. It adds that they work better on tasks with clear prompts than on open-ended or highly complex ones, may miss nuance, sarcasm or figurative language, may lack common sense, and reflect gaps and biases in their training data.

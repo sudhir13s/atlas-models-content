@@ -14,6 +14,14 @@ tasks:
 - task/image-classification
 parameters_active_b: 0.09
 total_parameters: 85800194
+base_models:
+- name: google/vit-base-patch16-224-in21k
+  address: https://huggingface.co/google/vit-base-patch16-224-in21k
+summary: This is a third-party fine-tune, published under the Falconsai account on Hugging Face, of the Vision Transformer (ViT) google/vit-base-patch16-224-in21k, which was pre-trained on ImageNet-21k images at 224 by 224 pixels. It is an image classifier that sorts an image into one of two classes, "normal" or "nsfw" (not safe for work). The card says it was fine-tuned on a proprietary dataset of about 80,000 images.
+intended_use: The card names NSFW image classification as the primary use, for filtering explicit or inappropriate content in applications. It asks users to apply the model responsibly and ethically, following content guidelines and applicable regulations.
+what_sets_it_apart: The card describes a ViT as a transformer encoder, similar to BERT, adapted to image classification. It gives the fine-tuning settings as a batch size of 16 and a learning rate of 5e-5, on a proprietary two-class dataset it does not publish.
+running_it: 'The card shows two ways to use it: the Transformers image-classification pipeline, or loading the model directly with its image processor. It also includes an example of running an ONNX version with the onnxruntime library.'
+limitations: The card says performance may vary on tasks other than NSFW classification, and may depend on the quality and representativeness of the fine-tuning data. It tells users to check the model's suitability for their own application and data.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -45,12 +53,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: The model's training data includes a proprietary dataset comprising approximately 80,000 images.
+  intended_use: The primary intended use of this model is for the classification of NSFW (Not Safe for Work) images.
+  what_sets_it_apart: a learning rate of 5e-5 was employed
+  running_it: 'Here is how to use this model to classifiy an image based on 1 of 2 classes (normal,nsfw):'
+  limitations: its performance may vary when applied to other tasks.
 tags:
 - image-classification
 - vit
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Falconsai/nsfw_image_detection
   title: Falconsai/nsfw_image_detection — model page (Hugging Face)
@@ -66,4 +80,22 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+This is a third-party fine-tune, published under the Falconsai account on Hugging Face, of the Vision Transformer (ViT) google/vit-base-patch16-224-in21k, which was pre-trained on ImageNet-21k images at 224 by 224 pixels. It is an image classifier that sorts an image into one of two classes, "normal" or "nsfw" (not safe for work). The card says it was fine-tuned on a proprietary dataset of about 80,000 images.
+
+## Intended Use
+
+The card names NSFW image classification as the primary use, for filtering explicit or inappropriate content in applications. It asks users to apply the model responsibly and ethically, following content guidelines and applicable regulations.
+
+## What Sets It Apart
+
+The card describes a ViT as a transformer encoder, similar to BERT, adapted to image classification. It gives the fine-tuning settings as a batch size of 16 and a learning rate of 5e-5, on a proprietary two-class dataset it does not publish.
+
+## Running It
+
+The card shows two ways to use it: the Transformers image-classification pipeline, or loading the model directly with its image processor. It also includes an example of running an ONNX version with the onnxruntime library.
+
+## Limitations
+
+The card says performance may vary on tasks other than NSFW classification, and may depend on the quality and representativeness of the fine-tuning data. It tells users to check the model's suitability for their own application and data.

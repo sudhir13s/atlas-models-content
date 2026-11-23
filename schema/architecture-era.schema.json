@@ -134,6 +134,74 @@
         }
       }
     },
+    "visual": {
+      "$ref": "hyperparameter.schema.json#/$defs/distribution_visual",
+      "description": "A computed figure for the Worked Example: the consumer draws softmax bars from the example scores (attention scores, router scores), with `panel_titles` naming what each panel shows."
+    },
+    "comparison": {
+      "type": "object",
+      "description": "What changed from the approach that came before, as a small table: one row per aspect, each with its source.",
+      "additionalProperties": false,
+      "required": ["before", "after", "rows"],
+      "properties": {
+        "before": { "type": "string", "minLength": 1, "description": "the earlier approach, as a column heading" },
+        "after": { "type": "string", "minLength": 1, "description": "this architecture, as a column heading" },
+        "rows": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["aspect", "before", "after", "source"],
+            "properties": {
+              "aspect": { "type": "string", "minLength": 1 },
+              "before": { "type": "string", "minLength": 1 },
+              "after": { "type": "string", "minLength": 1 },
+              "source": { "type": "string", "format": "uri", "description": "the url of one entry of this record's sources" }
+            }
+          }
+        }
+      }
+    },
+    "key_numbers": {
+      "type": "object",
+      "description": "Published configuration numbers (the original paper's model sizes, or the expert counts of named models), as a table; every row names its source.",
+      "additionalProperties": false,
+      "required": ["columns", "rows"],
+      "properties": {
+        "columns": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "string", "minLength": 1 } },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["cells", "source"],
+            "properties": {
+              "cells": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "string", "minLength": 1 }, "description": "one cell per entry of columns, in the same order" },
+              "source": { "type": "string", "format": "uri", "description": "the url of one entry of this record's sources" }
+            }
+          }
+        }
+      }
+    },
+    "misunderstandings": {
+      "type": "array",
+      "description": "Common misreadings of the architecture, each corrected from a source.",
+      "minItems": 2,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["misunderstanding", "truth", "source"],
+        "properties": {
+          "misunderstanding": { "type": "string", "minLength": 1 },
+          "truth": { "type": "string", "minLength": 1, "description": "what is actually true; Markdown" },
+          "source": { "type": "string", "format": "uri", "description": "the url of one entry of this record's sources" }
+        }
+      }
+    },
     "learn_first": {
       "type": "array",
       "description": "Content-driven prerequisites (replaces the hardcoded PREREQS map).",

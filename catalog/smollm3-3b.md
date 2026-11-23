@@ -17,6 +17,12 @@ tasks:
 parameters_active_b: 3.08
 total_parameters: 3075098624
 context_window_tokens: 65536
+base_models:
+- name: HuggingFaceTB/SmolLM3-3B-Base
+  address: https://huggingface.co/HuggingFaceTB/SmolLM3-3B-Base
+summary: 'SmolLM3-3B is a 3-billion-parameter language model from Hugging Face''s HuggingFaceTB team. The card says it is a decoder-only transformer trained further from SmolLM3-3B-Base, and that it supports dual-mode reasoning, long context and six natively supported languages: English, French, Spanish, German, Italian and Portuguese.'
+what_sets_it_apart: The card says it was pretrained on 11.2 trillion tokens with a staged curriculum of web, code, maths and reasoning data, then given 140 billion tokens of reasoning mid-training, supervised fine-tuning and Anchored Preference Optimization. It uses GQA and NoPE (positions without a positional encoding) in a 3 to 1 ratio, and is described as fully open, with weights, data mixture and training configs published.
+running_it: The card recommends temperature=0.6 and top_p=0.95. Extended thinking is on by default and can be switched with the /think and /no_think flags in the system prompt or the enable_thinking setting. The config is set for 65,536 tokens, and longer inputs up to 128k use YaRN.
 fingerprint:
   attention_type: GQA
   num_layers: 36
@@ -52,13 +58,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: SmolLM3 is a 3B parameter language model designed to push the boundaries of small models.
+  what_sets_it_apart: The model is a decoder-only transformer using GQA and NoPE (with 3:1 ratio)
+  running_it: We recommend setting `temperature=0.6` and `top_p=0.95` in the sampling parameters.
 tags:
 - llm
 - text-generation
 - smollm3
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
   title: HuggingFaceTB/SmolLM3-3B — model page (Hugging Face)
@@ -71,4 +81,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+SmolLM3-3B is a 3-billion-parameter language model from Hugging Face's HuggingFaceTB team. The card says it is a decoder-only transformer trained further from SmolLM3-3B-Base, and that it supports dual-mode reasoning, long context and six natively supported languages: English, French, Spanish, German, Italian and Portuguese.
+
+## What Sets It Apart
+
+The card says it was pretrained on 11.2 trillion tokens with a staged curriculum of web, code, maths and reasoning data, then given 140 billion tokens of reasoning mid-training, supervised fine-tuning and Anchored Preference Optimization. It uses GQA and NoPE (positions without a positional encoding) in a 3 to 1 ratio, and is described as fully open, with weights, data mixture and training configs published.
+
+## Running It
+
+The card recommends temperature=0.6 and top_p=0.95. Extended thinking is on by default and can be switched with the /think and /no_think flags in the system prompt or the enable_thinking setting. The config is set for 65,536 tokens, and longer inputs up to 128k use YaRN.

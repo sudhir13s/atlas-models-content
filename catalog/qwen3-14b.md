@@ -16,6 +16,12 @@ tasks:
 parameters_active_b: 14.77
 total_parameters: 14768307200
 context_window_tokens: 40960
+base_models:
+- name: Qwen/Qwen3-14B-Base
+  address: https://huggingface.co/Qwen/Qwen3-14B-Base
+summary: Qwen3-14B is a 14.8B-parameter language model from Qwen, part of the Qwen3 generation of dense and mixture-of-experts models. It was post-trained from Qwen/Qwen3-14B-Base. The card lists a context of 32,768 tokens natively and 131,072 tokens with YaRN, and support for 100+ languages and dialects.
+what_sets_it_apart: Qwen says it supports switching between a thinking mode, for complex logic, math and coding, and a non-thinking mode, for efficient general dialogue, within a single model. It also claims better reasoning than the earlier QwQ and Qwen2.5 instruct models on mathematics, code generation and commonsense reasoning, and stronger agent abilities for working with external tools.
+running_it: The card gives different sampling settings per mode. Thinking mode uses temperature 0.6, top_p 0.95, top_k 20 and min_p 0, and greedy decoding should not be used. Non-thinking mode, selected with enable_thinking=False, uses temperature 0.7, top_p 0.8, top_k 20 and min_p 0. It recommends an output length of 32,768 tokens for most queries. For inputs beyond 32,768 tokens it describes enabling YaRN, a technique for extending the length a model handles, but warns that its static form may affect shorter texts.
 fingerprint:
   attention_type: GQA
   num_layers: 40
@@ -57,13 +63,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: Qwen3 is the latest generation of large language models in Qwen series, offering a comprehensive suite of dense and mixture-of-experts (MoE) models.
+  what_sets_it_apart: Uniquely support of seamless switching between thinking mode
+  running_it: '**DO NOT use greedy decoding**, as it can lead to performance degradation and endless repetitions.'
 tags:
 - llm
 - text-generation
 - qwen3
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-14B
   title: Qwen/Qwen3-14B — model page (Hugging Face)
@@ -82,4 +92,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen3-14B is a 14.8B-parameter language model from Qwen, part of the Qwen3 generation of dense and mixture-of-experts models. It was post-trained from Qwen/Qwen3-14B-Base. The card lists a context of 32,768 tokens natively and 131,072 tokens with YaRN, and support for 100+ languages and dialects.
+
+## What Sets It Apart
+
+Qwen says it supports switching between a thinking mode, for complex logic, math and coding, and a non-thinking mode, for efficient general dialogue, within a single model. It also claims better reasoning than the earlier QwQ and Qwen2.5 instruct models on mathematics, code generation and commonsense reasoning, and stronger agent abilities for working with external tools.
+
+## Running It
+
+The card gives different sampling settings per mode. Thinking mode uses temperature 0.6, top_p 0.95, top_k 20 and min_p 0, and greedy decoding should not be used. Non-thinking mode, selected with enable_thinking=False, uses temperature 0.7, top_p 0.8, top_k 20 and min_p 0. It recommends an output length of 32,768 tokens for most queries. For inputs beyond 32,768 tokens it describes enabling YaRN, a technique for extending the length a model handles, but warns that its static form may affect shorter texts.

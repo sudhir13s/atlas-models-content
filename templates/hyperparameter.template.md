@@ -23,16 +23,19 @@ scale:                           # only for a numeric setting; the axis of the e
   typical_min: <number>          # the band the typical_values span
   typical_max: <number>
   spacing: linear                # linear | log (log needs min > 0); write decimals, not 2e-5
+options:                         # INSTEAD of scale, for a switch or a named choice; effects may then be left out
+  - value: "<the value as written in a configuration>"
+    effect: "<what choosing it does>"
 typical_values:                  # who used what; every row has its source
   - setting: "<who, for what>"
-    value: "<value>"
+    value: "<value>"             # one plain number (0.9, 50, 1e-3) is also marked on the scale
     source: "<url of one entry of sources>"
 mistakes:                        # 2 to 5, each traceable to a source or to the mechanism on the page
   - mistake: "<what people do>"
     why: "<why it goes wrong>"
     fix: "<what to do instead>"
 visual:                          # optional second figure, computed by the site from these values
-  kind: schedule                 # schedule | distribution; fields per kind in the schema
+  kind: schedule                 # schedule | distribution | beams; fields per kind in the schema
   peak: <number>
   warmup_steps: <int>
   total_steps: <int>

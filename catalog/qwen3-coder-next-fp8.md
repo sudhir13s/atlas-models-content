@@ -17,6 +17,10 @@ tasks:
 - task/tool-calling-models
 total_parameters: 79674391296
 context_window_tokens: 262144
+summary: Qwen3-Coder-Next-FP8 is an FP8-quantized copy of Qwen3-Coder-Next, an open-weight language model from Qwen for coding agents and local development. FP8 means the weights are stored as 8-bit floating-point numbers to shrink the model; the card names the method as fine-grained FP8 with a block size of 128. The card lists 80B parameters in total with 3B activated, and a native context length of 262,144 tokens.
+intended_use: The card says the model is designed specifically for coding agents and local development. It says the 256k context and adaptability to different scaffold templates let it work with various command-line and IDE platforms.
+what_sets_it_apart: Qwen claims that, with only 3B of its 80B parameters activated, it reaches performance comparable to models with 10 to 20 times more active parameters. The layout alternates Gated DeltaNet and Gated Attention layers, each followed by a mixture-of-experts layer with 512 experts, 10 of them activated plus 1 shared. The card says it supports only non-thinking mode, and that the results in the card come from the original bfloat16 model before FP8 quantization.
+running_it: The card advises using the latest Transformers library, or the latest SGLang or vLLM for an OpenAI-compatible endpoint. It says that if memory runs out, the context length can be reduced, for example to 32,768 tokens. The quantization settings are in the quantization_config field of config.json.
 fingerprint:
   attention_type: GQA
   num_layers: 48
@@ -55,13 +59,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This repository contains the **FP8-quantized Qwen3-Coder-Next** model checkpoint for convenience and performance.
+  intended_use: an open-weight language model designed specifically for coding agents and local development
+  what_sets_it_apart: With only 3B activated parameters (80B total parameters), it achieves performance comparable to models with 10–20x more active parameters
+  running_it: If you encounter out-of-memory (OOM) issues, consider reducing the context length to a shorter value, such as `32,768`.
 tags:
 - llm
 - text-generation
 - qwen3-next
 - moe
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-Coder-Next-FP8
   title: Qwen/Qwen3-Coder-Next-FP8 — model page (Hugging Face)
@@ -71,4 +80,18 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen3-Coder-Next-FP8 is an FP8-quantized copy of Qwen3-Coder-Next, an open-weight language model from Qwen for coding agents and local development. FP8 means the weights are stored as 8-bit floating-point numbers to shrink the model; the card names the method as fine-grained FP8 with a block size of 128. The card lists 80B parameters in total with 3B activated, and a native context length of 262,144 tokens.
+
+## Intended Use
+
+The card says the model is designed specifically for coding agents and local development. It says the 256k context and adaptability to different scaffold templates let it work with various command-line and IDE platforms.
+
+## What Sets It Apart
+
+Qwen claims that, with only 3B of its 80B parameters activated, it reaches performance comparable to models with 10 to 20 times more active parameters. The layout alternates Gated DeltaNet and Gated Attention layers, each followed by a mixture-of-experts layer with 512 experts, 10 of them activated plus 1 shared. The card says it supports only non-thinking mode, and that the results in the card come from the original bfloat16 model before FP8 quantization.
+
+## Running It
+
+The card advises using the latest Transformers library, or the latest SGLang or vLLM for an OpenAI-compatible endpoint. It says that if memory runs out, the context length can be reduced, for example to 32,768 tokens. The quantization settings are in the quantization_config field of config.json.

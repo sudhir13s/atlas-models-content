@@ -11,6 +11,9 @@ tasks:
 - task/depth-estimation
 parameters_active_b: 0.34
 total_parameters: 341850305
+summary: DPT-Large, also known as MiDaS 3.0, is a depth estimation model from Intel. From a single ordinary photo it predicts how far away each part of the scene is, a task called monocular depth estimation. The card says it is a Dense Prediction Transformer trained on 1.4 million images.
+intended_use: The card lists zero-shot monocular depth estimation as the primary use, for anyone doing that task. It says that in most cases the model will need to be fine-tuned for a particular task, and that it should not be used to intentionally create hostile or alienating environments for people.
+what_sets_it_apart: The card says DPT uses a Vision Transformer (ViT) as its backbone and adds a neck and a head on top to produce the depth map.
 fingerprint:
   attention_type: MHA
   num_layers: 24
@@ -40,12 +43,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: Dense Prediction Transformer (DPT) model trained on 1.4 million images for monocular depth estimation.
+  intended_use: This model in most cases will need to be fine-tuned for your particular task.
+  what_sets_it_apart: DPT uses the Vision Transformer (ViT) as backbone and adds a neck + head on top for monocular depth estimation.
 tags:
 - depth-estimation
 - dpt
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Intel/dpt-large
   title: Intel/dpt-large — model page (Hugging Face)
@@ -58,4 +65,14 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+DPT-Large, also known as MiDaS 3.0, is a depth estimation model from Intel. From a single ordinary photo it predicts how far away each part of the scene is, a task called monocular depth estimation. The card says it is a Dense Prediction Transformer trained on 1.4 million images.
+
+## Intended Use
+
+The card lists zero-shot monocular depth estimation as the primary use, for anyone doing that task. It says that in most cases the model will need to be fine-tuned for a particular task, and that it should not be used to intentionally create hostile or alienating environments for people.
+
+## What Sets It Apart
+
+The card says DPT uses a Vision Transformer (ViT) as its backbone and adds a neck and a head on top to produce the depth map.

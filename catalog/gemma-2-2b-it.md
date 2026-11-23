@@ -13,6 +13,12 @@ model_category: language
 tasks:
 - task/text-generation
 total_parameters: 2614341888
+base_models:
+- name: google/gemma-2-2b
+  address: https://huggingface.co/google/gemma-2-2b
+summary: Gemma 2 2B IT is a text-generation model from Google, the instruction-tuned version of the 2B size of the Gemma 2 family. Instruction-tuned means it was trained further to follow requests and hold a conversation. The card describes Gemma models as text-to-text, decoder-only large language models, available in English, with open weights.
+intended_use: 'The card lists content creation and communication: text generation such as poems, scripts, code, marketing copy and email drafts, chatbots and conversational AI, and text summarization. For research and education it lists natural language processing research, language learning tools and knowledge exploration. It says the list is not comprehensive and that its small size makes deployment possible on a laptop, a desktop or a user''s own cloud.'
+what_sets_it_apart: The card says the Gemma family is built from the same research and technology used to create Google's Gemini models, and that open weights are released for both pre-trained and instruction-tuned variants.
 filters:
   size_category: small
   is_gated: true
@@ -35,10 +41,14 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: They are text-to-text, decoder-only large language models, available in English,
+  intended_use: 'Chatbots and Conversational AI: Power conversational interfaces for customer'
+  what_sets_it_apart: built from the same research and technology used to create the Gemini models.
 tags:
 - llm
 - text-generation
-updated: '2026-11-20'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google/gemma-2-2b-it
   title: google/gemma-2-2b-it — model page (Hugging Face)
@@ -120,4 +130,14 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Gemma 2 2B IT is a text-generation model from Google, the instruction-tuned version of the 2B size of the Gemma 2 family. Instruction-tuned means it was trained further to follow requests and hold a conversation. The card describes Gemma models as text-to-text, decoder-only large language models, available in English, with open weights.
+
+## Intended Use
+
+The card lists content creation and communication: text generation such as poems, scripts, code, marketing copy and email drafts, chatbots and conversational AI, and text summarization. For research and education it lists natural language processing research, language learning tools and knowledge exploration. It says the list is not comprehensive and that its small size makes deployment possible on a laptop, a desktop or a user's own cloud.
+
+## What Sets It Apart
+
+The card says the Gemma family is built from the same research and technology used to create Google's Gemini models, and that open weights are released for both pre-trained and instruction-tuned variants.

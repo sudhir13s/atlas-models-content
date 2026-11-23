@@ -15,6 +15,13 @@ tasks:
 - task/text-generation
 parameters_active_b: 7.22
 total_parameters: 7217189760
+base_models:
+- name: tiiuae/falcon-7b
+  address: https://huggingface.co/tiiuae/falcon-7b
+summary: Falcon-7B-Instruct is a chat model built by TII. The card says it is based on TII's own Falcon-7B model, which TII fine-tuned on a mixture of chat and instruction datasets so that it answers questions and follows requests. The card calls it a causal decoder-only model with 7 billion parameters, meaning it reads text and predicts the next word, and lists English and French as its languages.
+intended_use: The card says it is for direct use as a chat or instruction model, fine-tuned on a mixture of instruct and chat datasets. It names production use without adequate assessment of risks and mitigation, and any irresponsible or harmful use, as out of scope, and advises users to build guardrails.
+what_sets_it_apart: The card says the architecture is optimized for inference, using FlashAttention and multiquery attention, two techniques that make attention cheaper to compute and its memory smaller. It states the Falcon-7B base was trained on 1,500B tokens of RefinedWeb, a web-crawl dataset, plus curated corpora, and that the instruct version was fine-tuned on a mixture of about 250M tokens of chat and instruction data.
+running_it: The card says you need at least 16GB of memory to run inference swiftly and PyTorch 2.0 to use it with Transformers. It also says this instruct model may not be ideal for further fine-tuning, and suggests starting from Falcon-7B to build your own chat model.
 fingerprint:
   attention_type: MQA
   num_layers: 32
@@ -44,13 +51,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: Falcon-7B-Instruct is a 7B parameters causal decoder-only model built by [TII](https://www.tii.ae) based on [Falcon-7B](https://huggingface.co/tiiuae/falcon-7b) and finetuned on a mixture of chat/instruct datasets.
+  intended_use: Production use without adequate assessment of risks and mitigation; any use cases which may be considered irresponsible or harmful.
+  what_sets_it_apart: It features an architecture optimized for inference
+  running_it: You will need **at least 16GB of memory** to swiftly run inference with Falcon-7B-Instruct.
 tags:
 - llm
 - text-generation
 - falcon
 - dense
 - mqa
-updated: '2026-11-20'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/tiiuae/falcon-7b-instruct
   title: tiiuae/falcon-7b-instruct — model page (Hugging Face)
@@ -75,4 +87,18 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Falcon-7B-Instruct is a chat model built by TII. The card says it is based on TII's own Falcon-7B model, which TII fine-tuned on a mixture of chat and instruction datasets so that it answers questions and follows requests. The card calls it a causal decoder-only model with 7 billion parameters, meaning it reads text and predicts the next word, and lists English and French as its languages.
+
+## Intended Use
+
+The card says it is for direct use as a chat or instruction model, fine-tuned on a mixture of instruct and chat datasets. It names production use without adequate assessment of risks and mitigation, and any irresponsible or harmful use, as out of scope, and advises users to build guardrails.
+
+## What Sets It Apart
+
+The card says the architecture is optimized for inference, using FlashAttention and multiquery attention, two techniques that make attention cheaper to compute and its memory smaller. It states the Falcon-7B base was trained on 1,500B tokens of RefinedWeb, a web-crawl dataset, plus curated corpora, and that the instruct version was fine-tuned on a mixture of about 250M tokens of chat and instruction data.
+
+## Running It
+
+The card says you need at least 16GB of memory to run inference swiftly and PyTorch 2.0 to use it with Transformers. It also says this instruct model may not be ideal for further fine-tuning, and suggests starting from Falcon-7B to build your own chat model.

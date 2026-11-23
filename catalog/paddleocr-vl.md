@@ -16,6 +16,12 @@ tasks:
 parameters_active_b: 0.96
 total_parameters: 958588736
 context_window_tokens: 131072
+base_models:
+- name: baidu/ERNIE-4.5-0.3B-Paddle
+  address: https://huggingface.co/baidu/ERNIE-4.5-0.3B-Paddle
+summary: 'PaddleOCR-VL is a document parsing model from PaddlePaddle: it reads an image of a page and recognizes its text, tables, formulas and charts. Its core component is PaddleOCR-VL-0.9B, a vision-language model, meaning a model that reads images and writes text, which joins a NaViT-style dynamic-resolution visual encoder with the ERNIE-4.5-0.3B language model. The card states support for 109 languages.'
+intended_use: The card presents it for document parsing at page level and for recognizing individual elements such as text, tables, formulas and charts. It says the content types it handles include handwritten text and historical documents.
+what_sets_it_apart: 'The card describes a compact design made for resource-efficient inference: a visual encoder that takes images at dynamic high resolution, paired with a lightweight language model, ERNIE-4.5-0.3B. The card lists the 109 languages as covering Chinese, English, Japanese, Latin and Korean, plus Cyrillic, Arabic, Devanagari and Thai scripts.'
 fingerprint:
   attention_type: GQA
   num_layers: 18
@@ -49,12 +55,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: integrates a NaViT-style dynamic resolution visual encoder with the ERNIE-4.5-0.3B language model
+  intended_use: model tailored for document parsing
+  what_sets_it_apart: specifically designed for resource-efficient inference
 tags:
 - image-text-to-text
 - paddleocr-vl
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/PaddlePaddle/PaddleOCR-VL
   title: PaddlePaddle/PaddleOCR-VL — model page (Hugging Face)
@@ -67,4 +77,14 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+PaddleOCR-VL is a document parsing model from PaddlePaddle: it reads an image of a page and recognizes its text, tables, formulas and charts. Its core component is PaddleOCR-VL-0.9B, a vision-language model, meaning a model that reads images and writes text, which joins a NaViT-style dynamic-resolution visual encoder with the ERNIE-4.5-0.3B language model. The card states support for 109 languages.
+
+## Intended Use
+
+The card presents it for document parsing at page level and for recognizing individual elements such as text, tables, formulas and charts. It says the content types it handles include handwritten text and historical documents.
+
+## What Sets It Apart
+
+The card describes a compact design made for resource-efficient inference: a visual encoder that takes images at dynamic high resolution, paired with a lightweight language model, ERNIE-4.5-0.3B. The card lists the 109 languages as covering Chinese, English, Japanese, Latin and Korean, plus Cyrillic, Arabic, Devanagari and Thai scripts.

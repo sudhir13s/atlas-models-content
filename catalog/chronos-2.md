@@ -14,6 +14,9 @@ tasks:
 - task/time-series-forecasting
 parameters_active_b: 0.12
 total_parameters: 119477664
+summary: Chronos-2 is a time series forecasting model from Amazon. A time series is a sequence of measurements over time, such as electricity prices, and a forecasting model predicts its future values. The card describes it as a 120-million-parameter model that forecasts without task-specific training, which is called zero-shot, and its table lists a maximum context length of 8192 and a maximum prediction length of 1024.
+intended_use: The card presents it for zero-shot forecasting. One model handles a single series (univariate), several series at once (multivariate), and forecasts informed by extra related inputs called covariates, such as known future values. The card says it runs on both GPU and CPU.
+what_sets_it_apart: The card describes an encoder-only design inspired by the T5 encoder that produces multi-step forecasts as quantiles, meaning a range of likely values rather than one number. A group attention mechanism lets the model learn from related series and covariates given in the input. The comparison table in the card lists cross-learning across items and multivariate forecasting as supported by Chronos-2 and not by Chronos-Bolt or the original Chronos. Training used real-world and large-scale synthetic datasets.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -46,12 +49,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: a 120M-parameter, encoder-only time series foundation model for zero-shot forecasting
+  intended_use: tasks within a single architecture
+  what_sets_it_apart: uses a group attention mechanism for efficient in-context learning across related series and covariates
 tags:
 - time-series-forecasting
 - t5
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/amazon/chronos-2
   title: amazon/chronos-2 — model page (Hugging Face)
@@ -67,4 +74,14 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Chronos-2 is a time series forecasting model from Amazon. A time series is a sequence of measurements over time, such as electricity prices, and a forecasting model predicts its future values. The card describes it as a 120-million-parameter model that forecasts without task-specific training, which is called zero-shot, and its table lists a maximum context length of 8192 and a maximum prediction length of 1024.
+
+## Intended Use
+
+The card presents it for zero-shot forecasting. One model handles a single series (univariate), several series at once (multivariate), and forecasts informed by extra related inputs called covariates, such as known future values. The card says it runs on both GPU and CPU.
+
+## What Sets It Apart
+
+The card describes an encoder-only design inspired by the T5 encoder that produces multi-step forecasts as quantiles, meaning a range of likely values rather than one number. A group attention mechanism lets the model learn from related series and covariates given in the input. The comparison table in the card lists cross-learning across items and multivariate forecasting as supported by Chronos-2 and not by Chronos-Bolt or the original Chronos. Training used real-world and large-scale synthetic datasets.

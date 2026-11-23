@@ -13,6 +13,9 @@ model_category: language
 tasks:
 - task/text-generation
 total_parameters: 312517632
+summary: T5Gemma is a family of encoder-decoder research models from Google. An encoder-decoder model reads the whole input with one network and writes the output with a second one, which suits tasks such as translation or summarization. This checkpoint is the Small-Small variant pre-trained with the PrefixLM objective, as its name indicates, and the card says the family is text-to-text and available in English with open weights.
+intended_use: The card says T5Gemma models are well suited to generative tasks such as question answering, summarization and reasoning, while their encoders can be used for discriminative tasks such as classification and understanding. It adds that the models are small enough to run on laptops, desktops or your own cloud.
+what_sets_it_apart: The card says T5Gemma models are made by adapting pretrained decoder-only models into encoder-decoder models, so that they inherit the decoder-only models' abilities while offering a more favorable quality-efficiency trade-off. It says the encoder and decoder can be paired at different sizes, for example a 9B encoder with a 2B decoder.
 filters:
   size_category: tiny
   is_gated: true
@@ -29,10 +32,14 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: T5Gemma is a family of lightweight yet powerful encoder-decoder research models from Google.
+  intended_use: T5Gemma models are well-suited for a variety of generative tasks, including question answering, summarization, and reasoning.
+  what_sets_it_apart: These models are created by adapting pretrained decoder-only models into a encoder-decoder.
 tags:
 - llm
 - text-generation
-updated: '2026-11-20'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google/t5gemma-s-s-prefixlm
   title: google/t5gemma-s-s-prefixlm — model page (Hugging Face)
@@ -81,4 +88,14 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+T5Gemma is a family of encoder-decoder research models from Google. An encoder-decoder model reads the whole input with one network and writes the output with a second one, which suits tasks such as translation or summarization. This checkpoint is the Small-Small variant pre-trained with the PrefixLM objective, as its name indicates, and the card says the family is text-to-text and available in English with open weights.
+
+## Intended Use
+
+The card says T5Gemma models are well suited to generative tasks such as question answering, summarization and reasoning, while their encoders can be used for discriminative tasks such as classification and understanding. It adds that the models are small enough to run on laptops, desktops or your own cloud.
+
+## What Sets It Apart
+
+The card says T5Gemma models are made by adapting pretrained decoder-only models into encoder-decoder models, so that they inherit the decoder-only models' abilities while offering a more favorable quality-efficiency trade-off. It says the encoder and decoder can be paired at different sizes, for example a 9B encoder with a 2B decoder.

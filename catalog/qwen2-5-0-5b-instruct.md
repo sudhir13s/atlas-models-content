@@ -16,6 +16,12 @@ tasks:
 parameters_active_b: 0.49
 total_parameters: 494032768
 context_window_tokens: 32768
+base_models:
+- name: Qwen/Qwen2.5-0.5B
+  address: https://huggingface.co/Qwen/Qwen2.5-0.5B
+summary: Qwen2.5 0.5B Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned member of the Qwen2.5 series at the 0.5B size, which means the base model was trained further to follow instructions and hold a conversation. The card lists 0.49B parameters and 24 layers, and says the Qwen2.5 series ranges from 0.5 to 72 billion parameters.
+what_sets_it_apart: Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. For this size the card lists a full context of 32,768 tokens with generation up to 8192 tokens, and support for over 29 languages.
+running_it: 'The card says the model needs a recent version of the Hugging Face transformers library: with versions older than 4.37.0 loading fails with a KeyError on the name qwen2.'
 fingerprint:
   attention_type: GQA
   num_layers: 24
@@ -52,13 +58,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This repo contains the instruction-tuned 0.5B Qwen2.5 model
+  what_sets_it_apart: Significantly **more knowledge** and has greatly improved capabilities in **coding** and **mathematics**, thanks to our specialized expert models in these domains.
+  running_it: 'With `transformers<4.37.0`, you will encounter the following error:'
 tags:
 - llm
 - text-generation
 - qwen2
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct
   title: Qwen/Qwen2.5-0.5B-Instruct — model page (Hugging Face)
@@ -74,4 +84,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen2.5 0.5B Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned member of the Qwen2.5 series at the 0.5B size, which means the base model was trained further to follow instructions and hold a conversation. The card lists 0.49B parameters and 24 layers, and says the Qwen2.5 series ranges from 0.5 to 72 billion parameters.
+
+## What Sets It Apart
+
+Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. For this size the card lists a full context of 32,768 tokens with generation up to 8192 tokens, and support for over 29 languages.
+
+## Running It
+
+The card says the model needs a recent version of the Hugging Face transformers library: with versions older than 4.37.0 loading fails with a KeyError on the name qwen2.

@@ -15,6 +15,10 @@ tasks:
 parameters_active_b: 0.28
 total_parameters: 278812163
 context_window_tokens: 512
+summary: 'This is a third-party fine-tune, published under the MoritzLaurer account on Hugging Face, of Microsoft''s mDeBERTa-v3-base. It performs natural language inference (NLI): given a premise and a hypothesis, it says whether the premise entails the hypothesis, is neutral to it, or contradicts it. The card says it covers 100 languages and can also do multilingual zero-shot classification, which sorts a text into labels you supply without task-specific training.'
+intended_use: The card presents it for natural language inference and zero-shot classification, with examples that check an English hypothesis against a German text. Its training mix pairs English hypotheses with premises in other languages so that users can write a hypothesis in English for a text in another language.
+what_sets_it_apart: The card says the underlying mDeBERTa-v3-base was pre-trained by Microsoft on 100 languages and then fine-tuned on the XNLI dataset and on a 26-language NLI dataset of more than 2.7 million pairs, with English added for 27 languages in all. That dataset was made by machine-translating English NLI datasets (MultiNLI, Fever-NLI, ANLI, LingNLI and WANLI). Bulgarian, Greek and Thai were kept out of NLI training so that cross-lingual transfer could be tested.
+limitations: The card says the multilingual dataset was machine-translated, which lowers data quality for a complex task like NLI. It adds that performance on languages seen only in pre-training, not in NLI fine-tuning, is most likely lower. It points to the DeBERTa-V3 paper and NLI literature for potential biases.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -48,13 +52,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This multilingual model can perform natural language inference (NLI) on 100 languages and is therefore also suitable for multilingual zero-shot classification.
+  intended_use: This mix of languages in the text pairs should enable users to formulate a hypothesis in English for a target text in another language.
+  what_sets_it_apart: was created using the latest open-source machine translation models
+  limitations: which reduces the quality of the data for a complex task like NLI
 tags:
 - llm
 - zero-shot-classification
 - deberta-v2
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7
   title: MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7 — model page (Hugging Face)
@@ -79,4 +88,18 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+This is a third-party fine-tune, published under the MoritzLaurer account on Hugging Face, of Microsoft's mDeBERTa-v3-base. It performs natural language inference (NLI): given a premise and a hypothesis, it says whether the premise entails the hypothesis, is neutral to it, or contradicts it. The card says it covers 100 languages and can also do multilingual zero-shot classification, which sorts a text into labels you supply without task-specific training.
+
+## Intended Use
+
+The card presents it for natural language inference and zero-shot classification, with examples that check an English hypothesis against a German text. Its training mix pairs English hypotheses with premises in other languages so that users can write a hypothesis in English for a text in another language.
+
+## What Sets It Apart
+
+The card says the underlying mDeBERTa-v3-base was pre-trained by Microsoft on 100 languages and then fine-tuned on the XNLI dataset and on a 26-language NLI dataset of more than 2.7 million pairs, with English added for 27 languages in all. That dataset was made by machine-translating English NLI datasets (MultiNLI, Fever-NLI, ANLI, LingNLI and WANLI). Bulgarian, Greek and Thai were kept out of NLI training so that cross-lingual transfer could be tested.
+
+## Limitations
+
+The card says the multilingual dataset was machine-translated, which lowers data quality for a complex task like NLI. It adds that performance on languages seen only in pre-training, not in NLI fine-tuning, is most likely lower. It points to the DeBERTa-V3 paper and NLI literature for potential biases.

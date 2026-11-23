@@ -15,6 +15,12 @@ tasks:
 parameters_active_b: 0.28
 total_parameters: 278220802
 context_window_tokens: 512
+base_models:
+- name: microsoft/mdeberta-v3-base
+  address: https://huggingface.co/microsoft/mdeberta-v3-base
+summary: 'mdeberta-v3-base-squad2 is an extractive question-answering model: given a question and a passage, it returns the stretch of the passage that answers the question. It was published on Hugging Face by timpal0l, not by the makers of the underlying model, and the card says it was fine-tuned for 3 epochs on SQuAD2.0, a question-answering dataset. Its base model is microsoft/mdeberta-v3-base, a multilingual DeBERTa model.'
+intended_use: The card says the model can be used for extractive question answering, with a short example that asks where someone lives and gets back the answer span from a given sentence.
+what_sets_it_apart: The card describes mDeBERTa as the multilingual version of DeBERTa, with the same structure and trained on CC100 multilingual data. DeBERTaV3, the version behind it, is pre-trained with an ELECTRA-style method and gradient-disentangled embedding sharing. The card does not report any distinguishing change made by this fine-tune beyond training on SQuAD2.0.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -48,13 +54,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: It has been finetuned for 3 epochs on [SQuAD2.0](https://rajpurkar.github.io/SQuAD-explorer/).
+  intended_use: This model can be used for Extractive QA
+  what_sets_it_apart: mDeBERTa is multilingual version of DeBERTa which use the same structure as DeBERTa and was trained with CC100 multilingual data.
 tags:
 - llm
 - question-answering
 - deberta-v2
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/timpal0l/mdeberta-v3-base-squad2
   title: timpal0l/mdeberta-v3-base-squad2 — model page (Hugging Face)
@@ -73,4 +83,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+mdeberta-v3-base-squad2 is an extractive question-answering model: given a question and a passage, it returns the stretch of the passage that answers the question. It was published on Hugging Face by timpal0l, not by the makers of the underlying model, and the card says it was fine-tuned for 3 epochs on SQuAD2.0, a question-answering dataset. Its base model is microsoft/mdeberta-v3-base, a multilingual DeBERTa model.
+
+## Intended Use
+
+The card says the model can be used for extractive question answering, with a short example that asks where someone lives and gets back the answer span from a given sentence.
+
+## What Sets It Apart
+
+The card describes mDeBERTa as the multilingual version of DeBERTa, with the same structure and trained on CC100 multilingual data. DeBERTaV3, the version behind it, is pre-trained with an ELECTRA-style method and gradient-disentangled embedding sharing. The card does not report any distinguishing change made by this fine-tune beyond training on SQuAD2.0.

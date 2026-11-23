@@ -16,6 +16,8 @@ tasks:
 parameters_active_b: 8.83
 total_parameters: 8829407232
 context_window_tokens: 4096
+summary: Yi-1.5-9B-Chat is the 9B chat model of Yi-1.5, a language model family from 01.AI. The card describes Yi-1.5 as an upgraded version of Yi that was continuously pre-trained on a 500B-token corpus and fine-tuned on 3M diverse fine-tuning samples. It lists context lengths of 4K, 16K and 32K and 3.6T pre-trained tokens for the Yi-1.5 family.
+what_sets_it_apart: The card says that, compared with Yi, Yi-1.5 delivers stronger performance in coding, math, reasoning and instruction following while keeping its strengths in language understanding, commonsense reasoning and reading comprehension. It describes this as the result of continued pre-training on Yi followed by fine-tuning.
 fingerprint:
   attention_type: GQA
   num_layers: 48
@@ -52,13 +54,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: Yi-1.5 is an upgraded version of Yi.
+  what_sets_it_apart: Compared with Yi, Yi-1.5 delivers stronger performance in coding, math, reasoning, and instruction-following capability
 tags:
 - llm
 - text-generation
 - llama
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/01-ai/Yi-1.5-9B-Chat
   title: 01-ai/Yi-1.5-9B-Chat — model page (Hugging Face)
@@ -74,4 +79,10 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Yi-1.5-9B-Chat is the 9B chat model of Yi-1.5, a language model family from 01.AI. The card describes Yi-1.5 as an upgraded version of Yi that was continuously pre-trained on a 500B-token corpus and fine-tuned on 3M diverse fine-tuning samples. It lists context lengths of 4K, 16K and 32K and 3.6T pre-trained tokens for the Yi-1.5 family.
+
+## What Sets It Apart
+
+The card says that, compared with Yi, Yi-1.5 delivers stronger performance in coding, math, reasoning and instruction following while keeping its strengths in language understanding, commonsense reasoning and reading comprehension. It describes this as the result of continued pre-training on Yi followed by fine-tuning.

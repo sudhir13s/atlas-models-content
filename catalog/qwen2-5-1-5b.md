@@ -16,6 +16,10 @@ tasks:
 parameters_active_b: 1.54
 total_parameters: 1543714304
 context_window_tokens: 131072
+summary: Qwen2.5-1.5B is the base, pretrained 1.5B-parameter model of the Qwen2.5 series from Qwen, a causal language model that continues text. The card lists 1.54B parameters, 28 layers and a full context length of 32,768 tokens. The Qwen2.5 series ranges from 0.5 to 72 billion parameters.
+intended_use: The card says base language models are not recommended for conversations. Instead it suggests applying post-training to this model, such as supervised fine-tuning (SFT), reinforcement learning from human feedback (RLHF) or continued pretraining.
+what_sets_it_apart: Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. The series description lists long-context support up to 128K tokens and over 29 languages, while this size's feature list gives a full context length of 32,768 tokens.
+running_it: The card advises using the latest version of the Transformers library, and says versions before 4.37.0 fail with a KeyError for qwen2.
 fingerprint:
   attention_type: GQA
   num_layers: 28
@@ -58,13 +62,18 @@ lineage:
   parents: []
   children:
   - model/qwen2-5-1-5b-instruct
+quotes:
+  summary: This repo contains the base 1.5B Qwen2.5 model
+  intended_use: We do not recommend using base language models for conversations.
+  what_sets_it_apart: Significantly **more knowledge** and has greatly improved capabilities in **coding** and **mathematics**, thanks to our specialized expert models in these domains.
+  running_it: 'With `transformers<4.37.0`, you will encounter the following error:'
 tags:
 - llm
 - text-generation
 - qwen2
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-1.5B
   title: Qwen/Qwen2.5-1.5B — model page (Hugging Face)
@@ -80,4 +89,18 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen2.5-1.5B is the base, pretrained 1.5B-parameter model of the Qwen2.5 series from Qwen, a causal language model that continues text. The card lists 1.54B parameters, 28 layers and a full context length of 32,768 tokens. The Qwen2.5 series ranges from 0.5 to 72 billion parameters.
+
+## Intended Use
+
+The card says base language models are not recommended for conversations. Instead it suggests applying post-training to this model, such as supervised fine-tuning (SFT), reinforcement learning from human feedback (RLHF) or continued pretraining.
+
+## What Sets It Apart
+
+Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. The series description lists long-context support up to 128K tokens and over 29 languages, while this size's feature list gives a full context length of 32,768 tokens.
+
+## Running It
+
+The card advises using the latest version of the Transformers library, and says versions before 4.37.0 fail with a KeyError for qwen2.

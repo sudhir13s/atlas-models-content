@@ -12,6 +12,9 @@ tasks:
 parameters_active_b: 0.07
 total_parameters: 65192450
 context_window_tokens: 512
+summary: This model is a question-answering version of DistilBERT, a small language model that Hugging Face made by distilling (teaching a smaller model to imitate) BERT. Given a question and a passage, it picks out the part of the passage that answers the question. The card says it is a fine-tuned checkpoint of DistilBERT-base-cased, trained with a second step of knowledge distillation on the SQuAD v1.1 dataset, and works in English.
+intended_use: 'The card says the model can be used for question answering. It lists out-of-scope uses: creating hostile or alienating environments for people, and generating content presented as factual, since the model was not trained to be factual or true.'
+what_sets_it_apart: The card describes DistilBERT as a small, fast, cheap and light Transformer trained by distilling BERT base. It says DistilBERT has 40% fewer parameters than bert-base-uncased and runs 60% faster while preserving over 95% of BERT's performance as measured on the GLUE language-understanding benchmark.
 fingerprint:
   attention_type: MHA
   num_layers: 6
@@ -42,13 +45,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: DistilBERT is a small, fast, cheap and light Transformer model trained by distilling BERT base.
+  intended_use: This model can be used for question answering.
+  what_sets_it_apart: runs 60% faster while preserving over 95% of BERT's performances as measured on the GLUE language understanding benchmark.
 tags:
 - llm
 - question-answering
 - distilbert
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/distilbert/distilbert-base-cased-distilled-squad
   title: distilbert/distilbert-base-cased-distilled-squad — model page (Hugging Face)
@@ -67,4 +74,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+This model is a question-answering version of DistilBERT, a small language model that Hugging Face made by distilling (teaching a smaller model to imitate) BERT. Given a question and a passage, it picks out the part of the passage that answers the question. The card says it is a fine-tuned checkpoint of DistilBERT-base-cased, trained with a second step of knowledge distillation on the SQuAD v1.1 dataset, and works in English.
+
+## Intended Use
+
+The card says the model can be used for question answering. It lists out-of-scope uses: creating hostile or alienating environments for people, and generating content presented as factual, since the model was not trained to be factual or true.
+
+## What Sets It Apart
+
+The card describes DistilBERT as a small, fast, cheap and light Transformer trained by distilling BERT base. It says DistilBERT has 40% fewer parameters than bert-base-uncased and runs 60% faster while preserving over 95% of BERT's performance as measured on the GLUE language-understanding benchmark.

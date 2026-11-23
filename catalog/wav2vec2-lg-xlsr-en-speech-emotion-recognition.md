@@ -11,6 +11,7 @@ tasks:
 - task/audio-classification
 parameters_active_b: 0.32
 total_parameters: 316496520
+summary: 'This is a speech emotion recognition model: it listens to an English speech recording and labels the emotion. It is a community fine-tune by the Hugging Face user ehcalabres of jonatasgrosman/wav2vec2-large-xlsr-53-english, trained on the RAVDESS dataset of 1,440 recordings of actors performing eight emotions: angry, calm, disgust, fearful, happy, neutral, sad and surprised.'
 fingerprint:
   attention_type: MHA
   num_layers: 24
@@ -41,12 +42,14 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: for a Speech Emotion Recognition (SER) task.
 tags:
 - audio-classification
 - wav2vec2
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition
   title: ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition — model page (Hugging Face)
@@ -56,4 +59,6 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+This is a speech emotion recognition model: it listens to an English speech recording and labels the emotion. It is a community fine-tune by the Hugging Face user ehcalabres of jonatasgrosman/wav2vec2-large-xlsr-53-english, trained on the RAVDESS dataset of 1,440 recordings of actors performing eight emotions: angry, calm, disgust, fearful, happy, neutral, sad and surprised.

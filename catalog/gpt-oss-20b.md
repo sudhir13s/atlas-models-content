@@ -17,6 +17,10 @@ tasks:
 - task/tool-calling-models
 total_parameters: 20914757184
 context_window_tokens: 131072
+summary: gpt-oss-20b is an open-weight language model from OpenAI, meaning its trained weights can be downloaded and run locally. It is the smaller of two gpt-oss models and has 21 billion parameters, of which 3.6 billion are active for each token. The card describes the series as designed for reasoning, agentic tasks (where a model calls tools) and general developer use.
+intended_use: OpenAI recommends gpt-oss-20b for lower-latency, local or specialized use cases, and its larger sibling gpt-oss-120b for production, general-purpose and high-reasoning use. The card says both models should only be used with the harmony response format, because they will not work correctly otherwise.
+what_sets_it_apart: The card highlights an adjustable reasoning effort (low, medium or high) and access to the model's full chain of thought, which it says is not meant to be shown to end users. It also lists built-in function calling, web browsing, Python code execution and structured outputs. The MoE (mixture-of-experts) weights were post-trained with MXFP4 quantization, a compact 4-bit number format, so the model runs within 16GB of memory according to the card.
+running_it: The card says the model must be used with OpenAI's harmony response format. The Transformers chat template applies it automatically, but anyone calling model.generate directly has to apply the format by hand or use the openai-harmony package.
 fingerprint:
   attention_type: GQA
   num_layers: 24
@@ -56,13 +60,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: '`gpt-oss-20b` — for lower latency, and local or specialized use cases (21B parameters with 3.6B active parameters)'
+  intended_use: Both models were trained on our [harmony response format](https://github.com/openai/harmony) and should only be used with the harmony format as it will not work correctly otherwise.
+  what_sets_it_apart: Easily adjust the reasoning effort (low, medium, high) based on your specific use case and latency needs.
+  running_it: If you use the Transformers chat template, it will automatically apply the [harmony response format](https://github.com/openai/harmony).
 tags:
 - llm
 - text-generation
 - gpt-oss
 - moe
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/openai/gpt-oss-20b
   title: openai/gpt-oss-20b — model page (Hugging Face)
@@ -78,4 +87,18 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+gpt-oss-20b is an open-weight language model from OpenAI, meaning its trained weights can be downloaded and run locally. It is the smaller of two gpt-oss models and has 21 billion parameters, of which 3.6 billion are active for each token. The card describes the series as designed for reasoning, agentic tasks (where a model calls tools) and general developer use.
+
+## Intended Use
+
+OpenAI recommends gpt-oss-20b for lower-latency, local or specialized use cases, and its larger sibling gpt-oss-120b for production, general-purpose and high-reasoning use. The card says both models should only be used with the harmony response format, because they will not work correctly otherwise.
+
+## What Sets It Apart
+
+The card highlights an adjustable reasoning effort (low, medium or high) and access to the model's full chain of thought, which it says is not meant to be shown to end users. It also lists built-in function calling, web browsing, Python code execution and structured outputs. The MoE (mixture-of-experts) weights were post-trained with MXFP4 quantization, a compact 4-bit number format, so the model runs within 16GB of memory according to the card.
+
+## Running It
+
+The card says the model must be used with OpenAI's harmony response format. The Transformers chat template applies it automatically, but anyone calling model.generate directly has to apply the format by hand or use the openai-harmony package.

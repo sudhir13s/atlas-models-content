@@ -15,6 +15,9 @@ tasks:
 parameters_active_b: 0.03
 total_parameters: 28818631
 context_window_tokens: 1024
+summary: Table Transformer (fine-tuned for table detection) is a model that finds the tables in an image of a document. The card says it is a Table Transformer (DETR) model trained on PubTables1M, introduced in the paper by Smock et al. and first released in the microsoft/table-transformer repository. The Hugging Face team wrote the card, because the releasing team did not.
+intended_use: The card says the raw model can be used for detecting tables in documents and points to the Transformers documentation.
+what_sets_it_apart: The card describes it as equivalent to DETR, a Transformer-based object detection model. It notes that the authors chose DETR's normalize-before setting, which applies layer normalization before the self- and cross-attention steps.
 fingerprint:
   num_layers: 6
   hidden_size: 256
@@ -38,11 +41,15 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: Table Transformer (DETR) model trained on PubTables1M.
+  intended_use: You can use the raw model for detecting tables in documents.
+  what_sets_it_apart: the authors decided to use the "normalize before" setting of DETR
 tags:
 - object-detection
 - table-transformer
 - dense
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/microsoft/table-transformer-detection
   title: microsoft/table-transformer-detection — model page (Hugging Face)
@@ -55,4 +62,14 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+Table Transformer (fine-tuned for table detection) is a model that finds the tables in an image of a document. The card says it is a Table Transformer (DETR) model trained on PubTables1M, introduced in the paper by Smock et al. and first released in the microsoft/table-transformer repository. The Hugging Face team wrote the card, because the releasing team did not.
+
+## Intended Use
+
+The card says the raw model can be used for detecting tables in documents and points to the Transformers documentation.
+
+## What Sets It Apart
+
+The card describes it as equivalent to DETR, a Transformer-based object detection model. It notes that the authors chose DETR's normalize-before setting, which applies layer normalization before the self- and cross-attention steps.

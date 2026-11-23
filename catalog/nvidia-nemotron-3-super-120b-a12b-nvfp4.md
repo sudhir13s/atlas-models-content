@@ -15,6 +15,10 @@ tasks:
 - task/text-generation
 total_parameters: 67228556288
 context_window_tokens: 262144
+summary: NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4 is the NVFP4 version of Nemotron-3-Super, a large language model from NVIDIA with 120B total and 12B active parameters, meaning only part of the weights is used for each token. NVFP4 is a reduced-precision number format, and the card says the Super model was pre-trained with it. The card lists a context of up to 1M tokens, seven supported languages (English, French, German, Italian, Japanese, Spanish and Chinese), and a reasoning mode that can be switched on or off.
+intended_use: The card calls it a general purpose reasoning and chat model for English, code and the supported languages, optimized for collaborative agents and high-volume workloads such as IT ticket automation. It names developers building AI agent systems, chatbots, RAG (retrieval-augmented generation) systems and other applications as the intended users, and lists complex instruction following and long-context reasoning as suitable tasks.
+what_sets_it_apart: NVIDIA describes a hybrid design that interleaves Mamba-2 layers and mixture-of-experts layers with a few attention layers. Its LatentMoE method projects tokens into a smaller latent dimension for expert routing and computation. It adds Multi-Token Prediction (MTP) layers, which allow faster generation through speculative decoding. The card says it is the first model in the Nemotron 3 family pre-trained at NVFP4 precision.
+running_it: The card says to use temperature 1.0 and top_p 0.95 for all tasks and serving backends. Reasoning is switched on or off with the enable_thinking flag in the chat template, and each serving backend needs NVIDIA's custom super_v3 reasoning parser. The card lists one B200 GPU or one DGX Spark as the minimum hardware and NVIDIA Blackwell as the supported microarchitecture.
 fingerprint:
   attention_type: GQA
   num_layers: 88
@@ -53,13 +57,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: is a large language model (LLM) trained by NVIDIA
+  intended_use: It is intended to be used by developers designing AI Agent systems, chatbots, RAG systems, and other AI-powered applications.
+  what_sets_it_apart: The Super model is pre-trained using NVFP4 quantization — the first model in the Nemotron 3 family trained at this precision.
+  running_it: Use `temperature=1.0` and `top_p=0.95` across **all tasks and serving backends**
 tags:
 - llm
 - text-generation
 - nemotron-h
 - moe
 - gqa
-updated: '2026-11-20'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4
   title: nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4 — model page (Hugging Face)
@@ -75,4 +84,18 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4 is the NVFP4 version of Nemotron-3-Super, a large language model from NVIDIA with 120B total and 12B active parameters, meaning only part of the weights is used for each token. NVFP4 is a reduced-precision number format, and the card says the Super model was pre-trained with it. The card lists a context of up to 1M tokens, seven supported languages (English, French, German, Italian, Japanese, Spanish and Chinese), and a reasoning mode that can be switched on or off.
+
+## Intended Use
+
+The card calls it a general purpose reasoning and chat model for English, code and the supported languages, optimized for collaborative agents and high-volume workloads such as IT ticket automation. It names developers building AI agent systems, chatbots, RAG (retrieval-augmented generation) systems and other applications as the intended users, and lists complex instruction following and long-context reasoning as suitable tasks.
+
+## What Sets It Apart
+
+NVIDIA describes a hybrid design that interleaves Mamba-2 layers and mixture-of-experts layers with a few attention layers. Its LatentMoE method projects tokens into a smaller latent dimension for expert routing and computation. It adds Multi-Token Prediction (MTP) layers, which allow faster generation through speculative decoding. The card says it is the first model in the Nemotron 3 family pre-trained at NVFP4 precision.
+
+## Running It
+
+The card says to use temperature 1.0 and top_p 0.95 for all tasks and serving backends. Reasoning is switched on or off with the enable_thinking flag in the chat template, and each serving backend needs NVIDIA's custom super_v3 reasoning parser. The card lists one B200 GPU or one DGX Spark as the minimum hardware and NVIDIA Blackwell as the supported microarchitecture.

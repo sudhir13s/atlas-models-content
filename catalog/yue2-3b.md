@@ -15,6 +15,10 @@ tasks:
 parameters_active_b: 3.63
 total_parameters: 3630684224
 context_window_tokens: 24576
+summary: YuE2-3B is an open music generation model, a text-to-audio model that writes songs. Given lyrics and a style prompt, it produces a complete song with vocals and accompaniment, and the song's melody and chords can then be shaped through an editable score. The card lists Chinese and English as its languages, and its license is CC BY-NC 4.0, which does not allow commercial use.
+intended_use: 'The card shows three uses: creating a song from a style prompt and lyrics, making a cover that gives an existing recording a new arrangement, and editing the score, by hand or with an agent, before regenerating the audio. It recommends melody-only planning for covers.'
+what_sets_it_apart: 'The card says the model plans with a symbolic score before making audio. One backbone that mixes autoregressive (step by step) and non-autoregressive transformers writes the score and semantic tokens, then generates acoustic latents through flow matching, and a separate VAE (variational autoencoder) turns them into stereo audio. It lists three planning modes: melody and chords, melody only, or no plan.'
+running_it: The card lists Linux, Python 3.10 or later and a 24GB NVIDIA GPU with BF16 support as requirements, with 24GB of host RAM, producing 48 kHz stereo songs without quantization. It says the default planning mode is full melody and chords, and that a cfg_scale setting such as 1.2 can be tried for stronger text guidance.
 fingerprint:
   attention_type: GQA
   num_layers: 28
@@ -46,12 +50,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: Turn lyrics and a style prompt into a complete song with vocals and accompaniment, then shape its melody and chords through an editable score.
+  intended_use: Start from an existing recording and give it a new arrangement.
+  what_sets_it_apart: One AR–NAR Mixture-of-Transformers backbone writes the score and semantic tokens, then generates acoustic latents through flow matching.
+  running_it: Linux · Python 3.10+ · 24GB NVIDIA GPU with BF16 support.
 tags:
 - text-to-audio
 - yue2
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/m-a-p/YuE2-3B
   title: m-a-p/YuE2-3B — model page (Hugging Face)
@@ -70,4 +79,18 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+YuE2-3B is an open music generation model, a text-to-audio model that writes songs. Given lyrics and a style prompt, it produces a complete song with vocals and accompaniment, and the song's melody and chords can then be shaped through an editable score. The card lists Chinese and English as its languages, and its license is CC BY-NC 4.0, which does not allow commercial use.
+
+## Intended Use
+
+The card shows three uses: creating a song from a style prompt and lyrics, making a cover that gives an existing recording a new arrangement, and editing the score, by hand or with an agent, before regenerating the audio. It recommends melody-only planning for covers.
+
+## What Sets It Apart
+
+The card says the model plans with a symbolic score before making audio. One backbone that mixes autoregressive (step by step) and non-autoregressive transformers writes the score and semantic tokens, then generates acoustic latents through flow matching, and a separate VAE (variational autoencoder) turns them into stereo audio. It lists three planning modes: melody and chords, melody only, or no plan.
+
+## Running It
+
+The card lists Linux, Python 3.10 or later and a 24GB NVIDIA GPU with BF16 support as requirements, with 24GB of host RAM, producing 48 kHz stereo songs without quantization. It says the default planning mode is full melody and chords, and that a cfg_scale setting such as 1.2 can be tried for stronger text guidance.

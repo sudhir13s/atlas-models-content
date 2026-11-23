@@ -16,6 +16,8 @@ tasks:
 parameters_active_b: 7.74
 total_parameters: 7737708544
 context_window_tokens: 32768
+summary: InternLM2.5-7B-Chat is a chat language model with 7 billion parameters from the InternLM project. The card says InternLM2.5 open-sources a 7 billion parameter base model together with this chat model, which is tailored for practical scenarios. It is a text model that reads a conversation and writes a reply.
+what_sets_it_apart: 'The card lists three characteristics as the project''s own claims: strong reasoning on maths problems, a context window of 1 million tokens (the amount of text it can take in at once), and better tool use, including gathering information from more than 100 web pages through the MindSearch project. The card suggests trying LMDeploy for 1M-context inference.'
 fingerprint:
   attention_type: GQA
   num_layers: 32
@@ -51,13 +53,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: InternLM2.5 has open-sourced a 7 billion parameter base model and a chat model tailored for practical scenarios.
+  what_sets_it_apart: InternLM2.5 supports gathering information from more than 100 web pages
 tags:
 - llm
 - text-generation
 - internlm2
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/internlm/internlm2_5-7b-chat
   title: internlm/internlm2_5-7b-chat — model page (Hugging Face)
@@ -73,4 +78,10 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+InternLM2.5-7B-Chat is a chat language model with 7 billion parameters from the InternLM project. The card says InternLM2.5 open-sources a 7 billion parameter base model together with this chat model, which is tailored for practical scenarios. It is a text model that reads a conversation and writes a reply.
+
+## What Sets It Apart
+
+The card lists three characteristics as the project's own claims: strong reasoning on maths problems, a context window of 1 million tokens (the amount of text it can take in at once), and better tool use, including gathering information from more than 100 web pages through the MindSearch project. The card suggests trying LMDeploy for 1M-context inference.

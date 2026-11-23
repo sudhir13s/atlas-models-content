@@ -15,6 +15,10 @@ tasks:
 parameters_active_b: 0.74
 total_parameters: 744371512
 context_window_tokens: 262144
+summary: EmbeddingGemma 2 is an embedding model from Google DeepMind. An embedding model turns an input into a list of numbers, called a vector, so that similar inputs end up close together. This one maps text (including code), images, video and audio into a single 768-dimensional vector space. The card gives 740M total parameters, support for 100+ languages and an 8K-token context window.
+intended_use: The card says it is designed to run on consumer hardware such as mobile devices and laptops, for on-device applications like search, retrieval-augmented generation (RAG), classification and clustering.
+what_sets_it_apart: The card lists these design points. It builds on the architecture of Gemma 4 and puts four input types in one shared vector space. A 270M-parameter text model is paired with vision (170M) and audio (300M) encoders that can be loaded separately, so only the needed input types are loaded. Matryoshka Representation Learning lets the vector be cut to 512, 256 or 128 numbers, which the card says cuts storage by up to 6 times. Short instruction prefixes in the text tune the embedding for a task.
+running_it: The card says text inputs should start with a short task prefix, such as one for search queries and a title-and-text format for documents. Omitting the prefix still works but reduces precision. Prefixes apply to text only; images, video and audio are passed without one. Truncated vectors of 128, 256 or 512 numbers should be re-normalized, and the card says 128 is best suited to text-only workloads.
 fingerprint:
   attention_type: GQA
   num_layers: 24
@@ -46,12 +50,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: is an open multimodal embedding model built by Google DeepMind
+  intended_use: Designed to run on consumer hardware such as mobile devices and laptops
+  what_sets_it_apart: allowing developers to load only the modalities required for their use case
+  running_it: Using the right prefix improves quality; omitting it still works but reduces precision.
 tags:
 - feature-extraction
 - embedding-gemma2
 - dense
 - gqa
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google/embeddinggemma-2
   title: google/embeddinggemma-2 — model page (Hugging Face)
@@ -64,4 +73,18 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+EmbeddingGemma 2 is an embedding model from Google DeepMind. An embedding model turns an input into a list of numbers, called a vector, so that similar inputs end up close together. This one maps text (including code), images, video and audio into a single 768-dimensional vector space. The card gives 740M total parameters, support for 100+ languages and an 8K-token context window.
+
+## Intended Use
+
+The card says it is designed to run on consumer hardware such as mobile devices and laptops, for on-device applications like search, retrieval-augmented generation (RAG), classification and clustering.
+
+## What Sets It Apart
+
+The card lists these design points. It builds on the architecture of Gemma 4 and puts four input types in one shared vector space. A 270M-parameter text model is paired with vision (170M) and audio (300M) encoders that can be loaded separately, so only the needed input types are loaded. Matryoshka Representation Learning lets the vector be cut to 512, 256 or 128 numbers, which the card says cuts storage by up to 6 times. Short instruction prefixes in the text tune the embedding for a task.
+
+## Running It
+
+The card says text inputs should start with a short task prefix, such as one for search queries and a title-and-text format for documents. Omitting the prefix still works but reduces precision. Prefixes apply to text only; images, video and audio are passed without one. Truncated vectors of 128, 256 or 512 numbers should be re-normalized, and the card says 128 is best suited to text-only workloads.

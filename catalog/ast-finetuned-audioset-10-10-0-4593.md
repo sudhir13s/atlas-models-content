@@ -14,6 +14,9 @@ tasks:
 - task/audio-classification
 parameters_active_b: 0.09
 total_parameters: 86594063
+summary: 'The Audio Spectrogram Transformer (AST) fine-tuned on AudioSet is an audio classification model: it takes a sound clip and assigns it to one of the sound categories of AudioSet, a large labelled collection of audio clips. It comes from the AST paper by Gong et al., and the Hugging Face team wrote its model card because the releasing team did not. It works by turning the audio into an image called a spectrogram and then reading that image with a Vision Transformer.'
+intended_use: The card says the raw model can be used for classifying audio into one of the AudioSet classes, and points to the Transformers documentation for an example.
+what_sets_it_apart: The card describes AST as the same design as ViT, the Vision Transformer, applied to audio instead of photographs. Audio is first converted into a spectrogram, a picture of how the sound energy spreads over frequency and time, and the transformer then processes that picture.
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -43,12 +46,16 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: Audio Spectrogram Transformer (AST) model fine-tuned on AudioSet.
+  intended_use: You can use the raw model for classifying audio into one of the AudioSet classes.
+  what_sets_it_apart: Audio is first turned into an image (as a spectrogram), after which a Vision Transformer is applied.
 tags:
 - audio-classification
 - audio-spectrogram-transformer
 - dense
 - mha
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/MIT/ast-finetuned-audioset-10-10-0.4593
   title: MIT/ast-finetuned-audioset-10-10-0.4593 — model page (Hugging Face)
@@ -61,4 +68,14 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+The Audio Spectrogram Transformer (AST) fine-tuned on AudioSet is an audio classification model: it takes a sound clip and assigns it to one of the sound categories of AudioSet, a large labelled collection of audio clips. It comes from the AST paper by Gong et al., and the Hugging Face team wrote its model card because the releasing team did not. It works by turning the audio into an image called a spectrogram and then reading that image with a Vision Transformer.
+
+## Intended Use
+
+The card says the raw model can be used for classifying audio into one of the AudioSet classes, and points to the Transformers documentation for an example.
+
+## What Sets It Apart
+
+The card describes AST as the same design as ViT, the Vision Transformer, applied to audio instead of photographs. Audio is first converted into a spectrogram, a picture of how the sound energy spreads over frequency and time, and the transformer then processes that picture.

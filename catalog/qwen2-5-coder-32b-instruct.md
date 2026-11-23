@@ -17,6 +17,12 @@ tasks:
 parameters_active_b: 32.76
 total_parameters: 32763876352
 context_window_tokens: 32768
+base_models:
+- name: Qwen/Qwen2.5-Coder-32B
+  address: https://huggingface.co/Qwen/Qwen2.5-Coder-32B
+summary: 'Qwen2.5-Coder-32B-Instruct is a language model from Qwen that is specialised for code: it reads a request in text and writes code or an explanation in reply. It is the instruction-tuned 32B member of the Qwen2.5-Coder series, which the card says comes in six sizes from 0.5 to 32 billion parameters and was formerly known as CodeQwen. The card gives it 32.5 billion parameters and a context length of 131,072 tokens.'
+what_sets_it_apart: Qwen states that, compared with CodeQwen1.5, Qwen2.5-Coder improves code generation, code reasoning and code fixing, built on Qwen2.5 with training scaled up to 5.5 trillion tokens of source code, text-code grounding and synthetic data. It also says the series aims to serve real-world uses such as code agents while keeping its strengths in mathematics and general skills.
+running_it: The card says the published config.json is set for a context of up to 32,768 tokens, and that longer inputs rely on YaRN, a technique for extending the length a model handles. It says vLLM supports only static YaRN, which may affect performance on shorter texts, so the setting should be added only when long contexts are needed.
 fingerprint:
   attention_type: GQA
   num_layers: 64
@@ -53,13 +59,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This repo contains the instruction-tuned 32B Qwen2.5-Coder model
+  what_sets_it_apart: we scale up the training tokens into 5.5 trillion including source code, text-code grounding, Synthetic data, etc.
+  running_it: The current `config.json` is set for context length up to 32,768 tokens.
 tags:
 - llm
 - text-generation
 - qwen2
 - dense
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct
   title: Qwen/Qwen2.5-Coder-32B-Instruct — model page (Hugging Face)
@@ -81,4 +91,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen2.5-Coder-32B-Instruct is a language model from Qwen that is specialised for code: it reads a request in text and writes code or an explanation in reply. It is the instruction-tuned 32B member of the Qwen2.5-Coder series, which the card says comes in six sizes from 0.5 to 32 billion parameters and was formerly known as CodeQwen. The card gives it 32.5 billion parameters and a context length of 131,072 tokens.
+
+## What Sets It Apart
+
+Qwen states that, compared with CodeQwen1.5, Qwen2.5-Coder improves code generation, code reasoning and code fixing, built on Qwen2.5 with training scaled up to 5.5 trillion tokens of source code, text-code grounding and synthetic data. It also says the series aims to serve real-world uses such as code agents while keeping its strengths in mathematics and general skills.
+
+## Running It
+
+The card says the published config.json is set for a context of up to 32,768 tokens, and that longer inputs rely on YaRN, a technique for extending the length a model handles. It says vLLM supports only static YaRN, which may affect performance on shorter texts, so the setting should be added only when long contexts are needed.

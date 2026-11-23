@@ -10,6 +10,7 @@ summary: "Turn a piece of text into a vector so that similar meanings land close
 hf_pipeline_tags: [feature-extraction, sentence-similarity]
 inputs: [text]
 outputs: [embedding]
+benchmarks: [benchmark/mteb-eng-v2, benchmark/mteb-multilingual-v2, benchmark/longembed]
 tags: [embeddings, retrieval, semantic-search]
 updated: 2026-11-18
 sources:

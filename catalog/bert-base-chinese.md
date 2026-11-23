@@ -12,6 +12,10 @@ tasks:
 parameters_active_b: 0.1
 total_parameters: 102882442
 context_window_tokens: 512
+summary: 'BERT base Chinese is a language model developed by Google. It is a fill-mask model: it predicts a word piece that has been hidden in a sentence, which is how BERT models learn language. The card says it was pre-trained for Chinese, and it names the BERT base uncased model as its parent model.'
+intended_use: The card lists masked language modeling as the direct use and names no other intended or out-of-scope uses.
+what_sets_it_apart: The card describes it as BERT pre-trained for Chinese, with training and random input masking applied independently to word pieces, as in the original BERT paper. It links Google's multilingual BERT notes as its GitHub source.
+limitations: The card's risks section only warns that language models can reproduce historical and current stereotypes, and points to research on bias and fairness. Its training data and results sections read "More Information Needed".
 fingerprint:
   attention_type: MHA
   num_layers: 12
@@ -45,13 +49,18 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: This model has been pre-trained for Chinese
+  intended_use: This model can be used for masked language modeling
+  what_sets_it_apart: training and random input masking has been applied independently to word pieces (as in the original BERT paper)
+  limitations: can propagate historical and current stereotypes
 tags:
 - llm
 - fill-mask
 - bert
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google-bert/bert-base-chinese
   title: google-bert/bert-base-chinese — model page (Hugging Face)
@@ -67,4 +76,18 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+BERT base Chinese is a language model developed by Google. It is a fill-mask model: it predicts a word piece that has been hidden in a sentence, which is how BERT models learn language. The card says it was pre-trained for Chinese, and it names the BERT base uncased model as its parent model.
+
+## Intended Use
+
+The card lists masked language modeling as the direct use and names no other intended or out-of-scope uses.
+
+## What Sets It Apart
+
+The card describes it as BERT pre-trained for Chinese, with training and random input masking applied independently to word pieces, as in the original BERT paper. It links Google's multilingual BERT notes as its GitHub source.
+
+## Limitations
+
+The card's risks section only warns that language models can reproduce historical and current stereotypes, and points to research on bias and fairness. Its training data and results sections read "More Information Needed".

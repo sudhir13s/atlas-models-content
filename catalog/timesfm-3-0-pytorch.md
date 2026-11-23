@@ -14,6 +14,8 @@ tasks:
 - task/time-series-forecasting
 parameters_active_b: 0.33
 total_parameters: 330710976
+summary: 'TimesFM 3.0 is a time-series foundation model from Google Research, used for forecasting: predicting the future values of a series of numbers measured over time. This repository holds the official PyTorch weights and configuration. The weights are released under the TimesFM Non-Commercial License v1.0.'
+what_sets_it_apart: The card lists a Stacked Mixing Transformer with Variate Attention and CPM Iterative RevIN, with 20 transformer layers, a model dimension of 1280 and 16 heads. It works on patches of 32 context points and 64 forecast points. Pretraining used GiftEvalPretrain (without the datasets that overlap with fev-bench), Wikipedia Pageviews up to November 2023, Google Trends top queries up to the end of 2022, and synthetic and augmented data.
 filters:
   size_category: tiny
   is_quantized: false
@@ -31,10 +33,13 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: TimesFM (Time Series Foundation Model) is a pretrained time-series foundation model developed by Google Research for time-series forecasting.
+  what_sets_it_apart: Stacked Mixing Transformer with Variate Attention and CPM Iterative RevIN.
 tags:
 - time-series-forecasting
 - dense
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google/timesfm-3.0-pytorch
   title: google/timesfm-3.0-pytorch — model page (Hugging Face)
@@ -47,4 +52,10 @@ sources:
   trust: 0.95
 ---
 
+## Summary
 
+TimesFM 3.0 is a time-series foundation model from Google Research, used for forecasting: predicting the future values of a series of numbers measured over time. This repository holds the official PyTorch weights and configuration. The weights are released under the TimesFM Non-Commercial License v1.0.
+
+## What Sets It Apart
+
+The card lists a Stacked Mixing Transformer with Variate Attention and CPM Iterative RevIN, with 20 transformer layers, a model dimension of 1280 and 16 heads. It works on patches of 32 context points and 64 forecast points. Pretraining used GiftEvalPretrain (without the datasets that overlap with fev-bench), Wikipedia Pageviews up to November 2023, Google Trends top queries up to the end of 2022, and synthetic and augmented data.

@@ -15,6 +15,12 @@ tasks:
 - task/text-generation
 total_parameters: 30532122624
 context_window_tokens: 40960
+base_models:
+- name: Qwen/Qwen3-30B-A3B-Base
+  address: https://huggingface.co/Qwen/Qwen3-30B-A3B-Base
+summary: 'Qwen3-30B-A3B is a language model from Qwen that reads text and writes text in reply. It is a mixture-of-experts model, meaning only some of its parameters are used for each token: the card lists 30.5B parameters in total with 3.3B activated, from 128 experts of which 8 are active. It is part of the Qwen3 series and supports a context of 32,768 tokens natively and 131,072 tokens with YaRN.'
+what_sets_it_apart: Qwen states that a single model can switch between a thinking mode, for complex logical reasoning, math and coding, and a non-thinking mode for efficient general dialogue. The card describes a switch, enable_thinking, and also soft switches, /think and /no_think, that change the mode from one turn to the next. It also lists improved reasoning, agent abilities and support for more than 100 languages and dialects.
+running_it: For thinking mode the card recommends temperature 0.6, top-p 0.95, top-k 20 and min-p 0, and says not to use greedy decoding because it can cause endless repetition. For non-thinking mode it suggests temperature 0.7 and top-p 0.8. The config.json is set for 40,960 positions, and the card advises enabling YaRN only for longer inputs because static YaRN may affect performance on shorter texts.
 fingerprint:
   attention_type: GQA
   num_layers: 48
@@ -53,13 +59,17 @@ aliases:
 lineage:
   parents: []
   children: []
+quotes:
+  summary: 'Number of Parameters: 30.5B in total and 3.3B activated'
+  what_sets_it_apart: Uniquely support of seamless switching between thinking mode
+  running_it: For thinking mode (`enable_thinking=True`), use `Temperature=0.6`, `TopP=0.95`, `TopK=20`, and `MinP=0`.
 tags:
 - llm
 - text-generation
 - qwen3-moe
 - moe
 - gqa
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-30B-A3B
   title: Qwen/Qwen3-30B-A3B — model page (Hugging Face)
@@ -78,4 +88,14 @@ sources:
   trust: 0.9
 ---
 
+## Summary
 
+Qwen3-30B-A3B is a language model from Qwen that reads text and writes text in reply. It is a mixture-of-experts model, meaning only some of its parameters are used for each token: the card lists 30.5B parameters in total with 3.3B activated, from 128 experts of which 8 are active. It is part of the Qwen3 series and supports a context of 32,768 tokens natively and 131,072 tokens with YaRN.
+
+## What Sets It Apart
+
+Qwen states that a single model can switch between a thinking mode, for complex logical reasoning, math and coding, and a non-thinking mode for efficient general dialogue. The card describes a switch, enable_thinking, and also soft switches, /think and /no_think, that change the mode from one turn to the next. It also lists improved reasoning, agent abilities and support for more than 100 languages and dialects.
+
+## Running It
+
+For thinking mode the card recommends temperature 0.6, top-p 0.95, top-k 20 and min-p 0, and says not to use greedy decoding because it can cause endless repetition. For non-thinking mode it suggests temperature 0.7 and top-p 0.8. The config.json is set for 40,960 positions, and the card advises enabling YaRN only for longer inputs because static YaRN may affect performance on shorter texts.
