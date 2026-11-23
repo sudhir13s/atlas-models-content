@@ -180,7 +180,6 @@ resources:
 learn_first:
   - { label: "Variational autoencoders (latent-variable view)", href: "/models/architecture/vae", tag: "Architecture" }
   - { label: "The Gaussian & adding noise", href: "/learn/concepts/gaussian", tag: "Math" }
-  - { label: "U-Net (the denoiser backbone)", href: "/models/architecture/unet", tag: "Architecture" }
 
 tags: [diffusion, generation, denoising, text-to-image]
 updated: '2026-11-23'

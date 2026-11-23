@@ -2,7 +2,7 @@
 id: architecture-era/vae
 type: architecture-era
 slug: vae
-schema_version: 1.0
+schema_version: 2.5
 title: "Variational Autoencoder"
 name: "Variational Autoencoder"
 era: foundation
@@ -10,53 +10,85 @@ era_range: "2013–2020"
 year: 2013
 family: generation
 core_innovation: "A probabilistic encoder-decoder trained by variational inference with the reparameterization trick, learning a continuous latent space."
-description: "A latent-variable generative model trained by stochastic variational inference that scales to large datasets, with a neural-network encoder approximating the posterior."
-key_features: ["Probabilistic encoder (approximate posterior)", "Evidence lower bound (ELBO) objective", "Reparameterization trick"]
+description: "A generative model made of two networks: an encoder that turns a data point into a small cloud of likely codes, and a decoder that turns a code back into data; both are trained together, and new data is made by decoding random codes."
+key_features: ["Probabilistic encoder (approximate posterior)", "Variational lower bound objective", "Reparameterization trick"]
 key_models: ["VAE (2013)", "VQ-VAE (2017)", "NVAE (2020)"]
 paper_title: "Auto-Encoding Variational Bayes (Kingma & Welling, 2013)"
 paper_url: "https://arxiv.org/abs/1312.6114"
 influenced_by: []
 led_to: [architecture-era/diffusion]
 
-eli5: "A VAE learns to squeeze an image down to a few numbers and then rebuild it. It is trained so that the squeezed numbers live in a tidy, gap-free space — so you can pick a random point in that space, decode it, and get a brand-new image that looks like your training data."
-
 analogy:
-  title: "A tidy compression cabinet you can also invent from"
-  body: "Imagine an artist who learns to describe any face with a short recipe: 'wide jaw, warm skin, slight smile'. That is the encoder compressing an image into a few numbers. A second artist reads a recipe and paints the face back — that is the decoder. A plain autoencoder would let the recipes scatter into isolated islands with empty gaps between them, so a made-up recipe decodes to nonsense. The VAE adds one rule: recipes must fill a smooth, connected space with no gaps, packed neatly around a simple center. Now you can invent a recipe you have never seen — pick any point in that tidy space — and the decoder paints a plausible new face. The 'keep the space tidy' rule is the KL penalty; encoding a *fuzzy region* instead of a single point is what fills the gaps."
+  title: "A recipe card that is a little blurry on purpose"
+  body: "This is an analogy, not the mechanism. One cook writes any dish as a short recipe card, and a second cook rebuilds the dish from the card alone. The first cook writes each quantity as a range, and a random draw within the range is what the second cook gets, so neighbouring cards must give similar dishes. A house rule also asks for ranges near the usual ones. Then a card drawn at random still rebuilds a sensible dish. The cards are codes, the cooks are the encoder and decoder, the house rule is the KL term, and the exact rule is the key equation below."
 
 narrative:
-  motivation: "Kingma and Welling asked how to perform efficient inference and learning in directed probabilistic models with continuous latent variables, intractable posterior distributions and large datasets. Variational inference offered a lower bound on the likelihood, but it needed an estimator that standard stochastic gradient methods could optimize."
-  approach: "Keep the encoder-decoder shape of an autoencoder, but make the encoder (a 'recognition model') output a *distribution* over codes rather than a single point, and train encoder and decoder jointly on a variational lower bound. A reparameterization of the bound makes it optimizable with ordinary stochastic gradients."
-  solution: "The encoder maps each input to a small Gaussian in latent space (a mean and a spread). Training maximizes the evidence lower bound (ELBO): a reconstruction term that rewards rebuilding the input, minus a KL term that pulls every encoded Gaussian toward a shared standard-normal prior — the rule that keeps the space tidy. The trick that makes it all differentiable is the reparameterization trick: instead of sampling a code directly (a dead end for gradients), write the code as mean + spread × external noise, so the randomness sits outside the network and gradients flow straight through."
-  outcome: "The result is a continuous latent space you can sample from: the paper's appendix shows learned 2D manifolds of MNIST digits and Frey faces, decoded from a grid of latent coordinates. Diffusion models are also latent-variable models trained on a variational bound (Ho et al., 2020), and latent diffusion runs diffusion in the latent space of a pretrained autoencoder (Rombach et al., 2021)."
-
-build_steps:
-  - { title: "1. Encode to a distribution", detail: "Pass the input through the encoder, which outputs two vectors: a mean and a spread (standard deviation). Together they define a small Gaussian cloud in latent space — the model's belief about where this input's code lives." }
-  - { title: "2. Sample a code — the reparameterization trick", detail: "Draw external noise from a standard normal, then set code = mean + spread × noise. This produces a random code but keeps the randomness outside the network, so gradients can flow back through the mean and spread." }
-  - { title: "3. Decode back to data", detail: "Feed the sampled code through the decoder to reconstruct the input. The decoder is the generator you will use later to turn codes into new samples." }
-  - { title: "4. Score reconstruction", detail: "Measure how close the reconstruction is to the original input. This is the first half of the loss — it rewards codes that carry enough information to rebuild the data." }
-  - { title: "5. Regularize the latent space (KL term)", detail: "Add a penalty pulling each encoded Gaussian toward the standard-normal prior. This is what fills the gaps and keeps the space tidy, so random codes decode to something sensible." }
-  - { title: "6. Generate new data", detail: "After training, throw away the encoder: sample a code straight from the standard normal, run it through the decoder, and get a brand-new sample that resembles the training data." }
+  motivation: "**Learning with a hidden cause that cannot be worked out exactly.** The question is posed by **Kingma and Welling (2013)**.\n\n- **The setting:** data generated from an unobserved continuous variable z, the **latent variable**, through a model with unknown parameters.\n- **Intractable:** for a model such as a neural network with a nonlinear hidden layer, the likelihood of the data and the posterior of z given x **cannot be computed**, so the EM algorithm and mean-field variational methods fail.\n- **Large datasets:** batch optimisation and per-example sampling loops such as Monte Carlo EM are **too slow**.\n- **The obstacle:** the usual Monte Carlo estimate of the gradient of the variational bound has **very high variance**, which the authors call impractical."
+  approach: "**An encoder that guesses the hidden cause, and a bound that can be differentiated.**\n\n- **Recognition model:** a network q(z|x) approximates the true posterior; the authors call it a **probabilistic encoder**, and the model p(x|z) a **probabilistic decoder**.\n- **The bound:** the log-likelihood of each data point equals a lower bound **plus** the KL divergence from q(z|x) to the true posterior; since that divergence is never negative, raising the bound pushes up the likelihood.\n- **Two parts:** the bound is a reconstruction term minus the **KL divergence from q(z|x) to the prior p(z)**.\n- **Reparameterisation:** a sample of z is written as a differentiable function of the encoder's outputs and **independent noise** ε, so ordinary stochastic gradients flow through the sampling step."
+  solution: "**The variational autoencoder: Gaussian codes, a closed-form KL term, one sample per data point.**\n\n- **Prior:** a standard normal, **N(0, I)**, with no parameters.\n- **Encoder:** a network with one hidden layer outputs a **mean μ** and a **standard deviation σ** for each code dimension.\n- **Sampling:** **z = μ + σ ⊙ ε** with ε drawn from N(0, I); ⊙ multiplies element by element.\n- **KL term in closed form:** for Gaussians, minus the KL divergence is **½ Σ (1 + log σ² − μ² − σ²)**, so only the reconstruction term needs sampling.\n- **Decoder:** a one-hidden-layer network giving a **Bernoulli** (binary data) or **Gaussian** (real-valued data) distribution over x.\n- **Training:** minibatches of **M = 100** data points with **L = 1** sample each, optimised with Adagrad."
+  outcome: "**A trainable generative model with a usable code space.**\n\n- **Against wake-sleep:** on MNIST and Frey Face the authors' method converged **considerably faster** and reached a **better bound in all experiments**.\n- **No overfitting from extra codes:** adding latent dimensions, up to **200** on MNIST, did not cause overfitting, which the authors credit to the bound's regularising effect.\n- **Pictures of the code space:** with a **2-dimensional** code, decoding a grid of codes draws a learned map of digits or faces.\n- **Found twice:** the paper notes that **Rezende, Mohamed and Wierstra (2014)** made the same connection independently.\n- **Descendants:** VQ-VAE (2017) uses **discrete** codes and a learnt prior; NVAE (2020) reached **256 × 256** images; latent diffusion (2021) trains its diffusion model in the code space of an autoencoder with a **slight KL penalty towards a standard normal**, similar to a VAE.\n- **Diffusion models:** **Ho et al. (2020)** describe them as a class of **latent variable models** and obtain their best results by training on a **weighted variational bound**."
 
 key_equation:
-  latex: "\\log p(x) \\;\\ge\\; \\underbrace{\\mathbb{E}_{q(z\\mid x)}\\!\\left[\\log p(x\\mid z)\\right]}_{\\text{reconstruction}} \\;-\\; \\underbrace{D_{\\mathrm{KL}}\\!\\left(q(z\\mid x)\\,\\|\\,p(z)\\right)}_{\\text{stay tidy}}"
-  plain: "We cannot compute the true likelihood of the data directly, so we maximize a lower bound on it — the evidence lower bound (ELBO). It has two parts pulling against each other: the reconstruction term rewards codes that let the decoder rebuild the input, while the KL term pushes every encoded distribution toward a simple standard-normal prior so the latent space stays smooth and gap-free. Push the bound up and both goals improve together."
+  latex: "\\mathcal{L}(\\theta, \\phi; x) \\simeq \\underbrace{\\tfrac{1}{2} \\sum_{j=1}^{J} \\left(1 + \\log \\sigma_j^2 - \\mu_j^2 - \\sigma_j^2\\right)}_{-D_{\\mathrm{KL}}(q_\\phi(z \\mid x)\\,\\|\\,p_\\theta(z))} + \\underbrace{\\log p_\\theta(x \\mid z)}_{\\text{reconstruction}}, \\qquad z = \\mu + \\sigma \\odot \\epsilon,\\;\\; \\epsilon \\sim \\mathcal{N}(0, I)"
+  plain: "In words: the score to maximise for one data point x has two parts. The first is minus the KL divergence between the encoder's Gaussian and the standard-normal prior, computed exactly from the encoder's means μ and standard deviations σ; it is 0 when every μ is 0 and every σ is 1, and negative otherwise. The second is how probable the decoder makes x, given a code z drawn by adding σ times random noise to μ. This is the paper's equation (10) with one sample, as in its experiments. The worked example above computes both parts by hand."
   terms:
-    - { symbol: "log p(x)", meaning: "the (intractable) log-likelihood of the data we ultimately want to maximize" }
-    - { symbol: "q(z|x)", meaning: "the encoder — the approximate posterior, a Gaussian over codes z given input x" }
-    - { symbol: "p(x|z)", meaning: "the decoder — the probability of reconstructing x from a code z" }
-    - { symbol: "p(z)", meaning: "the prior over codes, a standard normal N(0, I) — the 'tidy center' the KL term pulls toward" }
-    - { symbol: "D_KL", meaning: "Kullback–Leibler (KL) divergence — how far the encoder's distribution is from the prior" }
+    - { symbol: "x", meaning: "one data point, such as the pixels of an image" }
+    - { symbol: "z", meaning: "the code (latent variable) for x, with J dimensions" }
+    - { symbol: "μ_j, σ_j", meaning: "the mean and standard deviation of code dimension j, output by the encoder for this x" }
+    - { symbol: "ε", meaning: "random noise drawn from a standard normal, independent of the networks" }
+    - { symbol: "q_φ(z|x)", meaning: "the encoder: a Gaussian over codes given x, with network weights φ" }
+    - { symbol: "p_θ(x|z)", meaning: "the decoder: the probability of x given a code, with network weights θ" }
+    - { symbol: "p_θ(z)", meaning: "the prior over codes: a standard normal N(0, I)" }
+    - { symbol: "D_KL", meaning: "the Kullback–Leibler (KL) divergence, a measure of how far one distribution is from another; never negative" }
 
 strengths:
-  - "A single objective, the variational lower bound, optimized with standard stochastic gradient methods."
-  - "A continuous latent space you can sample from and decode into new data."
-  - "Fast sampling and an encoder network that is easy to access, as the NVAE authors note."
-  - "A probabilistic footing: a tractable lower bound on the data likelihood and a reusable compressed representation."
+  - "**One objective, ordinary training:** the authors' estimator of the lower bound can be differentiated and optimised with **standard stochastic gradient** methods."
+  - "**Fast inference for each data point:** the trained encoder gives an approximate posterior in one pass, **without iterative schemes such as MCMC** for each data point, the authors write."
+  - "**Extra code dimensions did not overfit:** superfluous latent variables did not cause overfitting in the authors' experiments, which they attribute to the **regularising nature** of the bound."
+  - "**Fast sampling, accessible encoder:** the NVAE authors list **fast and tractable sampling** and **easy-to-access encoding networks** as advantages of VAEs over other likelihood-based models."
 
 weaknesses:
-  - "Posterior collapse: paired with a powerful autoregressive decoder, the latents can be ignored (noted in the VQ-VAE paper)."
-  - "As of 2020, VAEs were outperformed on likelihood by normalizing flows and autoregressive models, per the NVAE authors."
+  - "**Posterior collapse:** the VQ-VAE authors write that in the VAE framework the latents are typically **ignored** when paired with a powerful **autoregressive decoder**."
+  - "**Lower likelihood than rivals (2020):** the NVAE authors write that VAEs were then **outperformed** by normalising flows and autoregressive models."
+  - "**A bound, not the likelihood:** the gap between the log-likelihood and the bound is the **KL divergence** from the encoder to the true posterior, and the true posterior is exactly what cannot be computed here."
+  - "**Continuous codes only:** the reparameterisation needs continuous latent variables; the authors note that the wake-sleep algorithm, unlike theirs, also applies to **discrete** ones."
+  - "**Deep versions are unstable:** the NVAE authors write that training very deep hierarchical VAEs is **often unstable**, because the KL divergence in the bound is **unbounded**."
+
+comparison:
+  before: "Earlier approaches"
+  after: "Auto-Encoding Variational Bayes (the VAE)"
+  rows:
+    - { aspect: "Gradient of the bound for the encoder's parameters", before: "The usual Monte Carlo estimator: very high variance, impractical", after: "Reparameterised samples z = μ + σ ⊙ ε give a differentiable estimator", source: "https://arxiv.org/abs/1312.6114" }
+    - { aspect: "Objective (wake-sleep algorithm)", before: "Two objective functions optimised together, which do not correspond to a bound on the likelihood", after: "One lower bound, optimised for encoder and decoder jointly", source: "https://arxiv.org/abs/1312.6114" }
+    - { aspect: "Inference for each data point (Monte Carlo EM)", before: "An expensive sampling loop per data point; not efficient on the full MNIST set", after: "One pass through the encoder", source: "https://arxiv.org/abs/1312.6114" }
+    - { aspect: "Keeping the code useful (autoencoders)", before: "Added regularisers (denoising, contractive, sparse) with a nuisance hyperparameter", after: "The KL term, set by the bound itself, with no such hyperparameter", source: "https://arxiv.org/abs/1312.6114" }
+    - { aspect: "Bound reached on MNIST and Frey Face", before: "Wake-sleep: slower, and a worse bound", after: "Considerably faster convergence and a better bound in all experiments", source: "https://arxiv.org/abs/1312.6114" }
+    - { aspect: "Discrete latent variables", before: "Wake-sleep handles them", after: "Not covered: the method is for continuous latent variables", source: "https://arxiv.org/abs/1312.6114" }
+
+key_numbers:
+  columns: ["Setting (Kingma & Welling)", "MNIST", "Frey Face"]
+  rows:
+    - { cells: ["Hidden units in the encoder and in the decoder", "500", "200 (a smaller dataset, to prevent overfitting)"], source: "https://arxiv.org/abs/1312.6114" }
+    - { cells: ["Code dimensions tried (N_z)", "3, 5, 10, 20, 200", "2, 5, 10, 20"], source: "https://arxiv.org/abs/1312.6114" }
+    - { cells: ["Minibatch size M and samples per data point L", "M = 100, L = 1", "M = 100, L = 1"], source: "https://arxiv.org/abs/1312.6114" }
+    - { cells: ["Starting weights", "Drawn from N(0, 0.01)", "Drawn from N(0, 0.01)"], source: "https://arxiv.org/abs/1312.6114" }
+    - { cells: ["Step size", "Adagrad, global step chosen from 0.01, 0.02 and 0.1", "Adagrad, global step chosen from 0.01, 0.02 and 0.1"], source: "https://arxiv.org/abs/1312.6114" }
+    - { cells: ["Marginal-likelihood experiment", "100 hidden units, 3 code dimensions", "not run"], source: "https://arxiv.org/abs/1312.6114" }
+    - { cells: ["Compute", "About 20 to 40 minutes per million training samples on an Intel Xeon CPU at an effective 40 GFLOPS", "Same"], source: "https://arxiv.org/abs/1312.6114" }
+
+misunderstandings:
+  - misunderstanding: "The KL term is a regulariser added to an autoencoder by hand."
+    truth: "It comes out of the **lower bound** itself: the bound equals the expected log-probability of x under the decoder **minus** the KL divergence from q(z|x) to the prior. The authors contrast this with autoencoder regularisers that need a **nuisance hyperparameter**, which their objective lacks."
+    source: "https://arxiv.org/abs/1312.6114"
+  - misunderstanding: "The encoder outputs a single code for each input."
+    truth: "It outputs a **distribution** over codes, in the paper a Gaussian with mean μ and standard deviation σ. A code is drawn as **z = μ + σ ⊙ ε** with noise ε from N(0, I), which keeps the sampling step differentiable with respect to μ and σ."
+    source: "https://arxiv.org/abs/1312.6114"
+  - misunderstanding: "Kingma and Welling were the only ones to find this method."
+    truth: "Their paper states that **Rezende, Mohamed and Wierstra (2014)** made the connection between auto-encoders, directed probabilistic models and stochastic variational inference with the same reparameterisation, **developed independently**."
+    source: "https://arxiv.org/abs/1312.6114"
+  - misunderstanding: "VQ-VAE is a VAE trained on the same bound with discrete codes."
+    truth: "The NVAE authors write that although VQ-VAE is **motivated** by VAEs, its objective **does not correspond to a lower bound** on the data log-likelihood. VQ-VAE's own paper lists its two differences: **discrete** codes and a **learnt** prior rather than a fixed one."
+    source: "https://arxiv.org/abs/2007.03898"
 
 diagram_svg: |
   <svg class="atlas-figure" viewBox="0 0 860 470" role="img" aria-label="A variational autoencoder: the encoder maps x to a mean μ and a spread σ, a separate noise sample ε gives the latent z = μ + σ ⊙ ε, and the decoder rebuilds x̂ from the narrow latent; the loss is reconstruction of x̂ against x plus a KL term pulling q(z|x) toward N(0, I).">
@@ -115,8 +147,8 @@ diagram_svg: |
 diagram_caption: "The encoder outputs a mean μ and spread σ; outside noise ε gives the latent z = μ + σ ⊙ ε, so gradients reach μ and σ. The decoder rebuilds x̂; the loss adds reconstruction and a KL pull toward N(0, I)."
 notable_models:
   - { name: "VAE", year: 2013, note: "The original: encoder and decoder trained jointly on a reparameterized variational lower bound with stochastic gradients." }
-  - { name: "VQ-VAE", year: 2017, note: "Discrete rather than continuous codes, via vector quantization, and a learnt prior; generated images, video and speech." }
-  - { name: "NVAE", year: 2020, note: "A deep hierarchical VAE with state-of-the-art results among non-autoregressive likelihood models; the authors report it as the first successful VAE on natural images as large as 256×256." }
+  - { name: "VQ-VAE", year: 2017, note: "Discrete rather than continuous codes, via vector quantisation, and a learnt prior; with an autoregressive prior it generated images, videos and speech." }
+  - { name: "NVAE", year: 2020, note: "A deep hierarchical VAE with state-of-the-art results among non-autoregressive likelihood-based models (2.91 bits per dimension on CIFAR-10); the authors report it as the first successful VAE on natural images as large as 256×256 pixels." }
 
 resources:
   - { kind: paper, title: "Auto-Encoding Variational Bayes (Kingma & Welling, 2013)", url: "https://arxiv.org/abs/1312.6114" }
@@ -125,35 +157,107 @@ resources:
   - { kind: video, title: "Variational Autoencoders (Arxiv Insights)", url: "https://www.youtube.com/watch?v=9zKuYvjFFS8" }
 
 learn_first:
-  - { label: "Autoencoders (compress then reconstruct)", href: "/models/architecture/autoencoder", tag: "Architecture" }
   - { label: "Probability distributions & the Gaussian", href: "/learn/concepts/gaussian", tag: "Math" }
   - { label: "KL divergence", href: "/learn/concepts/kl-divergence", tag: "Math" }
 
 tags: [vae, generation, latent-variable, variational-inference]
-updated: '2026-11-21'
+updated: '2026-11-23'
 sources:
-  - { url: "https://arxiv.org/abs/1312.6114", title: "Auto-Encoding Variational Bayes (Kingma & Welling, 2013)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1711.00937", title: "Neural Discrete Representation Learning (van den Oord et al., 2017)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2007.03898", title: "NVAE: A Deep Hierarchical Variational Autoencoder (Vahdat and Kautz, 2020)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2006.11239", title: "Denoising Diffusion Probabilistic Models (Ho et al., 2020)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/2112.10752", title: "High-Resolution Image Synthesis with Latent Diffusion Models (Rombach et al., 2021)", trust: 0.95 }
-  - { url: "https://lilianweng.github.io/posts/2018-08-12-vae/", title: "From Autoencoder to Beta-VAE (Lilian Weng)", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/1312.6114", title: "Auto-Encoding Variational Bayes (Kingma & Welling, arXiv:1312.6114, 2013)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/1711.00937", title: "Neural Discrete Representation Learning (van den Oord, Vinyals & Kavukcuoglu, arXiv:1711.00937, 2017)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2007.03898", title: "NVAE: A Deep Hierarchical Variational Autoencoder (Vahdat & Kautz, arXiv:2007.03898, 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2006.11239", title: "Denoising Diffusion Probabilistic Models (Ho, Jain & Abbeel, arXiv:2006.11239, 2020)", trust: 0.95 }
+  - { url: "https://arxiv.org/abs/2112.10752", title: "High-Resolution Image Synthesis with Latent Diffusion Models (Rombach et al., arXiv:2112.10752, 2021)", trust: 0.95 }
 ---
 
 ## What Changed
-Kingma and Welling (2013) pair an **encoder** that maps a data point to a *distribution* over latent
-codes with a **decoder** that reconstructs data from a sampled code. Training maximizes the **evidence
-lower bound (ELBO)**: reconstruction quality minus a Kullback–Leibler (KL) term pulling the encoder's
-posterior toward the prior (a centered isotropic Gaussian in the paper's example).
 
-The technical step is the **reparameterization trick**: writing a sampled latent as mean + spread ×
-external noise, so gradients flow through the sampling step and the model trains by backpropagation.
+A plain autoencoder squeezes each input into **one code** and rebuilds it. A VAE's encoder gives a
+**range of likely codes**, and training rewards both good rebuilding and ranges that stay close to
+a simple standard-normal prior.
+
+How to read the table above:
+
+- **Latent variable (code):** a hidden number, or list of numbers, that the model assumes
+  produced each data point; it is never observed.
+- **Lower bound:** a number that is always at or below the log-likelihood of the data; raising it
+  is the training goal, because the likelihood itself cannot be computed.
+- **Variance of an estimator:** how much a random estimate jumps around; a gradient estimate with
+  very high variance gives steps too noisy to train with.
+- **Wake-sleep** and **Monte Carlo EM** are the two earlier methods the paper compares against.
 
 ## Key Ideas
-- **Probabilistic encoder**: outputs a posterior *q(z|x)*, for example a Gaussian, rather than a point.
-- **ELBO objective**: maximize a tractable lower bound on data likelihood, a reconstruction term minus
-  a KL term toward the prior.
-- **Reparameterization trick**: express sampling as a deterministic function of the parameters plus
-  external noise, enabling gradient-based training through a stochastic node.
-- **Related models**: diffusion models are also latent-variable models trained on a variational bound
-  (Ho et al., 2020).
+
+- **Probabilistic encoder:** the encoder outputs a mean and a standard deviation for each code
+  dimension, not one fixed code.
+- **One bound, two parts:** a reconstruction term rewards rebuilding x; a KL term keeps the
+  encoder's Gaussian close to the prior N(0, I).
+- **Reparameterisation:** a code is the mean plus the standard deviation times outside noise, so
+  gradients pass through the random draw.
+- **Generation:** after training, codes drawn from N(0, I) and passed through the decoder give new
+  data.
+
+## How It Works
+
+The figure above runs from the input x on the left to its reconstruction x̂ on the right; the
+two boxes outside the main row are the two parts of the loss.
+
+A **Gaussian** (normal distribution) is the bell curve, set by a mean (its centre) and a standard
+deviation (its width). N(0, I) is the standard one: mean 0 and width 1 in every dimension.
+
+1. **Input x.** One data point, such as the pixels of a digit image.
+2. **Encoder q_φ(z | x).** A network with weights φ reads x and outputs two lists: a mean **μ**
+   and a standard deviation **σ** for each code dimension. In the paper it has one hidden layer;
+   the experiments used 500 hidden units on MNIST.
+3. **Noise ε ~ N(0, I).** A random draw from the standard normal, one number per code dimension.
+   It comes from outside the networks.
+4. **Reparameterisation (the boxed ⊙ and +).** The code is z = μ + σ ⊙ ε: each σ times its noise,
+   added to its μ. Because ε does not depend on the weights, the change of z with μ is 1 and with
+   σ is ε, so gradients reach the encoder.
+5. **Latent bottleneck z.** The sampled code, with far fewer numbers than x; the paper tried 2
+   to 200 dimensions.
+6. **Decoder p_θ(x | z).** A second network with weights θ turns z into a distribution over x:
+   for binary pixels, one probability per pixel (Bernoulli); for real values, a Gaussian.
+7. **Reconstruction term (bottom box).** −log p_θ(x | z): small when the decoder gives the real x
+   a high probability.
+8. **KL term (top box).** The divergence between the encoder's Gaussian and N(0, I), computed
+   exactly from μ and σ: ½ Σ (μ² + σ² − 1 − log σ²) for the paper's Gaussians.
+9. **Loss and training.** The loss is reconstruction plus KL, the negative of the bound. Encoder
+   and decoder are updated together by stochastic gradients on minibatches of 100 data points,
+   one noise sample each.
+10. **Making new data.** Draw z from N(0, I) and run only the decoder.
+
+## Worked Example
+
+**The two parts of the loss for one data point, by hand**, with a 2-number code and a 3-pixel
+image. The encoder's outputs, the noise and the decoder's outputs are made up so every step can be
+checked: an example, not from a trained model.
+
+The image is x = (1, 0, 1). The encoder returns μ = (0.5, −1.0) and σ = (1.0, 0.5), and the noise
+draw is ε = (0.4, −0.2). "log" is the natural logarithm; numbers are rounded to 4 decimals.
+
+1. **Draw the code.** z = μ + σ ⊙ ε:
+   - z₁ = 0.5 + 1.0 × 0.4 = **0.9**.
+   - z₂ = −1.0 + 0.5 × (−0.2) = **−1.1**.
+2. **How z responds to the encoder** (what the reparameterisation buys):
+   - Raising μ₁ or μ₂ by a little raises z by the same amount: the rate is **1**.
+   - Raising σ₁ raises z₁ at rate ε₁ = **0.4**; raising σ₂ changes z₂ at rate ε₂ = **−0.2**.
+3. **KL term, dimension 1** (μ = 0.5, σ = 1.0, log σ² = log 1 = 0):
+   - ½ × (1 + 0 − 0.25 − 1) = **−0.125**.
+4. **KL term, dimension 2** (μ = −1.0, σ = 0.5, log σ² = log 0.25 = −1.3863):
+   - ½ × (1 − 1.3863 − 1 − 0.25) = **−0.8181**.
+   - Together: −0.125 − 0.8181 = −0.9431, so the **KL divergence is 0.9431**.
+5. **Decode.** Suppose the decoder turns z into pixel probabilities y = (0.9, 0.2, 0.7).
+6. **Reconstruction term**, log p(x | z) = Σ [x log y + (1 − x) log(1 − y)]:
+   - pixel 1 (x = 1): log 0.9 = **−0.1054**.
+   - pixel 2 (x = 0): log(1 − 0.2) = log 0.8 = **−0.2231**.
+   - pixel 3 (x = 1): log 0.7 = **−0.3567**.
+   - Total: **−0.6852**.
+7. **The bound.** −0.9431 + (−0.6852) = **−1.6283**; the training loss is its negative,
+   **1.6283**.
+8. **Where the KL term is zero.** With μ = 0 and σ = 1 a dimension gives ½ × (1 + 0 − 0 − 1) =
+   **0**: no penalty for matching the prior exactly.
+
+**What this means:** the loss charges for a bad rebuild (0.6852) and for codes that stray from
+the standard normal (0.9431). Dimension 2, pulled to −1 and narrowed to 0.5, cost far more than
+dimension 1. Because z was built as μ + σ ⊙ ε, both costs can send gradients back to the encoder.
