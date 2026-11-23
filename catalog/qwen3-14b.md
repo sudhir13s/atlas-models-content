@@ -2,15 +2,14 @@
 id: model/qwen3-14b
 type: model
 slug: qwen3-14b
-schema_version: 1.1
+schema_version: 3.0
 title: Qwen3-14B
 organization: organization/qwen
 release_date: '2025-04-27'
-release_year: 2025
-release_month: 4
 license: license/apache-2-0
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 14.77
@@ -30,7 +29,6 @@ fingerprint:
   head_size: 128
   hidden_size: 5120
   intermediate_size: 17408
-  context_window_tokens: 32768
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -42,7 +40,6 @@ filters:
   size_category: medium
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -69,13 +66,8 @@ quotes:
   running_it: '**DO NOT use greedy decoding**, as it can lead to performance degradation and endless repetitions.'
 locked:
 - context_window_tokens
-- fingerprint.context_window_tokens
 tags:
-- llm
-- text-generation
 - qwen3
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-14B
@@ -95,14 +87,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Qwen3-14B is a 14.8B-parameter language model from Qwen, part of the Qwen3 generation of dense and mixture-of-experts models. It was post-trained from Qwen/Qwen3-14B-Base. The card lists a context of 32,768 tokens natively and 131,072 tokens with YaRN, and support for 100+ languages and dialects.
-
-## What Sets It Apart
-
-Qwen says it supports switching between a thinking mode, for complex logic, math and coding, and a non-thinking mode, for efficient general dialogue, within a single model. It also claims better reasoning than the earlier QwQ and Qwen2.5 instruct models on mathematics, code generation and commonsense reasoning, and stronger agent abilities for working with external tools.
-
-## Running It
-
-The card gives different sampling settings per mode. Thinking mode uses temperature 0.6, top_p 0.95, top_k 20 and min_p 0, and greedy decoding should not be used. Non-thinking mode, selected with enable_thinking=False, uses temperature 0.7, top_p 0.8, top_k 20 and min_p 0. It recommends an output length of 32,768 tokens for most queries. For inputs beyond 32,768 tokens it describes enabling YaRN, a technique for extending the length a model handles, but warns that its static form may affect shorter texts.

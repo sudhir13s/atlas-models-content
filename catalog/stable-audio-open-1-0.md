@@ -2,14 +2,13 @@
 id: model/stable-audio-open-1-0
 type: model
 slug: stable-audio-open-1-0
-schema_version: 1.1
+schema_version: 3.0
 title: stable-audio-open-1.0
 organization: organization/stabilityai
 release_date: '2024-05-24'
-release_year: 2024
-release_month: 5
 license_note: stable-audio-community
 model_category: generation
+model_kind: diffusion
 tasks:
 - task/music-and-sound-generation
 total_parameters: 1213448210
@@ -105,8 +104,7 @@ quotes:
   intended_use: 'The primary use of Stable Audio Open is research and experimentation on AI-based music and audio generation, including:'
   what_sets_it_apart: 'It comprises three components: an autoencoder that compresses waveforms into a manageable sequence length, a T5-based text embedding for text conditioning, and a transformer-based diffusion (DiT) model that operates in the latent space of the autoencoder.'
   limitations: The model is not able to generate realistic vocals.
-tags:
-- text-to-audio
+tags: []
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/stabilityai/stable-audio-open-1.0
@@ -117,18 +115,4 @@ sources:
   trust: 0.95
 ---
 
-## Summary
 
-Stable Audio Open 1.0 is a text-to-audio model from Stability AI: you describe a sound or piece of music in words and it generates it. The card says it produces variable-length stereo audio of up to 47 seconds at 44.1 kHz from text prompts.
-
-## Intended Use
-
-The card says the primary use is research and experimentation on AI-based music and audio generation. That includes research into the limits of generative models, and text-guided generation of music and audio by machine learning practitioners and artists. It says the model should not be used in downstream applications without further risk evaluation, or to create audio that creates hostile or alienating environments.
-
-## What Sets It Apart
-
-The card describes three components: an autoencoder that compresses waveforms into a manageable sequence length, a T5-based text embedding for text conditioning, and a transformer-based diffusion model working in the autoencoder's compressed space. It says the training data is 486,492 recordings from Freesound and the Free Music Archive, all under CC0, CC BY or CC Sampling+ licenses.
-
-## Limitations
-
-The card lists these limits: it cannot generate realistic vocals, it was trained on English descriptions and performs worse in other languages, it does not work equally well across music styles and cultures, and it is better at sound effects and field recordings than at music. It adds that prompt engineering may be needed to get good results.

@@ -2,14 +2,13 @@
 id: model/mitra-regressor
 type: model
 slug: mitra-regressor
-schema_version: 1.1
+schema_version: 3.0
 title: mitra-regressor
 organization: organization/autogluon
 release_date: '2025-06-22'
-release_year: 2025
-release_month: 6
 license: license/apache-2-0
 model_category: structured-data
+model_kind: tabular-time-series
 tasks:
 - task/tabular-regression
 parameters_active_b: 0.08
@@ -87,7 +86,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: tabular-regression
 hub_signals:
@@ -105,10 +103,7 @@ quotes:
   summary: Mitra regressor is a tabular foundation model that is pre-trained on purely synthetic datasets sampled from a mix of random regressors.
   what_sets_it_apart: Mitra is based on a 12-layer Transformer of 72 M parameters, pre-trained by incorporating an in-context learning paradigm.
   running_it: 'To use Mitra regressor, install AutoGluon by running:'
-tags:
-- tabular-regression
-- dense
-- mha
+tags: []
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/autogluon/mitra-regressor
@@ -125,14 +120,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Mitra regressor is a tabular foundation model published on Hugging Face by the AutoGluon project. A tabular regression model predicts a number, such as a price, for each row of a table, and a foundation model here means one pre-trained once and then applied to new tables. The card says it is pre-trained purely on synthetic datasets sampled from a mix of random regressors, and it is a 12-layer Transformer of 72 million parameters.
-
-## What Sets It Apart
-
-The card says Mitra is pre-trained using an in-context learning paradigm, in which the model reads example rows as part of its input instead of being retrained for each table. It also stresses that all of its pre-training data is synthetic, drawn from a mix of random regressors.
-
-## Running It
-
-The card says to install AutoGluon with the mitra extra and call it through TabularPredictor with the MITRA hyperparameters. Its example sets fine_tune to False and fits on a sample of 1000 rows.

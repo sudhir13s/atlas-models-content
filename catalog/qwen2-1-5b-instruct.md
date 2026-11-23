@@ -2,15 +2,14 @@
 id: model/qwen2-1-5b-instruct
 type: model
 slug: qwen2-1-5b-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: Qwen2-1.5B-Instruct
 organization: organization/qwen
 release_date: '2024-06-03'
-release_year: 2024
-release_month: 6
 license: license/apache-2-0
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 1.54
@@ -26,7 +25,6 @@ fingerprint:
   head_size: 128
   hidden_size: 1536
   intermediate_size: 8960
-  context_window_tokens: 32768
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -38,7 +36,6 @@ filters:
   size_category: small
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -58,11 +55,7 @@ quotes:
   summary: This repo contains the instruction-tuned 1.5B Qwen2 model.
   what_sets_it_apart: It is based on the Transformer architecture with SwiGLU activation, attention QKV bias, group query attention, etc.
 tags:
-- llm
-- text-generation
 - qwen2
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2-1.5B-Instruct
@@ -76,10 +69,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Qwen2-1.5B-Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned 1.5-billion-parameter model of the Qwen2 series, which means a base model was trained further to follow instructions and hold a conversation. The card says Qwen2 ranges from 0.5 to 72 billion parameters, including a Mixture-of-Experts model, and its metadata lists Qwen2.5-1.5B-Instruct as the newer version.
-
-## What Sets It Apart
-
-The card says Qwen2 is based on the Transformer architecture with SwiGLU activation, attention QKV bias and grouped-query attention, and has an improved tokenizer adapted to many natural languages and to code. It says the models were post-trained with both supervised fine-tuning and direct preference optimization.

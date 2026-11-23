@@ -2,15 +2,14 @@
 id: model/smollm2-1-7b-instruct
 type: model
 slug: smollm2-1-7b-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: SmolLM2-1.7B-Instruct
 organization: organization/hugging-face
 release_date: '2024-10-31'
-release_year: 2024
-release_month: 10
 license: license/apache-2-0
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 1.71
@@ -31,7 +30,6 @@ fingerprint:
   head_size: 64
   hidden_size: 2048
   intermediate_size: 8192
-  context_window_tokens: 8192
   vocabulary_size: 49152
   activation_function: silu
   normalization: RMSNorm
@@ -43,7 +41,6 @@ filters:
   size_category: small
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -65,11 +62,7 @@ quotes:
   what_sets_it_apart: We developed the instruct version through supervised fine-tuning (SFT) using a combination of public datasets and our own curated datasets.
   limitations: SmolLM2 models primarily understand and generate content in English.
 tags:
-- llm
-- text-generation
 - llama
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct
@@ -86,18 +79,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-SmolLM2-1.7B-Instruct is the instruction-tuned 1.7-billion-parameter model of SmolLM2, a family of compact language models from Hugging Face that the card says are light enough to run on-device. The card says the base model was trained on 11 trillion tokens, and the instruct version was then trained further to follow instructions.
-
-## Intended Use
-
-The card says the instruct model supports tasks such as text rewriting, summarization and function calling, and that the models in the family can solve a wide range of tasks while being light enough to run on a device.
-
-## What Sets It Apart
-
-The card says the 1.7B model improves on its predecessor SmolLM1-1.7B in instruction following, knowledge, reasoning and mathematics. The instruct version was built with supervised fine-tuning on public and self-curated datasets, followed by Direct Preference Optimization, a method that teaches the model from ranked answer pairs, using UltraFeedback.
-
-## Limitations
-
-The card says SmolLM2 models mainly understand and produce English, and their output may not always be factually accurate, logically consistent or free of bias from the training data. They should be treated as assistive tools rather than definitive sources, and important information should be verified.

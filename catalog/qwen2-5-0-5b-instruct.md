@@ -2,15 +2,14 @@
 id: model/qwen2-5-0-5b-instruct
 type: model
 slug: qwen2-5-0-5b-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: Qwen2.5-0.5B-Instruct
 organization: organization/qwen
 release_date: '2024-09-16'
-release_year: 2024
-release_month: 9
 license: license/apache-2-0
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 0.49
@@ -30,7 +29,6 @@ fingerprint:
   head_size: 64
   hidden_size: 896
   intermediate_size: 4864
-  context_window_tokens: 32768
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -42,7 +40,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -63,11 +60,7 @@ quotes:
   what_sets_it_apart: Significantly **more knowledge** and has greatly improved capabilities in **coding** and **mathematics**, thanks to our specialized expert models in these domains.
   running_it: 'With `transformers<4.37.0`, you will encounter the following error:'
 tags:
-- llm
-- text-generation
 - qwen2
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct
@@ -84,14 +77,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Qwen2.5 0.5B Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned member of the Qwen2.5 series at the 0.5B size, which means the base model was trained further to follow instructions and hold a conversation. The card lists 0.49B parameters and 24 layers, and says the Qwen2.5 series ranges from 0.5 to 72 billion parameters.
-
-## What Sets It Apart
-
-Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. For this size the card lists a full context of 32,768 tokens with generation up to 8192 tokens, and support for over 29 languages.
-
-## Running It
-
-The card says the model needs a recent version of the Hugging Face transformers library: with versions older than 4.37.0 loading fails with a KeyError on the name qwen2.

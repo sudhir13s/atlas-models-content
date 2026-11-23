@@ -2,15 +2,14 @@
 id: model/deepseek-coder-6-7b-instruct
 type: model
 slug: deepseek-coder-6-7b-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: deepseek-coder-6.7b-instruct
 organization: organization/deepseek
 release_date: '2023-10-29'
-release_year: 2023
-release_month: 10
 license: license/deepseek
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 - task/code-models
@@ -26,7 +25,6 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 11008
-  context_window_tokens: 16384
   vocabulary_size: 32256
   activation_function: silu
   normalization: RMSNorm
@@ -38,7 +36,6 @@ filters:
   size_category: small
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -71,11 +68,7 @@ generated_by:
   model: gemini/gemini-3.5-flash-lite
   prompt_version: 2.0.0
 tags:
-- llm
-- text-generation
 - llama
-- dense
-- mha
 updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct
@@ -89,6 +82,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-deepseek-coder-6.7b-instruct is a 6.7B parameter model initialized from deepseek-coder-6.7b-base and fine-tuned on 2B tokens of instruction data by DeepSeek.

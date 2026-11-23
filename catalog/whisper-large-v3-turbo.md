@@ -2,14 +2,13 @@
 id: model/whisper-large-v3-turbo
 type: model
 slug: whisper-large-v3-turbo
-schema_version: 1.1
+schema_version: 3.0
 title: whisper-large-v3-turbo
 organization: organization/openai
 release_date: '2024-10-01'
-release_year: 2024
-release_month: 10
 license: license/mit
 model_category: audio
+model_kind: audio-speech
 tasks:
 - task/speech-recognition
 parameters_active_b: 0.81
@@ -60,9 +59,7 @@ quotes:
   what_sets_it_apart: the number of decoding layers have reduced from 32 to 4
   limitations: the predictions may include texts that are not actually spoken in the audio input
 tags:
-- automatic-speech-recognition
 - whisper
-- dense
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/openai/whisper-large-v3-turbo
@@ -79,18 +76,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Whisper large-v3-turbo is a speech recognition model from OpenAI: it turns spoken audio into text, a task called automatic speech recognition (ASR), and can translate speech into English. The card says it is a finetuned version of a pruned Whisper large-v3, the same model except that the decoding layers are cut from 32 to 4, which makes it faster at the expense of a minor quality degradation.
-
-## Intended Use
-
-The card says Whisper models are primarily trained and evaluated on speech recognition and on speech translation into English, with strong recognition results in about 10 languages. They may show other abilities, such as voice activity detection or speaker diarization after fine-tuning, but these were not robustly evaluated, and the card urges users to test in their own context before deploying.
-
-## What Sets It Apart
-
-The card describes Whisper as a Transformer encoder-decoder model trained on more than 5 million hours of labeled data, which generalizes zero-shot, meaning without extra training, to many datasets and domains. This turbo version keeps the same encoder and reduces the decoder to 4 layers. By default the model predicts the source language automatically and transcribes, and setting the task to translate produces English text.
-
-## Limitations
-
-The card says the models were trained on large-scale noisy data in a weakly supervised way, so output may include text that was not spoken, a failure called hallucination. They perform unevenly across languages, accents and dialects, and the card says they are prone to repetitive text.

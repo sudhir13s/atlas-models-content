@@ -2,9 +2,145 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://theaiatlas.dev/schema/models/model.schema.json",
   "title": "model",
-  "allOf": [{ "$ref": "_shared.schema.json#/$defs/base" }],
+  "allOf": [
+    {
+      "$ref": "_shared.schema.json#/$defs/base"
+    },
+    {
+      "description": "a language transformer states its stack, unless its repository is gated",
+      "if": {
+        "properties": {
+          "model_kind": {
+            "const": "transformer-language"
+          }
+        },
+        "required": [
+          "model_kind"
+        ]
+      },
+      "then": {
+        "anyOf": [
+          {
+            "required": [
+              "fingerprint"
+            ]
+          },
+          {
+            "description": "a gated repository whose config.json cannot be read has no fingerprint yet",
+            "required": [
+              "filters"
+            ],
+            "properties": {
+              "filters": {
+                "required": [
+                  "is_gated"
+                ],
+                "properties": {
+                  "is_gated": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "description": "a convolutional network has no transformer stack: none of the stack's fields apply",
+      "if": {
+        "properties": {
+          "model_kind": {
+            "const": "convolutional"
+          }
+        },
+        "required": [
+          "model_kind"
+        ]
+      },
+      "then": {
+        "propertyNames": {
+          "not": {
+            "enum": ["fingerprint", "moe_config", "context_window_tokens"]
+          }
+        },
+        "properties": {
+          "filters": {
+            "propertyNames": {
+              "not": {
+                "const": "is_moe"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "only an embedding model states the length of the vector it returns",
+      "if": {
+        "required": [
+          "embedding_dimension"
+        ]
+      },
+      "then": {
+        "properties": {
+          "model_kind": {
+            "const": "embedding"
+          }
+        },
+        "required": [
+          "model_kind"
+        ]
+      }
+    },
+    {
+      "description": "routing facts belong to a model that states it is a mixture of experts",
+      "if": {
+        "required": [
+          "moe_config"
+        ]
+      },
+      "then": {
+        "required": [
+          "filters"
+        ],
+        "properties": {
+          "filters": {
+            "required": [
+              "is_moe"
+            ],
+            "properties": {
+              "is_moe": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "only an audio model states how its signal becomes the sequence its first block reads",
+      "if": {
+        "required": ["fingerprint"],
+        "properties": { "fingerprint": { "required": ["input_stem"] } }
+      },
+      "then": {
+        "required": ["model_kind"],
+        "properties": { "model_kind": { "const": "audio-speech" } }
+      }
+    }
+  ],
+  "$defs": {
+    "encoder_decoder_stack": {
+      "description": "a decoder's own depth or positions are stated only for a stack that has a decoder beside its encoder",
+      "required": ["stack"],
+      "properties": { "stack": { "const": "encoder-decoder" } }
+    }
+  },
   "properties": {
-    "type": { "const": "model" },
+    "type": {
+      "const": "model"
+    },
     "organization": {
       "type": "string",
       "pattern": "^organization/[a-z0-9]+(?:-[a-z0-9]+)*$",
@@ -12,10 +148,9 @@
     },
     "release_date": {
       "type": "string",
-      "description": "ISO date; for records built from Hugging Face, the day the repository was created"
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "ISO date; for records built from Hugging Face, the day the repository was created. The year and month are read from it, never stored beside it"
     },
-    "release_year": { "type": "integer" },
-    "release_month": { "type": "integer", "minimum": 1, "maximum": 12 },
     "license": {
       "type": "string",
       "pattern": "^license/[a-z0-9]+(?:-[a-z0-9]+)*$",
@@ -28,7 +163,10 @@
     "aliases": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "type": "string", "minLength": 1 },
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
       "description": "other names the model is known by (repository ids, earlier slugs)"
     },
     "variants": {
@@ -36,34 +174,107 @@
       "description": "quantised or repackaged copies of this model, published as repositories of their own",
       "items": {
         "type": "object",
-        "required": ["name", "format", "address", "publisher"],
+        "required": [
+          "name",
+          "format",
+          "address",
+          "publisher"
+        ],
         "additionalProperties": false,
         "properties": {
-          "name": { "type": "string", "minLength": 1 },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
           "format": {
             "type": "string",
-            "enum": ["gguf", "awq", "gptq", "fp8", "nvfp4", "bnb-4bit", "w8a8", "mlx", "other"]
+            "enum": [
+              "gguf",
+              "awq",
+              "gptq",
+              "fp8",
+              "nvfp4",
+              "bnb-4bit",
+              "w8a8",
+              "mlx",
+              "other"
+            ]
           },
-          "address": { "type": "string", "format": "uri" },
-          "publisher": { "type": "string", "minLength": 1, "description": "Hugging Face handle of whoever published the copy" }
+          "address": {
+            "type": "string",
+            "format": "uri"
+          },
+          "publisher": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Hugging Face handle of whoever published the copy"
+          }
         }
       }
     },
-    "signal_strength": { "type": "string", "enum": ["high", "medium", "low"] },
-    "architecture_id": { "type": "string", "description": "FK → architecture-era/<slug>" },
+    "signal_strength": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "architecture_id": {
+      "type": "string",
+      "pattern": "^architecture-era/[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "FK → architecture-era/<slug>"
+    },
     "model_category": {
       "type": "string",
-      "description": "kind of model; `language` covers decoder-only and encoder-decoder text models"
+      "enum": [
+        "language",
+        "vision",
+        "audio",
+        "multimodal",
+        "generation",
+        "retrieval",
+        "documents",
+        "structured-data",
+        "robotics-and-control"
+      ],
+      "description": "what the model is for: the task group of its first task; `language` covers decoder-only and encoder-decoder text models"
+    },
+    "model_kind": {
+      "type": "string",
+      "enum": [
+        "transformer-language",
+        "transformer-vision",
+        "multimodal",
+        "convolutional",
+        "diffusion",
+        "audio-speech",
+        "embedding",
+        "tabular-time-series",
+        "control-policy"
+      ],
+      "description": "how the model is built, which decides the architecture blocks and fields that apply (see the rules in `allOf`): `transformer-language` one transformer stack over text tokens; `transformer-vision` a transformer over image or video patches; `multimodal` encoders of more than one kind of input feeding one model; `convolutional` a convolutional network with no transformer stack; `diffusion` a network called in a denoising loop; `audio-speech` a model that reads or writes sound; `embedding` a model that returns one vector per input; `tabular-time-series` a network over table cells or time-series patches; `control-policy` a network that outputs a robot's actions. Absent until a rule or a person places the record; never guessed"
     },
     "tasks": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "type": "string", "pattern": "^task/[a-z0-9]+(?:-[a-z0-9]+)*$" },
+      "items": {
+        "type": "string",
+        "pattern": "^task/[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
       "description": "FKs → task/<slug>; the jobs this model does"
     },
-    "parameters_active_b": { "type": "number" },
-    "total_parameters": { "type": "integer" },
-    "context_window_tokens": { "type": "integer" },
+    "parameters_active_b": {
+      "type": "number",
+      "description": "parameters used per forward pass, in billions; stored here only, never inside `fingerprint`"
+    },
+    "total_parameters": {
+      "type": "integer"
+    },
+    "context_window_tokens": {
+      "type": "integer",
+      "description": "the longest token sequence the model reads; stored here only, never inside `fingerprint`"
+    },
     "embedding_dimension": {
       "type": "integer",
       "minimum": 1,
@@ -74,60 +285,124 @@
       "description": "the models this one was trained from that have no record here, nearest first, as the model card's `base_model` field or text names them; a base model with a record goes in `lineage.parents` instead",
       "items": {
         "type": "object",
-        "required": ["name", "address"],
+        "required": [
+          "name",
+          "address"
+        ],
         "additionalProperties": false,
         "properties": {
-          "name": { "type": "string", "minLength": 1, "description": "the repository id or name as the source gives it" },
-          "address": { "type": "string", "format": "uri" }
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "the repository id or name as the source gives it"
+          },
+          "address": {
+            "type": "string",
+            "format": "uri"
+          }
         }
       }
     },
-    "summary": { "type": "string", "description": "what the model is: its kind, its family or base model, what it was built to do; absent means the record has no prose yet, the prose queue writes it" },
-    "intended_use": { "type": "string", "description": "the tasks and users the source names, and uses it puts out of scope; absent when the source names none" },
-    "what_sets_it_apart": { "type": "string", "description": "the design choice, training approach, capability or reported result that separates it from its siblings, base model or predecessors; a result the authors claim is worded as their claim; absent when the source says none" },
-    "running_it": { "type": "string", "description": "what the source tells someone about to run it: settings, prompt format, hardware, anything that must or must not be done; absent when the source says none" },
-    "limitations": { "type": "string", "description": "what the source itself says the model does badly, does not cover, or risks; absent when the source says none" },
-    "why_it_matters": { "type": "string", "description": "hand-written reason the model matters; the prose queue no longer writes it, and it stays absent when the source states none" },
+    "summary": {
+      "type": "string",
+      "description": "what the model is: its kind, its family or base model, what it was built to do; absent means the record has no prose yet, the prose queue writes it"
+    },
+    "intended_use": {
+      "type": "string",
+      "description": "the tasks and users the source names, and uses it puts out of scope; absent when the source names none"
+    },
+    "what_sets_it_apart": {
+      "type": "string",
+      "description": "the design choice, training approach, capability or reported result that separates it from its siblings, base model or predecessors; a result the authors claim is worded as their claim; absent when the source says none"
+    },
+    "running_it": {
+      "type": "string",
+      "description": "what the source tells someone about to run it: settings, prompt format, hardware, anything that must or must not be done; absent when the source says none"
+    },
+    "limitations": {
+      "type": "string",
+      "description": "what the source itself says the model does badly, does not cover, or risks; absent when the source says none"
+    },
+    "why_it_matters": {
+      "type": "string",
+      "description": "hand-written reason the model matters; the prose queue no longer writes it, and it stays absent when the source states none"
+    },
     "quotes": {
       "type": "object",
       "description": "one span of the source text for each passage the prose queue wrote, keyed by the passage's field name; a passage that is absent has no quote",
       "additionalProperties": false,
       "properties": {
-        "summary": { "type": "string", "minLength": 1 },
-        "intended_use": { "type": "string", "minLength": 1 },
-        "what_sets_it_apart": { "type": "string", "minLength": 1 },
-        "running_it": { "type": "string", "minLength": 1 },
-        "limitations": { "type": "string", "minLength": 1 }
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intended_use": {
+          "type": "string",
+          "minLength": 1
+        },
+        "what_sets_it_apart": {
+          "type": "string",
+          "minLength": 1
+        },
+        "running_it": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limitations": {
+          "type": "string",
+          "minLength": 1
+        }
       }
-    },
-    "quote": {
-      "type": "string",
-      "minLength": 1,
-      "description": "legacy: the single passage behind the summary and why_it_matters written by writer prompt 1.0.0; new prose uses `quotes`"
     },
     "review": {
       "type": "object",
       "description": "what the Critic concluded about the written prose; set by the prose queue",
-      "required": ["score", "reviewed_by", "prompt_versions"],
+      "required": [
+        "score",
+        "reviewed_by",
+        "prompt_versions"
+      ],
       "additionalProperties": false,
       "properties": {
-        "score": { "type": "number", "minimum": 0, "maximum": 10 },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
         "reviewed_by": {
           "type": "object",
-          "required": ["provider", "model"],
+          "required": [
+            "provider",
+            "model"
+          ],
           "additionalProperties": false,
           "properties": {
-            "provider": { "type": "string", "minLength": 1 },
-            "model": { "type": "string", "minLength": 1 }
+            "provider": {
+              "type": "string",
+              "minLength": 1
+            },
+            "model": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         },
         "prompt_versions": {
           "type": "object",
-          "required": ["writer", "critic"],
+          "required": [
+            "writer",
+            "critic"
+          ],
           "additionalProperties": false,
           "properties": {
-            "writer": { "type": "string", "minLength": 1 },
-            "critic": { "type": "string", "minLength": 1 }
+            "writer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "critic": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         }
       }
@@ -135,68 +410,157 @@
     "generated_by": {
       "type": "object",
       "description": "which job run wrote the prose, with which model and prompt; set by the prose queue",
-      "required": ["job", "run_id", "provider", "model", "prompt_version"],
+      "required": [
+        "job",
+        "run_id",
+        "provider",
+        "model",
+        "prompt_version"
+      ],
       "additionalProperties": false,
       "properties": {
-        "job": { "type": "string", "minLength": 1 },
-        "run_id": { "type": "integer", "minimum": 0 },
-        "provider": { "type": "string", "minLength": 1 },
-        "model": { "type": "string", "minLength": 1 },
-        "prompt_version": { "type": "string", "minLength": 1 }
+        "job": {
+          "type": "string",
+          "minLength": 1
+        },
+        "run_id": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prompt_version": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "fingerprint": {
       "type": "object",
-      "description": "values a source gives; one it lacks stays absent. Depth and width are the least a fingerprint says.",
-      "required": ["num_layers", "hidden_size"],
+      "description": "a transformer stack as a source states it; a value the source lacks stays absent. Depth and width are the least a fingerprint says. Not allowed on a kind that has no transformer stack",
+      "required": [
+        "num_layers",
+        "hidden_size"
+      ],
       "properties": {
-        "attention_type": { "type": "string" },
-        "num_layers": { "type": "integer" },
-        "attention_heads": { "type": "integer" },
-        "kv_heads": { "type": "integer" },
-        "head_size": { "type": "integer" },
-        "hidden_size": { "type": "integer" },
-        "intermediate_size": { "type": "integer" },
-        "context_window_tokens": { "type": "integer" },
-        "vocabulary_size": { "type": "integer" },
-        "activation_function": { "type": "string" },
-        "normalization": { "type": "string" },
+        "attention_type": {
+          "type": "string",
+          "enum": [
+            "MHA",
+            "MQA",
+            "GQA",
+            "MLA"
+          ]
+        },
+        "num_layers": {
+          "type": "integer"
+        },
+        "attention_heads": {
+          "type": "integer"
+        },
+        "kv_heads": {
+          "type": "integer"
+        },
+        "head_size": {
+          "type": "integer"
+        },
+        "hidden_size": {
+          "type": "integer"
+        },
+        "intermediate_size": {
+          "type": "integer"
+        },
+        "vocabulary_size": {
+          "type": "integer"
+        },
+        "activation_function": {
+          "type": "string",
+          "minLength": 1,
+          "description": "the activation as the configuration names it, in one spelling per function: `silu` (never `swish`), `gelu_new` (never `gelu_pytorch_tanh`); a name that computes something else stays as written"
+        },
+        "normalization": {
+          "type": "string",
+          "enum": [
+            "RMSNorm",
+            "LayerNorm"
+          ]
+        },
         "norm_placement": {
           "type": "string",
-          "enum": ["pre", "post", "both"],
+          "enum": [
+            "pre",
+            "post",
+            "both"
+          ],
           "description": "where the block normalises: `pre` is before each sub-layer, inside the residual branch, with one final norm after the last block; `post` is after each residual add, with no final norm; `both` is a norm before and a norm after each sub-layer, both inside the residual branch, with one final norm. Set only when the model's paper or official implementation was read; absent for any other layout (blocks that are not attention plus feed-forward, or whose layers are not all of one kind)"
         },
         "parallel_sublayers": {
           "type": "string",
-          "enum": ["shared-norm", "separate-norms"],
+          "enum": [
+            "shared-norm",
+            "separate-norms"
+          ],
           "description": "set only for a block whose attention and feed-forward both read the block's input and are added to it in one step, with `norm_placement: pre`: `shared-norm` when one norm feeds both, `separate-norms` when each has its own norm. Read from the official implementation and the model's configuration"
         },
         "output_head": {
           "type": "string",
-          "enum": ["cell-selection", "cell-selection-aggregation"],
+          "enum": [
+            "cell-selection",
+            "cell-selection-aggregation"
+          ],
           "description": "the head of a checkpoint whose task tag does not name it, as the official implementation names it: a table model's cell selection head, alone or with an aggregation head. Absent for every other model"
         },
         "layer_mixers": {
           "type": "object",
           "description": "set only for a model whose layers do not all hold the same sequence mixer (attention in some layers, a state-space or linear-attention mixer in others), with `norm_placement: pre`: read from the model's own configuration (the per-layer pattern) and official code (what each layer does). The block figure then names the alternatives in one block and states the pattern; the attention fields of the fingerprint describe the attention layers",
-          "required": ["names", "pattern", "feed_forward"],
+          "required": [
+            "names",
+            "pattern",
+            "feed_forward"
+          ],
           "additionalProperties": false,
           "properties": {
             "names": {
               "type": "array",
               "minItems": 2,
               "maxItems": 3,
-              "items": { "type": "string", "minLength": 1, "maxLength": 16 },
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16
+              },
               "description": "the mixers a layer may hold, as the code names them"
             },
-            "pattern": { "type": "string", "minLength": 1, "maxLength": 40, "description": "how the mixers are spread over the layers, as counted from the configuration" },
-            "note": { "type": "string", "minLength": 1, "description": "one to three sentences on the pattern, shown when the block is opened and beside the figure" },
-            "feed_forward": { "type": "boolean", "description": "true when every layer also has its own feed-forward sub-layer after the mixer; false when the mixer is the layer's only sub-layer (the feed-forward is then one of the mixers)" }
+            "pattern": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40,
+              "description": "how the mixers are spread over the layers, as counted from the configuration"
+            },
+            "note": {
+              "type": "string",
+              "minLength": 1,
+              "description": "one to three sentences on the pattern, shown when the block is opened and beside the figure"
+            },
+            "feed_forward": {
+              "type": "boolean",
+              "description": "true when every layer also has its own feed-forward sub-layer after the mixer; false when the mixer is the layer's only sub-layer (the feed-forward is then one of the mixers)"
+            }
           }
         },
         "stack": {
           "type": "string",
-          "enum": ["encoder", "decoder", "encoder-decoder"],
+          "enum": [
+            "encoder",
+            "decoder",
+            "encoder-decoder"
+          ],
           "description": "which transformer stacks the model has: `encoder` (bidirectional blocks only), `decoder` (causal blocks only) or `encoder-decoder` (both, the decoder attending over the encoder's output). Set from the same source as `norm_placement`"
         },
         "decoder_layers": {
@@ -210,102 +574,275 @@
         },
         "input_stem": {
           "type": "string",
-          "enum": ["spectrogram-convolution", "spectrogram-patches", "waveform-convolution"],
+          "enum": [
+            "spectrogram-convolution",
+            "spectrogram-patches",
+            "waveform-convolution"
+          ],
           "description": "what turns the input into the sequence the first block reads, for a model that does not start from a token embedding: `spectrogram-convolution` (a log-mel spectrogram through convolution layers), `spectrogram-patches` (a spectrogram cut into patches, each projected to one vector) or `waveform-convolution` (the raw waveform through a convolutional feature encoder). Read from the official implementation; absent for a text model"
         },
-        "positional_encoding": { "type": "string" },
+        "positional_encoding": {
+          "type": "string",
+          "enum": [
+            "RoPE",
+            "Learned",
+            "ALiBi",
+            "Sinusoidal",
+            "Convolutional"
+          ]
+        },
         "decoder_positional_encoding": {
           "type": "string",
-          "description": "encoder-decoder models only: the decoder's positional encoding when the implementation gives it one that differs from the encoder's (`positional_encoding`)"
+          "description": "encoder-decoder models only: the decoder's positional encoding when the implementation gives it one that differs from the encoder's (`positional_encoding`)",
+          "enum": [
+            "RoPE",
+            "Learned",
+            "ALiBi",
+            "Sinusoidal",
+            "Convolutional"
+          ]
         },
-        "rope_theta": { "type": ["number", "null"] },
-        "parameters_active_b": { "type": "number" },
-        "kv_cache_rating": { "type": "string", "enum": ["low", "medium", "high"] },
-        "key_detail": { "type": "string" }
-      }
+        "rope_theta": {
+          "type": "number"
+        },
+        "kv_cache_rating": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "key_detail": {
+          "type": "string"
+        }
+      },
+      "dependentSchemas": {
+        "decoder_layers": { "$ref": "#/$defs/encoder_decoder_stack" },
+        "decoder_positional_encoding": { "$ref": "#/$defs/encoder_decoder_stack" }
+      },
+      "unevaluatedProperties": false
     },
     "pipeline": {
       "type": "object",
       "description": "the whole model as an ordered list of stages, for a figure drawn top to bottom: every stage and the order of the stages are read from one primary source (the paper's architecture figure or text, the model card, the configuration or the official code), which `source` names. A stage the source does not state is left out, and a record whose source does not give the structure has no `pipeline`",
-      "required": ["source", "stages"],
-      "additionalProperties": false,
+      "required": [
+        "source",
+        "stages"
+      ],
       "properties": {
-        "source": { "type": "string", "format": "uri", "description": "the `url` of the entry of `sources` the structure was read from" },
-        "summary": { "type": "string", "minLength": 1, "description": "what the figure shows, in two or three plain sentences, with no ranking words" },
-        "side_into": { "type": "string", "description": "the `id` of the main-column stage that the `side` stages feed; required when a `side` run names no `into`" },
-        "branch_from": { "type": "string", "description": "the `id` of the main-column stage the second output leaves from; required when any stage is `branch`" },
+        "source": {
+          "type": "string",
+          "format": "uri",
+          "description": "the `url` of the entry of `sources` the structure was read from"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "description": "what the figure shows, in two or three plain sentences, with no ranking words"
+        },
+        "side_into": {
+          "type": "string",
+          "description": "the `id` of the main-column stage that the `side` stages feed; required when a `side` run names no `into`"
+        },
+        "branch_from": {
+          "type": "string",
+          "description": "the `id` of the main-column stage the second output leaves from; required when any stage is `branch`"
+        },
         "stages": {
           "type": "array",
           "minItems": 2,
           "items": {
             "type": "object",
-            "required": ["id", "role", "title"],
+            "required": [
+              "id",
+              "role",
+              "title"
+            ],
             "additionalProperties": false,
             "properties": {
-              "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
               "role": {
                 "type": "string",
-                "enum": ["input", "tokenizer", "embedding", "positionalEncoding", "normalisation", "attention", "feedForward", "router", "experts", "outputHead", "visionEncoder", "audioEncoder", "textEncoder", "projector", "denoiser", "autoencoder", "step"],
+                "enum": [
+                  "input",
+                  "tokenizer",
+                  "embedding",
+                  "positionalEncoding",
+                  "normalisation",
+                  "attention",
+                  "feedForward",
+                  "router",
+                  "experts",
+                  "outputHead",
+                  "visionEncoder",
+                  "audioEncoder",
+                  "textEncoder",
+                  "projector",
+                  "denoiser",
+                  "autoencoder",
+                  "step"
+                ],
                 "description": "what kind of part the stage is; it gives the block its colour and its entry in the figure's legend. `denoiser` is the network a diffusion loop calls (a U-Net or a diffusion transformer), `autoencoder` a VAE encoder or decoder, `textEncoder`, `visionEncoder` and `audioEncoder` a tower that reads one kind of input, `step` any other processing step (a scheduler step, pooling, a safety check)"
               },
-              "title": { "type": "string", "minLength": 1, "maxLength": 28 },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 28
+              },
               "details": {
                 "type": "array",
                 "maxItems": 2,
-                "items": { "type": "string", "minLength": 1, "maxLength": 36 },
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 36
+                },
                 "description": "the stage's own numbers or names, as the source gives them"
               },
-              "note": { "type": "string", "minLength": 1, "description": "one or two sentences on what the stage does, shown when the block is opened" },
-              "frame": { "type": "string", "minLength": 1, "maxLength": 17, "description": "the name of the group the stage belongs to, short enough to print with its count; consecutive stages with one name share a frame" },
-              "repeat": { "type": "integer", "minimum": 2, "description": "how many times the stage's frame repeats; absent when the source gives no fixed count" },
-              "side": { "type": "boolean", "description": "true for a stage of a side input, drawn in a column left of the main one" },
-              "into": { "type": "string", "description": "on a `side` stage: the `id` of the main-column stage its run feeds. A side stage with `into` starts a new run and the side stages after it continue that run, so two inputs (two text encoders; a vision and an audio encoder) are drawn as separate runs. Absent on a run that feeds `side_into`" },
-              "branch": { "type": "boolean", "description": "true for a stage of the second output, drawn in a column right of the main one, top to bottom from the stage `branch_from` names" },
-              "inner_frame": { "type": "string", "minLength": 1, "maxLength": 14, "description": "on a stage that has a `frame`: the name of a group inside that frame (a repeated block inside a loop); consecutive stages with one name share the inner frame. One inner group per frame" },
-              "inner_repeat": { "type": "integer", "minimum": 2, "description": "how many times the inner group repeats; absent when the source gives no fixed count" }
+              "note": {
+                "type": "string",
+                "minLength": 1,
+                "description": "one or two sentences on what the stage does, shown when the block is opened"
+              },
+              "frame": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 17,
+                "description": "the name of the group the stage belongs to, short enough to print with its count; consecutive stages with one name share a frame"
+              },
+              "repeat": {
+                "type": "integer",
+                "minimum": 2,
+                "description": "how many times the stage's frame repeats; absent when the source gives no fixed count"
+              },
+              "side": {
+                "type": "boolean",
+                "description": "true for a stage of a side input, drawn in a column left of the main one"
+              },
+              "into": {
+                "type": "string",
+                "description": "on a `side` stage: the `id` of the main-column stage its run feeds. A side stage with `into` starts a new run and the side stages after it continue that run, so two inputs (two text encoders; a vision and an audio encoder) are drawn as separate runs. Absent on a run that feeds `side_into`"
+              },
+              "branch": {
+                "type": "boolean",
+                "description": "true for a stage of the second output, drawn in a column right of the main one, top to bottom from the stage `branch_from` names"
+              },
+              "inner_frame": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 14,
+                "description": "on a stage that has a `frame`: the name of a group inside that frame (a repeated block inside a loop); consecutive stages with one name share the inner frame. One inner group per frame"
+              },
+              "inner_repeat": {
+                "type": "integer",
+                "minimum": 2,
+                "description": "how many times the inner group repeats; absent when the source gives no fixed count"
+              }
             }
           }
         }
-      }
+      },
+      "unevaluatedProperties": false
     },
     "moe_config": {
-      "type": ["object", "null"],
+      "type": "object",
+      "description": "how a mixture-of-experts model routes tokens; present only when `filters.is_moe` is true, absent (never null) otherwise",
       "properties": {
-        "expert_count": { "type": "integer" },
-        "active_experts": { "type": "integer" },
-        "shared_expert": { "type": "boolean" },
-        "notes": { "type": "string" }
-      }
+        "expert_count": {
+          "type": "integer"
+        },
+        "active_experts": {
+          "type": "integer"
+        },
+        "shared_expert": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "unevaluatedProperties": false
     },
     "filters": {
       "type": "object",
       "properties": {
-        "size_category": { "type": "string", "enum": ["tiny", "small", "medium", "large", "xlarge"] },
-        "is_quantized": { "type": "boolean" },
-        "quant_format": { "type": "string" },
-        "is_moe": { "type": "boolean" },
-        "is_gated": { "type": "boolean", "description": "access needs approval on Hugging Face" },
-        "pipeline_tag": { "type": "string" },
-        "library": { "type": "string", "description": "Hugging Face library_name, for example transformers" },
-        "attention_type": { "type": "string" }
-      }
+        "size_category": {
+          "type": "string",
+          "enum": [
+            "tiny",
+            "small",
+            "medium",
+            "large",
+            "xlarge"
+          ]
+        },
+        "is_quantized": {
+          "type": "boolean"
+        },
+        "quant_format": {
+          "type": "string"
+        },
+        "is_moe": {
+          "type": "boolean",
+          "description": "the one stored statement that the model is a mixture of experts (true) or is known not to be (false, set when its configuration was read and names no routed experts); absent when no source says. Tags and the architecture link are derived from it"
+        },
+        "is_gated": {
+          "type": "boolean",
+          "description": "access needs approval on Hugging Face"
+        },
+        "pipeline_tag": {
+          "type": "string"
+        },
+        "library": {
+          "type": "string",
+          "description": "Hugging Face library_name, for example transformers"
+        }
+      },
+      "unevaluatedProperties": false
     },
     "hub_signals": {
       "type": "object",
       "description": "numbers that change, copied from Hugging Face by code; owned by the jobs",
-      "required": ["observed_at", "source"],
+      "required": [
+        "observed_at",
+        "source"
+      ],
       "properties": {
-        "downloads_30d": { "type": "integer", "minimum": 0 },
-        "likes": { "type": "integer", "minimum": 0 },
-        "last_modified": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-        "observed_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-        "source": { "type": "string", "format": "uri" }
-      }
+        "downloads_30d": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "likes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "last_modified": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "observed_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "source": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "unevaluatedProperties": false
     },
     "gguf_repositories": {
       "type": "object",
       "description": "links to GGUF copies of the model, copied from Hugging Face by code and owned by the jobs: each repository's own card names this model's repository as the model it quantizes, and its publisher is on the job's allow-list. Links only; the reader opens a repository to see its files",
-      "required": ["repositories", "observed_at", "source"],
+      "required": [
+        "repositories",
+        "observed_at",
+        "source"
+      ],
       "additionalProperties": false,
       "properties": {
         "repositories": {
@@ -313,43 +850,80 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": ["publisher", "repo_id", "address"],
+            "required": [
+              "publisher",
+              "repo_id",
+              "address"
+            ],
             "additionalProperties": false,
             "properties": {
-              "publisher": { "type": "string", "minLength": 1, "description": "Hugging Face handle the repository is published under" },
-              "repo_id": { "type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$" },
-              "address": { "type": "string", "format": "uri" }
+              "publisher": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Hugging Face handle the repository is published under"
+              },
+              "repo_id": {
+                "type": "string",
+                "pattern": "^[^/\\s]+/[^/\\s]+$"
+              },
+              "address": {
+                "type": "string",
+                "format": "uri"
+              }
             }
           }
         },
-        "observed_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-        "source": { "type": "string", "format": "uri", "description": "the Hub page listing the model's GGUF copies" }
+        "observed_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "source": {
+          "type": "string",
+          "format": "uri",
+          "description": "the Hub page listing the model's GGUF copies"
+        }
       }
     },
     "lineage": {
       "type": "object",
       "properties": {
-        "parents": { "type": "array", "items": { "type": "string" } },
-        "children": { "type": "array", "items": { "type": "string" } }
-      }
+        "parents": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^model/[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^model/[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        }
+      },
+      "unevaluatedProperties": false
+    },
+    "schema_version": {
+      "const": 3.0,
+      "description": "the version of this schema a model record is written against; every model record carries the current one, and a breaking change raises it with a conversion of every record"
     }
   },
-  "required": ["organization", "model_category"],
-  "anyOf": [{ "required": ["license"] }, { "required": ["license_note"] }],
-  "if": {
-    "properties": { "model_category": { "const": "language" } },
-    "required": ["model_category"]
-  },
-  "then": {
-    "anyOf": [
-      { "required": ["fingerprint"] },
-      {
-        "description": "a gated repository whose config.json cannot be read has no fingerprint yet",
-        "required": ["filters"],
-        "properties": {
-          "filters": { "required": ["is_gated"], "properties": { "is_gated": { "const": true } } }
-        }
-      }
-    ]
-  }
+  "required": [
+    "organization",
+    "model_category"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "license"
+      ]
+    },
+    {
+      "required": [
+        "license_note"
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
 }

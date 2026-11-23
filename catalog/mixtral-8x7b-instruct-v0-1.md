@@ -2,16 +2,15 @@
 id: model/mixtral-8x7b-instruct-v0-1
 type: model
 slug: mixtral-8x7b-instruct-v0-1
-schema_version: 1.1
+schema_version: 3.0
 title: Mixtral 8x7B Instruct v0.1
 organization: organization/mistral-ai
 release_date: '2023-12-11'
-release_year: 2023
-release_month: 12
 license: license/apache-2-0
 signal_strength: high
 architecture_id: architecture-era/mixture-of-experts
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 12.9
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 14336
-  context_window_tokens: 32768
   vocabulary_size: 32000
   activation_function: SwiGLU
   normalization: RMSNorm
@@ -35,7 +33,6 @@ fingerprint:
   stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000
-  parameters_active_b: 12.9
   kv_cache_rating: medium
   key_detail: Every FFN is replaced by 8 experts; a per-token router selects top-2 experts (intermediate_size 14336 per expert); ~46.7B total but only ~12.9B active per token
 moe_config:
@@ -49,7 +46,6 @@ filters:
   quant_format: original
   is_moe: true
   pipeline_tag: text-generation
-  attention_type: GQA
   is_gated: false
   library: vllm
 hub_signals:
@@ -68,8 +64,6 @@ locked:
 - title
 - organization
 - release_date
-- release_year
-- release_month
 - license
 - signal_strength
 - model_category
@@ -85,13 +79,11 @@ locked:
 - fingerprint.head_size
 - fingerprint.hidden_size
 - fingerprint.intermediate_size
-- fingerprint.context_window_tokens
 - fingerprint.vocabulary_size
 - fingerprint.activation_function
 - fingerprint.normalization
 - fingerprint.positional_encoding
 - fingerprint.rope_theta
-- fingerprint.parameters_active_b
 - fingerprint.kv_cache_rating
 - fingerprint.key_detail
 - moe_config
@@ -100,15 +92,10 @@ locked:
 - filters.quant_format
 - filters.is_moe
 - filters.pipeline_tag
-- filters.attention_type
-- benchmarks
 - body
 tags:
-- llm
 - mistral
-- moe
 - sparse
-- gqa
 - instruct
 - apache-2-0
 updated: '2026-11-22'

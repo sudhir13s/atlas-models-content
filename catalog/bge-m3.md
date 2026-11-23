@@ -2,14 +2,13 @@
 id: model/bge-m3
 type: model
 slug: bge-m3
-schema_version: 1.1
+schema_version: 3.0
 title: bge-m3
 organization: organization/baai
 release_date: '2024-01-27'
-release_year: 2024
-release_month: 1
 license: license/mit
 model_category: retrieval
+model_kind: embedding
 tasks:
 - task/embedding-models
 parameters_active_b: 0.57
@@ -34,7 +33,6 @@ fingerprint:
   head_size: 64
   hidden_size: 1024
   intermediate_size: 4096
-  context_window_tokens: 8192
   vocabulary_size: 250002
   activation_function: gelu
   normalization: LayerNorm
@@ -46,7 +44,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: sentence-similarity
   library: sentence-transformers
@@ -67,12 +64,8 @@ quotes:
   what_sets_it_apart: 'It can simultaneously perform the three common retrieval functionalities of embedding model: dense retrieval, multi-vector retrieval, and sparse retrieval.'
 locked:
 - context_window_tokens
-- fingerprint.context_window_tokens
 tags:
-- sentence-similarity
 - xlm-roberta
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/BAAI/bge-m3
@@ -107,14 +100,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-BGE-M3 is a text embedding model from the Beijing Academy of Artificial Intelligence (BAAI). It turns a sentence or a whole document into a list of numbers, called a vector, so that a search system can find texts with a similar meaning by comparing their vectors. Its model card states support for more than 100 languages and inputs of up to 8192 tokens.
-
-## Intended Use
-
-The model card presents it for the retrieval step of retrieval-augmented generation (RAG), where a system looks up relevant text before a language model writes an answer. For that step the card recommends hybrid retrieval, which combines meaning-based and keyword-based results, followed by a re-ranking model.
-
-## What Sets It Apart
-
-Its makers describe one model that returns three kinds of output at once. A dense output is a single vector per text, a sparse output is a weight for each token present in the text (the keyword-style matching that BM25 does), and a multi-vector output represents the text with several vectors, as ColBERT does. The card also states that it works across more than 100 languages and on inputs from a short sentence to a document of 8192 tokens.

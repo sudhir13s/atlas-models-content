@@ -2,16 +2,15 @@
 id: model/mistral-7b-instruct-v0-3
 type: model
 slug: mistral-7b-instruct-v0-3
-schema_version: 1.1
+schema_version: 3.0
 title: Mistral 7B Instruct v0.3
 organization: organization/mistral-ai
 release_date: '2024-05-22'
-release_year: 2024
-release_month: 5
 license: license/apache-2-0
 signal_strength: high
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 - task/tool-calling-models
@@ -28,7 +27,6 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 14336
-  context_window_tokens: 32768
   vocabulary_size: 32768
   activation_function: SwiGLU
   normalization: RMSNorm
@@ -36,17 +34,14 @@ fingerprint:
   stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000
-  parameters_active_b: 7.25
   kv_cache_rating: medium
   key_detail: 'v0.3 extends the vocab to 32768 and disables sliding-window attention (sliding_window: null); rope_theta raised to 1000000'
-moe_config: null
 filters:
   size_category: small
   is_quantized: false
   quant_format: original
   is_moe: false
   pipeline_tag: text-generation
-  attention_type: GQA
   is_gated: false
   library: vllm
 hub_signals:
@@ -65,8 +60,6 @@ locked:
 - title
 - organization
 - release_date
-- release_year
-- release_month
 - license
 - signal_strength
 - model_category
@@ -82,13 +75,11 @@ locked:
 - fingerprint.head_size
 - fingerprint.hidden_size
 - fingerprint.intermediate_size
-- fingerprint.context_window_tokens
 - fingerprint.vocabulary_size
 - fingerprint.activation_function
 - fingerprint.normalization
 - fingerprint.positional_encoding
 - fingerprint.rope_theta
-- fingerprint.parameters_active_b
 - fingerprint.kv_cache_rating
 - fingerprint.key_detail
 - moe_config
@@ -97,13 +88,9 @@ locked:
 - filters.quant_format
 - filters.is_moe
 - filters.pipeline_tag
-- filters.attention_type
 - body
 tags:
-- llm
 - mistral
-- dense
-- gqa
 - instruct
 - apache-2-0
 updated: '2026-11-22'

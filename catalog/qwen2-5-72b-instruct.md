@@ -2,16 +2,15 @@
 id: model/qwen2-5-72b-instruct
 type: model
 slug: qwen2-5-72b-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: Qwen2.5 72B Instruct
 organization: organization/qwen
 release_date: '2024-09-19'
-release_year: 2024
-release_month: 9
 license: license/qwen
 signal_strength: high
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 72.71
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 128
   hidden_size: 8192
   intermediate_size: 29568
-  context_window_tokens: 131072
   vocabulary_size: 152064
   activation_function: SwiGLU
   normalization: RMSNorm
@@ -35,17 +33,14 @@ fingerprint:
   stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000
-  parameters_active_b: 72.71
   kv_cache_rating: high
   key_detail: 80 layers, 64 query / 8 KV heads; QKV projections carry bias; 128K context via YaRN on a 32768-trained base
-moe_config: null
 filters:
   size_category: large
   is_quantized: false
   quant_format: original
   is_moe: false
   pipeline_tag: text-generation
-  attention_type: GQA
   is_gated: false
   library: transformers
 hub_signals:
@@ -64,8 +59,6 @@ locked:
 - title
 - organization
 - release_date
-- release_year
-- release_month
 - license
 - signal_strength
 - model_category
@@ -81,13 +74,11 @@ locked:
 - fingerprint.head_size
 - fingerprint.hidden_size
 - fingerprint.intermediate_size
-- fingerprint.context_window_tokens
 - fingerprint.vocabulary_size
 - fingerprint.activation_function
 - fingerprint.normalization
 - fingerprint.positional_encoding
 - fingerprint.rope_theta
-- fingerprint.parameters_active_b
 - fingerprint.kv_cache_rating
 - fingerprint.key_detail
 - moe_config
@@ -96,15 +87,10 @@ locked:
 - filters.quant_format
 - filters.is_moe
 - filters.pipeline_tag
-- filters.attention_type
-- benchmarks
 - body
 tags:
-- llm
 - qwen
 - alibaba
-- dense
-- gqa
 - instruct
 - multilingual
 - frontier

@@ -2,16 +2,15 @@
 id: model/qwen2-5-7b-instruct
 type: model
 slug: qwen2-5-7b-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: Qwen2.5 7B Instruct
 organization: organization/qwen
 release_date: '2024-09-19'
-release_year: 2024
-release_month: 9
 license: license/apache-2-0
 signal_strength: high
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 7.61
@@ -31,7 +30,6 @@ fingerprint:
   head_size: 128
   hidden_size: 3584
   intermediate_size: 18944
-  context_window_tokens: 131072
   vocabulary_size: 152064
   activation_function: SwiGLU
   normalization: RMSNorm
@@ -39,17 +37,14 @@ fingerprint:
   stack: decoder
   positional_encoding: RoPE
   rope_theta: 1000000
-  parameters_active_b: 7.61
   kv_cache_rating: low
   key_detail: 28 query heads share 4 KV heads; the QKV projections carry bias; the 128K context uses YaRN on a config set for 32,768 tokens
-moe_config: null
 filters:
   size_category: small
   is_quantized: false
   quant_format: original
   is_moe: false
   pipeline_tag: text-generation
-  attention_type: GQA
   is_gated: false
   library: transformers
 hub_signals:
@@ -78,8 +73,6 @@ locked:
 - title
 - organization
 - release_date
-- release_year
-- release_month
 - license
 - signal_strength
 - model_category
@@ -95,13 +88,11 @@ locked:
 - fingerprint.head_size
 - fingerprint.hidden_size
 - fingerprint.intermediate_size
-- fingerprint.context_window_tokens
 - fingerprint.vocabulary_size
 - fingerprint.activation_function
 - fingerprint.normalization
 - fingerprint.positional_encoding
 - fingerprint.rope_theta
-- fingerprint.parameters_active_b
 - fingerprint.kv_cache_rating
 - fingerprint.key_detail
 - moe_config
@@ -110,15 +101,10 @@ locked:
 - filters.quant_format
 - filters.is_moe
 - filters.pipeline_tag
-- filters.attention_type
-- benchmarks
 - body
 tags:
-- llm
 - qwen
 - alibaba
-- dense
-- gqa
 - instruct
 - multilingual
 - apache-2-0
@@ -146,18 +132,6 @@ related:
 - architecture-era/transformer
 - license/apache-2-0
 ---
-
-## Summary
-
-Qwen2.5 7B Instruct is a language model from Qwen that reads text and writes text in reply. It is the instruction-tuned member of the Qwen2.5 series at the 7B size, which means the base model was trained further to follow instructions and hold a conversation. The card says the Qwen2.5 series ranges from 0.5 to 72 billion parameters.
-
-## What Sets It Apart
-
-Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. The card also states support for a context of up to 128K tokens and for over 29 languages.
-
-## Running It
-
-The model card says the published config.json is set for a context of up to 32,768 tokens, and that longer inputs rely on YaRN, a technique for extending the length a model handles. The card advises enabling it only when long contexts are needed, because the static form of YaRN may affect performance on shorter texts.
 
 ## Notes
 

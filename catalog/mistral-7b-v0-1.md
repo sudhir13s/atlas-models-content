@@ -2,15 +2,14 @@
 id: model/mistral-7b-v0-1
 type: model
 slug: mistral-7b-v0-1
-schema_version: 1.1
+schema_version: 3.0
 title: Mistral-7B-v0.1
 organization: organization/mistral-ai
 release_date: '2023-09-20'
-release_year: 2023
-release_month: 9
 license: license/apache-2-0
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 7.24
@@ -28,7 +27,6 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 14336
-  context_window_tokens: 32768
   vocabulary_size: 32000
   activation_function: silu
   normalization: RMSNorm
@@ -40,7 +38,6 @@ filters:
   size_category: medium
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -64,11 +61,7 @@ quotes:
   running_it: Ensure you are utilizing a stable version of Transformers, 4.34.0 or newer.
   limitations: does not have any moderation mechanisms
 tags:
-- llm
-- text-generation
 - mistral
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/mistralai/Mistral-7B-v0.1
@@ -85,18 +78,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Mistral-7B-v0.1 is a language model from Mistral AI with 7 billion parameters. The card calls it a pretrained generative text model and a pretrained base model, and says it has no moderation mechanisms. It is gated on Hugging Face, and the card says it needs Transformers 4.34.0 or newer.
-
-## What Sets It Apart
-
-The card lists a transformer with Grouped-Query Attention, in which several query heads share key and value heads, Sliding-Window Attention, in which each token looks only at a window of recent tokens, and a byte-fallback BPE tokenizer, which can fall back to raw bytes for text it has no token for. It also states that the model outperforms Llama 2 13B on all benchmarks the Mistral team tested.
-
-## Running It
-
-The card says to use a stable version of Transformers, 4.34.0 or newer, to avoid a KeyError on the name mistral and a meta-tensor copy error.
-
-## Limitations
-
-The card says that, being a pretrained base model, it does not have any moderation mechanisms.

@@ -2,14 +2,13 @@
 id: model/table-transformer-detection
 type: model
 slug: table-transformer-detection
-schema_version: 1.1
+schema_version: 3.0
 title: table-transformer-detection
 organization: organization/microsoft
 release_date: '2022-10-14'
-release_year: 2022
-release_month: 10
 license: license/mit
 model_category: vision
+model_kind: transformer-vision
 tasks:
 - task/object-detection
 parameters_active_b: 0.03
@@ -115,9 +114,7 @@ quotes:
   intended_use: You can use the raw model for detecting tables in documents.
   what_sets_it_apart: the authors decided to use the "normalize before" setting of DETR
 tags:
-- object-detection
 - table-transformer
-- dense
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/microsoft/table-transformer-detection
@@ -134,14 +131,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Table Transformer (fine-tuned for table detection) is a model that finds the tables in an image of a document. The card says it is a Table Transformer (DETR) model trained on PubTables1M, introduced in the paper by Smock et al. and first released in the microsoft/table-transformer repository. The Hugging Face team wrote the card, because the releasing team did not.
-
-## Intended Use
-
-The card says the raw model can be used for detecting tables in documents and points to the Transformers documentation.
-
-## What Sets It Apart
-
-The card describes it as equivalent to DETR, a Transformer-based object detection model. It notes that the authors chose DETR's normalize-before setting, which applies layer normalization before the self- and cross-attention steps.

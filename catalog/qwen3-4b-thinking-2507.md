@@ -2,15 +2,14 @@
 id: model/qwen3-4b-thinking-2507
 type: model
 slug: qwen3-4b-thinking-2507
-schema_version: 1.1
+schema_version: 3.0
 title: Qwen3-4B-Thinking-2507
 organization: organization/qwen
 release_date: '2025-08-05'
-release_year: 2025
-release_month: 8
 license: license/apache-2-0
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 - task/reasoning-models
@@ -29,7 +28,6 @@ fingerprint:
   head_size: 128
   hidden_size: 2560
   intermediate_size: 9728
-  context_window_tokens: 262144
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -41,7 +39,6 @@ filters:
   size_category: small
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -62,11 +59,7 @@ quotes:
   what_sets_it_apart: Additionally, to enforce model thinking, the default chat template automatically includes `<think>`.
   running_it: We suggest using `Temperature=0.6`, `TopP=0.95`, `TopK=20`, and `MinP=0`.
 tags:
-- llm
-- text-generation
 - qwen3
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-4B-Thinking-2507
@@ -83,18 +76,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Qwen3-4B-Thinking-2507 is a 4-billion-parameter language model from Qwen that writes out its reasoning before it answers. The card says this release continues to scale the thinking capability of Qwen3-4B, improving the quality and depth of its reasoning, and that it has a native context of 262,144 tokens.
-
-## Intended Use
-
-The card says this version has an increased thinking length and that Qwen strongly recommends it for highly complex reasoning tasks. It lists improved reasoning in logical reasoning, mathematics, science and coding, and better instruction following, tool use and text generation.
-
-## What Sets It Apart
-
-The card says the model supports only thinking mode, so enabling it is no longer needed, and that the default chat template automatically includes the opening thinking tag. It is therefore normal for the output to contain only a closing thinking tag.
-
-## Running It
-
-The card suggests Temperature=0.6, TopP=0.95, TopK=20 and MinP=0, and an output length of 32,768 tokens for most queries, or 81,920 tokens for highly complex math and programming problems.

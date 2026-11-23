@@ -2,11 +2,12 @@
 id: model/bert-base-chinese
 type: model
 slug: bert-base-chinese
-schema_version: 1.1
+schema_version: 3.0
 title: bert-base-chinese
 organization: organization/google-bert
 license: license/apache-2-0
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/fill-mask
 parameters_active_b: 0.1
@@ -24,7 +25,6 @@ fingerprint:
   head_size: 64
   hidden_size: 768
   intermediate_size: 3072
-  context_window_tokens: 512
   vocabulary_size: 21128
   activation_function: gelu
   normalization: LayerNorm
@@ -35,7 +35,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: fill-mask
   library: transformers
@@ -56,11 +55,7 @@ quotes:
   what_sets_it_apart: training and random input masking has been applied independently to word pieces (as in the original BERT paper)
   limitations: can propagate historical and current stereotypes
 tags:
-- llm
-- fill-mask
 - bert
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google-bert/bert-base-chinese
@@ -77,18 +72,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-BERT base Chinese is a language model developed by Google. It is a fill-mask model: it predicts a word piece that has been hidden in a sentence, which is how BERT models learn language. The card says it was pre-trained for Chinese, and it names the BERT base uncased model as its parent model.
-
-## Intended Use
-
-The card lists masked language modeling as the direct use and names no other intended or out-of-scope uses.
-
-## What Sets It Apart
-
-The card describes it as BERT pre-trained for Chinese, with training and random input masking applied independently to word pieces, as in the original BERT paper. It links Google's multilingual BERT notes as its GitHub source.
-
-## Limitations
-
-The card's risks section only warns that language models can reproduce historical and current stereotypes, and points to research on bias and fairness. Its training data and results sections read "More Information Needed".

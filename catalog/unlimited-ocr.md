@@ -2,14 +2,13 @@
 id: model/unlimited-ocr
 type: model
 slug: unlimited-ocr
-schema_version: 1.1
+schema_version: 3.0
 title: Unlimited-OCR
 organization: organization/baidu
 release_date: '2026-06-19'
-release_year: 2026
-release_month: 6
 license: license/mit
 model_category: documents
+model_kind: multimodal
 tasks:
 - task/ocr
 - task/vision-language-models
@@ -26,7 +25,6 @@ fingerprint:
   head_size: 128
   hidden_size: 1280
   intermediate_size: 6848
-  context_window_tokens: 32768
   vocabulary_size: 129280
 moe_config:
   expert_count: 64
@@ -123,7 +121,6 @@ filters:
   size_category: small
   is_quantized: false
   is_moe: true
-  attention_type: MHA
   is_gated: false
   pipeline_tag: image-text-to-text
   library: transformers
@@ -143,10 +140,7 @@ quotes:
   intended_use: Multi page / PDF only uses base (image_size=1024)
   what_sets_it_apart: we replace all attention layers in the decoder with our proposed Reference Sliding Window Attention (R-SWA)
 tags:
-- image-text-to-text
 - unlimited-ocr
-- moe
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/baidu/Unlimited-OCR
@@ -163,14 +157,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Unlimited OCR is a document-reading model from Baidu. OCR, optical character recognition, means turning an image of a page into text. The accompanying paper takes DeepSeek OCR as its baseline and says the model can transcribe dozens of pages of documents in a single forward pass under a standard maximum length of 32K.
-
-## Intended Use
-
-The card shows parsing single images in two configurations, called gundam and base, and parsing multi-page documents and PDFs, where each PDF page is first converted to an image and only the base configuration is used. The paper's authors add that the same attention mechanism can also apply to speech recognition and translation.
-
-## What Sets It Apart
-
-The paper points out that a language-model decoder keeps a growing store of past attention data, the KV cache, which raises memory use and slows generation as the output gets longer. It replaces every attention layer in the decoder with Reference Sliding Window Attention, which the authors say reduces attention computation and keeps the KV cache constant for the whole decoding process. It keeps the high-compression encoder of DeepSeek OCR.

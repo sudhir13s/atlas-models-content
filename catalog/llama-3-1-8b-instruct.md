@@ -2,16 +2,15 @@
 id: model/llama-3-1-8b-instruct
 type: model
 slug: llama-3-1-8b-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: Llama 3.1 8B Instruct
 organization: organization/meta
 release_date: '2024-07-23'
-release_year: 2024
-release_month: 7
 license: license/llama-3-1
 signal_strength: high
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 8.03
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 14336
-  context_window_tokens: 131072
   vocabulary_size: 128256
   activation_function: SwiGLU
   normalization: RMSNorm
@@ -35,17 +33,14 @@ fingerprint:
   stack: decoder
   positional_encoding: RoPE
   rope_theta: 500000
-  parameters_active_b: 8.03
   kv_cache_rating: medium
   key_detail: 128K context via RoPE scaling (factor 8); rope_theta 500000
-moe_config: null
 filters:
   size_category: small
   is_quantized: false
   quant_format: original
   is_moe: false
   pipeline_tag: text-generation
-  attention_type: GQA
   is_gated: true
   library: transformers
 hub_signals:
@@ -74,8 +69,6 @@ locked:
 - title
 - organization
 - release_date
-- release_year
-- release_month
 - license
 - signal_strength
 - model_category
@@ -91,13 +84,11 @@ locked:
 - fingerprint.head_size
 - fingerprint.hidden_size
 - fingerprint.intermediate_size
-- fingerprint.context_window_tokens
 - fingerprint.vocabulary_size
 - fingerprint.activation_function
 - fingerprint.normalization
 - fingerprint.positional_encoding
 - fingerprint.rope_theta
-- fingerprint.parameters_active_b
 - fingerprint.kv_cache_rating
 - fingerprint.key_detail
 - moe_config
@@ -106,15 +97,10 @@ locked:
 - filters.quant_format
 - filters.is_moe
 - filters.pipeline_tag
-- filters.attention_type
-- benchmarks
 - body
 tags:
-- llm
 - meta
 - llama
-- dense
-- gqa
 - instruct
 updated: '2026-11-23'
 sources:

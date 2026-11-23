@@ -2,15 +2,14 @@
 id: model/deepseek-r1-distill-qwen-32b
 type: model
 slug: deepseek-r1-distill-qwen-32b
-schema_version: 1.1
+schema_version: 3.0
 title: DeepSeek-R1-Distill-Qwen-32B
 organization: organization/deepseek
 release_date: '2025-01-20'
-release_year: 2025
-release_month: 1
 license: license/mit
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 - task/reasoning-models
@@ -32,7 +31,6 @@ fingerprint:
   head_size: 128
   hidden_size: 5120
   intermediate_size: 27648
-  context_window_tokens: 131072
   vocabulary_size: 152064
   activation_function: silu
   normalization: RMSNorm
@@ -44,7 +42,6 @@ filters:
   size_category: large
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -65,11 +62,7 @@ quotes:
   what_sets_it_apart: We demonstrate that the reasoning patterns of larger models can be distilled into smaller models, resulting in better performance compared to the reasoning patterns discovered through RL on small models.
   running_it: Avoid adding a system prompt; all instructions should be contained within the user prompt.
 tags:
-- llm
-- text-generation
 - qwen2
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
@@ -86,18 +79,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-DeepSeek-R1-Distill-Qwen-32B is a language model released by DeepSeek-AI. According to its card it is Qwen2.5-32B fine-tuned on 800k samples curated with DeepSeek-R1, DeepSeek's larger reasoning model. The card calls this distillation: the reasoning patterns of a larger model are transferred into a smaller dense model. It is one of six distilled checkpoints the card lists, from 1.5B to 70B parameters.
-
-## Intended Use
-
-The card offers the distilled checkpoints to the research community, so that people can run and study smaller reasoning models, and it says the series supports commercial use and further distillation to train other language models. It asks readers to review its usage recommendations before running the models locally.
-
-## What Sets It Apart
-
-DeepSeek reports that reasoning patterns of a larger model can be distilled into smaller models, and says this gives better results than the reasoning patterns found by applying reinforcement learning directly to small models. The card also says the team slightly changed the configs and tokenizers of the distilled models, so their settings should be used.
-
-## Running It
-
-The card recommends a temperature between 0.5 and 0.7 (0.6 preferred) to avoid endless repetition, and advises against a system prompt, with all instructions placed in the user prompt. For maths problems it suggests asking the model to reason step by step and put the final answer in a box. It also says the models sometimes skip their thinking step, and recommends starting every response with a "<think>" tag to force reasoning. It shows serving with vLLM or SGLang.

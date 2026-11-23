@@ -2,11 +2,12 @@
 id: model/tapas-base-finetuned-wtq
 type: model
 slug: tapas-base-finetuned-wtq
-schema_version: 1.1
+schema_version: 3.0
 title: tapas-base-finetuned-wtq
 organization: organization/google-deepmind
 license: license/apache-2-0
 model_category: documents
+model_kind: transformer-language
 tasks:
 - task/table-question-answering
 context_window_tokens: 1024
@@ -21,7 +22,6 @@ fingerprint:
   head_size: 64
   hidden_size: 768
   intermediate_size: 3072
-  context_window_tokens: 1024
   vocabulary_size: 30522
   activation_function: gelu
   normalization: LayerNorm
@@ -33,7 +33,6 @@ fingerprint:
 filters:
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: table-question-answering
   library: transformers
@@ -53,10 +52,7 @@ quotes:
   intended_use: You can use this model for answering questions related to a table.
   what_sets_it_apart: It uses relative position embeddings (i.e. resetting the position index at every cell of the table).
 tags:
-- table-question-answering
 - tapas
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google/tapas-base-finetuned-wtq
@@ -79,14 +75,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-TAPAS base fine-tuned on WikiTable Questions (WTQ) is a table question answering model: you give it a table and a question in English and it finds the answer in the table's cells. TAPAS is a BERT-like model pretrained on English Wikipedia tables and their surrounding text, and the Hugging Face team wrote this card because the TAPAS authors did not publish one.
-
-## Intended Use
-
-The card says the model can be used for answering questions related to a table, and points to the TAPAS documentation for code examples.
-
-## What Sets It Apart
-
-The card says the model was pretrained with masked language modeling and with an intermediate step that teaches numerical reasoning, by classifying whether a sentence is supported or refuted by a table. It was then fine-tuned in a chain on SQA, WikiSQL and finally WTQ, using a cell selection head and an aggregation head. This default version uses relative position embeddings, resetting the position index at every table cell.

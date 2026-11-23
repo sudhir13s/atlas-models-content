@@ -2,16 +2,15 @@
 id: model/deepseek-v3
 type: model
 slug: deepseek-v3
-schema_version: 1.1
+schema_version: 3.0
 title: DeepSeek-V3
 organization: organization/deepseek
 release_date: '2024-12-26'
-release_year: 2024
-release_month: 12
 license: license/deepseek
 signal_strength: high
 architecture_id: architecture-era/mixture-of-experts
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 37
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 128
   hidden_size: 7168
   intermediate_size: 18432
-  context_window_tokens: 131072
   vocabulary_size: 129280
   activation_function: SwiGLU
   normalization: RMSNorm
@@ -35,7 +33,6 @@ fingerprint:
   stack: decoder
   positional_encoding: RoPE
   rope_theta: 10000
-  parameters_active_b: 37
   kv_cache_rating: low
   key_detail: Multi-head Latent Attention compresses KV to a 512-dim latent (kv_lora_rank 512, q_lora_rank 1536) with decoupled RoPE (qk_rope_head_dim 64 + qk_nope_head_dim 128, v_head_dim 128); DeepSeekMoE with 256 routed + 1 shared expert, top-8, first 3 layers dense; 128K context via YaRN (config max_position_embeddings 163840); auxiliary-loss-free load balancing; native FP8 training
 moe_config:
@@ -49,7 +46,6 @@ filters:
   quant_format: original
   is_moe: true
   pipeline_tag: text-generation
-  attention_type: MLA
   is_gated: false
   library: transformers
 hub_signals:
@@ -65,8 +61,6 @@ locked:
 - title
 - organization
 - release_date
-- release_year
-- release_month
 - license
 - signal_strength
 - model_category
@@ -82,13 +76,11 @@ locked:
 - fingerprint.head_size
 - fingerprint.hidden_size
 - fingerprint.intermediate_size
-- fingerprint.context_window_tokens
 - fingerprint.vocabulary_size
 - fingerprint.activation_function
 - fingerprint.normalization
 - fingerprint.positional_encoding
 - fingerprint.rope_theta
-- fingerprint.parameters_active_b
 - fingerprint.kv_cache_rating
 - fingerprint.key_detail
 - moe_config
@@ -97,15 +89,10 @@ locked:
 - filters.quant_format
 - filters.is_moe
 - filters.pipeline_tag
-- filters.attention_type
-- benchmarks
 - body
 tags:
-- llm
 - deepseek
-- moe
 - sparse
-- mla
 - frontier
 - fp8
 updated: '2026-11-22'

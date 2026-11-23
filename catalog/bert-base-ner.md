@@ -2,11 +2,12 @@
 id: model/bert-base-ner
 type: model
 slug: bert-base-ner
-schema_version: 1.1
+schema_version: 3.0
 title: bert-base-NER
 organization: organization/dslim
 license: license/mit
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/token-classification
 parameters_active_b: 0.11
@@ -24,7 +25,6 @@ fingerprint:
   head_size: 64
   hidden_size: 768
   intermediate_size: 3072
-  context_window_tokens: 512
   vocabulary_size: 28996
   activation_function: gelu
   normalization: LayerNorm
@@ -35,7 +35,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: token-classification
   library: transformers
@@ -56,11 +55,7 @@ quotes:
   what_sets_it_apart: The training dataset distinguishes between the beginning and continuation of an entity so that if there are back-to-back entities of the same type, the model can output where the second entity begins.
   limitations: This model is limited by its training dataset of entity-annotated news articles from a specific span of time.
 tags:
-- llm
-- token-classification
 - bert
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/dslim/bert-base-NER
@@ -77,18 +72,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-bert-base-NER is a version of the BERT language model (the cased base size) fine-tuned by its publisher, dslim, for named entity recognition: finding names in text and labelling each as a person, organization, location or miscellaneous. The card says it was fine-tuned on the English CoNLL-2003 dataset, which is built from Reuters news stories.
-
-## Intended Use
-
-The card presents it for named entity recognition on English text, used through the Transformers pipeline for token labelling. It marks four entity types: person, organization, location and miscellaneous.
-
-## What Sets It Apart
-
-The model separates the start of an entity from its continuation, so two names of the same type that sit side by side can be told apart. The card also lists related versions fine-tuned the same way: a larger bert-large-NER, a smaller distilbert-NER and an uncased bert-base variant.
-
-## Limitations
-
-The card says the model is limited by its training data, news articles from a specific span of time, so it may not generalize to other domains. It also notes that the model occasionally tags pieces of words as entities, so results may need post-processing.

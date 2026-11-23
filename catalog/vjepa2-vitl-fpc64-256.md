@@ -2,14 +2,13 @@
 id: model/vjepa2-vitl-fpc64-256
 type: model
 slug: vjepa2-vitl-fpc64-256
-schema_version: 1.1
+schema_version: 3.0
 title: vjepa2-vitl-fpc64-256
 organization: organization/meta
 release_date: '2025-05-31'
-release_year: 2025
-release_month: 5
 license: license/mit
 model_category: vision
+model_kind: transformer-vision
 tasks:
 - task/video-understanding
 parameters_active_b: 0.33
@@ -78,7 +77,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: video-classification
   library: transformers
@@ -98,10 +96,7 @@ quotes:
   intended_use: V-JEPA 2 is intended to represent any video (and image) to perform video classification, retrieval, or as a video encoder for VLMs.
   running_it: To load a video, sample the number of frames according to the model. For this model, we use 64.
 tags:
-- video-classification
 - vjepa2
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/facebook/vjepa2-vitl-fpc64-256
@@ -115,14 +110,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-V-JEPA 2 is a video understanding model developed by FAIR at Meta. The card says it extends the pre-training objectives of the earlier V-JEPA model, and describes it as a model that represents videos and images as features for tasks such as classification and retrieval.
-
-## Intended Use
-
-The card says V-JEPA 2 is intended to represent any video or image, in order to do video classification and retrieval or to act as a video encoder for vision-language models (VLMs).
-
-## Running It
-
-The card says to sample the number of frames according to the model, and that this checkpoint uses 64 frames. It asks for the latest Transformers, installed from the GitHub repository.

@@ -2,15 +2,14 @@
 id: model/bloomz-560m
 type: model
 slug: bloomz-560m
-schema_version: 1.1
+schema_version: 3.0
 title: bloomz-560m
 organization: organization/bigscience
 release_date: '2022-10-08'
-release_year: 2022
-release_month: 10
 license: license/bigscience-bloom-rail-1-0
 architecture_id: architecture-era/transformer
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 0.56
@@ -28,7 +27,6 @@ fingerprint:
   kv_heads: 16
   head_size: 64
   hidden_size: 1024
-  context_window_tokens: 2048
   vocabulary_size: 250880
   normalization: LayerNorm
   norm_placement: pre
@@ -38,7 +36,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -74,11 +71,7 @@ generated_by:
   model: gemini/gemini-3.5-flash-lite
   prompt_version: 2.0.0
 tags:
-- llm
-- text-generation
 - bloom
-- dense
-- mha
 updated: '2026-11-22'
 sources:
 - url: https://huggingface.co/bigscience/bloomz-560m
@@ -95,22 +88,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-bloomz-560m is a member of the BLOOMZ and mT0 family created by BigScience, built by multitask finetuning the pretrained bloom-560m multilingual language model on the xP3 crosslingual task mixture.
-
-## Intended Use
-
-It is intended to perform tasks expressed in natural language, and its authors recommend prompting it in English.
-
-## What Sets It Apart
-
-Unlike the original pretrained bloom-560m model, bloomz-560m is capable of following human instructions in dozens of languages zero-shot and generalizing to unseen tasks and languages.
-
-## Running It
-
-The authors recommend making it very clear where the input stops to prevent continuation, and providing as much context as possible.
-
-## Limitations
-
-Its performance may vary depending on the prompt used.

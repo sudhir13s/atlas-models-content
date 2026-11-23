@@ -2,15 +2,14 @@
 id: model/phi-4-mini-instruct
 type: model
 slug: phi-4-mini-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: Phi-4-mini-instruct
 organization: organization/microsoft
 release_date: '2025-02-19'
-release_year: 2025
-release_month: 2
 license: license/mit
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 - task/tool-calling-models
@@ -28,7 +27,6 @@ fingerprint:
   head_size: 128
   hidden_size: 3072
   intermediate_size: 8192
-  context_window_tokens: 131072
   vocabulary_size: 200064
   activation_function: silu
   normalization: RMSNorm
@@ -40,7 +38,6 @@ filters:
   size_category: small
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -60,11 +57,7 @@ quotes:
   intended_use: The model is intended for broad multilingual commercial and research use.
   what_sets_it_apart: The Phi-4-mini model employed new architecture for efficiency, larger vocabulary for multilingual support
 tags:
-- llm
-- text-generation
 - phi3
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/microsoft/Phi-4-mini-instruct
@@ -81,14 +74,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Phi-4-mini-instruct is a small open language model from Microsoft, part of the Phi-4 family. The card says it was built on synthetic data and filtered public websites, with a focus on reasoning-dense data, and that it supports a 128K token context. It was then post-trained with supervised fine-tuning and direct preference optimization, two training steps for following instructions and for safety. The card gives its size as 3.8B parameters.
-
-## Intended Use
-
-The card says it is intended for broad multilingual commercial and research use, in general-purpose AI systems that need to run in memory or compute constrained environments, in latency-bound scenarios, or that need strong reasoning, especially math and logic. It also says the model is meant to speed up research on language and multimodal models and to serve as a building block for generative AI features. The card warns that the model is not designed or evaluated for every downstream purpose, so developers should evaluate accuracy, safety and fairness first, particularly in high-risk scenarios.
-
-## What Sets It Apart
-
-The card's release notes say the Phi-4-mini model uses a new architecture for efficiency, a larger vocabulary for multilingual support, and better post-training techniques for instruction following and function calling, compared with the Phi-3 series that came before. The training data is described as synthetic data plus filtered public websites, chosen for reasoning-dense content.

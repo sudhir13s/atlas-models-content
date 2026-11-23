@@ -5,6 +5,53 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Schema 3.0 for `model`: every fact once, real kinds, strict schema (breaking)
+
+All 188 `model` records were converted by the consumer's `atlas migrate model-restructure`. The
+conversion only moved, renamed, derived or deleted: no value was added that a record did not hold,
+and `updated` was left alone because no fact changed.
+
+- **Removed** `fingerprint.context_window_tokens` (109 copies of the top-level field; on
+  `gemma-2-2b-it` and `gemma-2-27b-it` it was the only copy and moved up),
+  `fingerprint.parameters_active_b` (8 copies), `filters.attention_type` (117 copies of
+  `fingerprint.attention_type`), `release_year` and `release_month` (167 each, read from
+  `release_date`), `moe_config: null` (6 records; absent now) and the unused `quote`.
+- **Removed** 552 tags that only repeated a field: the pipeline tag, the attention type, `llm`,
+  `moe` and `dense`. `tags` now hold only what no field states.
+- **Removed** 628 body sections that were word-for-word copies of the frontmatter passages
+  (`summary`, `intended_use`, `what_sets_it_apart`, `running_it`, `limitations`). The registry's
+  optional sections of a model are now Summary, Why It Matters and Notes: the hand-written
+  long-form text eight records keep, which is not in their frontmatter.
+- **Changed** `locked` on 29 records: a lock on a removed path names the surviving one
+  (`fingerprint.context_window_tokens` → `context_window_tokens`, `fingerprint.parameters_active_b`
+  → `parameters_active_b`, `filters.attention_type` → `fingerprint.attention_type`, `release_year`
+  and `release_month` → `release_date`), each path once. The lock on `benchmarks` (7 records) is
+  dropped: the field left the model record in schema 2.0.
+- **Added** `model_kind` (how the model is built): `transformer-language` (108),
+  `transformer-vision` (13), `multimodal` (16), `convolutional` (3), `diffusion` (15),
+  `audio-speech` (16), `embedding` (6), `tabular-time-series` (9), `control-policy` (2). A fixed
+  rule over each record's own fields placed 159; 29 were placed after reading the record. The
+  schema's per-kind rules: a `transformer-language` record states its `fingerprint` unless it is
+  gated; a `convolutional` record has no `fingerprint`, `moe_config`, `context_window_tokens` or
+  `filters.is_moe` (the stored `is_moe: false` of `rmbg-1-4` and `superpoint` is removed); only an
+  `embedding` record has `embedding_dimension`; `moe_config` needs `filters.is_moe: true`; only an
+  `audio-speech` record has `fingerprint.input_stem`; `fingerprint.decoder_layers` and
+  `decoder_positional_encoding` need `stack: encoder-decoder`.
+- **Changed** to enums: `model_category` (its nine values), `fingerprint.attention_type`,
+  `normalization`, `positional_encoding` and `decoder_positional_encoding`. `release_date` must be
+  `YYYY-MM-DD`; `architecture_id` and `lineage` entries must be IDs; `rope_theta` is a number,
+  never null; `moe_config` is an object, never null.
+- **Changed** `fingerprint.activation_function` to one spelling per function: `swish` → `silu`
+  (1 record) and `gelu_pytorch_tanh` → `gelu_new` (1 record). `situ` on `kimi-k3` is kept: the
+  model's `config.json` states `hidden_act: situ`.
+- **Changed** `schema_version` to a constant of the model schema (`3.0`): a model record with any
+  other value is refused. All 188 records carry it (they said `1.1`).
+- **Changed** to strict: no unknown field at the top level of a model record or inside
+  `fingerprint`, `moe_config`, `filters`, `hub_signals`, `lineage` and `pipeline`.
+- **Consumers must** read the context window and active parameters from the top level, the
+  attention type from `fingerprint`, the year and month from `release_date`, mixture of experts
+  from `filters.is_moe`, and the passages from the frontmatter.
+
 ### Schema 2.9 for `parameter`: the teaching form (additive)
 
 - **Added** to `parameter` the hyperparameter teaching fields by reference (`effects`, `scale`,

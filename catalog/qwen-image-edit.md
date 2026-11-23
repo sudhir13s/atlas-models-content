@@ -2,14 +2,13 @@
 id: model/qwen-image-edit
 type: model
 slug: qwen-image-edit
-schema_version: 1.1
+schema_version: 3.0
 title: Qwen-Image-Edit
 organization: organization/qwen
 release_date: '2025-08-17'
-release_year: 2025
-release_month: 8
 license: license/apache-2-0
 model_category: generation
+model_kind: diffusion
 tasks:
 - task/image-editing
 total_parameters: 20430401088
@@ -104,8 +103,7 @@ quotes:
   intended_use: Qwen-Image-Edit supports bilingual (Chinese and English) text editing, allowing direct addition, deletion, and modification of text in images while preserving the original font, size, and style.
   what_sets_it_apart: Qwen-Image-Edit simultaneously feeds the input image into Qwen2.5-VL (for visual semantic control) and the VAE Encoder (for visual appearance control)
   running_it: Install the latest version of diffusers
-tags:
-- image-to-image
+tags: []
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen-Image-Edit
@@ -118,25 +116,11 @@ sources:
   title: 'diffusers/pipelines/qwenimage/pipeline_qwenimage_edit.py: reference pipeline (Hugging Face Diffusers)'
   trust: 0.9
 - url: https://huggingface.co/Qwen/Qwen-Image-Edit/blob/main/model_index.json
-  title: 'Qwen/Qwen-Image-Edit — model_index.json'
+  title: Qwen/Qwen-Image-Edit — model_index.json
   trust: 0.9
 - url: https://huggingface.co/Qwen/Qwen-Image-Edit/blob/main/transformer/config.json
-  title: 'Qwen/Qwen-Image-Edit — transformer/config.json'
+  title: Qwen/Qwen-Image-Edit — transformer/config.json
   trust: 0.9
 ---
 
-## Summary
 
-Qwen-Image-Edit is the image-editing version of Qwen-Image, from Qwen. It takes an input image and a written instruction and produces an edited image. The card says it is built on the 20B Qwen-Image model and lists English and Chinese as its languages.
-
-## Intended Use
-
-The card names two kinds of editing. Appearance editing adds, removes or changes elements while the rest of the image stays unchanged. Semantic editing, such as IP creation, object rotation and style transfer, may change many pixels but keeps the meaning consistent. It also lists bilingual text editing, which adds, deletes or changes text in images while keeping the original font, size and style.
-
-## What Sets It Apart
-
-Qwen says it extends the text rendering ability of Qwen-Image to editing. The input image is fed into two paths at once: Qwen2.5-VL for visual semantic control, and the VAE (variational autoencoder) encoder for visual appearance control.
-
-## Running It
-
-The card says to install the latest version of the Diffusers library from GitHub. Its example loads the model with QwenImageEditPipeline in bfloat16 on a CUDA GPU, with 50 inference steps and a true_cfg_scale of 4.0.

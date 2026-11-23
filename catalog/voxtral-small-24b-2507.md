@@ -2,14 +2,13 @@
 id: model/voxtral-small-24b-2507
 type: model
 slug: voxtral-small-24b-2507
-schema_version: 1.1
+schema_version: 3.0
 title: Voxtral-Small-24B-2507
 organization: organization/mistral-ai
 release_date: '2025-07-01'
-release_year: 2025
-release_month: 7
 license: license/apache-2-0
 model_category: audio
+model_kind: audio-speech
 tasks:
 - task/speech-language-models
 parameters_active_b: 24.26
@@ -31,7 +30,6 @@ fingerprint:
   head_size: 128
   hidden_size: 5120
   intermediate_size: 32768
-  context_window_tokens: 32768
   vocabulary_size: 131072
   activation_function: silu
   normalization: RMSNorm
@@ -107,7 +105,6 @@ filters:
   size_category: large
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: audio-text-to-text
   library: vllm
@@ -130,12 +127,8 @@ quotes:
   limitations: System prompts are not yet supported
 locked:
 - context_window_tokens
-- fingerprint.context_window_tokens
 tags:
-- audio-text-to-text
 - voxtral
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/mistralai/Voxtral-Small-24B-2507
@@ -152,22 +145,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Voxtral Small 1.0 (24B) 2507 is an audio-language model from Mistral AI: it takes speech or other audio, optionally with text, and answers in text. The card describes it as an enhancement of Mistral Small 3 with audio input, for speech transcription, translation and audio understanding. With a 32k-token context it handles audio up to 30 minutes for transcription or 40 minutes for understanding, and the card lists English, French, German, Spanish, Italian, Portuguese, Dutch and Hindi.
-
-## Intended Use
-
-The card names speech transcription, translation and audio understanding. It also lists asking questions about audio directly, summarizing audio without separate speech-recognition and language models, and triggering backend functions or API calls from spoken requests.
-
-## What Sets It Apart
-
-Mistral says it has a dedicated transcription mode, which by default detects the spoken language itself and transcribes in that language. It says the model keeps the text abilities of its language model backbone and can call functions straight from voice, so one model covers what would otherwise need a separate speech recognizer and language model.
-
-## Running It
-
-The card recommends vLLM, version 0.10.0 or later, and says running the model on GPU needs about 55 GB of GPU memory in bf16 or fp16. It suggests temperature 0.2 and top_p 0.95 for chat and audio understanding, and temperature 0.0 for transcription.
-
-## Limitations
-
-The card says system prompts are not yet supported.

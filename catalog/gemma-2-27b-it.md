@@ -2,17 +2,17 @@
 id: model/gemma-2-27b-it
 type: model
 slug: gemma-2-27b-it
-schema_version: 1.1
+schema_version: 3.0
 title: gemma-2-27b-it
 organization: organization/google-deepmind
 release_date: '2024-06-24'
-release_year: 2024
-release_month: 6
 license: license/gemma
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 total_parameters: 27227128320
+context_window_tokens: 8192
 base_models:
 - name: google/gemma-2-27b
   address: https://huggingface.co/google/gemma-2-27b
@@ -26,7 +26,6 @@ fingerprint:
   kv_heads: 16
   head_size: 128
   hidden_size: 4608
-  context_window_tokens: 8192
   activation_function: GeGLU
   normalization: RMSNorm
   norm_placement: both
@@ -52,9 +51,7 @@ quotes:
   summary: They are text-to-text, decoder-only large language models, available in English,
   intended_use: 'Text Generation: These models can be used to generate creative text formats such as poems, scripts, code, marketing copy, and email drafts.'
   limitations: The scope of the training dataset determines the subject areas the model can handle effectively.
-tags:
-- llm
-- text-generation
+tags: []
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google/gemma-2-27b-it
@@ -137,14 +134,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Gemma 2 27B IT is the instruction-tuned 27-billion-parameter model of Google's Gemma 2 family, which is built from the same research and technology as Google's Gemini models. The card describes Gemma as text-to-text, decoder-only language models, available in English, with open weights for both pre-trained and instruction-tuned variants.
-
-## Intended Use
-
-The card lists text generation such as poems, scripts, code, marketing copy and email drafts, chatbots and conversational AI, and text summarization. For research and education it lists natural language processing research, language-learning tools and exploring large bodies of text. It says the models are suited to question answering, summarization and reasoning, and small enough to run on a laptop, a desktop or your own cloud.
-
-## Limitations
-
-The card says the quality and diversity of the training data shape the model's capabilities, so biases or gaps in the data can limit its responses, and the scope of the training data decides which subject areas it handles well.

@@ -2,14 +2,13 @@
 id: model/jina-reranker-v2-base-multilingual
 type: model
 slug: jina-reranker-v2-base-multilingual
-schema_version: 1.1
+schema_version: 3.0
 title: jina-reranker-v2-base-multilingual
 organization: organization/jinaai
 release_date: '2024-06-19'
-release_year: 2024
-release_month: 6
 license_note: cc-by-nc-4.0
 model_category: retrieval
+model_kind: transformer-language
 tasks:
 - task/reranking-models
 parameters_active_b: 0.28
@@ -26,7 +25,6 @@ fingerprint:
   head_size: 64
   hidden_size: 768
   intermediate_size: 3072
-  context_window_tokens: 1024
   vocabulary_size: 250002
   activation_function: gelu
   normalization: LayerNorm
@@ -38,7 +36,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: text-ranking
   library: transformers
@@ -59,11 +56,7 @@ quotes:
   what_sets_it_apart: To enable the model to handle long texts that exceed 1024 tokens, the model uses a sliding window approach to chunk the input text into smaller pieces and rerank each chunk separately.
 locked:
 - context_window_tokens
-- fingerprint.context_window_tokens
-tags:
-- text-ranking
-- dense
-- mha
+tags: []
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/jinaai/jina-reranker-v2-base-multilingual
@@ -80,14 +73,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Jina Reranker v2 is a text reranking model from Jina AI. A reranker is the second step of a search system: it takes a query and a candidate document and scores how relevant the document is to the query, so the candidates can be put in order. The card calls it a cross-encoder, trained to rerank documents in multiple languages.
-
-## Intended Use
-
-The card presents it as a reranking component for information retrieval systems. It says the repository is licensed for research and evaluation under CC-BY-NC-4.0 and points to Jina AI's API, AWS SageMaker or Azure Marketplace offerings for commercial use.
-
-## What Sets It Apart
-
-The card says the model handles inputs of up to 1024 tokens, and splits longer text into chunks with a sliding window and reranks each chunk separately. It adds that the model is equipped with a flash attention mechanism, which the card says improves its performance.

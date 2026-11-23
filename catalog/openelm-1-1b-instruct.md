@@ -2,14 +2,13 @@
 id: model/openelm-1-1b-instruct
 type: model
 slug: openelm-1-1b-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: OpenELM-1_1B-Instruct
 organization: organization/apple
 release_date: '2024-04-12'
-release_year: 2024
-release_month: 4
 license: license/apple-amlr
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 1.08
@@ -22,9 +21,8 @@ fingerprint:
   num_layers: 28
   head_size: 64
   hidden_size: 2048
-  context_window_tokens: 2048
   vocabulary_size: 32000
-  activation_function: swish
+  activation_function: silu
   normalization: RMSNorm
   norm_placement: pre
   stack: decoder
@@ -52,10 +50,7 @@ quotes:
   what_sets_it_apart: OpenELM uses a layer-wise scaling strategy to efficiently allocate parameters within each layer of the transformer model, leading to enhanced accuracy.
   running_it: Additional arguments to the hugging face generate function can be passed via `generate_kwargs`.
 tags:
-- llm
-- text-generation
 - openelm
-- dense
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/apple/OpenELM-1_1B-Instruct
@@ -72,14 +67,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-OpenELM-1_1B-Instruct is a small language model from Apple, with 1.1 billion parameters, that was instruction-tuned so it can follow prompts. It belongs to OpenELM, which the card calls a family of Open Efficient Language Models released in pretrained and instruction-tuned versions at 270M, 450M, 1.1B and 3B parameters. The card says the pre-training data totals approximately 1.8 trillion tokens.
-
-## What Sets It Apart
-
-The card says OpenELM uses a layer-wise scaling strategy to allocate parameters within each layer of the transformer, and credits this for better accuracy. Apple also states that it released the complete framework for data preparation, training, fine-tuning and evaluation, together with checkpoints and training logs, to support open research.
-
-## Running It
-
-The card provides a generate_openelm.py script for models loaded from the Hugging Face Hub, run with repetition_penalty=1.2 in its example. It also describes two ways to speed up generation: prompt lookup speculative generation, and an assistant model, a smaller model that drafts tokens for the larger one.

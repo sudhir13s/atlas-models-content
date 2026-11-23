@@ -2,11 +2,12 @@
 id: model/distilbart-cnn-12-6
 type: model
 slug: distilbart-cnn-12-6
-schema_version: 1.1
+schema_version: 3.0
 title: distilbart-cnn-12-6
 organization: organization/sshleifer
 license: license/apache-2-0
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/summarization
 parameters_active_b: 0.306
@@ -23,7 +24,6 @@ fingerprint:
   head_size: 64
   hidden_size: 1024
   intermediate_size: 4096
-  context_window_tokens: 1024
   vocabulary_size: 50264
   activation_function: gelu
   normalization: LayerNorm
@@ -53,10 +53,7 @@ quotes:
   what_sets_it_apart: bart-large-cnn (baseline)
   running_it: This checkpoint should be loaded into `BartForConditionalGeneration.from_pretrained`.
 tags:
-- llm
-- summarization
 - bart
-- dense
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/sshleifer/distilbart-cnn-12-6
@@ -70,14 +67,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-DistilBART CNN 12-6 is a summarization model: it reads a longer text and writes a shorter one. The card is brief. It presents the checkpoint as one of the DistilBART models, tags it English, lists the datasets cnn_dailymail and xsum, and compares it with bart-large-cnn as the baseline. It names no maker; the repository belongs to the sshleifer account on Hugging Face.
-
-## What Sets It Apart
-
-The card's table lists the DistilBART variants beside the bart-large-cnn baseline, with their sizes and inference times. It shows distilbart-12-6-cnn at 306 million parameters against 406 million for the baseline, and 307 ms inference time against 381 ms. The card does not describe how the model was made.
-
-## Running It
-
-The card says the checkpoint should be loaded with BartForConditionalGeneration.from_pretrained in the Transformers library.

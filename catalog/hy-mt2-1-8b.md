@@ -2,14 +2,13 @@
 id: model/hy-mt2-1-8b
 type: model
 slug: hy-mt2-1-8b
-schema_version: 1.1
+schema_version: 3.0
 title: Hy-MT2-1.8B
 organization: organization/tencent
 release_date: '2026-05-11'
-release_year: 2026
-release_month: 5
 license: license/apache-2-0
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/translation
 parameters_active_b: 2.04
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 128
   hidden_size: 2048
   intermediate_size: 6144
-  context_window_tokens: 262144
   vocabulary_size: 120818
   activation_function: silu
   normalization: RMSNorm
@@ -39,7 +37,6 @@ filters:
   size_category: small
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: translation
   library: transformers
@@ -60,11 +57,7 @@ quotes:
   what_sets_it_apart: all of which support translation among 33 languages and effectively follow translation instructions in multiple languages.
   running_it: Note that our models do not have a default system_prompt.
 tags:
-- llm
-- translation
 - hunyuan-v1-dense
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/tencent/Hy-MT2-1.8B
@@ -81,18 +74,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Hy-MT2-1.8B is the 1.8-billion-parameter member of Hy-MT2, a family of machine translation models from Tencent Hy, which translate text from one language to another. The card says all sizes in the family support translation among 33 languages and follow translation instructions given in several languages.
-
-## Intended Use
-
-The card presents the model for translation in complex real-world settings and shows instruction templates for default translation, translation with a terminology list, a requested style, user preferences, preserved delimiters, structured data such as JSON, and background information. It asks that language names in prompts be written in full.
-
-## What Sets It Apart
-
-The card describes the family as fast-thinking and as able to follow translation instructions. Tencent also released IFMTBench, a benchmark for translation instruction following. For phones and similar devices, the card says a 1.25-bit quantized build made with AngelSlim reduces the 1.8B model's storage to 440 MB.
-
-## Running It
-
-For the 1.8B and 7B sizes the card recommends a temperature of 0.7, top-p of 0.6, top-k of 20, a repetition penalty of 1.05 and a maximum of 4096 new tokens. It notes that the models have no default system prompt and that the Transformers library version 5.6.0 or newer is needed.

@@ -2,15 +2,14 @@
 id: model/openchat-3-5-0106
 type: model
 slug: openchat-3-5-0106
-schema_version: 1.1
+schema_version: 3.0
 title: openchat-3.5-0106
 organization: organization/openchat
 release_date: '2024-01-07'
-release_year: 2024
-release_month: 1
 license: license/apache-2-0
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 7.24
@@ -28,7 +27,6 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 14336
-  context_window_tokens: 8192
   vocabulary_size: 32002
   activation_function: silu
   normalization: RMSNorm
@@ -40,7 +38,6 @@ filters:
   size_category: medium
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -63,11 +60,7 @@ quotes:
   what_sets_it_apart: '2 Modes: Coding + Generalist, Mathematical Reasoning'
   limitations: OpenChat may sometimes generate information that does not exist or is not accurate
 tags:
-- llm
-- text-generation
 - mistral
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/openchat/openchat-3.5-0106
@@ -87,18 +80,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-OpenChat 3.5 0106 is a chat language model from the OpenChat project, fine-tuned from Mistral AI's Mistral-7B-v0.1. The card lists a size of 7B and a context of 8192 tokens, and its headline describes the project as advancing open-source language models with mixed-quality data.
-
-## Intended Use
-
-The card recommends serving it with the OpenChat package's OpenAI-compatible API server, which it says can run on a consumer GPU with 24GB of memory. It describes two modes, one for coding and general use and one for mathematical reasoning, and experimental support for evaluator and feedback uses.
-
-## What Sets It Apart
-
-The card tags the training method as C-RLFT and describes two modes, Coding plus Generalist and Mathematical Reasoning. It also lists experimental support for evaluator and feedback capabilities.
-
-## Limitations
-
-The card says the model is bound by the limitations of its foundation models, which may affect complex reasoning, mathematical and arithmetic tasks, and programming. It may also generate information that does not exist, so users should verify critical information.

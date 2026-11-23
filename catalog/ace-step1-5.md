@@ -2,14 +2,13 @@
 id: model/ace-step1-5
 type: model
 slug: ace-step1-5
-schema_version: 1.1
+schema_version: 3.0
 title: Ace-Step1.5
 organization: organization/ace-step
 release_date: '2026-01-23'
-release_year: 2026
-release_month: 1
 license: license/mit
 model_category: generation
+model_kind: diffusion
 tasks:
 - task/music-and-sound-generation
 context_window_tokens: 32768
@@ -24,7 +23,6 @@ fingerprint:
   head_size: 128
   hidden_size: 2048
   intermediate_size: 6144
-  context_window_tokens: 32768
   vocabulary_size: 64003
   activation_function: silu
   normalization: RMSNorm
@@ -102,7 +100,6 @@ pipeline:
 filters:
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-to-audio
   library: transformers
@@ -122,10 +119,7 @@ quotes:
   intended_use: versatile editing capabilities—such as cover generation, repainting, and vocal-to-BGM conversion
   what_sets_it_apart: the Language Model (LM) functions as an omni-capable planner
 tags:
-- text-to-audio
 - acestep
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/ACE-Step/Ace-Step1.5
@@ -138,18 +132,8 @@ sources:
   title: arXiv:2602.00744
   trust: 0.95
 - url: https://huggingface.co/ACE-Step/Ace-Step1.5/blob/main/acestep-v15-turbo/config.json
-  title: 'ACE-Step/Ace-Step1.5 — acestep-v15-turbo/config.json'
+  title: ACE-Step/Ace-Step1.5 — acestep-v15-turbo/config.json
   trust: 0.9
 ---
 
-## Summary
 
-ACE-Step 1.5 is an open music generation model from ACE-Step that turns a text description into a song, a task called text-to-music. Its model card says it pairs a language model, which plans the song, with a diffusion transformer, which produces the audio, and that it follows prompts in more than 50 languages. The card also states that it generates a full song in under 2 seconds on an A100 graphics card and runs locally with less than 4 GB of video memory.
-
-## Intended Use
-
-The model card presents it for creators: it says the generated music may be used for commercial purposes, and that the model fits the workflows of music artists, producers and content creators. Besides writing a song from a text prompt, the card lists editing functions such as cover generation, repainting and vocal-to-background-music conversion.
-
-## What Sets It Apart
-
-The card describes a hybrid design in which a language model acts as a planner. It turns a simple request into a song blueprint, from a short loop to a 10-minute composition, writing metadata, lyrics and captions that then guide the diffusion transformer (the part that generates the audio). The card says the two are aligned through reinforcement learning that uses only the model's own internal signals, with no external reward model or human preference data. It describes the training data as licensed tracks, royalty-free or public-domain music, and synthetic audio made from MIDI files.

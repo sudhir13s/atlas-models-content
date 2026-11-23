@@ -2,15 +2,14 @@
 id: model/deepseek-r1
 type: model
 slug: deepseek-r1
-schema_version: 1.1
+schema_version: 3.0
 title: DeepSeek-R1
 organization: organization/deepseek
 release_date: '2025-01-20'
-release_year: 2025
-release_month: 1
 license: license/mit
 architecture_id: architecture-era/mixture-of-experts
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 - task/reasoning-models
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 56
   hidden_size: 7168
   intermediate_size: 18432
-  context_window_tokens: 131072
   vocabulary_size: 129280
   activation_function: silu
   normalization: RMSNorm
@@ -44,7 +42,6 @@ filters:
   is_quantized: true
   quant_format: fp8
   is_moe: true
-  attention_type: MLA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -65,13 +62,8 @@ quotes:
   running_it: Set the temperature within the range of 0.5-0.7 (0.6 is recommended) to prevent endless repetitions or incoherent outputs.
 locked:
 - context_window_tokens
-- fingerprint.context_window_tokens
 tags:
-- llm
-- text-generation
 - deepseek-v3
-- moe
-- mla
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/deepseek-ai/DeepSeek-R1
@@ -88,14 +80,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-DeepSeek-R1 is a reasoning language model from DeepSeek that works through a problem in a long chain of thought before it answers. The card says it was trained from DeepSeek-V3-Base with large-scale reinforcement learning, which improves a model by rewarding good results, with cold-start data added before the reinforcement learning. It is a mixture-of-experts model with 671 billion total parameters, 37 billion active per token, and a 128K context length.
-
-## What Sets It Apart
-
-DeepSeek describes a training pipeline with two reinforcement-learning stages, to find better reasoning patterns and to match human preferences, and two supervised fine-tuning stages that seed the model's reasoning and non-reasoning abilities. The card says its predecessor DeepSeek-R1-Zero was trained with reinforcement learning alone, without a supervised first step, and showed endless repetition, poor readability and language mixing, which the cold-start data in DeepSeek-R1 addresses.
-
-## Running It
-
-The card recommends a temperature between 0.5 and 0.7, with 0.6 suggested, to prevent endless repetition, and advises against a system prompt, with all instructions placed in the user prompt. It also suggests forcing the output to begin with the text <think> so that the model reasons before answering.

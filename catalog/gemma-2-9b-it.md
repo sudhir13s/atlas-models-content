@@ -2,16 +2,15 @@
 id: model/gemma-2-9b-it
 type: model
 slug: gemma-2-9b-it
-schema_version: 1.1
+schema_version: 3.0
 title: Gemma 2 9B IT
 organization: organization/google-deepmind
 release_date: '2024-06-27'
-release_year: 2024
-release_month: 6
 license: license/gemma
 signal_strength: high
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 9.24
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 256
   hidden_size: 3584
   intermediate_size: 14336
-  context_window_tokens: 8192
   vocabulary_size: 256000
   activation_function: GeGLU
   normalization: RMSNorm
@@ -35,17 +33,14 @@ fingerprint:
   stack: decoder
   positional_encoding: RoPE
   rope_theta: 10000
-  parameters_active_b: 9.24
   kv_cache_rating: medium
   key_detail: Alternates local sliding-window (4096) and global attention every other layer; attn logit soft-cap 50.0, final logit soft-cap 30.0; head_dim 256 (decoupled from hidden_size); pre- and post-RMSNorm on each sublayer
-moe_config: null
 filters:
   size_category: small
   is_quantized: false
   quant_format: original
   is_moe: false
   pipeline_tag: text-generation
-  attention_type: GQA
   is_gated: true
   library: transformers
 hub_signals:
@@ -70,8 +65,6 @@ locked:
 - title
 - organization
 - release_date
-- release_year
-- release_month
 - license
 - signal_strength
 - model_category
@@ -87,13 +80,11 @@ locked:
 - fingerprint.head_size
 - fingerprint.hidden_size
 - fingerprint.intermediate_size
-- fingerprint.context_window_tokens
 - fingerprint.vocabulary_size
 - fingerprint.activation_function
 - fingerprint.normalization
 - fingerprint.positional_encoding
 - fingerprint.rope_theta
-- fingerprint.parameters_active_b
 - fingerprint.kv_cache_rating
 - fingerprint.key_detail
 - moe_config
@@ -102,15 +93,10 @@ locked:
 - filters.quant_format
 - filters.is_moe
 - filters.pipeline_tag
-- filters.attention_type
-- benchmarks
 - body
 tags:
-- llm
 - gemma
 - google
-- dense
-- gqa
 - instruct
 - sliding-window
 updated: '2026-11-23'

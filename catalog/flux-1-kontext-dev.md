@@ -2,14 +2,13 @@
 id: model/flux-1-kontext-dev
 type: model
 slug: flux-1-kontext-dev
-schema_version: 1.1
+schema_version: 3.0
 title: FLUX.1-Kontext-dev
 organization: organization/black-forest-labs
 release_date: '2025-05-28'
-release_year: 2025
-release_month: 5
 license_note: flux-1-dev-non-commercial-license
 model_category: generation
+model_kind: diffusion
 tasks:
 - task/image-editing
 total_parameters: 11901408320
@@ -120,8 +119,7 @@ quotes:
   summary: is a 12 billion parameter rectified flow transformer capable of editing images based on text instructions.
   what_sets_it_apart: Robust consistency allows users to refine an image through multiple successive edits with minimal visual drift.
   running_it: Filters or manual review must be used with the model under the terms of the FLUX.1 [dev] Non-Commercial License.
-tags:
-- image-to-image
+tags: []
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/black-forest-labs/FLUX.1-Kontext-dev
@@ -135,14 +133,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-FLUX.1 Kontext [dev] is an image-editing model published by Black Forest Labs. You give it an existing image and a text instruction, and it returns the edited image. The card describes it as a 12 billion parameter rectified flow transformer, a type of image-generation network, released with open weights.
-
-## What Sets It Apart
-
-The card lists these features: it changes an existing image from an edit instruction, it keeps a character, style or object as a reference without any fine-tuning, and it stays consistent over several successive edits with minimal visual drift. It says the model was trained with guidance distillation, which makes it more efficient.
-
-## Running It
-
-The card says the repository includes filters for illegal or infringing content, and that filters or manual review must be used with the model under the terms of the FLUX.1 [dev] Non-Commercial License. It points to a reference implementation with sampling code on GitHub and to use through the diffusers library.

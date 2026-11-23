@@ -2,14 +2,13 @@
 id: model/embeddinggemma-2
 type: model
 slug: embeddinggemma-2
-schema_version: 1.1
+schema_version: 3.0
 title: embeddinggemma-2
 organization: organization/google-deepmind
 release_date: '2026-09-14'
-release_year: 2026
-release_month: 9
 license: license/apache-2-0
 model_category: retrieval
+model_kind: embedding
 tasks:
 - task/embedding-models
 parameters_active_b: 0.74
@@ -28,7 +27,6 @@ fingerprint:
   head_size: 256
   hidden_size: 512
   intermediate_size: 2048
-  context_window_tokens: 8192
   vocabulary_size: 262144
   normalization: RMSNorm
   norm_placement: both
@@ -116,7 +114,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: feature-extraction
   library: transformers
@@ -138,12 +135,8 @@ quotes:
   running_it: Using the right prefix improves quality; omitting it still works but reduces precision.
 locked:
 - context_window_tokens
-- fingerprint.context_window_tokens
 tags:
-- feature-extraction
 - embedding-gemma2
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google/embeddinggemma-2
@@ -160,18 +153,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-EmbeddingGemma 2 is an embedding model from Google DeepMind. An embedding model turns an input into a list of numbers, called a vector, so that similar inputs end up close together. This one maps text (including code), images, video and audio into a single 768-dimensional vector space. The card gives 740M total parameters, support for 100+ languages and an 8K-token context window.
-
-## Intended Use
-
-The card says it is designed to run on consumer hardware such as mobile devices and laptops, for on-device applications like search, retrieval-augmented generation (RAG), classification and clustering.
-
-## What Sets It Apart
-
-The card lists these design points. It builds on the architecture of Gemma 4 and puts four input types in one shared vector space. A 270M-parameter text model is paired with vision (170M) and audio (300M) encoders that can be loaded separately, so only the needed input types are loaded. Matryoshka Representation Learning lets the vector be cut to 512, 256 or 128 numbers, which the card says cuts storage by up to 6 times. Short instruction prefixes in the text tune the embedding for a task.
-
-## Running It
-
-The card says text inputs should start with a short task prefix, such as one for search queries and a title-and-text format for documents. Omitting the prefix still works but reduces precision. Prefixes apply to text only; images, video and audio are passed without one. Truncated vectors of 128, 256 or 512 numbers should be re-normalized, and the card says 128 is best suited to text-only workloads.

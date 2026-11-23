@@ -2,12 +2,13 @@
 id: model/gpt2
 type: model
 slug: gpt2
-schema_version: 1.1
+schema_version: 3.0
 title: gpt2
 organization: organization/openai
 license: license/mit
 architecture_id: architecture-era/gpt
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 0.14
@@ -23,7 +24,6 @@ fingerprint:
   kv_heads: 12
   head_size: 64
   hidden_size: 768
-  context_window_tokens: 1024
   vocabulary_size: 50257
   activation_function: gelu_new
   normalization: LayerNorm
@@ -34,7 +34,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -54,11 +53,7 @@ quotes:
   intended_use: You can use the raw model for text generation or fine-tune it to a downstream task.
   what_sets_it_apart: was trained to guess the next word in sentences
 tags:
-- llm
-- text-generation
 - gpt2
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/openai-community/gpt2
@@ -72,14 +67,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-GPT-2 is an English language model from OpenAI that writes text by repeatedly predicting the next word. This is the smallest version of GPT-2, with 124M parameters. The card says it was pretrained on a very large corpus of English text with a causal language modeling objective, and that the Hugging Face team extended the model card written by the release team.
-
-## Intended Use
-
-The card says the raw model can be used for text generation or fine-tuned for a downstream task, and that it is best at what it was pretrained for: generating text from a prompt.
-
-## What Sets It Apart
-
-The card describes self-supervised pretraining on raw text with no human labels, where the target is the same text shifted one token to the right. A mask inside the model makes the prediction for each token use only the tokens before it, never the ones after. The card says this lets the model learn an internal representation of English that can also supply features for other tasks.

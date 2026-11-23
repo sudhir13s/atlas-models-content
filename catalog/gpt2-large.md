@@ -2,12 +2,13 @@
 id: model/gpt2-large
 type: model
 slug: gpt2-large
-schema_version: 1.1
+schema_version: 3.0
 title: gpt2-large
 organization: organization/openai
 license: license/mit
 architecture_id: architecture-era/gpt
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 0.81
@@ -24,7 +25,6 @@ fingerprint:
   kv_heads: 20
   head_size: 64
   hidden_size: 1280
-  context_window_tokens: 1024
   vocabulary_size: 50257
   activation_function: gelu_new
   normalization: LayerNorm
@@ -35,7 +35,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -56,11 +55,7 @@ quotes:
   what_sets_it_apart: We found no statistically significant difference in gender, race, and religious bias probes between 774M and 1.5B
   limitations: We know it contains a lot of unfiltered content from the internet, which is far from neutral.
 tags:
-- llm
-- text-generation
 - gpt2
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/openai-community/gpt2-large
@@ -77,18 +72,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-GPT-2 Large is the 774 million parameter version of GPT-2, a transformer-based language model created and released by OpenAI. It was pretrained on English text with a causal language modeling objective, which means it learns to predict the next word from the words before it, so it can continue a piece of text.
-
-## Intended Use
-
-Quoting OpenAI's own GPT-2 model card, the card names AI researchers and practitioners as the primary users, who are expected to study the behaviors, capabilities, biases and constraints of large generative language models. Likely secondary uses are writing assistance, creative writing and entertainment such as chat bots. Out of scope are uses that need the generated text to be true, and deployment in systems that interact with people unless the deployers first study the biases relevant to their use.
-
-## What Sets It Apart
-
-The card places it as one size in the GPT-2 family and lists GPT-2, GPT-Medium and GPT-XL as related models. OpenAI's quoted text says it found no statistically significant difference in gender, race and religious bias probes between the 774M and 1.5B versions, so all versions should be approached with similar caution.
-
-## Limitations
-
-The card says the training data has not been released as a browsable dataset and is known to contain a lot of unfiltered internet content. It warns that predictions can include harmful stereotypes across protected classes, identity characteristics, and social and occupational groups.

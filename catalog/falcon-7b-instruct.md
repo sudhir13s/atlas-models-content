@@ -2,15 +2,14 @@
 id: model/falcon-7b-instruct
 type: model
 slug: falcon-7b-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: falcon-7b-instruct
 organization: organization/technology-innovation-institute
 release_date: '2023-04-25'
-release_year: 2023
-release_month: 4
 license: license/apache-2-0
 architecture_id: architecture-era/transformer
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 7.22
@@ -39,7 +38,6 @@ filters:
   size_category: medium
   is_quantized: false
   is_moe: false
-  attention_type: MQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -60,11 +58,7 @@ quotes:
   what_sets_it_apart: It features an architecture optimized for inference
   running_it: You will need **at least 16GB of memory** to swiftly run inference with Falcon-7B-Instruct.
 tags:
-- llm
-- text-generation
 - falcon
-- dense
-- mqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/tiiuae/falcon-7b-instruct
@@ -93,18 +87,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Falcon-7B-Instruct is a chat model built by TII. The card says it is based on TII's own Falcon-7B model, which TII fine-tuned on a mixture of chat and instruction datasets so that it answers questions and follows requests. The card calls it a causal decoder-only model with 7 billion parameters, meaning it reads text and predicts the next word, and lists English and French as its languages.
-
-## Intended Use
-
-The card says it is for direct use as a chat or instruction model, fine-tuned on a mixture of instruct and chat datasets. It names production use without adequate assessment of risks and mitigation, and any irresponsible or harmful use, as out of scope, and advises users to build guardrails.
-
-## What Sets It Apart
-
-The card says the architecture is optimized for inference, using FlashAttention and multiquery attention, two techniques that make attention cheaper to compute and its memory smaller. It states the Falcon-7B base was trained on 1,500B tokens of RefinedWeb, a web-crawl dataset, plus curated corpora, and that the instruct version was fine-tuned on a mixture of about 250M tokens of chat and instruction data.
-
-## Running It
-
-The card says you need at least 16GB of memory to run inference swiftly and PyTorch 2.0 to use it with Transformers. It also says this instruct model may not be ideal for further fine-tuning, and suggests starting from Falcon-7B to build your own chat model.

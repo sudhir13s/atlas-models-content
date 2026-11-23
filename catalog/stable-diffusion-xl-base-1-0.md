@@ -2,14 +2,13 @@
 id: model/stable-diffusion-xl-base-1-0
 type: model
 slug: stable-diffusion-xl-base-1-0
-schema_version: 1.1
+schema_version: 3.0
 title: stable-diffusion-xl-base-1.0
 organization: organization/stabilityai
 release_date: '2023-07-25'
-release_year: 2023
-release_month: 7
 license_note: openrail++
 model_category: generation
+model_kind: diffusion
 tasks:
 - task/image-generation
 total_parameters: 2567463684
@@ -89,8 +88,7 @@ quotes:
   intended_use: The model is intended for research purposes only.
   what_sets_it_apart: In a first step, the base model is used to generate (noisy) latents,
   running_it: 'Make sure to upgrade diffusers to >= 0.19.0:'
-tags:
-- text-to-image
+tags: []
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0
@@ -116,18 +114,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Stable Diffusion XL (SDXL) 1.0 base is a text-to-image model from Stability AI: it turns a written prompt into an image. The card calls it a latent diffusion model, a design that builds an image by repeatedly removing noise from a compressed representation, and says it uses two fixed, pretrained text encoders, OpenCLIP-ViT/G and CLIP-ViT/L.
-
-## Intended Use
-
-The card says the model is intended for research purposes only, such as artworks and design processes, educational or creative tools, research on generative models, and studying limitations and biases. It says it was not trained to be factual representations of people or events, so using it for that is out of scope.
-
-## What Sets It Apart
-
-The card describes an ensemble-of-experts pipeline: the base model generates noisy latents, and a separate refinement model specialised for the final denoising steps can then process them. The base model can also be used by itself.
-
-## Running It
-
-The card says to use diffusers 0.19.0 or later, together with transformers, safetensors, accelerate and the invisible watermark package.

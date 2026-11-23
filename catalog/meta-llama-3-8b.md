@@ -2,14 +2,13 @@
 id: model/meta-llama-3-8b
 type: model
 slug: meta-llama-3-8b
-schema_version: 1.1
+schema_version: 3.0
 title: Meta-Llama-3-8B
 organization: organization/meta
 release_date: '2024-04-17'
-release_year: 2024
-release_month: 4
 license: license/llama-3
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 total_parameters: 8030261248
@@ -50,9 +49,7 @@ quotes:
   summary: Llama 3 is an auto-regressive language model that uses an optimized transformer architecture.
   intended_use: Llama 3 is intended for commercial and research use in English.
   what_sets_it_apart: Both the 8 and 70B versions use Grouped-Query Attention (GQA) for improved inference scalability.
-tags:
-- llm
-- text-generation
+tags: []
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/meta-llama/Meta-Llama-3-8B
@@ -66,14 +63,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Meta Llama 3 8B is the 8-billion-parameter size of Meta's Llama 3 family of language models, which take text in and generate text and code. The card says it is an auto-regressive language model with an optimized transformer architecture, trained on more than 15 trillion tokens with an 8k-token context length.
-
-## Intended Use
-
-Meta says Llama 3 is intended for commercial and research use in English. Pretrained models such as this one can be adapted for a variety of natural language generation tasks, while the instruction-tuned versions are meant for assistant-like chat. Out-of-scope uses are anything that violates applicable laws or the Acceptable Use Policy, and languages other than English unless a developer fine-tunes the model for them.
-
-## What Sets It Apart
-
-The card says the 8B and 70B models use Grouped-Query Attention for better inference scalability, and that the training data is a new mix of publicly available online data with a knowledge cutoff of March 2023 for the 8B size.

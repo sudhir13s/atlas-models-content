@@ -2,14 +2,13 @@
 id: model/nllb-200-distilled-600m
 type: model
 slug: nllb-200-distilled-600m
-schema_version: 1.1
+schema_version: 3.0
 title: nllb-200-distilled-600M
 organization: organization/meta
 release_date: '2022-07-08'
-release_year: 2022
-release_month: 7
 license_note: cc-by-nc-4.0
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/translation
 context_window_tokens: 1024
@@ -25,7 +24,6 @@ fingerprint:
   head_size: 64
   hidden_size: 1024
   intermediate_size: 4096
-  context_window_tokens: 1024
   vocabulary_size: 256206
   activation_function: relu
   normalization: LayerNorm
@@ -54,10 +52,7 @@ quotes:
   intended_use: NLLB-200 is a research model and is not released for production deployment.
   what_sets_it_apart: many languages chosen for this study are low-resource languages, with a heavy emphasis on African languages.
 tags:
-- llm
-- translation
 - m2m-100
-- dense
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/facebook/nllb-200-distilled-600M
@@ -71,14 +66,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-NLLB-200 distilled 600M is a machine translation model from the NLLB (No Language Left Behind) team that translates single sentences among 200 languages. This card is for the distilled 600M variant, the smaller version of the NLLB-200 model. The card says it is aimed mainly at research, especially for low-resource languages, which are languages with little training text available.
-
-## Intended Use
-
-The card lists researchers and the machine translation research community as the primary users. It marks several uses as out of scope: production deployment, domain-specific text such as medical or legal, document translation, and certified translations. It adds that the model was trained on inputs of up to 512 tokens, so longer sequences may translate worse.
-
-## What Sets It Apart
-
-The card describes training on parallel multilingual data from a variety of sources, plus monolingual data built from Common Crawl, and refers to the paper for the strategies used for data imbalance between high and low-resource languages. It notes that many of the chosen languages are low-resource, with a heavy emphasis on African languages.

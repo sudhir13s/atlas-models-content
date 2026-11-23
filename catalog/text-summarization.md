@@ -2,14 +2,13 @@
 id: model/text-summarization
 type: model
 slug: text-summarization
-schema_version: 1.1
+schema_version: 3.0
 title: text_summarization
 organization: organization/falconsai
 release_date: '2023-10-21'
-release_year: 2023
-release_month: 10
 license: license/apache-2-0
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/summarization
 parameters_active_b: 0.06
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 64
   hidden_size: 512
   intermediate_size: 2048
-  context_window_tokens: 512
   vocabulary_size: 32128
   activation_function: relu
   normalization: LayerNorm
@@ -37,7 +35,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: summarization
   library: transformers
@@ -57,11 +54,7 @@ quotes:
   intended_use: The primary intended use of this model is to generate concise and coherent text summaries.
   what_sets_it_apart: a batch size of 8 is chosen for efficient computation and learning.
 tags:
-- llm
-- summarization
 - t5
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Falconsai/text_summarization
@@ -75,14 +68,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-text_summarization is a summarization model published on Hugging Face by Falconsai, not by the makers of the original T5 model. The card says it is a fine-tuned version of t5-small, a small T5 transformer, that writes concise summaries of input text. The card says it was fine-tuned on documents paired with human-written summaries, but does not name the dataset.
-
-## Intended Use
-
-The card names text summarization as the primary use, for lengthy documents, news articles and other text. It says performance may vary on other language tasks, and points users to other fine-tuned models for those.
-
-## What Sets It Apart
-
-The card describes fine-tuning with a batch size of 8 and a learning rate of 2e-5 on a variety of documents with human-generated summaries. It does not describe any other distinguishing feature.

@@ -2,14 +2,13 @@
 id: model/xclip-base-patch32
 type: model
 slug: xclip-base-patch32
-schema_version: 1.1
+schema_version: 3.0
 title: xclip-base-patch32
 organization: organization/microsoft
 release_date: '2022-08-25'
-release_year: 2022
-release_month: 8
 license: license/mit
 model_category: vision
+model_kind: transformer-vision
 tasks:
 - task/video-understanding
 parameters_active_b: 0.2
@@ -114,7 +113,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: video-classification
   library: transformers
@@ -135,10 +133,7 @@ quotes:
   what_sets_it_apart: The model is trained in a contrastive way on (video, text) pairs.
   running_it: During validation, one resizes the shorter edge of each frame, after which center cropping is performed to a fixed-size resolution (like 224x224).
 tags:
-- video-classification
 - xclip
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/microsoft/xclip-base-patch32
@@ -155,18 +150,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-X-CLIP is a video-language model from Microsoft that scores how well a text fits a video. This is the base-sized version with a patch resolution of 32, trained fully supervised on the Kinetics-400 video dataset using 8 frames per video at 224 by 224 pixels. It comes from the paper "Expanding Language-Image Pretrained Models for General Video Recognition". The Hugging Face team wrote the card, because the X-CLIP team did not.
-
-## Intended Use
-
-The card says the raw model can be used to determine how well text goes with a given video, and points to the model hub for versions fine-tuned on other tasks. It lists zero-shot, few-shot and fully supervised video classification, and video-text retrieval, as tasks it enables.
-
-## What Sets It Apart
-
-The card describes X-CLIP as a minimal extension of CLIP, an image-text model, for general video-language understanding. It is trained in a contrastive way on pairs of a video and a text, so that matching pairs score higher than mismatched ones.
-
-## Running It
-
-The card says training used 8 frames per video at 224 by 224 pixels. During validation, the shorter edge of each frame is resized, the frame is center-cropped to a fixed size and normalized with the ImageNet mean and standard deviation.

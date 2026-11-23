@@ -31,7 +31,9 @@ numeric config) so it stays machine-parseable.
 - `tags`: lowercase, hyphen-separated.
 - `updated`: ISO date (`YYYY-MM-DD`).
 - `sources[]`: `{ url, title, trust }` — `trust` in `[0,1]`. Open-source-first; cite, do not copy.
-- `schema_version`: the `major.minor` the file was authored against (currently `2.9`).
+- `schema_version`: the `major.minor` the file was authored against (the repo is at `3.0`). A
+  type whose schema fixes the value (`model`: `3.0`) is refused with any other, so every record of
+  that type carries the current version; a breaking change raises it and converts every record.
 
 ## Body sections
 
@@ -185,16 +187,56 @@ numeric config) so it stays machine-parseable.
   - **Every row has its source.** Each `comparison` row, `key_numbers` row and misunderstanding
     names one entry of `sources`, fetched for the record; findings are attributed to who reports
     them, and no number is written from memory.
-- **model** — one record per base model. Carries the `fingerprint`, `organization` and `license`
+- **model** — one record per base model (schema 3.0). Carries the `fingerprint`, `organization` and `license`
   (IDs; `license_note` names a licence with no record), `variants[]` (quantised or repackaged copies:
   name, format, address, publisher), `aliases[]`, `hub_signals`, `gguf_repositories` and lineage (benchmark values live in `score-sheet` records of
-  `atlas-evaluation-content`). Prose is
-  optional: a record without `summary` has none yet. The prose queue writes up to five passages,
-  each a field and a body section (`summary`, `intended_use`, `what_sets_it_apart`, `running_it`,
-  `limitations`), with the span of the source behind each in `quotes`. Body sections, all optional:
-  Summary → Intended Use → What Sets It Apart → Running It → Limitations → Why It Matters → Notes.
-  A field with no source is absent, never `0` or `Unknown`; a passage the source cannot support has
-  neither field nor section. `fingerprint.norm_placement` (`pre` | `post` | `both`) and `fingerprint.stack`
+  `atlas-evaluation-content`).
+  - **Every fact is stored once.** `context_window_tokens` and `parameters_active_b` are top-level
+    fields only; `attention_type` is in `fingerprint` only; the release year and month are read
+    from `release_date` (`YYYY-MM-DD`). A consumer derives the rest.
+  - **Mixture of experts has one stored statement, `filters.is_moe`:** true for a mixture of
+    experts, false when the configuration was read and names no routed experts, absent when no
+    source says. `moe_config` holds the routing facts and exists only with `is_moe: true` (never
+    null). The `moe` and `dense` tags are derived, not stored, and the consumer's rule that sets
+    `architecture_id` reads the flag, so `architecture-era/mixture-of-experts` follows it.
+  - **`tags` hold only what no field states** (the model type, such as `bert` or `vit`): never the
+    pipeline tag, the attention type, `llm`, `moe` or `dense`. A consumer that shows tags adds
+    those from the fields.
+  - **Prose lives in the frontmatter only.** A record without `summary` has none yet. The prose
+    queue writes up to five passages (`summary`, `intended_use`, `what_sets_it_apart`,
+    `running_it`, `limitations`), with the span of the source behind each in `quotes`. The body
+    never repeats a passage: most records have no body. A hand-written record may keep its own
+    long-form sections (Summary → Why It Matters → Notes), which no job writes.
+  - **`model_category` says what the model is for; `model_kind` says how it is built**, and
+    decides which architecture fields apply:
+
+    | `model_kind` | What it is | Architecture blocks |
+    |---|---|---|
+    | `transformer-language` | one transformer stack over text tokens | `fingerprint` required unless the repository is gated; `pipeline` optional |
+    | `transformer-vision` | a transformer over image or video patches | `fingerprint`, `pipeline` or both |
+    | `multimodal` | encoders of more than one kind of input feeding one model | `pipeline`; `fingerprint` for its language stack |
+    | `convolutional` | a convolutional network | `pipeline` only: no `fingerprint`, `moe_config`, `context_window_tokens` or `filters.is_moe` |
+    | `diffusion` | a network called in a denoising loop | `pipeline`; `fingerprint` when it also has a transformer stack |
+    | `audio-speech` | a model that reads or writes sound | `fingerprint`, `pipeline` or both |
+    | `embedding` | a model that returns one vector per input | either block; the only kind with `embedding_dimension` |
+    | `tabular-time-series` | a network over table cells or time-series patches | `pipeline`; `fingerprint` when it states a stack |
+    | `control-policy` | a network that outputs a robot's actions | `pipeline` |
+
+    A job gives the kind by a fixed rule over the record's own fields; a record the rule cannot
+    place has no `model_kind` until a person reads it and sets one. It is never guessed. A gated
+    record whose configuration cannot be read may have neither block.
+  - **A sparse field is allowed only where it applies:** `fingerprint.input_stem` on an
+    `audio-speech` record, `fingerprint.decoder_layers` and `decoder_positional_encoding` with
+    `stack: encoder-decoder`, `moe_config` with `filters.is_moe: true`.
+  - **Closed value sets are enums:** `fingerprint.attention_type` (`MHA`, `MQA`, `GQA`, `MLA`),
+    `normalization` (`RMSNorm`, `LayerNorm`), `positional_encoding` (`RoPE`, `Learned`, `ALiBi`,
+    `Sinusoidal`, `Convolutional`). `activation_function` keeps the configuration's name in one
+    spelling per function: `silu` (never `swish`), `gelu_new` (never `gelu_pytorch_tanh`).
+  - **No unknown fields,** at the top level or inside `fingerprint`, `moe_config`, `filters`,
+    `hub_signals`, `lineage` and `pipeline`.
+
+  A field with no source is absent, never `0` or `Unknown`; a passage the source cannot support is
+  absent. `fingerprint.norm_placement` (`pre` | `post` | `both`) and `fingerprint.stack`
   (`encoder` | `decoder` | `encoder-decoder`) are read from the model's official implementation or
   paper, which is then listed in `sources`; a block with any other layout leaves both absent, and a
   consumer draws no block figure without them. The same source gives `fingerprint.decoder_layers`

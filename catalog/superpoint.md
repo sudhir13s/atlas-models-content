@@ -2,14 +2,13 @@
 id: model/superpoint
 type: model
 slug: superpoint
-schema_version: 1.1
+schema_version: 3.0
 title: superpoint
 organization: organization/magic-leap-community
 release_date: '2024-03-13'
-release_year: 2024
-release_month: 3
 license_note: other
 model_category: vision
+model_kind: convolutional
 tasks:
 - task/keypoint-detection
 parameters_active_b: 0.0
@@ -69,7 +68,6 @@ pipeline:
 filters:
   size_category: tiny
   is_quantized: false
-  is_moe: false
   is_gated: false
   pipeline_tag: keypoint-detection
   library: transformers
@@ -89,9 +87,7 @@ quotes:
   intended_use: The use of the model in its own is limited, but it can be used as a feature extractor for other tasks such as homography estimation, image matching, etc.
   what_sets_it_apart: We introduce Homographic Adaptation, a multi-scale, multi-homography approach for boosting interest point detection repeatability
 tags:
-- keypoint-detection
 - superpoint
-- dense
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/magic-leap-community/superpoint
@@ -108,14 +104,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-SuperPoint is a model that finds interest points in an image, meaning distinctive spots such as corners, and produces a descriptor for each one so the same spot can be recognised in another image. This repository is magic-leap-community's copy on Hugging Face, and the card cites the SuperPoint paper by DeTone, Malisiewicz and Rabinovich. The card says it is a fully-convolutional network trained in a self-supervised way.
-
-## Intended Use
-
-The card says the model on its own has limited use, but can serve as a feature extractor for other tasks such as homography estimation and image matching.
-
-## What Sets It Apart
-
-The card says the interest points it detects are repeatable under homographic transformations, that is, they are found again when the view of a flat scene changes. The quoted paper abstract adds that it introduces Homographic Adaptation, a multi-scale, multi-homography approach for boosting that repeatability.

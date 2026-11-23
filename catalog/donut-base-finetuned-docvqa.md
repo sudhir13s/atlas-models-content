@@ -2,14 +2,13 @@
 id: model/donut-base-finetuned-docvqa
 type: model
 slug: donut-base-finetuned-docvqa
-schema_version: 1.1
+schema_version: 3.0
 title: donut-base-finetuned-docvqa
 organization: organization/naver-clova-ix
 release_date: '2022-07-19'
-release_year: 2022
-release_month: 7
 license: license/mit
 model_category: documents
+model_kind: multimodal
 tasks:
 - task/document-question-answering
 summary: 'Donut base fine-tuned on DocVQA is a document question answering model: given an image of a document and a question about it, it writes the answer as text. The card says this is Donut fine-tuned on DocVQA, a document visual question answering dataset, and that Donut was introduced in the paper OCR-free Document Understanding Transformer. The Hugging Face team wrote the card, not the team that released Donut.'
@@ -115,9 +114,7 @@ quotes:
   intended_use: This model is fine-tuned on DocVQA, a document visual question answering dataset.
   what_sets_it_apart: Donut consists of a vision encoder (Swin Transformer) and a text decoder (BART).
 tags:
-- document-question-answering
 - vision-encoder-decoder
-- dense
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/naver-clova-ix/donut-base-finetuned-docvqa
@@ -131,14 +128,4 @@ sources:
   trust: 0.95
 ---
 
-## Summary
 
-Donut base fine-tuned on DocVQA is a document question answering model: given an image of a document and a question about it, it writes the answer as text. The card says this is Donut fine-tuned on DocVQA, a document visual question answering dataset, and that Donut was introduced in the paper OCR-free Document Understanding Transformer. The Hugging Face team wrote the card, not the team that released Donut.
-
-## Intended Use
-
-The card says only that the model is fine-tuned on DocVQA and refers readers to the Transformers documentation for code examples. The example questions in its metadata, "What is the invoice number?" and "What is the purchase amount?", show the kind of question it is meant to answer from scans of invoices and contracts.
-
-## What Sets It Apart
-
-The card describes two parts. A vision encoder, a Swin Transformer, turns the image into a set of embeddings, and a text decoder, BART, then writes text one token at a time based on that encoding. The paper title says the approach needs no OCR (optical character recognition), so the page image is read directly rather than first passed through a separate text-extraction step.

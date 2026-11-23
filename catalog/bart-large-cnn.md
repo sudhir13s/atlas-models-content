@@ -2,11 +2,12 @@
 id: model/bart-large-cnn
 type: model
 slug: bart-large-cnn
-schema_version: 1.1
+schema_version: 3.0
 title: bart-large-cnn
 organization: organization/meta
 license: license/mit
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/summarization
 parameters_active_b: 0.41
@@ -24,7 +25,6 @@ fingerprint:
   head_size: 64
   hidden_size: 1024
   intermediate_size: 4096
-  context_window_tokens: 1024
   vocabulary_size: 50264
   activation_function: gelu
   normalization: LayerNorm
@@ -55,10 +55,7 @@ quotes:
   intended_use: You can use this model for text summarization.
   what_sets_it_apart: a bidirectional (BERT-like) encoder and an autoregressive (GPT-like) decoder
 tags:
-- llm
-- summarization
 - bart
-- dense
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/facebook/bart-large-cnn
@@ -75,14 +72,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-BART Large CNN is a text summarization model: given a news article, it writes a shorter version. It is published under the facebook organization on Hugging Face as an English BART model, a design that pairs a reading half (encoder) with a writing half (decoder), fine-tuned on the CNN Daily Mail collection of articles and their summaries. The card was written by the Hugging Face team, not by the team that released BART.
-
-## Intended Use
-
-The intended-use section of the card says only that the model can be used for text summarization. The card describes BART in general as also effective, once fine-tuned, for translation, text classification and question answering, but this checkpoint is the one fine-tuned on CNN Daily Mail.
-
-## What Sets It Apart
-
-The card describes BART as a sequence-to-sequence transformer with a bidirectional encoder, like BERT, and an autoregressive decoder, like GPT, which writes one token at a time from left to right. In pre-training the text is first corrupted with a noising function and the model learns to reconstruct the original. This checkpoint was then fine-tuned on CNN Daily Mail.

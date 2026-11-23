@@ -2,14 +2,13 @@
 id: model/piiranha-v1-detect-personal-information
 type: model
 slug: piiranha-v1-detect-personal-information
-schema_version: 1.1
+schema_version: 3.0
 title: piiranha-v1-detect-personal-information
 organization: organization/iiiorg
 release_date: '2024-09-12'
-release_year: 2024
-release_month: 9
 license_note: cc-by-nc-nd-4.0
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/token-classification
 parameters_active_b: 0.28
@@ -30,7 +29,6 @@ fingerprint:
   head_size: 64
   hidden_size: 768
   intermediate_size: 3072
-  context_window_tokens: 256
   vocabulary_size: 251000
   activation_function: gelu
   normalization: LayerNorm
@@ -41,7 +39,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: token-classification
   library: transformers
@@ -63,13 +60,8 @@ quotes:
   running_it: The context length is 256 Deberta tokens. If your text is longer than that, just split it up.
 locked:
 - context_window_tokens
-- fingerprint.context_window_tokens
 tags:
-- llm
-- token-classification
 - deberta-v2
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/iiiorg/piiranha-v1-detect-personal-information
@@ -83,18 +75,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Piiranha-v1 is a model that finds personally identifiable information (PII), such as names, emails and card numbers, in text. It was published on Hugging Face by iiiorg and is a fine-tuned version of microsoft/mdeberta-v3-base. The card says it detects 17 types of PII across six languages: English, Spanish, French, German, Italian and Dutch.
-
-## Intended Use
-
-The card says Piiranha can be used to assist with redacting PII from texts, and adds that it is used at your own risk, with no responsibility accepted for incorrect predictions.
-
-## What Sets It Apart
-
-The card lists the 17 supported PII types, among them account number, credit card number, date of birth, email, password, phone number and username. It notes that the model sometimes confuses one PII type for another, such as first names for last names, but still flags the token as PII, which is what matters for redaction.
-
-## Running It
-
-The card gives a context length of 256 DeBERTa tokens and says to split longer text.

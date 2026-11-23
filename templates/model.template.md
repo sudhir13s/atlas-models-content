@@ -2,23 +2,22 @@
 id: model/<slug>
 type: model
 slug: <slug>
-schema_version: 1.1
+schema_version: 3.0              # the model schema's current version; the schema refuses any other
 title: "<Human Readable Model Name>"
 organization: organization/<organization-slug>
-release_date: "<YYYY-MM-DD>"
-release_year: <YYYY>
-release_month: <M>
+release_date: "<YYYY-MM-DD>"     # the year and month are read from it, never stored beside it
 license: license/<license-slug>   # or `license_note: "<licence name as the source gives it>"` when no license record exists
 signal_strength: medium          # high | medium | low
 architecture_id: architecture-era/<slug>
-model_category: language
-parameters_active_b: <number>
+model_category: language         # what the model is for: language | vision | audio | multimodal | generation | retrieval | documents | structured-data | robotics-and-control
+model_kind: transformer-language # how it is built: transformer-language | transformer-vision | multimodal | convolutional | diffusion | audio-speech | embedding | tabular-time-series | control-policy; omit when unsure, never guess
+parameters_active_b: <number>    # stored here only, never inside fingerprint
 total_parameters: <int>
-context_window_tokens: <int>
-embedding_dimension: <int>       # embedding models only: the vector length the card or pooling configuration states
+context_window_tokens: <int>     # stored here only, never inside fingerprint; not on a convolutional model
+embedding_dimension: <int>       # model_kind embedding only: the vector length the card or pooling configuration states
 base_models:                     # bases with no record here, nearest first; a base with a record goes in lineage.parents
   - { name: "<owner/repo>", address: "https://huggingface.co/<owner/repo>" }
-summary: "<2-3 sentences: what the model is, its family or base model, what it was built to do>"   # omit the five passages, quotes and the body for a record with no prose yet
+summary: "<2-3 sentences: what the model is, its family or base model, what it was built to do>"   # omit the five passages and quotes for a record with no prose yet; a passage is written here only, never repeated in the body
 intended_use: "<1-3 sentences: the tasks and users the source names, and uses it rules out>"   # a passage the source cannot support is omitted, never written as "unknown"
 what_sets_it_apart: "<1-3 sentences: the design choice, training approach or reported result that separates it from its siblings or predecessors>"
 running_it: "<1-2 sentences: recommended settings, prompt format, hardware, what must or must not be done>"
@@ -30,17 +29,16 @@ quotes:                          # set by the prose queue: one span of the sourc
   what_sets_it_apart: "<span of the source text>"
   running_it: "<span of the source text>"
   limitations: "<span of the source text>"
-fingerprint:
-  attention_type: <MHA | GQA | MQA | MLA>
+fingerprint:                     # a transformer stack; not on a convolutional model
+  attention_type: <MHA | GQA | MQA | MLA>   # stored here only; `filters` has no copy
   num_layers: <int>
   attention_heads: <int>
   kv_heads: <int>
   head_size: <int>
   hidden_size: <int>
   intermediate_size: <int>
-  context_window_tokens: <int>
   vocabulary_size: <int>
-  activation_function: <SwiGLU | GELU | ...>
+  activation_function: <silu | gelu | gelu_new | relu | SwiGLU | ...>   # one spelling per function: silu (not swish), gelu_new (not gelu_pytorch_tanh)
   normalization: <RMSNorm | LayerNorm>
   norm_placement: <pre | post | both>   # only when read from the paper or official implementation; absent for any other layout
   stack: <encoder | decoder | encoder-decoder>   # same rule
@@ -50,10 +48,9 @@ fingerprint:
   decoder_layers: <int>            # encoder-decoder only: the decoder's block count (num_layers is the encoder's)
   embedding_norm: true             # only when the implementation normalises the summed embeddings before the first block
   input_stem: <spectrogram-convolution | spectrogram-patches | waveform-convolution>   # audio models only, read from the implementation
-  positional_encoding: <RoPE | ALiBi | learned>
-  decoder_positional_encoding: <Learned | ...>   # encoder-decoder only, when it differs from the encoder's
-  rope_theta: <number | null>
-  parameters_active_b: <number>
+  positional_encoding: <RoPE | Learned | ALiBi | Sinusoidal | Convolutional>
+  decoder_positional_encoding: <same values>   # encoder-decoder only, when it differs from the encoder's
+  rope_theta: <number>
   kv_cache_rating: <low | medium | high>
   key_detail: "<notable detail>"
 pipeline:                        # the whole model as stages, only when one primary source states the structure
@@ -67,16 +64,15 @@ pipeline:                        # the whole model as stages, only when one prim
     - { id: <slug>, role: textEncoder, title: "<...>", side: true, into: <id> }   # `into` starts a further side run that feeds <id>
     - { id: <slug>, role: denoiser, title: "<...>", frame: "<loop>", inner_frame: "<block>", inner_repeat: <int> }   # a repeated block inside a loop
     - { id: <slug>, role: outputHead, title: "<...>", branch: true }   # a second output, leaving from pipeline.branch_from
-moe_config: null                 # or { expert_count, active_experts, shared_expert, notes }
+moe_config: { expert_count: <int>, active_experts: <int>, shared_expert: true, notes: "<...>" }   # only with filters.is_moe: true; omit otherwise, never null
 filters:
   size_category: <tiny | small | medium | large | xlarge>
   is_quantized: false
   quant_format: original
-  is_moe: false
+  is_moe: false                  # the one stored statement: true = mixture of experts, false = its configuration names no experts; omit when no source says and on a convolutional model
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
-  attention_type: <...>
 hub_signals:                     # owned by the jobs; numbers that change
   downloads_30d: <int>
   likes: <int>
@@ -95,7 +91,7 @@ lineage:
   parents: [model/<base-slug>]
   children: []
 locked: [summary, why_it_matters]  # field paths no job may change (any passage field, or `body`)
-tags: [<tag>, <tag>]
+tags: [<model type such as bert or vit>]   # only what no field states: never the pipeline tag, the attention type, `llm`, `moe` or `dense`
 updated: <YYYY-MM-DD>
 sources:
   - { url: "<url>", title: "<title>", trust: 0.9 }
@@ -103,23 +99,5 @@ sources:
 related: [architecture-era/<slug>]
 ---
 
-## Summary
-<2-3 sentences: what the model is.>
-
-## Intended Use
-<1-3 sentences: tasks and users, and uses ruled out.>
-
-## What Sets It Apart
-<1-3 sentences: what separates it from its siblings, base model or predecessors.>
-
-## Running It
-<1-2 sentences: settings, prompt format, hardware.>
-
-## Limitations
-<1-2 sentences: what it does badly, does not cover, or risks.>
-
-## Why It Matters
-<1-2 paragraphs on the model's significance; hand-written records only.>
-
 ## Notes
-<Notable configuration details, gotchas, deployment notes.>
+<Hand-written records only: notable configuration details, gotchas, deployment notes. The body never repeats a frontmatter passage; most records have no body at all.>

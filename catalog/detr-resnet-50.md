@@ -2,11 +2,12 @@
 id: model/detr-resnet-50
 type: model
 slug: detr-resnet-50
-schema_version: 1.1
+schema_version: 3.0
 title: detr-resnet-50
 organization: organization/meta
 license: license/apache-2-0
 model_category: vision
+model_kind: transformer-vision
 tasks:
 - task/object-detection
 parameters_active_b: 0.04
@@ -112,9 +113,7 @@ quotes:
   intended_use: You can use the raw model for object detection.
   what_sets_it_apart: Each object query looks for a particular object in the image.
 tags:
-- object-detection
 - detr
-- dense
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/facebook/detr-resnet-50
@@ -131,14 +130,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-DETR (DEtection TRansformer) with a ResNet-50 backbone is an object detection model: given an image, it outputs a box and a class label for each object it finds. It was introduced in the paper by Carion et al. and first released in the facebookresearch repository, and the card says it was trained on COCO 2017, a set of 118 thousand annotated images. The Hugging Face team wrote the card, because the releasing team did not.
-
-## Intended Use
-
-The card says the raw model can be used for object detection and points to the model hub for other DETR models.
-
-## What Sets It Apart
-
-The card describes an encoder-decoder transformer on top of a convolutional backbone, which uses 100 object queries, each of which looks for one particular object in the image. Training uses a bipartite matching loss: the Hungarian algorithm pairs each query with one ground-truth annotation, so that every object is matched exactly once.

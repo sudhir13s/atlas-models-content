@@ -2,14 +2,13 @@
 id: model/whisper-large-v3
 type: model
 slug: whisper-large-v3
-schema_version: 1.1
+schema_version: 3.0
 title: whisper-large-v3
 organization: organization/openai
 release_date: '2023-11-07'
-release_year: 2023
-release_month: 11
 license: license/apache-2-0
 model_category: audio
+model_kind: audio-speech
 tasks:
 - task/speech-recognition
 parameters_active_b: 1.54
@@ -60,9 +59,7 @@ quotes:
   what_sets_it_apart: The spectrogram input uses 128 Mel frequency bins instead of 80
   running_it: Additional Speed & Memory Improvements
 tags:
-- automatic-speech-recognition
 - whisper
-- dense
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/openai/whisper-large-v3
@@ -79,18 +76,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Whisper large-v3 is a speech recognition model from OpenAI: it transcribes spoken audio into text and can also translate speech into English. The card describes the Whisper paper by Radford et al. from OpenAI, and says Whisper was trained on more than 5 million hours of labeled data. Large-v3 has the same architecture as the large and large-v2 models, apart from small differences.
-
-## Intended Use
-
-The card says the primary intended users are AI researchers studying the robustness, generalization and limits of the model, and that Whisper may also be useful as a speech recognition tool for developers, especially for English. It cautions against transcribing recordings of people made without their consent, against using it for subjective classification, and against high-risk decision-making uses.
-
-## What Sets It Apart
-
-The card lists two changes from large-v2: the input spectrogram uses 128 Mel frequency bins instead of 80, and there is a new language token for Cantonese. It says large-v3 was trained on 1 million hours of weakly labeled audio and 4 million hours of audio pseudo-labeled with large-v2.
-
-## Running It
-
-The card has a section on additional speed and memory improvements, covering chunked long-form transcription, torch.compile, Flash Attention 2 and PyTorch scaled dot-product attention.

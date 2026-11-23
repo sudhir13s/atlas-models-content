@@ -2,14 +2,13 @@
 id: model/nvidia-nemotronlabs-re-use
 type: model
 slug: nvidia-nemotronlabs-re-use
-schema_version: 1.1
+schema_version: 3.0
 title: NVIDIA-NemotronLabs-RE-USE
 organization: organization/nvidia
 release_date: '2026-07-22'
-release_year: 2026
-release_month: 7
 license_note: openmdw-1.1
 model_category: audio
+model_kind: audio-speech
 tasks:
 - task/audio-enhancement
 parameters_active_b: 0.01
@@ -96,9 +95,7 @@ quotes:
   intended_use: For overlapping speech, this model is trained to preserve the main speaker while suppressing other speakers.
   what_sets_it_apart: Support for **multiple input sampling rates**, including 8, 16, 22.05, 24, 32, 44.1, and 48 kHz.
   running_it: 'or cause GPU out-of-memory (OOM) errors, please use the following procedure instead:'
-tags:
-- audio-to-audio
-- dense
+tags: []
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/nvidia/NVIDIA-NemotronLabs-RE-USE
@@ -124,18 +121,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-NVIDIA NemotronLabs RE-USE is a speech enhancement model from NVIDIA. It takes noisy or degraded speech recordings and restores their quality, and the card says it is language-agnostic. The card describes it as a 9.6-million-parameter multilingual universal speech enhancement model that accepts input sampling rates from 8 to 48 kHz.
-
-## Intended Use
-
-The card lists degradations it is built to handle: additive noise, reverberation, clipping, bandwidth limitation, codec artifacts, packet loss and low-quality microphones. For overlapping speech it is trained to keep the main speaker and suppress the others. For better laughter preservation the card points to a separate RE-USE-laughter model.
-
-## What Sets It Apart
-
-The card describes a 9.6-million-parameter model that works across many input sampling rates (8, 16, 22.05, 24, 32, 44.1 and 48 kHz) and across languages, with optional bandwidth extension. It says the model was trained on clips shorter than 10 seconds.
-
-## Running It
-
-The card says to place noisy files in a folder and run the provided inference script. For files longer than about 30 seconds, or when the GPU runs out of memory, it provides a separate chunked inference script.

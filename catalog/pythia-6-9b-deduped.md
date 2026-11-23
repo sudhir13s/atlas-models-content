@@ -2,15 +2,14 @@
 id: model/pythia-6-9b-deduped
 type: model
 slug: pythia-6-9b-deduped
-schema_version: 1.1
+schema_version: 3.0
 title: pythia-6.9b-deduped
 organization: organization/eleutherai
 release_date: '2023-02-25'
-release_year: 2023
-release_month: 2
 license: license/apache-2-0
 architecture_id: architecture-era/transformer
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 6.86
@@ -28,7 +27,6 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 16384
-  context_window_tokens: 2048
   vocabulary_size: 50432
   activation_function: gelu
   normalization: LayerNorm
@@ -40,7 +38,6 @@ fingerprint:
 filters:
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -62,11 +59,7 @@ quotes:
   what_sets_it_apart: All 8 model sizes are trained on the exact
   limitations: Never rely on Pythia-6.9B-deduped to produce factually accurate
 tags:
-- llm
-- text-generation
 - gpt-neox
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/EleutherAI/pythia-6.9b-deduped
@@ -89,18 +82,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Pythia-6.9B-deduped is an English language model from EleutherAI, one of the Pythia suite of models built to support research into how language models work. It was trained on the Pile after that dataset was globally deduplicated, meaning repeated documents were removed. The card says it only predicts the next token, so it does not answer prompts the way a chat product does.
-
-## Intended Use
-
-The card names research on the behavior, functionality and limitations of large language models as the primary use, with intermediate checkpoints stored as branches for controlled experiments. Fine-tuning for deployment is allowed under the Apache 2.0 license, after the user's own risk and bias assessment. The card lists as out of scope any deployment, human-facing interaction, translation or text in other languages, and chatbot or genre-writing use.
-
-## What Sets It Apart
-
-The card describes a suite of two sets of eight models, from 70M to 12B parameters, one set trained on the Pile and one on the deduplicated Pile. All sizes saw the same data in the same order, and 154 intermediate checkpoints per model are published. The authors say they did not make downstream performance a design goal but that the models match or exceed similar-sized OPT and GPT-Neo models.
-
-## Limitations
-
-The card says never to rely on the model for factually accurate output. It notes that the Pile contains profanity and offensive text, so the model may produce undesirable text even when the prompt is not offensive.

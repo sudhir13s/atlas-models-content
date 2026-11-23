@@ -2,14 +2,13 @@
 id: model/qwen3-reranker-8b
 type: model
 slug: qwen3-reranker-8b
-schema_version: 1.1
+schema_version: 3.0
 title: Qwen3-Reranker-8B
 organization: organization/qwen
 release_date: '2025-05-29'
-release_year: 2025
-release_month: 5
 license: license/apache-2-0
 model_category: retrieval
+model_kind: transformer-language
 tasks:
 - task/reranking-models
 parameters_active_b: 8.19
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 12288
-  context_window_tokens: 32768
   vocabulary_size: 151669
   activation_function: silu
   normalization: RMSNorm
@@ -39,7 +37,6 @@ filters:
   size_category: medium
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-ranking
   library: transformers
@@ -62,12 +59,8 @@ quotes:
   running_it: we also advise users to write their instructions in English
 locked:
 - context_window_tokens
-- fingerprint.context_window_tokens
 tags:
-- text-ranking
 - qwen3
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-Reranker-8B
@@ -84,18 +77,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Qwen3-Reranker-8B is a text reranking model from Qwen. A reranker takes a search query and a list of candidate documents and scores how well each document matches the query, so that the most relevant ones can be placed first. The card says it belongs to the Qwen3 Embedding series, is built on the dense Qwen3 foundation models, has 8B parameters, a 32k context length and support for more than 100 languages.
-
-## Intended Use
-
-The card says the Qwen3 Embedding series is designed for text embedding and ranking tasks, including text retrieval, code retrieval, text classification, text clustering and bitext mining. It adds that developers can combine the embedding and reranking models, with the embedding model finding candidates and the reranker ordering them.
-
-## What Sets It Apart
-
-The card says the reranking models are instruction aware: users can supply a custom instruction to suit a task, language or scenario, and its evaluation found that instructions typically improve results by 1% to 5% compared with none. The series comes in 0.6B, 4B and 8B sizes and inherits the multilingual and long-text abilities of its Qwen3 base.
-
-## Running It
-
-The card shows loading it as a cross-encoder in Sentence Transformers, which scores a query and a document together. For multilingual use it advises writing instructions in English, because most instructions used in training were in English.

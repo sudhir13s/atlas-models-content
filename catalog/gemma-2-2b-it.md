@@ -2,17 +2,17 @@
 id: model/gemma-2-2b-it
 type: model
 slug: gemma-2-2b-it
-schema_version: 1.1
+schema_version: 3.0
 title: gemma-2-2b-it
 organization: organization/google-deepmind
 release_date: '2024-07-16'
-release_year: 2024
-release_month: 7
 license: license/gemma
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 total_parameters: 2614341888
+context_window_tokens: 8192
 base_models:
 - name: google/gemma-2-2b
   address: https://huggingface.co/google/gemma-2-2b
@@ -26,7 +26,6 @@ fingerprint:
   kv_heads: 4
   head_size: 256
   hidden_size: 2304
-  context_window_tokens: 8192
   activation_function: GeGLU
   normalization: RMSNorm
   norm_placement: both
@@ -58,9 +57,7 @@ quotes:
   summary: They are text-to-text, decoder-only large language models, available in English,
   intended_use: 'Chatbots and Conversational AI: Power conversational interfaces for customer'
   what_sets_it_apart: built from the same research and technology used to create the Gemini models.
-tags:
-- llm
-- text-generation
+tags: []
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/google/gemma-2-2b-it
@@ -149,14 +146,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Gemma 2 2B IT is a text-generation model from Google, the instruction-tuned version of the 2B size of the Gemma 2 family. Instruction-tuned means it was trained further to follow requests and hold a conversation. The card describes Gemma models as text-to-text, decoder-only large language models, available in English, with open weights.
-
-## Intended Use
-
-The card lists content creation and communication: text generation such as poems, scripts, code, marketing copy and email drafts, chatbots and conversational AI, and text summarization. For research and education it lists natural language processing research, language learning tools and knowledge exploration. It says the list is not comprehensive and that its small size makes deployment possible on a laptop, a desktop or a user's own cloud.
-
-## What Sets It Apart
-
-The card says the Gemma family is built from the same research and technology used to create Google's Gemini models, and that open weights are released for both pre-trained and instruction-tuned variants.

@@ -2,15 +2,14 @@
 id: model/qwen3-4b
 type: model
 slug: qwen3-4b
-schema_version: 1.1
+schema_version: 3.0
 title: Qwen3-4B
 organization: organization/qwen
 release_date: '2025-04-27'
-release_year: 2025
-release_month: 4
 license: license/apache-2-0
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 4.02
@@ -30,7 +29,6 @@ fingerprint:
   head_size: 128
   hidden_size: 2560
   intermediate_size: 9728
-  context_window_tokens: 32768
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -42,7 +40,6 @@ filters:
   size_category: small
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -63,13 +60,8 @@ quotes:
   running_it: For thinking mode (`enable_thinking=True`), use `Temperature=0.6`, `TopP=0.95`, `TopK=20`, and `MinP=0`.
 locked:
 - context_window_tokens
-- fingerprint.context_window_tokens
 tags:
-- llm
-- text-generation
 - qwen3
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-4B
@@ -89,14 +81,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Qwen3-4B is a language model from Qwen that reads text and writes text in reply. The card lists 4.0B parameters and 36 layers, and says it supports a context of 32,768 tokens natively and 131,072 tokens with YaRN. It is part of the Qwen3 series, which the card describes as a suite of dense and mixture-of-experts models.
-
-## What Sets It Apart
-
-Qwen states that a single model can switch between a thinking mode, for complex logical reasoning, math and coding, and a non-thinking mode for efficient general dialogue. The card also lists improved reasoning, human preference alignment, agent abilities that connect to external tools, and support for more than 100 languages and dialects.
-
-## Running It
-
-For thinking mode the card recommends temperature 0.6, top-p 0.95, top-k 20 and min-p 0, and says not to use greedy decoding because it can cause endless repetition. For non-thinking mode it suggests temperature 0.7 and top-p 0.8. It advises enabling YaRN only for longer inputs because static YaRN may affect performance on shorter texts.

@@ -2,14 +2,13 @@
 id: model/ast-finetuned-audioset-10-10-0-4593
 type: model
 slug: ast-finetuned-audioset-10-10-0-4593
-schema_version: 1.1
+schema_version: 3.0
 title: ast-finetuned-audioset-10-10-0.4593
 organization: organization/mit
 release_date: '2022-11-14'
-release_year: 2022
-release_month: 11
 license_note: bsd-3-clause
 model_category: audio
+model_kind: audio-speech
 tasks:
 - task/audio-classification
 parameters_active_b: 0.09
@@ -35,7 +34,6 @@ filters:
   size_category: tiny
   is_quantized: false
   is_moe: false
-  attention_type: MHA
   is_gated: false
   pipeline_tag: audio-classification
   library: transformers
@@ -55,10 +53,7 @@ quotes:
   intended_use: You can use the raw model for classifying audio into one of the AudioSet classes.
   what_sets_it_apart: Audio is first turned into an image (as a spectrogram), after which a Vision Transformer is applied.
 tags:
-- audio-classification
 - audio-spectrogram-transformer
-- dense
-- mha
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/MIT/ast-finetuned-audioset-10-10-0.4593
@@ -75,14 +70,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-The Audio Spectrogram Transformer (AST) fine-tuned on AudioSet is an audio classification model: it takes a sound clip and assigns it to one of the sound categories of AudioSet, a large labelled collection of audio clips. It comes from the AST paper by Gong et al., and the Hugging Face team wrote its model card because the releasing team did not. It works by turning the audio into an image called a spectrogram and then reading that image with a Vision Transformer.
-
-## Intended Use
-
-The card says the raw model can be used for classifying audio into one of the AudioSet classes, and points to the Transformers documentation for an example.
-
-## What Sets It Apart
-
-The card describes AST as the same design as ViT, the Vision Transformer, applied to audio instead of photographs. Audio is first converted into a spectrogram, a picture of how the sound energy spreads over frequency and time, and the transformer then processes that picture.

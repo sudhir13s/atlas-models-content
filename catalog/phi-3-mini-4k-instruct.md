@@ -2,16 +2,15 @@
 id: model/phi-3-mini-4k-instruct
 type: model
 slug: phi-3-mini-4k-instruct
-schema_version: 1.1
+schema_version: 3.0
 title: Phi-3 Mini 4K Instruct
 organization: organization/microsoft
 release_date: '2024-04-23'
-release_year: 2024
-release_month: 4
 license: license/mit
 signal_strength: high
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 3.82
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 96
   hidden_size: 3072
   intermediate_size: 8192
-  context_window_tokens: 4096
   vocabulary_size: 32064
   activation_function: SwiGLU
   normalization: RMSNorm
@@ -35,17 +33,14 @@ fingerprint:
   stack: decoder
   positional_encoding: RoPE
   rope_theta: 10000
-  parameters_active_b: 3.82
   kv_cache_rating: medium
   key_detail: Full multi-head attention (32 query = 32 KV heads, no GQA); fused qkv_proj and gate_up_proj; Llama-compatible tensor layout; 4K context variant (a separate 128K variant uses LongRoPE)
-moe_config: null
 filters:
   size_category: small
   is_quantized: false
   quant_format: original
   is_moe: false
   pipeline_tag: text-generation
-  attention_type: MHA
   is_gated: false
   library: transformers
 hub_signals:
@@ -63,8 +58,6 @@ locked:
 - title
 - organization
 - release_date
-- release_year
-- release_month
 - license
 - signal_strength
 - model_category
@@ -80,13 +73,11 @@ locked:
 - fingerprint.head_size
 - fingerprint.hidden_size
 - fingerprint.intermediate_size
-- fingerprint.context_window_tokens
 - fingerprint.vocabulary_size
 - fingerprint.activation_function
 - fingerprint.normalization
 - fingerprint.positional_encoding
 - fingerprint.rope_theta
-- fingerprint.parameters_active_b
 - fingerprint.kv_cache_rating
 - fingerprint.key_detail
 - moe_config
@@ -95,15 +86,10 @@ locked:
 - filters.quant_format
 - filters.is_moe
 - filters.pipeline_tag
-- filters.attention_type
-- benchmarks
 - body
 tags:
-- llm
 - phi
 - microsoft
-- dense
-- mha
 - instruct
 - small
 - mit

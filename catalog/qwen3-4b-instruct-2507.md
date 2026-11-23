@@ -2,15 +2,14 @@
 id: model/qwen3-4b-instruct-2507
 type: model
 slug: qwen3-4b-instruct-2507
-schema_version: 1.1
+schema_version: 3.0
 title: Qwen3-4B-Instruct-2507
 organization: organization/qwen
 release_date: '2025-08-05'
-release_year: 2025
-release_month: 8
 license: license/apache-2-0
 architecture_id: architecture-era/llama-recipe
 model_category: language
+model_kind: transformer-language
 tasks:
 - task/text-generation
 parameters_active_b: 4.02
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 128
   hidden_size: 2560
   intermediate_size: 9728
-  context_window_tokens: 262144
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -39,7 +37,6 @@ filters:
   size_category: small
   is_quantized: false
   is_moe: false
-  attention_type: GQA
   is_gated: false
   pipeline_tag: text-generation
   library: transformers
@@ -59,11 +56,7 @@ quotes:
   what_sets_it_apart: This model supports only non-thinking mode and does not generate
   running_it: We suggest using `Temperature=0.7`, `TopP=0.8`, `TopK=20`, and `MinP=0`.
 tags:
-- llm
-- text-generation
 - qwen3
-- dense
-- gqa
 updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507
@@ -80,14 +73,4 @@ sources:
   trust: 0.9
 ---
 
-## Summary
 
-Qwen3-4B-Instruct-2507 is an updated version of the non-thinking mode of Qwen3-4B, from Qwen. It is a 4.0B-parameter causal language model that answers directly and does not write thinking blocks. The card gives a native context length of 262,144 tokens.
-
-## What Sets It Apart
-
-Qwen lists these changes over the earlier version: better general abilities (instruction following, logical reasoning, text comprehension, mathematics, science, coding and tool use), wider knowledge of rare topics across languages, closer alignment with user preferences on open-ended tasks, and improved understanding of 256K-token contexts. The card says the model supports only non-thinking mode, and the enable_thinking=False setting is no longer needed.
-
-## Running It
-
-The card suggests temperature 0.7, top_p 0.8, top_k 20 and min_p 0, and an output length of 16,384 tokens for most queries. A presence_penalty between 0 and 2 can reduce endless repetition but may cause language mixing. If memory runs out, it advises shortening the context length, for example to 32,768 tokens. It says Transformers versions before 4.51.0 fail with a KeyError for qwen3.
