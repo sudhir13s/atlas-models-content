@@ -19,9 +19,22 @@
     "common_mistake": { "type": "string", "description": "schema 1.0 form; a 2.2 record uses mistakes" },
     "effects": { "$ref": "#/$defs/effects" },
     "scale": { "$ref": "#/$defs/scale" },
+    "options": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/option" },
+      "description": "for a setting with no numeric scale (a switch, a named choice): every value it takes and what choosing it does; drawn as one tile per option in place of the axis"
+    },
     "typical_values": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/typical_value" } },
     "mistakes": { "type": "array", "minItems": 2, "maxItems": 5, "items": { "$ref": "#/$defs/mistake" } },
-    "visual": { "oneOf": [{ "$ref": "#/$defs/schedule_visual" }, { "$ref": "#/$defs/distribution_visual" }] }
+    "visual": {
+      "oneOf": [
+        { "$ref": "#/$defs/schedule_visual" },
+        { "$ref": "#/$defs/distribution_visual" },
+        { "$ref": "#/$defs/beams_visual" }
+      ]
+    }
   },
   "required": ["name", "context", "priority", "importance", "range"],
   "$defs": {
@@ -49,9 +62,18 @@
         "spacing": { "type": "string", "enum": ["linear", "log"], "description": "log needs min > 0" }
       }
     },
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "effect"],
+      "properties": {
+        "value": { "type": "string", "minLength": 1, "description": "the value as it is written in a configuration, e.g. true, bf16" },
+        "effect": { "type": "string", "minLength": 1, "description": "one or two plain sentences: what choosing this value does" }
+      }
+    },
     "typical_value": {
       "type": "object",
-      "description": "one value somebody used or ships as a default, with the page that states it",
+      "description": "one value somebody used or ships as a default, with the page that states it; a value written as one plain number (0.9, 50, 1e-3) is also marked on the effect scale",
       "additionalProperties": false,
       "required": ["setting", "value", "source"],
       "properties": {
@@ -94,14 +116,74 @@
     },
     "distribution_visual": {
       "type": "object",
-      "description": "next-token probabilities of one small set of scores at several temperatures, computed by the consumer as softmax(logits / temperature)",
+      "description": "next-token probabilities of one small set of scores, computed by the consumer as softmax(logits). Exactly one of three fields says what is compared: temperatures (one panel per temperature), truncate (before and after candidates are removed) or penalty (before and after the repetition penalty)",
       "additionalProperties": false,
-      "required": ["kind", "tokens", "logits", "temperatures", "caption"],
+      "required": ["kind", "tokens", "logits", "caption"],
+      "oneOf": [{ "required": ["temperatures"] }, { "required": ["truncate"] }, { "required": ["penalty"] }],
       "properties": {
         "kind": { "const": "distribution" },
-        "tokens": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "string", "minLength": 1 } },
+        "tokens": { "type": "array", "minItems": 2, "maxItems": 6, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
         "logits": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "number" }, "description": "one score per token, in the same order" },
         "temperatures": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "number", "exclusiveMinimum": 0 } },
+        "truncate": {
+          "type": "object",
+          "description": "which candidates are removed before the draw; the rest are renormalised. Exactly one rule",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": {
+            "top_k": { "type": "integer", "minimum": 1, "description": "keep every token whose score is not below the k-th highest score (Transformers TopKLogitsWarper)" },
+            "top_p": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "keep the most probable tokens up to and including the one whose running total reaches p (Transformers TopPLogitsWarper)" },
+            "remove": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "tokens of `tokens` whose score is set to minus infinity, as min_new_tokens does to the end-of-sequence token" }
+          }
+        },
+        "penalty": {
+          "type": "object",
+          "description": "the repetition penalty as Transformers RepetitionPenaltyLogitsProcessor applies it: a positive score of a repeated token is divided by value, a negative one multiplied by it",
+          "additionalProperties": false,
+          "required": ["value", "repeated"],
+          "properties": {
+            "value": { "type": "number", "exclusiveMinimum": 0 },
+            "repeated": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "tokens of `tokens` that are already in the text" }
+          }
+        },
+        "caption": { "type": "string", "minLength": 1 }
+      }
+    },
+    "beam_token": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["token", "probability"],
+      "properties": {
+        "token": { "type": "string", "minLength": 1 },
+        "probability": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "beams_visual": {
+      "type": "object",
+      "description": "a two-step tree of next-token probabilities; the consumer multiplies along each path and marks what greedy decoding and beam search with num_beams each return",
+      "additionalProperties": false,
+      "required": ["kind", "prompt", "num_beams", "tree", "caption"],
+      "properties": {
+        "kind": { "const": "beams" },
+        "prompt": { "type": "string", "minLength": 1, "description": "the text the candidates continue" },
+        "num_beams": { "type": "integer", "minimum": 2, "maximum": 3 },
+        "tree": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "description": "the candidate first tokens, each with the candidates that can follow it",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["token", "probability", "next"],
+            "properties": {
+              "token": { "type": "string", "minLength": 1 },
+              "probability": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+              "next": { "type": "array", "minItems": 2, "maxItems": 3, "items": { "$ref": "#/$defs/beam_token" } }
+            }
+          }
+        },
         "caption": { "type": "string", "minLength": 1 }
       }
     }
