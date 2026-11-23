@@ -273,7 +273,7 @@ numeric config) so it stays machine-parseable.
   `fingerprint.hidden_size`). `base_models[]` (`name`, `address`) names the bases that have no
   record here, nearest first; a base with a record goes in `lineage.parents`. An arXiv entry of
   `sources` carries the paper's title as the arXiv API gives it, copied by code, not the bare ID.
-  `gguf_repositories` is written by `models-scout` only: links (`publisher`, `repo_id`,
+  `gguf_repositories` is written by `models-sync` only: links (`publisher`, `repo_id`,
   `address`) to at most two GGUF repositories whose own Hugging Face card names this model's
   repository as the model they quantize, from the publishers its `jobs.yaml` entry allows (the
   model's own organisation first), with `observed_at` and `source`. Never matched by name, and it
