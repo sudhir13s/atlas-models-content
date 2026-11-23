@@ -17,8 +17,9 @@ summary: SAM 3 is an image and video segmentation model published on Hugging Fac
 what_sets_it_apart: The card says that, compared with its predecessor SAM 2, SAM 3 can segment every instance of an open-vocabulary concept, meaning any concept named by a short text phrase or shown by example images. The card says it handles a much larger set of such prompts than earlier work.
 pipeline:
   source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/sam3/modeling_sam3.py
-  summary: The image detector of SAM 3 as Transformers implements it. A vision transformer turns the image into feature maps, a text encoder (left) turns the prompt into vectors, and a fusion encoder mixes the two. A DETR-style decoder (DEtection TRansformer) turns 200 learned queries into boxes and scores, and a mask decoder gives each query a mask.
+  summary: The image detector of SAM 3 as Transformers implements it. A vision transformer turns the image into feature maps, a text encoder (left) turns the prompt into vectors, and a fusion encoder mixes the two. A DETR-style decoder (DEtection TRansformer) turns 200 learned queries into boxes and scores, and a mask decoder (right) gives each query a mask.
   side_into: fusion
+  branch_from: decoder
   stages:
   - id: prompt
     role: input
@@ -80,7 +81,8 @@ pipeline:
     title: Mask decoder
     details:
     - one mask per query
-    note: A pixel decoder upsamples the feature maps; each query's embedding is multiplied with the pixel embeddings to give its mask. A semantic mask for the whole prompt is also produced.
+    note: A pixel decoder upsamples the feature maps; each query's embedding from the query decoder is multiplied with the pixel embeddings to give its mask. A semantic mask for the whole prompt is also produced.
+    branch: true
 filters:
   size_category: tiny
   is_gated: true

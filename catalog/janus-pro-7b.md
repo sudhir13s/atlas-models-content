@@ -17,8 +17,9 @@ what_sets_it_apart: The card says Janus-Pro splits visual encoding into separate
 running_it: The card gives no run instructions itself and refers readers to the Janus GitHub repository. It states that use of the models is subject to the DeepSeek Model License, while the code repository is under the MIT License.
 pipeline:
   source: https://arxiv.org/abs/2501.17811
-  summary: The figure shows image generation. A text prompt goes into a 30-layer transformer, which predicts the image one discrete code at a time; each new code is embedded and fed back (left). A decoder turns the 576 codes into a 384 × 384 image. Images to understand enter the same transformer through a separate encoder, described in the transformer's note.
+  summary: One 30-layer transformer serves two tasks. For image generation it reads a text prompt and predicts the image one discrete code at a time; each new code is embedded and fed back (left), and a decoder turns the 576 codes into a 384 × 384 image. For understanding, an image goes in through its own encoder (left) and the text head writes the answer (right).
   side_into: block
+  branch_from: block
   stages:
   - id: codes-so-far
     role: input
@@ -26,6 +27,7 @@ pipeline:
     details:
     - one new code per step
     side: true
+    into: block
   - id: codebook
     role: embedding
     title: Codebook embedding
@@ -39,6 +41,24 @@ pipeline:
     details:
     - two-layer MLP · 8 → 4096
     note: Maps the code vectors into the input space of the language model.
+    side: true
+  - id: understanding-image
+    role: input
+    title: Image to understand
+    details:
+    - 384 × 384 pixels
+    side: true
+    into: block
+  - id: siglip
+    role: visionEncoder
+    title: SigLIP-Large encoder
+    side: true
+  - id: und-adaptor
+    role: projector
+    title: Understanding adaptor
+    details:
+    - two-layer MLP
+    note: Maps the image features into the input space of the language model.
     side: true
   - id: prompt
     role: tokenizer
@@ -55,7 +75,7 @@ pipeline:
     title: Attention + feed-forward
     details:
     - 32 heads · width 4096
-    note: One autoregressive transformer (DeepSeek-LLM 7B) serves both tasks. For understanding, a SigLIP-Large encoder reads a 384 × 384 image and a two-layer MLP adaptor maps its features into this transformer, whose built-in text head writes the answer.
+    note: One autoregressive transformer (DeepSeek-LLM 7B) serves both tasks.
     frame: Transformer block
     repeat: 30
   - id: image-head
@@ -75,6 +95,13 @@ pipeline:
     title: Image
     details:
     - 384 × 384 pixels
+  - id: text-head
+    role: outputHead
+    title: Text head
+    details:
+    - text answer
+    note: For understanding, the transformer's built-in text head writes the answer.
+    branch: true
 filters:
   is_quantized: false
   is_moe: false

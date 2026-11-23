@@ -66,9 +66,11 @@ pipeline:
     - acoustic latents · 25 Hz × 64
   - id: nar
     role: denoiser
-    title: NAR stream
+    title: NAR stream layer
     details:
-    - 28 layers · NAR experts
+    - NAR experts · shared attention
+    inner_frame: Layer
+    inner_repeat: 28
     note: Each of the 28 layers has separate normalisation, projections and MLP experts for each mode, and both modes take part in one attention computation. The NAR experts predict the flow velocity of the latents. Acoustic positions see the whole score and token sequence and each other; the AR positions never see the acoustic ones.
     frame: Denoising loop
   - id: step

@@ -60,11 +60,13 @@ pipeline:
     frame: Denoising loop
   - id: joint-blocks
     role: denoiser
-    title: Joint transformer blocks
+    title: Joint transformer block
     details:
-    - 24 blocks · 16 heads · width 1024
-    note: Latent, image and camera tokens form one sequence, and each block attends over all of them with learned rotary positions. The step modulates every block; the output is the velocity for the latent and the camera.
+    - 16 heads · width 1024
+    note: Latent, image and camera tokens form one sequence, and each of the 24 blocks attends over all of them with learned rotary positions. The step modulates every block; the output is the velocity for the latent and the camera.
     frame: Denoising loop
+    inner_frame: Joint block
+    inner_repeat: 24
   - id: scheduler
     role: step
     title: Euler step

@@ -18,8 +18,9 @@ what_sets_it_apart: 'The card lists these technical contributions: an efficient 
 limitations: The card says the checkpoint in this repository is a reference implementation that has been re-trained, so its performance is close to the model reported in the paper but does not match it exactly.
 pipeline:
   source: https://arxiv.org/abs/2410.02073
-  summary: The photo is resized to 1536 × 1536 pixels and cut into 384-pixel patches at three scales. One shared vision transformer (ViT) encodes every patch, a second one sees the whole image at low resolution (left), and a decoder merges everything into a depth map that the camera's focal length turns into metres.
+  summary: The photo is resized to 1536 × 1536 pixels and cut into 384-pixel patches at three scales. One shared vision transformer (ViT) encodes every patch, a second one sees the whole image at low resolution (left), and a decoder merges everything into a depth map that the camera's focal length turns into metres. A field-of-view head (right) estimates the focal length when the photo does not give it.
   side_into: merge
+  branch_from: decoder
   stages:
   - id: global-image
     role: input
@@ -74,7 +75,15 @@ pipeline:
     title: Depth in metres
     details:
     - scaled by the focal length
-    note: The inverse depth is scaled by the focal length in pixels and the image width, then inverted. The focal length comes from the photo's metadata or, if missing, from a field-of-view head that reads the decoder's features and its own ViT image encoder.
+    note: The inverse depth is scaled by the focal length in pixels and the image width, then inverted. The focal length comes from the photo's metadata or, if missing, from the field-of-view head.
+  - id: fov-head
+    role: outputHead
+    title: Field-of-view head
+    details:
+    - own ViT image encoder
+    - focal length if metadata lacks it
+    note: Reads the decoder's features together with its own ViT image encoder and estimates the camera's field of view, which gives the focal length when the photo's metadata has none.
+    branch: true
 filters:
   is_gated: false
   pipeline_tag: depth-estimation

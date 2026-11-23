@@ -19,24 +19,37 @@ intended_use: The card presents it for real-time voice and video chat, with an a
 what_sets_it_apart: The card describes a Thinker-Talker architecture proposed by the Qwen team. It also describes TMRoPE (Time-aligned Multimodal RoPE), a position embedding that synchronizes the timestamps of video input with audio.
 pipeline:
   source: https://arxiv.org/abs/2503.20215
-  summary: The Thinker, a language model with audio and vision encoders, reads text, audio, images and video as one sequence and writes the text answer. The Talker reads the Thinker's hidden states and the text it samples and writes speech codes, which a flow-matching DiT (diffusion transformer) turns into a mel-spectrogram and a vocoder turns into a waveform. The figure shows the audio input on the left; images and video enter the same way through a vision encoder.
+  summary: The Thinker, a language model with audio and vision encoders, reads text, audio, images and video as one sequence and writes the text answer. The Talker reads the Thinker's hidden states and the text it samples and writes speech codes, which a flow-matching DiT (diffusion transformer) turns into a mel-spectrogram and a vocoder turns into a waveform. The vision and audio encoders are on the left, the speech output on the right.
   side_into: merge
   branch_from: thinker-block
   stages:
+  - id: image
+    role: input
+    title: Image or video
+    side: true
+    into: merge
+  - id: vision-encoder
+    role: visionEncoder
+    title: Vision encoder
+    details:
+    - 32 layers
+    - 14 × 14 pixel patches
+    note: Images and video frames are read by the Qwen2.5-VL vision encoder.
+    side: true
   - id: audio
     role: input
     title: Audio
     details:
     - 16 kHz · mel-spectrogram, 128 bins
     side: true
-  - id: audio-block
+    into: merge
+  - id: audio-encoder
     role: audioEncoder
-    title: Attention + feed-forward
+    title: Audio encoder
     details:
-    - 20 heads · width 1280
+    - 32 blocks · 20 heads
+    - width 1280 → 3584
     note: The audio encoder comes from Qwen2-Audio. Each output vector covers about 40 ms of sound, and a final projection maps it to width 3584.
-    frame: Audio encoder
-    repeat: 32
     side: true
   - id: text
     role: tokenizer
@@ -53,7 +66,7 @@ pipeline:
     title: Place among text embeddings
     details:
     - TMRoPE · 1 time step = 40 ms
-    note: Audio, image and video vectors take their places in the token sequence. Images and video come from the Qwen2.5-VL vision encoder (32 layers, 14 × 14 pixel patches). Time-aligned multimodal RoPE (TMRoPE) gives audio and video frames time positions so they line up.
+    note: Audio, image and video vectors take their places in the token sequence. Time-aligned multimodal RoPE (TMRoPE) gives audio and video frames time positions so they line up.
   - id: thinker-block
     role: attention
     title: Attention + feed-forward

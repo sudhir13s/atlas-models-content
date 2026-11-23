@@ -30,6 +30,38 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
   "very shallow models plateau on hard reasoning", "~70% of a modern LLM" as a general share,
   Llama 2's 32k vocabulary, GPT-2 small's 12 heads, and the KV cache at 128k being "far larger
   than the model's activations".
+- **Added** to `parameter`: `options` (the hyperparameter definition, by reference) for a switch or
+  a named choice, and seven `visual` kinds for convolutional and recurrent networks, defined in
+  `schema/_parameter-cnn-rnn-visuals.schema.json`: `conv_geometry` (output size and the sliding
+  window under stride, padding and dilation, on number grids), `conv_params` (k × k × in × out
+  plus biases, summed per part), `pooling` (max and average windows), `batch_norm` (one channel
+  normalised over a mini-batch), `recurrent_sweep` (one layer's count against hidden_size per
+  cell), `recurrent_layers` (each layer of a stack, one or two directions) and `gate_blocks` (a
+  layer split into its weight blocks).
+- **Rewritten** in the 2.9 form, every fact from a source fetched and read for the rewrite (LeNet-5,
+  AlexNet, VGG, ResNet, Batch Normalization, Yu and Koltun, DeepLab, Wang et al., Dumoulin and
+  Visin, Springenberg et al., Network In Network, Hochreiter and Schmidhuber, Gers et al. 2002,
+  Cho et al., Chung et al., Sutskever et al., Bahdanau et al., Schuster and Paliwal, the PyTorch
+  documentation and torchvision source): `cnn-kernel-size`, `cnn-conv-stride`, `cnn-padding`,
+  `cnn-dilation`, `cnn-num-filters`, `cnn-num-conv-layers`, `cnn-pooling`, `cnn-batch-norm`,
+  `rnn-hidden-units`, `rnn-num-layers`, `rnn-cell-type`, `rnn-gates` and `rnn-bidirectional`.
+  The VGG counts reproduce torchvision's totals (138,357,544 for VGG-16) and the paper's Table 2;
+  Sutskever et al.'s 4 layers of 1,000 cells reproduce their 32M recurrent weights per LSTM.
+- **Fixed** on the convolutional pages: ResNet-50 has 49 convolutions on its main path, not 50;
+  VGG-19 has 16 convolutional layers, not 19; deep plain stacks degrade for reasons the ResNet
+  authors trace to optimisation, not vanishing gradients; pooling has parameters in LeNet-5's
+  sub-sampling layers (2 per map); bidirectional layers more than double a stack, because the
+  layers above read both directions.
+- **Fixed** on the recurrent pages: Cho et al. describe the GRU as having two gating units, not
+  three; the three or four figures are weight blocks. The bias convention of every count is
+  stated (PyTorch keeps two bias vectors per block, papers often none).
+- **Removed** statements no fetched source supports: typical hidden sizes "128–256, 512–1024,
+  2048", "deep-but-narrow stacks were often preferred", gains that "fall off past ~4 layers", "LSTM
+  handles long-range dependencies best", "past ~20 layers plain stacks stop improving (vanishing
+  gradients)", early and deep channel ranges "16–64" and "256–512", batch normalization "smooths
+  the loss landscape" and is "standard in every modern CNN", GroupNorm and LayerNorm "for tiny
+  batches", "valid padding is used when boundary effects don't matter", and the CS231n and Olah
+  pages as sources (not primary).
 
 ### Schema 2.8 for `fine-tuning-method`: the teaching form (additive)
 

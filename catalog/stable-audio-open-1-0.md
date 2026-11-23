@@ -20,7 +20,7 @@ limitations: 'The card lists these limits: it cannot generate realistic vocals, 
 pipeline:
   source: https://arxiv.org/abs/2407.14358
   summary: The sound is made in the latent space of an audio autoencoder, not as raw samples. A T5 text encoder reads the prompt, a diffusion transformer (DiT) cleans random noise step by step while reading the prompt and the wanted length, and a decoder turns the result into a stereo waveform.
-  side_into: dit
+  side_into: cross-attention
   stages:
   - id: prompt
     role: input
@@ -46,14 +46,26 @@ pipeline:
     details:
     - in the latent space · 64 channels
     note: Generation starts from random numbers in the latent space of the autoencoder. A window of 1024 latent frames covers about 47 seconds.
-  - id: dit
-    role: denoiser
-    title: Diffusion transformer
+  - id: self-attention
+    role: attention
+    title: Self-attention
     details:
-    - 1057M parameters
-    - attention · cross-attention · MLP
-    note: Each block has self-attention, a cross-attention layer that reads the text and timing vectors, and a gated MLP. Timing and the step are also prepended to the input sequence.
+    - over the latent frames
+    note: The diffusion transformer (1057M parameters) is a stack of blocks; each starts with self-attention. Timing and the step are also prepended to the input sequence.
     frame: Denoising loop
+    inner_frame: DiT block
+  - id: cross-attention
+    role: attention
+    title: Cross-attention
+    details:
+    - reads text and timing vectors
+    frame: Denoising loop
+    inner_frame: DiT block
+  - id: mlp
+    role: feedForward
+    title: Gated MLP
+    frame: Denoising loop
+    inner_frame: DiT block
   - id: scheduler
     role: step
     title: Scheduler step

@@ -19,7 +19,8 @@ intended_use: The card says the model on its own has limited use, but can serve 
 what_sets_it_apart: The card says the interest points it detects are repeatable under homographic transformations, that is, they are found again when the view of a flat scene changes. The quoted paper abstract adds that it introduces Homographic Adaptation, a multi-scale, multi-homography approach for boosting that repeatability.
 pipeline:
   source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/superpoint/modeling_superpoint.py
-  summary: A small convolutional encoder shrinks a grayscale image to one eighth of its size. One head scores every pixel as a possible interest point and keeps the strongest ones; a second head gives each kept point a 256-number descriptor for matching.
+  summary: A small convolutional encoder shrinks a grayscale image to one eighth of its size. One head scores every pixel as a possible interest point and keeps the strongest ones; a second head (right) reads the same encoder output and gives each kept point a 256-number descriptor for matching.
+  branch_from: encoder
   stages:
   - id: image
     role: input
@@ -47,17 +48,24 @@ pipeline:
     details:
     - threshold 0.005 · NMS radius 4
     note: Points above the threshold are kept, weaker points within 4 pixels of a stronger one are dropped (non-maximum suppression), and points within 4 pixels of the border are removed.
+  - id: output
+    role: outputHead
+    title: Keypoints
+    details:
+    - position, score
   - id: descriptor-head
     role: projector
     title: Descriptor head
     details:
     - 256 numbers · sampled at keypoints
-    note: Convolutions give a 256-channel descriptor map from the same encoder output. It is read at each keypoint by bilinear interpolation and scaled to length one.
-  - id: output
+    note: Convolutions give a 256-channel descriptor map from the same encoder output. It is read at each kept keypoint by bilinear interpolation and scaled to length one.
+    branch: true
+  - id: descriptors
     role: outputHead
-    title: Keypoints + descriptors
+    title: Descriptors
     details:
-    - position, score, descriptor
+    - one per keypoint
+    branch: true
 filters:
   size_category: tiny
   is_quantized: false

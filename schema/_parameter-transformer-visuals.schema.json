@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/_parameter-transformer-visuals.schema.json",
+  "title": "parameter visuals: transformer functions and mixture of experts",
+  "description": "The `visual` kinds of the transformer and mixture-of-experts parameter records that are not plain parameter counts, referenced from parameter.schema.json. Every value drawn is computed by the consumer from these inputs.",
+  "$defs": {
+    "caption": { "type": "string", "minLength": 1, "description": "what is drawn, whose configuration it uses, and that made-up numbers are an example" },
+    "pair_vector": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } },
+    "moe_config": {
+      "type": "object",
+      "description": "a decoder whose every feed-forward block is a mixture of experts: the keys of decoder_config plus the expert keys, copied from the named model's config.json (Mixtral's expert width is its intermediate_size)",
+      "additionalProperties": false,
+      "required": ["name", "vocab_size", "hidden_size", "intermediate_size", "num_hidden_layers", "num_attention_heads", "num_key_value_heads", "head_dim", "tie_word_embeddings", "ffn_matrices", "qk_norm", "num_experts", "num_experts_per_tok", "moe_intermediate_size"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "vocab_size": { "type": "integer", "minimum": 1 },
+        "hidden_size": { "type": "integer", "minimum": 1 },
+        "intermediate_size": { "type": "integer", "minimum": 1 },
+        "num_hidden_layers": { "type": "integer", "minimum": 1 },
+        "num_attention_heads": { "type": "integer", "minimum": 1 },
+        "num_key_value_heads": { "type": "integer", "minimum": 1 },
+        "head_dim": { "type": "integer", "minimum": 1 },
+        "tie_word_embeddings": { "type": "boolean" },
+        "ffn_matrices": { "type": "integer", "enum": [3], "description": "every expert is a gated feed-forward block (gate, up, down)" },
+        "qk_norm": { "type": "boolean" },
+        "num_experts": { "type": "integer", "minimum": 1 },
+        "num_experts_per_tok": { "type": "integer", "minimum": 1 },
+        "moe_intermediate_size": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "activation_curves_visual": {
+      "type": "object",
+      "description": "each activation of Transformers' ACT2FN as a curve over range, its value at every input in marks tabulated: relu max(0, x), gelu x·Φ(x) with the exact error function, gelu_new the tanh approximation, silu x·σ(x)",
+      "additionalProperties": false,
+      "required": ["kind", "functions", "range", "marks", "caption"],
+      "properties": {
+        "kind": { "const": "activation_curves" },
+        "functions": { "type": "array", "minItems": 1, "maxItems": 4, "uniqueItems": true, "items": { "type": "string", "enum": ["relu", "gelu", "gelu_new", "silu"] } },
+        "range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["min", "max"],
+          "properties": { "min": { "type": "number" }, "max": { "type": "number" } }
+        },
+        "marks": { "type": "array", "minItems": 1, "maxItems": 9, "items": { "type": "number" } },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "norm_compare_visual": {
+      "type": "object",
+      "description": "one example vector normalised by LayerNorm ((x − mean) ÷ √(variance + eps)) and by RMSNorm (x ÷ √(mean of squares + eps)), gain 1 and bias 0, with the named model's epsilon",
+      "additionalProperties": false,
+      "required": ["kind", "vector", "eps", "model", "caption"],
+      "properties": {
+        "kind": { "const": "norm_compare" },
+        "vector": { "type": "array", "minItems": 2, "maxItems": 10, "items": { "type": "number" } },
+        "eps": { "type": "number", "exclusiveMinimum": 0 },
+        "model": { "type": "string", "minLength": 1 },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "rope_rotation_visual": {
+      "type": "object",
+      "description": "an example query and key, two numbers each, turned by position × the angle of one pair of a real model's head, rope_theta^(−2 · pair ÷ head_dim) radians, and their score per pair of positions",
+      "additionalProperties": false,
+      "required": ["kind", "model", "rope_theta", "head_dim", "pair", "query", "key", "positions", "caption"],
+      "properties": {
+        "kind": { "const": "rope_rotation" },
+        "model": { "type": "string", "minLength": 1 },
+        "rope_theta": { "type": "number", "exclusiveMinimum": 0 },
+        "head_dim": { "type": "integer", "minimum": 2 },
+        "pair": { "type": "integer", "minimum": 0 },
+        "query": { "$ref": "#/$defs/pair_vector" },
+        "key": { "$ref": "#/$defs/pair_vector" },
+        "positions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["query", "key"],
+            "properties": { "query": { "type": "integer", "minimum": 0 }, "key": { "type": "integer", "minimum": 0 } }
+          }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "moe_sweep_visual": {
+      "type": "object",
+      "description": "total and active parameters as one expert value takes each of values, the rest as the model has them",
+      "additionalProperties": false,
+      "required": ["kind", "model", "vary", "values", "caption"],
+      "properties": {
+        "kind": { "const": "moe_sweep" },
+        "model": { "$ref": "#/$defs/moe_config" },
+        "vary": { "type": "string", "enum": ["num_experts", "num_experts_per_tok", "moe_intermediate_size"] },
+        "values": { "type": "array", "minItems": 2, "maxItems": 10, "items": { "type": "integer", "minimum": 1 } },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "moe_count_visual": {
+      "type": "object",
+      "description": "each model's parameters by part (embedding, attention, experts, router, norms, output head), stored against used per token",
+      "additionalProperties": false,
+      "required": ["kind", "models", "caption"],
+      "properties": {
+        "kind": { "const": "moe_count" },
+        "models": { "type": "array", "minItems": 1, "maxItems": 2, "items": { "$ref": "#/$defs/moe_config" } },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "expert_layer_visual": {
+      "type": "object",
+      "description": "one mixture-of-experts layer: routed experts (3 × hidden × moe_intermediate_size each), the shared feed-forward block every token runs, and the router, stored and per token",
+      "additionalProperties": false,
+      "required": ["kind", "model", "caption"],
+      "properties": {
+        "kind": { "const": "expert_layer" },
+        "model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "hidden_size", "moe_intermediate_size", "n_routed_experts", "num_experts_per_tok", "n_shared_experts"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "hidden_size": { "type": "integer", "minimum": 1 },
+            "moe_intermediate_size": { "type": "integer", "minimum": 1 },
+            "n_routed_experts": { "type": "integer", "minimum": 1 },
+            "num_experts_per_tok": { "type": "integer", "minimum": 1 },
+            "n_shared_experts": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    }
+  }
+}

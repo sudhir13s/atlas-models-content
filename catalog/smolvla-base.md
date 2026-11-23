@@ -79,21 +79,24 @@ pipeline:
     details:
     - among the action tokens
     note: The action expert starts from noisy actions and the flow time. Its self-attention layers let each action token see only the earlier tokens of the chunk.
-    frame: Expert layer pair
-    repeat: 8
+    frame: Denoising loop
+    inner_frame: Expert pair
+    inner_repeat: 8
   - id: cross-attention
     role: attention
     title: Cross-attention
     details:
     - reads the matching VLM layer
     note: The expert's cross-attention layers read the keys and values of the matching layer of the vision-language model. The expert's width is 0.75 times the model's.
-    frame: Expert layer pair
+    frame: Denoising loop
+    inner_frame: Expert pair
   - id: flow-step
     role: step
     title: Flow-matching step
     details:
     - 10 steps at inference
     note: The expert predicts a velocity that moves the actions from noise towards the final chunk; inference runs it 10 times.
+    frame: Denoising loop
   - id: actions
     role: outputHead
     title: Action chunk

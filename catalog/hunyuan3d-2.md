@@ -19,7 +19,7 @@ running_it: 'The card lists three pretrained components in this repository: Huny
 pipeline:
   source: https://arxiv.org/abs/2501.12202
   summary: 'Two models run one after the other. Hunyuan3D-DiT makes the bare shape: it cleans random latent tokens step by step while reading the image features (left), and the ShapeVAE decoder turns the tokens into a mesh. Hunyuan3D-Paint then paints views of that mesh from the image, and they are baked into a texture map.'
-  side_into: dit
+  side_into: double-stream
   stages:
   - id: cond-image
     role: input
@@ -45,14 +45,22 @@ pipeline:
     details:
     - up to 3072 tokens · 64 channels
     note: Shape generation starts from random numbers in the latent space of the ShapeVAE. The tokens have no position embedding; their content alone says where the shape is.
-  - id: dit
+  - id: double-stream
     role: denoiser
-    title: Hunyuan3D-DiT
+    title: Double-stream blocks
     details:
-    - 16 double-stream blocks
-    - 32 single-stream blocks · width 1024
-    note: In double-stream blocks the shape tokens and the image tokens have separate weights and meet in one attention. In single-stream blocks they are joined and processed together. Only the step modulates the blocks.
+    - 16 blocks · shape and image tokens
+    note: In the 16 double-stream blocks of Hunyuan3D-DiT the shape tokens and the image tokens have separate weights and meet in one attention. Only the step modulates the blocks.
     frame: Denoising loop
+  - id: single-stream
+    role: denoiser
+    title: Single-stream block
+    details:
+    - one joined sequence · width 1024
+    note: The shape and image tokens are then joined and processed together by 32 single-stream blocks.
+    frame: Denoising loop
+    inner_frame: Single block
+    inner_repeat: 32
   - id: scheduler
     role: step
     title: Scheduler step

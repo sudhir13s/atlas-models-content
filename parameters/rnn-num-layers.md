@@ -2,52 +2,135 @@
 id: parameter/rnn-num-layers
 type: parameter
 slug: rnn-num-layers
-schema_version: 1.0
+schema_version: 2.9
 title: "Number of Layers (Stacked Depth)"
 name: num_layers
 priority: 2
 importance: critical
 applies_to: [rnn]
-range: "1 → 4"
-controls: "How many recurrent layers are stacked, each feeding its hidden-state sequence to the next. Depth lets the network build a hierarchy of temporal features."
-formula: "total = Σ per-layer params; layers beyond the first take input_size = hidden_size"
-if_increased: "A deeper temporal feature hierarchy and more capacity, but linearly more parameters and harder optimization (recurrent depth compounds vanishing gradients)."
-if_decreased: "Cheaper and easier to train, but a single recurrence level captures a shallower notion of sequence structure."
+range: "1 — 4"
+controls: "How many recurrent layers are stacked, each reading the sequence of states of the layer below."
+effects:
+  decrease:
+    - "Fewer parameters by exactly the layers removed"
+    - "A smaller total state: one layer of h and c instead of several"
+  increase:
+    - "Each layer adds its own parameters; above the first, a layer reads the layer below's hidden values instead of the input"
+    - "Sutskever et al. found deep LSTMs significantly outperformed shallow ones, each additional layer reducing perplexity by nearly 10%"
+    - "Every layer runs at every step; Sutskever et al. put each of their 4 layers on its own GPU"
+scale:
+  min: 1
+  max: 8
+  typical_min: 1
+  typical_max: 4
+  spacing: linear
+typical_values:
+  - setting: "PyTorch RNN, GRU and LSTM default (documentation)"
+    value: "1"
+    source: "https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html"
+  - setting: "Bahdanau et al., encoder of RNNsearch: one bidirectional layer"
+    value: "1"
+    source: "https://arxiv.org/abs/1409.0473"
+  - setting: "Sutskever et al., encoder and decoder LSTMs"
+    value: "4"
+    source: "https://arxiv.org/abs/1409.3215"
+mistakes:
+  - mistake: "Assuming every layer of a stack has the same count"
+    why: >-
+      PyTorch sizes weight_ih_l0 as (blocks × hidden) × input_size, but every higher layer as
+      (blocks × hidden) × (directions × hidden). A GRU with 620-number inputs and 1,000 units has
+      **4,860,000** weights in layer 1 and **6,000,000** in layer 2 (biases left out).
+    fix: "Count the first layer from input_size and the others from hidden_size."
+  - mistake: "Reading the first dimension of h_n as the number of layers"
+    why: >-
+      PyTorch's h_0 and h_n have a first dimension of D × num_layers, where D is 2 for a bidirectional
+      network and 1 otherwise.
+    fix: "Divide by 2 when the network is bidirectional."
+  - mistake: "Expecting dropout after every layer"
+    why: >-
+      PyTorch applies the dropout argument to the outputs of each layer except the last, so with
+      num_layers = 1 it has nothing to act on.
+    fix: "Use dropout only with two or more layers, or add it outside the recurrent module."
+related: [parameter/rnn-hidden-units, parameter/rnn-bidirectional, parameter/rnn-cell-type]
+visual:
+  kind: recurrent_layers
+  stacks:
+    - { label: "Encoder", gates: 4, input_size: 1000, hidden_size: 1000, num_layers: 4, bidirectional: false }
+  biases: 0
+  caption: "Weights of each layer of Sutskever et al.'s encoder LSTM: 4 layers of 1,000 cells reading 1,000-number word embeddings. Because the input is as wide as the state, every layer has the same 8,000,000 weights; together 32,000,000, the paper's 32M. Biases are left out, as in the paper's count."
 tags: [rnn, lstm, recurrent, depth, structure, parameters]
-updated: 2026-07-19
+updated: 2026-11-23
 sources:
-  - { url: "https://www.bioinf.jku.at/publications/older/2604.pdf", title: "Long Short-Term Memory (Hochreiter & Schmidhuber, 1997)", trust: 0.95 }
-  - { url: "https://arxiv.org/abs/1409.3215", title: "Sequence to Sequence Learning with Neural Networks (Sutskever et al., 2014)", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/1409.3215", title: "Sequence to Sequence Learning with Neural Networks (Sutskever, Vinyals & Le, arXiv:1409.3215)", trust: 0.95 }
+  - { url: "https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html", title: "PyTorch documentation: torch.nn.LSTM", trust: 0.9 }
+  - { url: "https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/rnn.py", title: "PyTorch source: torch/nn/modules/rnn.py", trust: 0.9 }
+  - { url: "https://arxiv.org/abs/1409.0473", title: "Neural Machine Translation by Jointly Learning to Align and Translate (Bahdanau, Cho & Bengio, arXiv:1409.0473)", trust: 0.95 }
 ---
 
 ## Definition
-`num_layers` is how many recurrent layers are **stacked**: the first layer reads the input sequence,
-and each subsequent layer consumes the previous layer's hidden-state sequence as its input. This
-"deep RNN" lets the network learn a hierarchy of temporal patterns.
 
-Depth multiplies parameters — the total is the sum over layers — with an important twist: **every
-layer after the first takes `input_size = hidden_size`**, since its input is the prior layer's state.
+**num_layers is how many recurrent layers are stacked.** PyTorch's documentation: "setting
+num_layers=2 would mean stacking two LSTMs together", the second taking in the outputs of the first.
 
-## What to look for
-Recurrent networks stay shallow compared to CNNs, because depth in time is already hard to optimize:
+- **Layer 1** reads the input sequence, one vector per step.
+- **Each higher layer** reads the sequence of states h of the layer below.
+- **Every layer** has its own weights and its own state.
+- **The figure** counts the 4 layers of Sutskever et al.'s encoder.
 
-- 1 layer: many simple sequence tasks.
-- 2–4 layers: standard for translation and language modeling (Seq2Seq used 4).
+**Analogy:** several readers in a row, each reading the notes of the one before rather than the
+book itself. The analogy shows the idea only; the counts are under Calculation.
 
-Deeper stacks compound the vanishing-gradient problem *across layers* on top of *across time*, so
-gains fall off quickly past ~4 layers — one reason recurrent models rarely went as deep as CNNs.
+## How It Works
+
+**At each step, the input climbs the stack.**
+
+1. **Layer 1** combines x_t with its own previous state into h_t^(1).
+2. **Layer 2** treats h_t^(1) as its input and combines it with its own previous state.
+3. **Upwards** to layer L, whose states are the stack's output.
+4. **State.** Each layer keeps its own h (and c in an LSTM): Sutskever et al.'s 4 layers of 1,000
+   cells hold 8,000 numbers.
 
 ## Calculation
-Depth is the summation bound over per-layer costs. Because upper layers see `x = h`, they are larger
-than the first:
 
-$$P_\text{total} = \underbrace{4h(x + h + 1)}_{\text{layer 1}} + (L-1)\cdot\underbrace{4h(h + h + 1)}_{\text{layers 2..L}}$$
+**The first layer reads the input; the others read hidden values.**
 
-Each added layer contributes roughly $4h(2h+1) \approx 8h^2$ — a linear growth in `L`, but each
-term is the *larger* upper-layer cost, not the first layer's.
+In words: add one count per layer; the first uses input_size, every other uses directions ×
+hidden_size as its input.
 
-## Example
-Stack two LSTM layers with `input_size = 100`, `hidden_size = 256`. Layer 1: $4 \times 256 \times
-(100 + 256 + 1) = 365\,568$. Layer 2 (its input is now 256): $4 \times 256 \times (256 + 256 + 1) =
-525\,312$. Total $= 890\,880$ — and note the *deeper* layer is the larger one, because its input
-dimension grew from 100 to 256 to match the hidden size.
+$$
+P = G\,h\,(x + h) + (L - 1)\,G\,h\,(D h + h) \quad (+\ \text{biases})
+$$
+
+| Symbol | Meaning |
+| --- | --- |
+| $L$ | num_layers |
+| $h$, $x$ | hidden_size, input_size |
+| $G$ | weight blocks: 4 LSTM, 3 GRU, 1 plain RNN |
+| $D$ | directions: 1, or 2 if bidirectional (then each layer's count doubles too) |
+
+PyTorch adds 2 × G × h biases per layer and direction. For whole-network counts, see the
+[parameter calculators](/models/hyperparameters/calculators).
+
+## Worked Example
+
+**Sutskever et al.'s translation model:** two LSTMs of 4 layers, 1,000 cells, 1,000-number word
+embeddings, vocabularies of 160,000 and 80,000 words.
+
+1. **Layer 1:** 4 × 1,000 × (1,000 + 1,000) = **8,000,000**.
+2. **Layers 2 to 4:** they read 1,000 hidden values, so the same **8,000,000** each.
+3. **Encoder:** 4 × 8,000,000 = **32,000,000**, the paper's 32M; the decoder has as many.
+4. **Both LSTMs:** **64,000,000**, the paper's "64M are pure recurrent connections".
+5. **The rest of its 384M:** 160,000 × 1,000 + 80,000 × 1,000 + 80,000 × 1,000 = **320,000,000**,
+   consistent with the two embedding tables and the 80,000-word softmax (the paper gives only the
+   totals).
+6. **A narrower input, for contrast:** a GRU reading 620 numbers with 1,000 units has 4,860,000
+   weights in layer 1 but 6,000,000 in layer 2; an example, not a published network.
+
+**What this means:** each layer adds a full layer's weights; the first differs from the rest only
+when the input is narrower or wider than the state.
+
+## What To Watch
+
+- **bidirectional.** It doubles every layer and widens what the layers above read.
+- **dropout.** Applied between layers only.
+- **Embedding and output layers.** In Sutskever et al.'s model they hold most of the parameters.

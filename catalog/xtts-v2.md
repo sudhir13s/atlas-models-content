@@ -46,6 +46,19 @@ pipeline:
     - 32 learned queries · 2 layers
     note: Thirty-two learned vectors attend over the encoder output and keep a fixed-size summary of the voice. The summaries of the chunks are averaged.
     side: true
+  - id: reference-again
+    role: input
+    title: The same recording
+    side: true
+    into: hifigan
+  - id: speaker-encoder
+    role: audioEncoder
+    title: Speaker encoder
+    details:
+    - ResNet
+    - one 512-number vector
+    note: Turns the reference recording into one vector that conditions every upsampling layer of the decoder.
+    side: true
   - id: text
     role: tokenizer
     title: Text tokens
@@ -83,7 +96,7 @@ pipeline:
     title: HiFi-GAN decoder
     details:
     - reads a speaker embedding
-    note: Upsamples the hidden states into a waveform. A ResNet speaker encoder turns the reference recording into one 512-number vector that conditions every upsampling layer.
+    note: Upsamples the hidden states into a waveform, with the speaker embedding conditioning every upsampling layer.
   - id: audio
     role: outputHead
     title: Speech

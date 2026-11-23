@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/_parameter-cnn-rnn-visuals.schema.json",
+  "title": "parameter visuals: convolutional and recurrent networks",
+  "description": "The `visual` kinds of the convolutional- and recurrent-network parameter records, referenced from parameter.schema.json. Every value drawn is computed by the consumer from these inputs.",
+  "$defs": {
+    "caption": { "type": "string", "minLength": 1, "description": "what is drawn, whose layer sizes it uses, and that made-up numbers are an example" },
+    "label": { "type": "string", "minLength": 1, "maxLength": 24 },
+    "grid": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 9,
+      "items": { "type": "array", "minItems": 1, "maxItems": 9, "items": { "type": "number" } }
+    },
+    "position": {
+      "type": "object",
+      "description": "a cell counted from 1 at the top left",
+      "additionalProperties": false,
+      "required": ["row", "column"],
+      "properties": { "row": { "type": "integer", "minimum": 1 }, "column": { "type": "integer", "minimum": 1 } }
+    },
+    "bias_vectors": { "type": "integer", "enum": [0, 1, 2], "description": "bias vectors per weight block: 0 counts weights only (as most papers do), 1 one bias, 2 as PyTorch stores them (b_ih and b_hh)" },
+    "conv_geometry_visual": {
+      "type": "object",
+      "description": "the image padded and the filter's window on it, and the output, for each panel's stride, padding and dilation, as PyTorch's Conv2d computes them (cross-correlation)",
+      "additionalProperties": false,
+      "required": ["kind", "image", "filter", "panels", "caption"],
+      "properties": {
+        "kind": { "const": "conv_geometry" },
+        "image": { "$ref": "#/$defs/grid" },
+        "filter": { "$ref": "#/$defs/grid" },
+        "panels": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "stride", "padding", "dilation", "window"],
+            "properties": {
+              "label": { "$ref": "#/$defs/label" },
+              "stride": { "type": "integer", "minimum": 1 },
+              "padding": { "type": "integer", "minimum": 0 },
+              "dilation": { "type": "integer", "minimum": 1 },
+              "window": { "$ref": "#/$defs/position", "description": "the output cell whose window is outlined" }
+            }
+          }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "conv_params_visual": {
+      "type": "object",
+      "description": "each group's parameters, kernel × kernel × in × out weights plus out biases per layer, summed per part; a fully connected layer is written as the convolution it equals",
+      "additionalProperties": false,
+      "required": ["kind", "groups", "caption"],
+      "properties": {
+        "kind": { "const": "conv_params" },
+        "groups": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "layers"],
+            "properties": {
+              "label": { "$ref": "#/$defs/label" },
+              "layers": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["kernel", "in_channels", "out_channels", "count", "bias", "part"],
+                  "properties": {
+                    "kernel": { "type": "integer", "minimum": 1 },
+                    "in_channels": { "type": "integer", "minimum": 1 },
+                    "out_channels": { "type": "integer", "minimum": 1 },
+                    "count": { "type": "integer", "minimum": 1 },
+                    "bias": { "type": "boolean" },
+                    "part": { "type": "string", "minLength": 1, "maxLength": 10 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "pooling_visual": {
+      "type": "object",
+      "description": "one grid pooled in each panel's way (window size, stride, max or average), as PyTorch's MaxPool2d and AvgPool2d compute it",
+      "additionalProperties": false,
+      "required": ["kind", "image", "panels", "caption"],
+      "properties": {
+        "kind": { "const": "pooling" },
+        "image": { "$ref": "#/$defs/grid" },
+        "panels": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "size", "stride", "mode", "window"],
+            "properties": {
+              "label": { "$ref": "#/$defs/label" },
+              "size": { "type": "integer", "minimum": 1 },
+              "stride": { "type": "integer", "minimum": 1 },
+              "mode": { "type": "string", "enum": ["max", "average"] },
+              "window": { "$ref": "#/$defs/position" }
+            }
+          }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "batch_norm_visual": {
+      "type": "object",
+      "description": "one channel's values over a mini-batch normalised with their mean and variance (divided by n), then scaled by gamma and shifted by beta",
+      "additionalProperties": false,
+      "required": ["kind", "values", "gamma", "beta", "epsilon", "worked", "caption"],
+      "properties": {
+        "kind": { "const": "batch_norm" },
+        "values": { "$ref": "#/$defs/grid" },
+        "gamma": { "type": "number" },
+        "beta": { "type": "number" },
+        "epsilon": { "type": "number", "exclusiveMinimum": 0 },
+        "worked": { "$ref": "#/$defs/position" },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "recurrent_sweep_visual": {
+      "type": "object",
+      "description": "one recurrent layer's parameters, blocks × hidden × (input + hidden) plus biases, against hidden size, one line per cell",
+      "additionalProperties": false,
+      "required": ["kind", "cells", "input_size", "hidden_sizes", "marked", "biases", "caption"],
+      "properties": {
+        "kind": { "const": "recurrent_sweep" },
+        "cells": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "gates"],
+            "properties": { "label": { "$ref": "#/$defs/label" }, "gates": { "type": "integer", "minimum": 1, "maximum": 4 } }
+          }
+        },
+        "input_size": { "type": "integer", "minimum": 1 },
+        "hidden_sizes": { "type": "array", "minItems": 2, "maxItems": 10, "items": { "type": "integer", "minimum": 1 } },
+        "marked": { "type": "integer", "minimum": 1 },
+        "biases": { "$ref": "#/$defs/bias_vectors" },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "recurrent_layers_visual": {
+      "type": "object",
+      "description": "the parameters of every layer of each stack; above the first, a layer reads directions × hidden numbers",
+      "additionalProperties": false,
+      "required": ["kind", "stacks", "biases", "caption"],
+      "properties": {
+        "kind": { "const": "recurrent_layers" },
+        "stacks": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "gates", "input_size", "hidden_size", "num_layers", "bidirectional"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1, "maxLength": 10 },
+              "gates": { "type": "integer", "minimum": 1, "maximum": 4 },
+              "input_size": { "type": "integer", "minimum": 1 },
+              "hidden_size": { "type": "integer", "minimum": 1 },
+              "num_layers": { "type": "integer", "minimum": 1, "maximum": 8 },
+              "bidirectional": { "type": "boolean" }
+            }
+          }
+        },
+        "biases": { "$ref": "#/$defs/bias_vectors" },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "gate_blocks_visual": {
+      "type": "object",
+      "description": "one layer of each cell split into its weight blocks, each block into input weights, recurrent weights and biases",
+      "additionalProperties": false,
+      "required": ["kind", "cells", "input_size", "hidden_size", "biases", "caption"],
+      "properties": {
+        "kind": { "const": "gate_blocks" },
+        "cells": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "blocks"],
+            "properties": {
+              "label": { "$ref": "#/$defs/label" },
+              "blocks": { "type": "array", "minItems": 1, "maxItems": 4, "items": { "$ref": "#/$defs/label" } }
+            }
+          }
+        },
+        "input_size": { "type": "integer", "minimum": 1 },
+        "hidden_size": { "type": "integer", "minimum": 1 },
+        "biases": { "$ref": "#/$defs/bias_vectors" },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    }
+  }
+}

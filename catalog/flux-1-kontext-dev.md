@@ -19,26 +19,31 @@ running_it: The card says the repository includes filters for illegal or infring
 pipeline:
   source: https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/flux/pipeline_flux_kontext.py
   summary: The input image is turned into latent tokens and placed after the tokens of the image being made, so the transformer sees both in one sequence. A CLIP and a T5 text encoder read the instruction, random noise is cleaned step by step, and a decoder turns the result into the edited picture.
-  side_into: transformer
   stages:
   - id: prompt
     role: input
     title: Text instruction
     side: true
-  - id: tokenizer
-    role: tokenizer
-    title: CLIP + T5 tokenizers
-    details:
-    - two
-    side: true
-  - id: text-encoder
+    into: double-stream
+  - id: t5
     role: textEncoder
-    title: CLIP + T5 text encoders
+    title: T5 tokenizer + encoder
     details:
-    - CLIP · one pooled vector
-    - T5 · one vector per token
-    note: The two encoders read the instruction side by side. T5 gives one vector per token, which the transformer reads as text tokens; CLIP gives one pooled vector, which conditions every block together with the step.
+    - one vector per token
     side: true
+    note: T5 gives one vector per token, which the transformer reads as text tokens.
+  - id: prompt-again
+    role: input
+    title: The same instruction
+    side: true
+    into: double-stream
+  - id: clip
+    role: textEncoder
+    title: CLIP tokenizer + encoder
+    details:
+    - one pooled vector
+    side: true
+    note: CLIP gives one pooled vector for the whole instruction, which conditions every block together with the step.
   - id: image
     role: input
     title: Input image
@@ -63,14 +68,22 @@ pipeline:
     - appended in the sequence
     note: The image being made starts as random noise in the latent space. At every step the context tokens are appended after its tokens, and both enter the image stream of the transformer.
     frame: Denoising loop
-  - id: transformer
+  - id: double-stream
     role: denoiser
-    title: Flux transformer
+    title: Double-stream blocks
     details:
-    - double-stream blocks
-    - then 38 single-stream blocks
-    note: Double-stream blocks keep separate weights for image and text tokens and mix them in one attention; the sequences are then joined for 38 single-stream blocks. Only the outputs at the positions of the image being made are kept.
+    - image and text tokens, own weights
+    note: Double-stream blocks keep separate weights for image and text tokens and mix them in one attention over both.
     frame: Denoising loop
+  - id: single-stream
+    role: denoiser
+    title: Single-stream block
+    details:
+    - one joined sequence
+    note: The two sequences are then joined and pass 38 single-stream blocks. Only the outputs at the positions of the image being made are kept.
+    frame: Denoising loop
+    inner_frame: Single block
+    inner_repeat: 38
   - id: scheduler
     role: step
     title: Scheduler step

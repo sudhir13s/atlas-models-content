@@ -19,7 +19,7 @@ running_it: The card says the model works on resolutions divisible by 32 and fra
 pipeline:
   source: https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/ltx/pipeline_ltx.py
   summary: The video is made in the latent space of a video autoencoder that packs 32 by 32 pixels and 8 frames into one latent position. A T5 text encoder reads the prompt, a transformer cleans random noise step by step while reading it, and the decoder turns the result into frames. The figure follows the Diffusers-format weights in the repository's transformer and vae folders.
-  side_into: transformer
+  side_into: cross-attention
   stages:
   - id: prompt
     role: input
@@ -50,14 +50,29 @@ pipeline:
     details:
     - one token per latent position
     note: The latent video is flattened into one sequence of tokens, each tagged with its frame, row and column for the rotary position embedding.
-  - id: transformer
-    role: denoiser
-    title: Video transformer
+  - id: self-attention
+    role: attention
+    title: Self-attention
     details:
-    - 28 blocks · 32 heads · width 2048
-    - attention · cross-attention · FFN
-    note: Each block has self-attention over all video tokens, cross-attention to the prompt vectors and a feed-forward layer; the step conditions every block. It predicts what the scheduler needs to clean the latents.
+    - 32 heads · width 2048
+    - over all video tokens
+    note: Each of the 28 blocks of the video transformer starts with self-attention over all video tokens; the step conditions every block.
     frame: Denoising loop
+    inner_frame: Video block
+    inner_repeat: 28
+  - id: cross-attention
+    role: attention
+    title: Cross-attention
+    details:
+    - reads the prompt vectors
+    frame: Denoising loop
+    inner_frame: Video block
+  - id: feed-forward
+    role: feedForward
+    title: Feed-forward
+    note: Each block ends with a feed-forward layer. The output of the last block is the prediction the scheduler needs to clean the latents.
+    frame: Denoising loop
+    inner_frame: Video block
   - id: scheduler
     role: step
     title: Scheduler step

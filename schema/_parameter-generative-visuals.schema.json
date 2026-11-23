@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://theaiatlas.dev/schema/models/_parameter-generative-visuals.schema.json",
+  "title": "parameter visuals: diffusion models, GANs and state-space models",
+  "description": "The `visual` kinds of the diffusion, generative-adversarial-network and state-space parameter records, referenced from parameter.schema.json. Inputs are copied from a named model's configuration or code; every value drawn is computed by the consumer from them.",
+  "$defs": {
+    "caption": { "type": "string", "minLength": 1, "description": "what is drawn and whose configuration or code it uses" },
+    "positive_int": { "type": "integer", "minimum": 1 },
+    "schedule": {
+      "type": "object",
+      "description": "one forward noise schedule as a Diffusers scheduler_config.json writes it; squaredcos_cap_v2 (Improved DDPM's cosine schedule) ignores beta_start and beta_end",
+      "additionalProperties": false,
+      "required": ["label", "beta_schedule", "beta_start", "beta_end"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "beta_schedule": { "type": "string", "enum": ["linear", "scaled_linear", "squaredcos_cap_v2"] },
+        "beta_start": { "type": "number", "exclusiveMinimum": 0 },
+        "beta_end": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "noise_schedules_visual": {
+      "type": "object",
+      "description": "ᾱ_t of each schedule at every step t = 1 … steps, with `marks` tabulated; sampling_steps above 0 instead marks that many steps evenly spaced from 1 to steps, rounded (Improved DDPM's striding), on the first schedule",
+      "additionalProperties": false,
+      "required": ["kind", "steps", "schedules", "marks", "caption"],
+      "properties": {
+        "kind": { "const": "noise_schedules" },
+        "steps": { "type": "integer", "minimum": 2, "maximum": 10000 },
+        "schedules": { "type": "array", "minItems": 1, "maxItems": 4, "items": { "$ref": "#/$defs/schedule" } },
+        "marks": { "type": "array", "maxItems": 10, "items": { "$ref": "#/$defs/positive_int" } },
+        "sampling_steps": { "type": "integer", "minimum": 0, "maximum": 20 },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "unet_config": {
+      "type": "object",
+      "description": "the keys of a Diffusers UNet2DConditionModel config.json that set its parameter count, copied from the named model's unet/config.json; projection_class_embeddings_input_dim is 0 for a model without SDXL's extra embedding",
+      "additionalProperties": false,
+      "required": ["name", "sample_size", "in_channels", "out_channels", "block_out_channels", "layers_per_block", "down_block_types", "transformer_layers_per_block", "cross_attention_dim", "projection_class_embeddings_input_dim"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "sample_size": { "$ref": "#/$defs/positive_int" },
+        "in_channels": { "$ref": "#/$defs/positive_int" },
+        "out_channels": { "$ref": "#/$defs/positive_int" },
+        "block_out_channels": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "$ref": "#/$defs/positive_int" } },
+        "layers_per_block": { "$ref": "#/$defs/positive_int" },
+        "down_block_types": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "string", "enum": ["CrossAttnDownBlock2D", "DownBlock2D"] } },
+        "transformer_layers_per_block": {
+          "oneOf": [{ "$ref": "#/$defs/positive_int" }, { "type": "array", "minItems": 2, "maxItems": 6, "items": { "$ref": "#/$defs/positive_int" } }]
+        },
+        "cross_attention_dim": { "$ref": "#/$defs/positive_int" },
+        "projection_class_embeddings_input_dim": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "unet_levels_visual": {
+      "type": "object",
+      "description": "the channels at each resolution level (base × multiplier) and each level's ResNet and attention parameters, counted as Diffusers builds the U-Net; compare_base above 0 recounts with that base width and the same multipliers",
+      "additionalProperties": false,
+      "required": ["kind", "model", "caption"],
+      "properties": {
+        "kind": { "const": "unet_levels" },
+        "model": { "$ref": "#/$defs/unet_config" },
+        "compare_base": { "type": "integer", "minimum": 0 },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "unet_attention_visual": {
+      "type": "object",
+      "description": "at each level and in the middle block: the positions one attention layer compares (side²), the self-attention scores per head (side⁴) and the attention parameters; levels without attention are drawn empty",
+      "additionalProperties": false,
+      "required": ["kind", "model", "caption"],
+      "properties": {
+        "kind": { "const": "unet_attention" },
+        "model": { "$ref": "#/$defs/unet_config" },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "dcgan_config": {
+      "type": "object",
+      "description": "a DCGAN-style network as the DCGAN authors' code builds it: z projected to start_size² × (multiplier × base_features) numbers, then layers that double the side up to image_size (generator) or halve it down to start_size (discriminator)",
+      "additionalProperties": false,
+      "required": ["name", "latent_dim", "base_features", "kernel", "image_size", "image_channels", "start_size"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 24 },
+        "latent_dim": { "$ref": "#/$defs/positive_int" },
+        "base_features": { "$ref": "#/$defs/positive_int", "description": "ngf for the generator, ndf for the discriminator" },
+        "kernel": { "$ref": "#/$defs/positive_int" },
+        "image_size": { "$ref": "#/$defs/positive_int" },
+        "image_channels": { "$ref": "#/$defs/positive_int" },
+        "start_size": { "$ref": "#/$defs/positive_int" }
+      }
+    },
+    "dcgan_layers_visual": {
+      "type": "object",
+      "description": "the feature maps after each layer and each layer's weights and batch-norm values; `compare` names one value (latent_dim or base_features) to recount with",
+      "additionalProperties": false,
+      "required": ["kind", "model", "network", "caption"],
+      "properties": {
+        "kind": { "const": "dcgan_layers" },
+        "model": { "$ref": "#/$defs/dcgan_config" },
+        "network": { "type": "string", "enum": ["generator", "discriminator"] },
+        "compare": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": { "latent_dim": { "$ref": "#/$defs/positive_int" }, "base_features": { "$ref": "#/$defs/positive_int" } }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "mamba_config": {
+      "type": "object",
+      "description": "the keys of a Mamba config.json (d_model, n_layer, vocab_size, pad_vocab_size_multiple) and the block settings of the reference code (d_state, d_conv, expand; tie_embeddings as MambaConfig defaults it)",
+      "additionalProperties": false,
+      "required": ["name", "d_model", "n_layer", "vocab_size", "pad_vocab_size_multiple", "d_state", "d_conv", "expand", "tie_embeddings"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "d_model": { "$ref": "#/$defs/positive_int" },
+        "n_layer": { "$ref": "#/$defs/positive_int" },
+        "vocab_size": { "$ref": "#/$defs/positive_int" },
+        "pad_vocab_size_multiple": { "$ref": "#/$defs/positive_int" },
+        "d_state": { "$ref": "#/$defs/positive_int" },
+        "d_conv": { "$ref": "#/$defs/positive_int" },
+        "expand": { "$ref": "#/$defs/positive_int" },
+        "tie_embeddings": { "type": "boolean" }
+      }
+    },
+    "mamba_count_visual": {
+      "type": "object",
+      "description": "one Mamba block's parameters by part, the count per block (or in total for n_layer) as `vary` takes each of `values`, and for d_state and d_conv the numbers each block keeps while generating, d_inner × (d_conv + d_state)",
+      "additionalProperties": false,
+      "required": ["kind", "model", "vary", "values", "caption"],
+      "properties": {
+        "kind": { "const": "mamba_count" },
+        "model": { "$ref": "#/$defs/mamba_config" },
+        "vary": { "type": "string", "enum": ["d_state", "d_conv", "expand", "n_layer"] },
+        "values": { "type": "array", "minItems": 2, "maxItems": 8, "items": { "$ref": "#/$defs/positive_int" } },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    }
+  }
+}

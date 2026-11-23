@@ -20,6 +20,13 @@
     "formula": { "type": "string", "description": "schema 1.0 form: how this parameter contributes to the parameter count; a 2.9 record explains it in its Calculation section" },
     "effects": { "$ref": "hyperparameter.schema.json#/$defs/effects" },
     "scale": { "$ref": "hyperparameter.schema.json#/$defs/scale" },
+    "options": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 6,
+      "items": { "$ref": "hyperparameter.schema.json#/$defs/option" },
+      "description": "for a switch or a named choice with no numeric scale: every value it takes and what choosing it does; drawn as one tile per option in place of the axis"
+    },
     "typical_values": {
       "type": "array",
       "minItems": 1,
@@ -33,7 +40,25 @@
         { "$ref": "#/$defs/count_breakdown_visual" },
         { "$ref": "#/$defs/head_grid_visual" },
         { "$ref": "#/$defs/kv_cache_visual" },
-        { "$ref": "#/$defs/context_cost_visual" }
+        { "$ref": "#/$defs/context_cost_visual" },
+        { "$ref": "_parameter-cnn-rnn-visuals.schema.json#/$defs/conv_geometry_visual" },
+        { "$ref": "_parameter-cnn-rnn-visuals.schema.json#/$defs/conv_params_visual" },
+        { "$ref": "_parameter-cnn-rnn-visuals.schema.json#/$defs/pooling_visual" },
+        { "$ref": "_parameter-cnn-rnn-visuals.schema.json#/$defs/batch_norm_visual" },
+        { "$ref": "_parameter-cnn-rnn-visuals.schema.json#/$defs/recurrent_sweep_visual" },
+        { "$ref": "_parameter-cnn-rnn-visuals.schema.json#/$defs/recurrent_layers_visual" },
+        { "$ref": "_parameter-cnn-rnn-visuals.schema.json#/$defs/gate_blocks_visual" },
+        { "$ref": "_parameter-generative-visuals.schema.json#/$defs/noise_schedules_visual" },
+        { "$ref": "_parameter-generative-visuals.schema.json#/$defs/unet_levels_visual" },
+        { "$ref": "_parameter-generative-visuals.schema.json#/$defs/unet_attention_visual" },
+        { "$ref": "_parameter-generative-visuals.schema.json#/$defs/dcgan_layers_visual" },
+        { "$ref": "_parameter-generative-visuals.schema.json#/$defs/mamba_count_visual" },
+        { "$ref": "_parameter-transformer-visuals.schema.json#/$defs/activation_curves_visual" },
+        { "$ref": "_parameter-transformer-visuals.schema.json#/$defs/norm_compare_visual" },
+        { "$ref": "_parameter-transformer-visuals.schema.json#/$defs/rope_rotation_visual" },
+        { "$ref": "_parameter-transformer-visuals.schema.json#/$defs/moe_sweep_visual" },
+        { "$ref": "_parameter-transformer-visuals.schema.json#/$defs/moe_count_visual" },
+        { "$ref": "_parameter-transformer-visuals.schema.json#/$defs/expert_layer_visual" }
       ]
     }
   },

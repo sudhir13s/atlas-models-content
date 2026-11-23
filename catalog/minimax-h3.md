@@ -50,12 +50,14 @@ pipeline:
     note: The video latents are cut into 1 by 2 by 2 patches, so each visual token covers 32 by 32 pixels and 4 frames. Video, audio and text tokens form one packed sequence with 3D rotary positions over time, height and width.
   - id: transformer
     role: denoiser
-    title: H3-Omni-Transformer
+    title: H3-Omni-Transformer block
     details:
-    - 50 blocks · 56 heads · width 5376
-    - single stream · 33B parameters
-    note: A dense single-stream transformer predicts the velocity of the video and the audio latents together. Attention and feed-forward layers are shared by all modalities; only the input and output layers and the AdaLN branches are modality-specific.
+    - 56 heads · width 5376
+    - single stream · 33B in all
+    note: A dense single-stream transformer of 50 blocks predicts the velocity of the video and the audio latents together. Attention and feed-forward layers are shared by all modalities; only the input and output layers and the AdaLN branches are modality-specific.
     frame: Denoising loop
+    inner_frame: H3 block
+    inner_repeat: 50
   - id: scheduler
     role: step
     title: Scheduler step

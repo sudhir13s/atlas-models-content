@@ -35,27 +35,21 @@ fingerprint:
   positional_encoding: RoPE
 pipeline:
   source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/gemma4/modeling_gemma4.py
-  summary: A vision encoder (left) turns an image into a short row of vectors, and a projector maps them to the language model's width. They take their places among the text token embeddings, and a 42-layer language model reads the whole sequence and writes text. Audio enters the same way through its own encoder, which this figure leaves out.
+  summary: A vision encoder turns an image into a short row of vectors and an audio encoder does the same for sound (left); each has a projector that maps its vectors to the language model's width. They take their places among the text token embeddings, and a 42-layer language model reads the whole sequence and writes text.
   side_into: merge
   stages:
   - id: image
     role: input
     title: Image
     side: true
-  - id: patches
-    role: embedding
-    title: Patch embedding
-    details:
-    - 16 × 16 pixel patches · width 768
-    note: A linear layer turns the pixels of each 16 by 16 patch into one vector, and learned x and y position embeddings are added.
-    side: true
-  - id: vision-block
+    into: merge
+  - id: vision-encoder
     role: visionEncoder
-    title: Attention + feed-forward
+    title: Vision encoder
     details:
-    - 12 heads · width 768
-    frame: Vision block
-    repeat: 16
+    - 16 × 16 pixel patches
+    - 16 blocks · width 768
+    note: A linear layer turns the pixels of each 16 by 16 patch into one vector, and learned x and y position embeddings are added. Sixteen attention and feed-forward blocks (12 heads, width 768) then read the patch vectors.
     side: true
   - id: pool
     role: step
@@ -71,6 +65,22 @@ pipeline:
     - RMSNorm · linear 768 → 2560
     note: Normalizes the image vectors and maps them into the space of the language model's token embeddings.
     side: true
+  - id: audio
+    role: input
+    title: Audio
+    side: true
+    into: merge
+  - id: audio-encoder
+    role: audioEncoder
+    title: Audio encoder
+    details:
+    - 12 layers
+    side: true
+  - id: audio-projector
+    role: projector
+    title: Projector
+    note: Maps the audio vectors into the space of the language model's token embeddings.
+    side: true
   - id: text
     role: tokenizer
     title: Text tokens
@@ -85,8 +95,8 @@ pipeline:
     role: embedding
     title: Place among text embeddings
     details:
-    - at the image token positions
-    note: The image vectors take the places the prompt reserves with image tokens. Audio goes through a 12-layer audio encoder and its own projector and is placed at the audio token positions the same way.
+    - at the image and audio positions
+    note: The image vectors take the places the prompt reserves with image tokens, and the audio vectors are placed at the audio token positions the same way.
   - id: block
     role: attention
     title: Attention + feed-forward

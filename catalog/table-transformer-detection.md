@@ -23,8 +23,9 @@ fingerprint:
   activation_function: relu
 pipeline:
   source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/table_transformer/modeling_table_transformer.py
-  summary: A convolutional network turns the image into a grid of features and a transformer encoder (left) refines them. The decoder (right) starts from a fixed set of learned queries; each query reads the image features and ends as one predicted object.
+  summary: A convolutional network turns the image into a grid of features and a transformer encoder (left) refines them. The decoder starts from a fixed set of learned queries; each query reads the image features and ends as one predicted object, with a class from one head and a box from a second head (right).
   side_into: cross-attention
+  branch_from: norm
   stages:
   - id: image
     role: input
@@ -78,12 +79,19 @@ pipeline:
   - id: norm
     role: normalisation
     title: Final LayerNorm
-  - id: heads
+  - id: class-head
     role: outputHead
-    title: Class head + box head
+    title: Class head
     details:
-    - a class and a box per query
-    note: A linear layer gives each query a class (or no object), and a small network gives it a box.
+    - a class per query
+    note: A linear layer gives each query a class, or no object.
+  - id: box-head
+    role: outputHead
+    title: Box head
+    details:
+    - a box per query
+    note: A small network gives each query a box, read from the same decoder output as the class.
+    branch: true
 filters:
   size_category: tiny
   is_quantized: false

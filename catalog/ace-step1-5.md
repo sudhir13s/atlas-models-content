@@ -73,12 +73,14 @@ pipeline:
     frame: Denoising loop
   - id: dit
     role: denoiser
-    title: Diffusion transformer
+    title: Diffusion transformer layer
     details:
-    - 24 layers · 16 heads · 8 KV heads
-    - about 2B parameters · width 2048
+    - 16 heads · 8 KV heads · width 2048
+    - about 2B parameters in all
     note: Odd layers use sliding-window attention over 128 positions for local detail and even layers use global grouped-query attention for long-range structure; cross-attention reads the caption, lyric and timbre vectors.
     frame: Denoising loop
+    inner_frame: DiT layer
+    inner_repeat: 24
   - id: scheduler
     role: step
     title: Scheduler step

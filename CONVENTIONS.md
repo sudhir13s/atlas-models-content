@@ -116,8 +116,23 @@ numeric config) so it stays machine-parseable.
       head per query head.
     - `context_cost`: attention-score entries in one layer and the KV cache against context
       length, `marks` naming lengths such as the native context and `max_position_embeddings`.
+  - **Convolutional and recurrent `visual` kinds** (`schema/_parameter-cnn-rnn-visuals.schema.json`)
+    take a published network's layer shapes, or small grids named as an example in `caption`, and
+    compute as PyTorch's Conv2d, MaxPool2d, AvgPool2d, BatchNorm2d, RNN, GRU and LSTM do.
+    - `conv_geometry`: the padded input with one window's taps shaded and its span outlined, and
+      the output, for each panel's stride, padding and dilation.
+    - `conv_params`: kernel × kernel × in × out weights plus out biases per layer, summed per
+      `part`; a fully connected layer is written as the convolution it equals.
+    - `pooling`: max or average windows of `size` at `stride` on one grid.
+    - `batch_norm`: one channel's values normalised with their mean and variance (divided by n),
+      then γ × x̂ + β.
+    - `recurrent_sweep`, `recurrent_layers`, `gate_blocks`: blocks × hidden × (input + hidden) plus
+      `biases` bias vectors per block (0 weights only, 1, or 2 as PyTorch), against hidden size,
+      per layer of a stack, or per block. Every count states its bias convention.
+  - **`options`** replaces `scale` for a switch or a named choice (bidirectional, the cell type),
+    with the hyperparameter shape and drawing.
   - **The Worked Example uses a catalog model's own numbers**, names the model, and can be redone
-    by hand with every step numbered.
+    by hand with every step numbered; with no catalog model, a published network's layers.
 - **architecture-era** — carries `led_to[]` / `influenced_by[]` (IDs) forming the evolution DAG,
   plus `era`, `year`, `family`. Body sections: What Changed → Key Ideas, then the optional
   How It Works → Worked Example. A record is written in one of two forms:
