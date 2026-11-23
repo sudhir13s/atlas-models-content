@@ -129,6 +129,18 @@ numeric config) so it stays machine-parseable.
     - `recurrent_sweep`, `recurrent_layers`, `gate_blocks`: blocks × hidden × (input + hidden) plus
       `biases` bias vectors per block (0 weights only, 1, or 2 as PyTorch), against hidden size,
       per layer of a stack, or per block. Every count states its bias convention.
+  - **Transformer-function and mixture-of-experts `visual` kinds**
+    (`schema/_parameter-transformer-visuals.schema.json`) compute as Hugging Face Transformers does;
+    example inputs are named as such in `caption`.
+    - `activation_curves`: relu, gelu (exact), gelu_new (tanh approximation) and silu over `range`,
+      the values at `marks` tabulated.
+    - `norm_compare`: one `vector` through LayerNorm and RMSNorm (gain 1, bias 0) with a model's
+      `eps`.
+    - `rope_rotation`: an example query and key turned by position × rope_theta^(−2·pair ÷ head_dim).
+    - `moe_sweep`, `moe_count`: total and active parameters of a decoder whose every layer is a
+      mixture of experts (`decoder_config` plus `num_experts`, `num_experts_per_tok`,
+      `moe_intermediate_size`), against one expert value or part by part.
+    - `expert_layer`: one layer's routed experts, shared experts and router, stored and per token.
   - **`options`** replaces `scale` for a switch or a named choice (bidirectional, the cell type),
     with the hyperparameter shape and drawing.
   - **The Worked Example uses a catalog model's own numbers**, names the model, and can be redone

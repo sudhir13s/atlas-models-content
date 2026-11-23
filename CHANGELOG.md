@@ -62,6 +62,29 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
   the loss landscape" and is "standard in every modern CNN", GroupNorm and LayerNorm "for tiny
   batches", "valid padding is used when boundary effects don't matter", and the CS231n and Olah
   pages as sources (not primary).
+- **Added** to `parameter` six `visual` kinds for transformer functions and mixtures of experts,
+  defined in `schema/_parameter-transformer-visuals.schema.json`: `activation_curves` (relu, gelu,
+  gelu_new and silu as Transformers computes them), `norm_compare` (one vector through LayerNorm
+  and RMSNorm), `rope_rotation` (a query and key turned by one rotary pair of a real model's head),
+  `moe_sweep` (total and active parameters as one expert value changes), `moe_count` (total
+  against active, part by part) and `expert_layer` (one layer's routed and shared experts).
+- **Rewritten** in the 2.9 form, every fact from a source fetched and read for the rewrite (GQA,
+  MQA, RoFormer, ALiBi, GELU, Swish, SiLU, GLU variants, LayerNorm, RMSNorm, Press and Wolf,
+  Shazeer et al. 2017, Switch Transformer, Mixtral, DeepSeekMoE, DeepSeek-V3, the Qwen3 report,
+  Transformers and PyTorch source, each model's config.json): `num-key-value-heads-gqa`,
+  `tied-embeddings`, `token-embedding`, `output-head`, `positional-encoding`,
+  `activation-function`, `normalization`, `moe-num-experts`, `moe-top-k`, `moe-expert-ffn-size`
+  and `moe-shared-experts`. The counts reproduce the published totals of Qwen3-4B, Qwen3-32B,
+  SmolLM2-135M, Mistral-7B-v0.1, Qwen3-30B-A3B (30,532,122,624 total, 3,353,032,704 active) and
+  Mixtral-8x7B (46,702,792,704 and 12,879,925,248).
+- **Changed** `name` to a real configuration key: `norm_type` (no such key) to `rms_norm_eps`,
+  `position_embedding_type` to `rope_theta`, `num_local_experts` to `num_experts`.
+- **Removed** statements no fetched source supports, among them "small models almost always tie",
+  "large models often untie (Llama 3, GPT-3)", tying as "a mild regularizer", "modern LLMs almost
+  universally use RoPE", RoPE and ALiBi "extrapolate to longer contexts", SwiGLU's "quality per
+  FLOP" and a "2.67×" intermediate size, RMSNorm "with equal or better stability", "extra norms
+  rarely help", "16 experts would reach ~90B", top-2 as "the common sweet spot", and every Llama 3
+  8B number (gated configuration).
 
 ### Schema 2.8 for `fine-tuning-method`: the teaching form (additive)
 

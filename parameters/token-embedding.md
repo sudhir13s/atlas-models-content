@@ -20,8 +20,8 @@ effects:
     - "Still one row read per token"
     - "A larger share in a small model: 21.0% of SmolLM2-135M"
 scale:
-  min: 10000000
-  max: 1000000000
+  min: 5000000
+  max: 3000000000
   typical_min: 23440896
   typical_max: 926679040
   spacing: log
