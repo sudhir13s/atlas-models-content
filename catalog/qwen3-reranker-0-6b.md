@@ -14,7 +14,7 @@ tasks:
 - task/reranking-models
 parameters_active_b: 0.6
 total_parameters: 595776512
-context_window_tokens: 40960
+context_window_tokens: 32768
 base_models:
 - name: Qwen/Qwen3-0.6B-Base
   address: https://huggingface.co/Qwen/Qwen3-0.6B-Base
@@ -30,7 +30,7 @@ fingerprint:
   head_size: 128
   hidden_size: 1024
   intermediate_size: 3072
-  context_window_tokens: 40960
+  context_window_tokens: 32768
   vocabulary_size: 151669
   activation_function: silu
   normalization: RMSNorm
@@ -60,6 +60,9 @@ quotes:
   intended_use: including text retrieval, code retrieval, text classification, text clustering, and bitext mining.
   what_sets_it_apart: using instructions (instruct) typically yields an improvement of 1% to 5% compared to not using them.
   running_it: In multilingual contexts, we also advise users to write their instructions in English, as most instructions utilized during the model training process were originally written in English.
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - text-ranking
 - qwen3

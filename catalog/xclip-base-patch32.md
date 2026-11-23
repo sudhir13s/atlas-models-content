@@ -14,7 +14,6 @@ tasks:
 - task/video-understanding
 parameters_active_b: 0.2
 total_parameters: 196585855
-context_window_tokens: 77
 summary: X-CLIP is a video-language model from Microsoft that scores how well a text fits a video. This is the base-sized version with a patch resolution of 32, trained fully supervised on the Kinetics-400 video dataset using 8 frames per video at 224 by 224 pixels. It comes from the paper "Expanding Language-Image Pretrained Models for General Video Recognition". The Hugging Face team wrote the card, because the X-CLIP team did not.
 intended_use: The card says the raw model can be used to determine how well text goes with a given video, and points to the model hub for versions fine-tuned on other tasks. It lists zero-shot, few-shot and fully supervised video classification, and video-text retrieval, as tasks it enables.
 what_sets_it_apart: The card describes X-CLIP as a minimal extension of CLIP, an image-text model, for general video-language understanding. It is trained in a contrastive way on pairs of a video and a text, so that matching pairs score higher than mismatched ones.
@@ -27,7 +26,6 @@ fingerprint:
   head_size: 64
   hidden_size: 512
   intermediate_size: 2048
-  context_window_tokens: 77
   vocabulary_size: 49408
   activation_function: quick_gelu
   normalization: LayerNorm

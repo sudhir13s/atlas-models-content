@@ -15,7 +15,7 @@ tasks:
 - task/text-generation
 parameters_active_b: 1.54
 total_parameters: 1543714304
-context_window_tokens: 131072
+context_window_tokens: 32768
 summary: Qwen2.5-1.5B is the base, pretrained 1.5B-parameter model of the Qwen2.5 series from Qwen, a causal language model that continues text. The card lists 1.54B parameters, 28 layers and a full context length of 32,768 tokens. The Qwen2.5 series ranges from 0.5 to 72 billion parameters.
 intended_use: The card says base language models are not recommended for conversations. Instead it suggests applying post-training to this model, such as supervised fine-tuning (SFT), reinforcement learning from human feedback (RLHF) or continued pretraining.
 what_sets_it_apart: Qwen states that, compared with the earlier Qwen2 series, Qwen2.5 has more knowledge and improved coding and mathematics, follows instructions better, generates long texts of over 8K tokens, understands structured data such as tables and produces structured outputs such as JSON. The series description lists long-context support up to 128K tokens and over 29 languages, while this size's feature list gives a full context length of 32,768 tokens.
@@ -28,7 +28,7 @@ fingerprint:
   head_size: 128
   hidden_size: 1536
   intermediate_size: 8960
-  context_window_tokens: 131072
+  context_window_tokens: 32768
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -67,6 +67,9 @@ quotes:
   intended_use: We do not recommend using base language models for conversations.
   what_sets_it_apart: Significantly **more knowledge** and has greatly improved capabilities in **coding** and **mathematics**, thanks to our specialized expert models in these domains.
   running_it: 'With `transformers<4.37.0`, you will encounter the following error:'
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - text-generation

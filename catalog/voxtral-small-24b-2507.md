@@ -14,7 +14,7 @@ tasks:
 - task/speech-language-models
 parameters_active_b: 24.26
 total_parameters: 24261800960
-context_window_tokens: 131072
+context_window_tokens: 32768
 base_models:
 - name: mistralai/Mistral-Small-24B-Base-2501
   address: https://huggingface.co/mistralai/Mistral-Small-24B-Base-2501
@@ -31,7 +31,7 @@ fingerprint:
   head_size: 128
   hidden_size: 5120
   intermediate_size: 32768
-  context_window_tokens: 131072
+  context_window_tokens: 32768
   vocabulary_size: 131072
   activation_function: silu
   normalization: RMSNorm
@@ -62,6 +62,9 @@ quotes:
   what_sets_it_apart: Voxtral can operate in a pure speech transcription mode to maximize performance.
   running_it: '`temperature=0.2` and `top_p=0.95` for chat completion (*e.g. Audio Understanding*) and `temperature=0.0` for transcription'
   limitations: System prompts are not yet supported
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - audio-text-to-text
 - voxtral

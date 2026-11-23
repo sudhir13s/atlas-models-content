@@ -14,7 +14,7 @@ model_category: language
 tasks:
 - task/text-generation
 total_parameters: 123611012096
-context_window_tokens: 262144
+context_window_tokens: 1048576
 summary: NVIDIA-Nemotron-3-Super-120B-A12B-FP8 is a large language model trained by NVIDIA, with 120 billion parameters in total of which 12 billion are active for each token. The card says it answers by first writing a reasoning trace and then a final response, and that reasoning can be switched on or off through a flag in the chat template. It lists support for English, French, German, Italian, Japanese, Spanish and Chinese and a context length of up to 1 million tokens.
 intended_use: NVIDIA describes a general-purpose reasoning and chat model for English, code and supported multilingual use, optimized for collaborative agents and high-volume workloads. It is meant for developers building AI agent systems, chatbots and retrieval-augmented generation (RAG) systems, and is also described as suitable for complex instruction following and long-context reasoning.
 what_sets_it_apart: The card describes a hybrid design that interleaves Mamba-2 layers (a sequence-modelling layer that is not attention) with mixture-of-experts layers and a few attention layers. In its LatentMoE design, tokens are projected into a smaller latent dimension for expert routing. It adds Multi-Token Prediction (MTP) layers, which enable faster generation through speculative decoding, and it states the model was pre-trained with NVFP4, a 4-bit number format, which it says is a first in the Nemotron 3 family.
@@ -27,7 +27,7 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 2688
-  context_window_tokens: 262144
+  context_window_tokens: 1048576
   vocabulary_size: 131072
   activation_function: relu2
   normalization: LayerNorm
@@ -62,6 +62,9 @@ quotes:
   intended_use: It is intended to be used by developers designing AI Agent systems, chatbots, RAG systems, and other AI-powered applications.
   what_sets_it_apart: tokens are projected into a smaller latent dimension for expert routing and computation
   running_it: Use `temperature=1.0` and `top_p=0.95` across
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - text-generation

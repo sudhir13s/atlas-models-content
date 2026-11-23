@@ -14,7 +14,7 @@ model_category: language
 tasks:
 - task/text-generation
 total_parameters: 30532122624
-context_window_tokens: 40960
+context_window_tokens: 32768
 base_models:
 - name: Qwen/Qwen3-30B-A3B-Base
   address: https://huggingface.co/Qwen/Qwen3-30B-A3B-Base
@@ -29,7 +29,7 @@ fingerprint:
   head_size: 128
   hidden_size: 2048
   intermediate_size: 6144
-  context_window_tokens: 40960
+  context_window_tokens: 32768
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
@@ -63,6 +63,9 @@ quotes:
   summary: 'Number of Parameters: 30.5B in total and 3.3B activated'
   what_sets_it_apart: Uniquely support of seamless switching between thinking mode
   running_it: For thinking mode (`enable_thinking=True`), use `Temperature=0.6`, `TopP=0.95`, `TopK=20`, and `MinP=0`.
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - text-generation

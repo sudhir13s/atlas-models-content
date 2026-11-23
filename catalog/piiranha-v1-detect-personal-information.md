@@ -14,7 +14,7 @@ tasks:
 - task/token-classification
 parameters_active_b: 0.28
 total_parameters: 278232594
-context_window_tokens: 512
+context_window_tokens: 256
 base_models:
 - name: microsoft/mdeberta-v3-base
   address: https://huggingface.co/microsoft/mdeberta-v3-base
@@ -30,7 +30,7 @@ fingerprint:
   head_size: 64
   hidden_size: 768
   intermediate_size: 3072
-  context_window_tokens: 512
+  context_window_tokens: 256
   vocabulary_size: 251000
   activation_function: gelu
   normalization: LayerNorm
@@ -60,6 +60,9 @@ quotes:
   intended_use: Piiranha can be used to assist with redacting PII from texts.
   what_sets_it_apart: The model sometimes misclassifies one PII type for another, but at the end of the day, it still recognizes the token as PII.
   running_it: The context length is 256 Deberta tokens. If your text is longer than that, just split it up.
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - token-classification

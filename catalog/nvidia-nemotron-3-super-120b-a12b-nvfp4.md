@@ -14,7 +14,7 @@ model_category: language
 tasks:
 - task/text-generation
 total_parameters: 67228556288
-context_window_tokens: 262144
+context_window_tokens: 1048576
 summary: NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4 is the NVFP4 version of Nemotron-3-Super, a large language model from NVIDIA with 120B total and 12B active parameters, meaning only part of the weights is used for each token. NVFP4 is a reduced-precision number format, and the card says the Super model was pre-trained with it. The card lists a context of up to 1M tokens, seven supported languages (English, French, German, Italian, Japanese, Spanish and Chinese), and a reasoning mode that can be switched on or off.
 intended_use: The card calls it a general purpose reasoning and chat model for English, code and the supported languages, optimized for collaborative agents and high-volume workloads such as IT ticket automation. It names developers building AI agent systems, chatbots, RAG (retrieval-augmented generation) systems and other applications as the intended users, and lists complex instruction following and long-context reasoning as suitable tasks.
 what_sets_it_apart: NVIDIA describes a hybrid design that interleaves Mamba-2 layers and mixture-of-experts layers with a few attention layers. Its LatentMoE method projects tokens into a smaller latent dimension for expert routing and computation. It adds Multi-Token Prediction (MTP) layers, which allow faster generation through speculative decoding. The card says it is the first model in the Nemotron 3 family pre-trained at NVFP4 precision.
@@ -27,7 +27,7 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 2688
-  context_window_tokens: 262144
+  context_window_tokens: 1048576
   vocabulary_size: 131072
   activation_function: relu2
   normalization: LayerNorm
@@ -62,6 +62,9 @@ quotes:
   intended_use: It is intended to be used by developers designing AI Agent systems, chatbots, RAG systems, and other AI-powered applications.
   what_sets_it_apart: The Super model is pre-trained using NVFP4 quantization — the first model in the Nemotron 3 family trained at this precision.
   running_it: Use `temperature=1.0` and `top_p=0.95` across **all tasks and serving backends**
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - text-generation

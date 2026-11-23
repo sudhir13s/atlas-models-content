@@ -14,7 +14,7 @@ tasks:
 - task/reranking-models
 parameters_active_b: 8.19
 total_parameters: 8188548096
-context_window_tokens: 40960
+context_window_tokens: 32768
 summary: Qwen3-Reranker-8B is a text reranking model from Qwen. A reranker takes a search query and a list of candidate documents and scores how well each document matches the query, so that the most relevant ones can be placed first. The card says it belongs to the Qwen3 Embedding series, is built on the dense Qwen3 foundation models, has 8B parameters, a 32k context length and support for more than 100 languages.
 intended_use: The card says the Qwen3 Embedding series is designed for text embedding and ranking tasks, including text retrieval, code retrieval, text classification, text clustering and bitext mining. It adds that developers can combine the embedding and reranking models, with the embedding model finding candidates and the reranker ordering them.
 what_sets_it_apart: 'The card says the reranking models are instruction aware: users can supply a custom instruction to suit a task, language or scenario, and its evaluation found that instructions typically improve results by 1% to 5% compared with none. The series comes in 0.6B, 4B and 8B sizes and inherits the multilingual and long-text abilities of its Qwen3 base.'
@@ -27,7 +27,7 @@ fingerprint:
   head_size: 128
   hidden_size: 4096
   intermediate_size: 12288
-  context_window_tokens: 40960
+  context_window_tokens: 32768
   vocabulary_size: 151669
   activation_function: silu
   normalization: RMSNorm
@@ -58,6 +58,9 @@ quotes:
   intended_use: specifically designed for text embedding and ranking tasks
   what_sets_it_apart: both embedding and reranking models support user-defined instructions to enhance performance for specific tasks, languages, or scenarios
   running_it: we also advise users to write their instructions in English
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - text-ranking
 - qwen3

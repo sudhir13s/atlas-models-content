@@ -13,7 +13,7 @@ model_category: language
 tasks:
 - task/token-classification
 total_parameters: 1399486865
-context_window_tokens: 131072
+context_window_tokens: 128000
 summary: 'OpenAI Privacy Filter is a token-classification model from OpenAI: it reads text and labels each token, a word or word piece, so that personally identifiable information (PII) can be found and masked. The card lists 8 categories, including names, emails, phone numbers, addresses and secrets. It gives 1.5B parameters in total with 50M active, a 128,000-token context window, and primarily English as the language.'
 intended_use: The card says it is intended for high-throughput data sanitization workflows where teams need a model they can run on-premises that is fast, context-aware and tunable. It states that the tool is a redaction and data minimization aid, not an anonymization, compliance or safety guarantee, and asks for extra caution in medical, legal, financial, human resources, education and government settings.
 what_sets_it_apart: OpenAI says it was pretrained like a language model, with an architecture similar to gpt-oss but smaller, then converted into a bidirectional token classifier and post-trained with a supervised classification loss. Instead of writing text one token at a time, it labels the whole input in a single pass and then decodes coherent spans with a constrained Viterbi procedure, which picks the best consistent path of labels. Its feed-forward blocks are sparse mixture-of-experts layers with 128 experts.
@@ -27,7 +27,7 @@ fingerprint:
   head_size: 64
   hidden_size: 640
   intermediate_size: 640
-  context_window_tokens: 131072
+  context_window_tokens: 128000
   vocabulary_size: 200064
   activation_function: silu
   normalization: RMSNorm
@@ -63,6 +63,9 @@ quotes:
   what_sets_it_apart: Instead of generating text token-by-token, this model labels an input sequence in a single forward pass, then decodes coherent spans with a constrained Viterbi procedure.
   running_it: 'Runtime control: configure precision/recall tradeoffs and detected span lengths through preset operating points.'
   limitations: Privacy Filter is a redaction and data minimization aid, not an anonymization, compliance, or a safety guarantee.
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - token-classification

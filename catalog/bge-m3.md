@@ -14,7 +14,7 @@ tasks:
 - task/embedding-models
 parameters_active_b: 0.57
 total_parameters: 567754752
-context_window_tokens: 8194
+context_window_tokens: 8192
 embedding_dimension: 1024
 base_models:
 - name: BAAI/bge-m3-unsupervised
@@ -34,7 +34,7 @@ fingerprint:
   head_size: 64
   hidden_size: 1024
   intermediate_size: 4096
-  context_window_tokens: 8194
+  context_window_tokens: 8192
   vocabulary_size: 250002
   activation_function: gelu
   normalization: LayerNorm
@@ -64,6 +64,9 @@ quotes:
   summary: In this project, we introduce BGE-M3, which is distinguished for its versatility in Multi-Functionality, Multi-Linguality, and Multi-Granularity.
   intended_use: 'We recommend to use the following pipeline: hybrid retrieval + re-ranking.'
   what_sets_it_apart: 'It can simultaneously perform the three common retrieval functionalities of embedding model: dense retrieval, multi-vector retrieval, and sparse retrieval.'
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - sentence-similarity
 - xlm-roberta

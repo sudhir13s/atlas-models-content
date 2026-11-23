@@ -14,7 +14,7 @@ model_category: language
 tasks:
 - task/text-generation
 total_parameters: 15706484224
-context_window_tokens: 163840
+context_window_tokens: 32768
 summary: 'DeepSeek-V2-Lite-Chat is a conversational language model from DeepSeek. It is the chat version of DeepSeek-V2-Lite, a Mixture-of-Experts model, which means only some of its parameters are used for each token: the card lists 16B in total and 2.4B active. The chat version was made by supervised fine-tuning, training on example conversations, after pre-training and a long-context extension, and the card lists a context length of 32k.'
 intended_use: The card says that after the release of DeepSeek-V2, community members suggested open-sourcing a smaller Mixture-of-Experts model for in-depth research, and DeepSeek-V2-Lite is that release. It states that the model can be deployed on a single 40G GPU and fine-tuned on 8 GPUs of 80G, and that the V2 series supports commercial use under the Model License.
 what_sets_it_apart: The card highlights two design choices. Multi-head Latent Attention compresses the key-value cache, the stored attention data for earlier tokens, into a smaller latent vector so inference is efficient. DeepSeekMoE uses sparse computation, so each token passes through a few experts only. For the Lite model the card gives 27 layers, 2 shared experts and 64 routed experts per mixture layer with 6 routed experts active per token, and pre-training from scratch on 5.7T tokens.
@@ -26,7 +26,7 @@ fingerprint:
   head_size: 128
   hidden_size: 2048
   intermediate_size: 10944
-  context_window_tokens: 163840
+  context_window_tokens: 32768
   vocabulary_size: 102400
   activation_function: silu
   normalization: RMSNorm
@@ -61,6 +61,9 @@ quotes:
   summary: 16B total params, 2.4B active params, scratch training with 5.7T tokens
   intended_use: Many in the community suggested open-sourcing a smaller MoE model for in-depth research.
   what_sets_it_apart: MLA guarantees efficient inference through significantly compressing the Key-Value (KV) cache into a latent vector
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - text-generation

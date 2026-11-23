@@ -11,7 +11,7 @@ tasks:
 - task/question-answering
 parameters_active_b: 0.12
 total_parameters: 124057092
-context_window_tokens: 514
+context_window_tokens: 512
 base_models:
 - name: FacebookAI/roberta-base
   address: https://huggingface.co/FacebookAI/roberta-base
@@ -26,7 +26,7 @@ fingerprint:
   head_size: 64
   hidden_size: 768
   intermediate_size: 3072
-  context_window_tokens: 514
+  context_window_tokens: 512
   vocabulary_size: 50265
   activation_function: gelu
   normalization: LayerNorm
@@ -55,6 +55,9 @@ quotes:
   summary: It's been trained on question-answer pairs
   intended_use: You can use this model in Haystack to do extractive question answering on documents.
   what_sets_it_apart: including unanswerable questions, for the task of Extractive Question Answering
+locked:
+- context_window_tokens
+- fingerprint.context_window_tokens
 tags:
 - llm
 - question-answering
