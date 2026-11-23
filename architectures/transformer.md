@@ -23,10 +23,10 @@ analogy:
   body: "This is an analogy, not the mechanism. Picture every word of a sentence as a person holding a note. Each person writes a question (the query), a label on their note (the key) and the note itself (the value). Everyone compares their question with every label at the same moment, then copies a blend of the notes, taking most from the best-matching labels. That simultaneous comparison is self-attention; the exact rule is the key equation below."
 
 narrative:
-  motivation: "Recurrent networks, the authors write, had been firmly established as the state of the art in sequence modelling and translation. A recurrent network computes one position after another, and the authors note that this sequential nature precludes parallelization within training examples."
-  approach: "The paper proposes a model based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Every position attends to every other position directly, so a self-attention layer needs a constant number of sequential operations, against a number that grows with sequence length for a recurrent layer (the paper's Table 1)."
-  solution: "Each layer pairs multi-head self-attention with a feed-forward network applied to every position, each wrapped as LayerNorm(x + Sublayer(x)). The encoder and the decoder each stack six such layers. Because the model contains no recurrence and no convolution, sine and cosine positional encodings are added to the input embeddings to give it the order of the tokens."
-  outcome: "On WMT 2014 the authors report 28.4 BLEU for English to German and 41.8 BLEU for English to French, the latter after 3.5 days of training on eight GPUs; the base model trained in about 12 hours. BERT is built from its encoder, GPT from a decoder-only stack, and the Vision Transformer applies it to image patches."
+  motivation: "**Recurrent networks compute one position at a time.** The paper is by **Vaswani et al. (2017)**.\n\n- **State of the art then:** the authors write that recurrent networks had been firmly established as the state of the art in sequence modelling and translation.\n- **The limit:** a recurrent network computes **one position after another**, and the authors note that this sequential nature **precludes parallelization** within training examples."
+  approach: "**Use attention only.** The paper proposes a model based solely on attention mechanisms, dispensing with **recurrence and convolutions** entirely.\n\n- **Direct connections:** every position attends to every other position directly.\n- **Fewer sequential steps:** a self-attention layer needs a **constant number** of sequential operations; a recurrent layer needs a number that **grows with sequence length** (the paper's Table 1)."
+  solution: "**Two sub-layers in every layer**, stacked six times.\n\n- **Sub-layers:** multi-head **self-attention**, then a **feed-forward network** applied to every position.\n- **Wrapping:** each sub-layer is wrapped as `LayerNorm(x + Sublayer(x))`.\n- **Depth:** the encoder and the decoder each stack **six** such layers.\n- **Word order:** the model contains no recurrence and no convolution, so **sine and cosine positional encodings** are added to the input embeddings to give it the order of the tokens."
+  outcome: "**Translation results the authors report on WMT 2014**, in BLEU (a score of how closely a translation matches reference translations):\n\n- **English to German:** **28.4 BLEU**.\n- **English to French:** **41.8 BLEU**, after **3.5 days** of training on **eight GPUs**.\n- **Base model:** trained in about **12 hours**.\n\n**What was built from it:**\n\n- **BERT:** built from its encoder.\n- **GPT:** a decoder-only stack.\n- **Vision Transformer:** applies it to image patches."
 
 key_equation:
   latex: "\\mathrm{Attention}(Q,K,V)=\\mathrm{softmax}\\!\\left(\\frac{QK^{\\top}}{\\sqrt{d_k}}\\right)V"
@@ -39,15 +39,15 @@ key_equation:
     - { symbol: "softmax", meaning: "turns a row of scores into positive weights that add up to 1: e to the power of each score, divided by the sum of those terms" }
 
 strengths:
-  - "A self-attention layer connects any two positions with a constant number of sequential operations, against O(n) for a recurrent layer (Table 1 of the paper)."
-  - "The authors report training the base model in about 12 hours and the big model in 3.5 days on eight NVIDIA P100 GPUs."
-  - "Kaplan et al. (2020) report that language-model loss scales as a power law with model size, dataset size and the compute used for training."
-  - "The Vision Transformer applies a pure Transformer directly to sequences of image patches."
+  - "**Short paths between words:** a self-attention layer connects any two positions with a **constant number** of sequential operations, against **O(n)** for a recurrent layer (Table 1 of the paper)."
+  - "**Training time:** the authors report training the base model in about **12 hours** and the big model in **3.5 days** on **eight NVIDIA P100 GPUs**."
+  - "**Scaling:** **Kaplan et al. (2020)** report that language-model loss scales as a **power law** with model size, dataset size and the compute used for training."
+  - "**Beyond text:** the **Vision Transformer** applies a pure Transformer directly to sequences of image patches."
 
 weaknesses:
-  - "Self-attention costs O(n²·d) per layer, which grows with the square of the sequence length n; the paper notes it is faster than a recurrent layer when n is smaller than the vector width d."
-  - "The model has no built-in notion of order, so position information must be added to the inputs."
-  - "The Vision Transformer authors report accuracies a few percentage points below ResNets of comparable size when trained on mid-sized datasets such as ImageNet without strong regularization."
+  - "**Cost grows with length squared:** self-attention costs **O(n²·d)** per layer, which grows with the square of the sequence length n; the paper notes it is faster than a recurrent layer when n is smaller than the vector width d."
+  - "**No sense of order:** the model has no built-in notion of order, so **position information must be added** to the inputs."
+  - "**Trails on mid-sized image datasets:** the Vision Transformer authors report accuracies **a few percentage points below ResNets** of comparable size when trained on mid-sized datasets such as ImageNet without strong regularization."
 
 visual:
   kind: distribution

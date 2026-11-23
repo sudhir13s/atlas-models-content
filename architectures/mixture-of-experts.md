@@ -23,10 +23,10 @@ analogy:
   body: "This is an analogy, not the mechanism. A dense model is one doctor who sees every patient. A mixture-of-experts layer is a hospital: many specialists sit ready, and a triage nurse at the door sends each patient to one or two of them. The hospital holds far more expertise than one doctor, but each patient occupies only a few specialists. The router is the nurse, the experts are the specialists, and k is how many specialists each patient sees. Unlike hospital specialists, the experts of a trained model are not assigned topics; see Common misunderstandings."
 
 narrative:
-  motivation: "In a dense layer every parameter takes part in computing every token, so more parameters means more computation for every token. Shazeer et al. (2017) report greater than 1000x improvements in model capacity with only minor losses in computational efficiency by making that computation sparse."
-  approach: "Jacobs et al. (1991) trained systems of many separate networks, each of which learns to handle a subset of the training cases. Shazeer et al. (2017) built a layer of up to thousands of feed-forward sub-networks with a trainable gating network that keeps only the top k scores for each example, applied between stacked LSTM layers. GShard (2020) used a variant of top-2 gating in a Transformer encoder and decoder, scaling beyond 600 billion parameters."
-  solution: "The router is a learned linear layer that scores every expert for a token. Mixtral keeps the top two scores and applies a softmax over them; the layer's output is the weighted sum of those experts' outputs. Switch Transformer routes each token to a single expert and adds an auxiliary load-balancing loss; DeepSeek-V3 uses an auxiliary-loss-free balancing strategy."
-  outcome: "Mixtral 8x7B has 47B parameters and uses 13B active parameters per token; its authors report that it outperforms or matches Llama 2 70B and GPT-3.5 across all evaluated benchmarks. DeepSeek-V3 has 671B total parameters with 37B activated for each token, and its report states 2.788M H800 GPU hours for its full training."
+  motivation: "**More parameters meant more computation for every token.**\n\n- **The problem:** in a dense layer **every parameter** takes part in computing **every token**.\n- **The claim:** **Shazeer et al. (2017)** report **greater than 1000x** improvements in model capacity with only minor losses in computational efficiency by making that computation sparse."
+  approach: "**Many networks, with a gate that picks a few.** Three steps:\n\n- **Jacobs et al. (1991):** trained systems of many separate networks, each of which learns to handle a **subset of the training cases**.\n- **Shazeer et al. (2017):** built a layer of up to **thousands** of feed-forward sub-networks with a trainable gating network that keeps only the **top k** scores for each example, applied between stacked LSTM (long short-term memory) layers.\n- **GShard (2020):** used a variant of **top-2 gating** in a Transformer encoder and decoder, scaling beyond **600 billion parameters**."
+  solution: "**A router scores every expert; only the best-scoring ones run.**\n\n- **The router:** a learned linear layer that scores every expert for a token.\n- **Mixtral:** keeps the **top two** scores and applies a softmax over them; the layer's output is the weighted sum of those experts' outputs.\n- **Switch Transformer:** routes each token to a **single expert** and adds an auxiliary load-balancing loss.\n- **DeepSeek-V3:** uses an **auxiliary-loss-free** balancing strategy."
+  outcome: "**Models that hold far more parameters than they use for one token.**\n\n- **Mixtral 8x7B:** **47B** parameters, **13B** active per token; its authors report that it outperforms or matches **Llama 2 70B** and **GPT-3.5** across all evaluated benchmarks.\n- **DeepSeek-V3:** **671B** total parameters with **37B** activated for each token; its report states **2.788M H800 GPU hours** for its full training."
 
 key_equation:
   latex: "y = \\sum_{i \\in \\mathrm{TopK}(x)} g_i(x)\\, E_i(x)"
@@ -38,15 +38,15 @@ key_equation:
     - { symbol: "TopK(x)", meaning: "the k experts with the highest router scores for this token; k = 1 in Switch Transformer, 2 in Mixtral, 8 routed experts in DeepSeek-V3" }
 
 strengths:
-  - "Mixtral's authors: the parameter count can grow while the computational cost stays effectively constant, because only k experts run for each token."
-  - "Switch Transformer's authors report up to 7x increases in pre-training speed with the same computational resources."
-  - "GLaM's authors report 1.2 trillion parameters at about one third of the energy used to train GPT-3 and half of its computation FLOPs for inference."
-  - "Only the feed-forward layer changes: Switch Transformer replaces the dense feed-forward layer of the Transformer and leaves attention as it is."
+  - "**Size without matching cost:** Mixtral's authors: the parameter count can grow while the computational cost stays **effectively constant**, because only **k experts** run for each token."
+  - "**Faster pre-training:** Switch Transformer's authors report **up to 7x** increases in pre-training speed with the same computational resources."
+  - "**Less energy:** GLaM's authors report **1.2 trillion parameters** at about **one third of the energy** used to train GPT-3 and **half** of its computation FLOPs for inference."
+  - "**A small change:** only the feed-forward layer changes. Switch Transformer replaces the dense feed-forward layer of the Transformer and **leaves attention as it is**."
 
 weaknesses:
-  - "Memory follows the total parameter count: Mixtral's authors write that its serving memory is proportional to its sparse parameter count, 47B, not the 13B active."
-  - "Mixtral's authors note that the routing mechanism adds overhead, and that spreading experts over devices introduces challenges in load balancing."
-  - "Switch Transformer's authors write that widespread adoption has been hindered by complexity, communication costs and training instability."
+  - "**Memory follows the total parameter count:** Mixtral's authors write that its serving memory is proportional to its sparse parameter count, **47B**, not the **13B** active."
+  - "**Routing overhead:** Mixtral's authors note that the routing mechanism adds overhead, and that spreading experts over devices introduces challenges in **load balancing**."
+  - "**Hurdles to adoption:** Switch Transformer's authors write that widespread adoption has been hindered by **complexity, communication costs and training instability**."
 
 visual:
   kind: distribution
