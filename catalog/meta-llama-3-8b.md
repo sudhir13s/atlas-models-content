@@ -16,6 +16,20 @@ total_parameters: 8030261248
 summary: Meta Llama 3 8B is the 8-billion-parameter size of Meta's Llama 3 family of language models, which take text in and generate text and code. The card says it is an auto-regressive language model with an optimized transformer architecture, trained on more than 15 trillion tokens with an 8k-token context length.
 intended_use: Meta says Llama 3 is intended for commercial and research use in English. Pretrained models such as this one can be adapted for a variety of natural language generation tasks, while the instruction-tuned versions are meant for assistant-like chat. Out-of-scope uses are anything that violates applicable laws or the Acceptable Use Policy, and languages other than English unless a developer fine-tunes the model for them.
 what_sets_it_apart: The card says the 8B and 70B models use Grouped-Query Attention for better inference scalability, and that the training data is a new mix of publicly available online data with a knowledge cutoff of March 2023 for the 8B size.
+fingerprint:
+  attention_type: GQA
+  num_layers: 32
+  attention_heads: 32
+  kv_heads: 8
+  head_size: 128
+  hidden_size: 4096
+  intermediate_size: 14336
+  activation_function: SwiGLU
+  normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
+  positional_encoding: RoPE
+  rope_theta: 500000
 filters:
   size_category: medium
   is_gated: true
@@ -43,6 +57,12 @@ updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/meta-llama/Meta-Llama-3-8B
   title: meta-llama/Meta-Llama-3-8B — model page (Hugging Face)
+  trust: 0.9
+- url: https://arxiv.org/abs/2407.21783
+  title: The Llama 3 Herd of Models
+  trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py
+  title: 'transformers/models/llama/modeling_llama.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

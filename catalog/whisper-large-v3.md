@@ -19,10 +19,22 @@ intended_use: The card says the primary intended users are AI researchers studyi
 what_sets_it_apart: 'The card lists two changes from large-v2: the input spectrogram uses 128 Mel frequency bins instead of 80, and there is a new language token for Cantonese. It says large-v3 was trained on 1 million hours of weakly labeled audio and 4 million hours of audio pseudo-labeled with large-v2.'
 running_it: The card has a section on additional speed and memory improvements, covering chunked long-form transcription, torch.compile, Flash Attention 2 and PyTorch scaled dot-product attention.
 fingerprint:
+  attention_type: MHA
   num_layers: 32
+  decoder_layers: 32
+  attention_heads: 20
+  kv_heads: 20
+  head_size: 64
   hidden_size: 1280
+  intermediate_size: 5120
   vocabulary_size: 51866
   activation_function: gelu
+  normalization: LayerNorm
+  norm_placement: pre
+  stack: encoder-decoder
+  input_stem: spectrogram-convolution
+  positional_encoding: Sinusoidal
+  decoder_positional_encoding: Learned
 filters:
   size_category: small
   is_quantized: false
@@ -62,6 +74,9 @@ sources:
 - url: https://arxiv.org/abs/2212.04356
   title: arXiv:2212.04356
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/whisper/modeling_whisper.py
+  title: 'transformers/models/whisper/modeling_whisper.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

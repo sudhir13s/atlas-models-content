@@ -29,6 +29,7 @@ fingerprint:
   normalization: LayerNorm
   norm_placement: post
   stack: encoder
+  embedding_norm: true
   positional_encoding: Learned
 filters:
   size_category: tiny

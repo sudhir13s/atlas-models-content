@@ -30,6 +30,9 @@ fingerprint:
   vocabulary_size: 250002
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: post
+  stack: encoder
+  embedding_norm: true
   positional_encoding: Learned
 filters:
   size_category: tiny
@@ -68,6 +71,12 @@ sources:
   trust: 0.9
 - url: https://huggingface.co/jinaai/jina-reranker-v2-base-multilingual/blob/main/config.json
   title: jinaai/jina-reranker-v2-base-multilingual — config.json
+  trust: 0.9
+- url: https://huggingface.co/jinaai/jina-reranker-v2-base-multilingual/blob/main/modeling_xlm_roberta.py
+  title: jinaai/jina-reranker-v2-base-multilingual — modeling_xlm_roberta.py
+  trust: 0.9
+- url: https://huggingface.co/jinaai/jina-reranker-v2-base-multilingual/blob/main/block.py
+  title: jinaai/jina-reranker-v2-base-multilingual — block.py
   trust: 0.9
 ---
 

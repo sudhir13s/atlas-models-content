@@ -5,6 +5,117 @@ All notable changes to `ai-models-content`. Grouped by schema version / release.
 
 ## [Unreleased]
 
+### Schema 2.9 for `parameter`: the teaching form (additive)
+
+- **Added** to `parameter` the hyperparameter teaching fields by reference (`effects`, `scale`,
+  `typical_values`, `mistakes`) and `visual`, a figure computed from a real model's configuration
+  (`decoder_config`) of one of five kinds: `count_sweep`, `count_breakdown`, `head_grid`,
+  `kv_cache` and `context_cost`. Optional body sections How It Works, Worked Example and What To
+  Watch; Definition stays the one required section, so 1.0 records remain valid. Schema, registry,
+  template and conventions ship together; the conventions' old "parameter" entry, which described
+  `parameter-calculator`, is renamed to it.
+- **Rewritten** in the 2.9 form, every fact from a source fetched for the rewrite: `hidden-size`,
+  `num-hidden-layers`, `num-attention-heads`, `head-dim`, `intermediate-size-ffn`,
+  `context-length` and `vocab-size`. Worked examples use Qwen3-8B's config.json and reproduce its
+  published total of 8,190,735,360 parameters exactly.
+- **Fixed** on `num-attention-heads` and `head-dim`: "Q and O stay d² whatever the head count" and
+  head_dim = hidden_size ÷ heads hold only when the configuration sets no head_dim; Qwen3-32B
+  (5120 against 64 × 128) and Qwen3-0.6B (1024 against 16 × 128) are the sourced exceptions.
+- **Fixed** on `context-length`: max_position_embeddings is a limit, not the usable context; the
+  page now gives Qwen3-8B's 40,960 (config), 32,768 native and 131,072 with YaRN (card). GPT-2's
+  learned position table is removed (the GPT-2 paper does not state it); BERT's 512 × 768 replaces
+  it.
+- **Removed** statements no fetched source supports: head_dim "far below 64 under-performs, far
+  above 128 has diminishing returns", head_dim held at 64 to 128 "for compute efficiency",
+  "very shallow models plateau on hard reasoning", "~70% of a modern LLM" as a general share,
+  Llama 2's 32k vocabulary, GPT-2 small's 12 heads, and the KV cache at 128k being "far larger
+  than the model's activations".
+
+### Schema 2.8 for `fine-tuning-method`: the teaching form (additive)
+
+- **Added** to `fine-tuning-method`: `typical_values` and `mistakes` (the hyperparameter
+  definitions, by reference), `profile` (the method's row of the comparison across all methods:
+  `trains`, `models_in_training`, `data`, `stages`, `source`) and `visual`, a computed figure of
+  one of six kinds: `memory_terms`, `adapter_size`, `memory_bars`, `dpo_loss`, `orpo_loss` and
+  `kl_reward`. Optional body sections How It Works, Worked Example, Memory, Trade-offs and When
+  To Use; Definition stays the one required section, so 1.0 records remain valid. Schema,
+  registry, template and conventions ship together.
+- **Rewritten** in the 2.8 form, every fact from a source fetched and read for the rewrite:
+  `full-fine-tuning`, `lora`, `qlora`, `dpo`, `orpo` and `rlhf-ppo`.
+- **Fixed** on `full-fine-tuning`: the bytes per weight of mixed-precision Adam listed four terms
+  (2 + 4 + 4 + 4, which is 14) yet gave 16; ZeRO's accounting has five (16-bit weights and
+  gradients, 2 + 2, and 32-bit weights, momentum and variance, 4 + 4 + 4). The Lester et al.
+  source, which no statement used, is removed.
+- **Fixed** on `lora`: A and B were given swapped shapes (the paper's B is d × r and A is r × k),
+  and the example counted Llama 3 8B's value projection as 4096 × 4096 although it is smaller
+  (grouped-query attention); the example now uses the paper's GPT-3 matrices.
+- **Removed** statements no fetched source supports, among them a "solid default" rank of 8 to 16,
+  lora_alpha "commonly 2 × r", learning-rate bands for LoRA, DPO and full fine-tuning, a DPO β of
+  0.3 to cure terse answers, ORPO's memory as half of DPO's and a quarter of PPO's, PPO's
+  learning rate "~1e-6", and the opinion "powerful but finicky".
+
+### Schema 2.7 for `architecture-era`: a computed figure for every Worked Example (additive)
+
+- **Added** twelve kinds of `visual` beside `distribution`, each naming the computation of a
+  Worked Example and carrying its inputs: `recurrent_memory` (a plain recurrent network beside
+  an LSTM cell, and the error left after n steps), `convolution` (filter, ReLU, max-pooling),
+  `noise_schedule` (DDPM's linear schedule), `residual_gradient` (wⁿ against (1 + w)ⁿ),
+  `discriminator` (the best GAN discriminator), `rotary` (rotary position embedding),
+  `selective_scan` (a one-number state space model, selective against a fixed step size),
+  `loss_formula` (the fitted L(N, D) of Hoffmann et al.), `group_advantages` (GRPO),
+  `perceptron_training` (the perceptron learning rule), `backprop` (one forward and backward
+  pass) and `gaussian_code` (a variational autoencoder's code against its prior). The consumer
+  computes every value it draws from these inputs. Schema, template and conventions ship
+  together.
+- **Added** a `visual` to `rnn-lstm`, `cnn`, `diffusion`, `resnet`, `gan`, `llama-recipe`,
+  `mamba-ssm`, `scaling-laws`, `reasoning-models`, `perceptron`, `mlp-backprop` and `vae`, with
+  exactly the inputs of each record's Worked Example; no other fact changed.
+
+### Schema 2.7 for `model`: links to GGUF copies (additive)
+
+- **Added** the agent-owned block `gguf_repositories` to `model`: `repositories[]` (`publisher`,
+  `repo_id`, `address`), `observed_at` and `source`. `models-scout` writes it by code: a GGUF
+  repository whose own Hugging Face card names the model's repository as the model it quantizes,
+  from an allowed publisher (the model's own organisation, then `unsloth`, `bartowski`,
+  `ggml-org`), at most two per model. Links only: no file names, types or sizes. Schema,
+  template and conventions ship together.
+
+### Schema 2.7 for `model`: architecture figure fields (additive)
+
+- **Added** to `fingerprint`: `decoder_layers` (an encoder-decoder's decoder depth),
+  `embedding_norm` (a norm on the summed embeddings before the first block), `input_stem`
+  (`spectrogram-convolution`, `spectrogram-patches`, `waveform-convolution`) and
+  `decoder_positional_encoding`. Each is read from the model's configuration and the official
+  implementation of its model type, which the record lists in `sources`.
+- **Added** the block `pipeline` to `model`: the whole model as ordered `stages` (`id`, `role`,
+  `title`, `details[]`, `note`, `frame`, `repeat`, `side`) with `source`, `summary` and
+  `side_into`, for models that are more than one transformer stack. Schema, template and
+  conventions ship together.
+- **Added** these fields to records whose source was fetched and read: the encoder-decoder text
+  models (BART, T5, NLLB, TAPEX), Whisper, the audio encoders (AST, wav2vec2), the Qwen3
+  rerankers, and `embedding_norm` on the BERT-family encoders.
+- **Added** to `fingerprint`: the `norm_placement` value `both` (a norm before and after each
+  sub-layer), `parallel_sublayers` (`shared-norm`, `separate-norms`) and `output_head`
+  (`cell-selection`, `cell-selection-aggregation`). **Added** the `pipeline` stage roles
+  `textEncoder`, `denoiser`, `autoencoder` and `step`.
+- **Added** from fetched sources: the parallel layout of Phi-2, Falcon-7B and the three Pythia
+  models; TAPAS (encoder layout and head); the jina reranker (from its own block code); Gemma 2
+  2B, 9B and 27B (`both`; the gated 2B and 27B take their numbers from Table 1 of the Gemma 2
+  paper); Llama 3 8B and Llama 3.1 70B (from Table 3 of "The Llama 3 Herd of Models").
+- **Added** `fingerprint.layer_mixers` (`names[]`, `pattern`, `note`, `feed_forward`) for models
+  whose layers do not all hold the same sequence mixer, counted from each model's configuration
+  and read from its code: the three Nemotron 3 records (Mamba-2, MoE and attention layers; their
+  `normalization` corrected to RMSNorm from the code), Qwen3-Coder-Next and Qwen3.8-27B (three
+  Gated DeltaNet layers, then one attention layer; Qwen3.8-27B also gets a `pipeline`).
+- **Added** to `pipeline`: `into` on a side stage (a further side input with its own target),
+  `branch` with `branch_from` (a second output), and `inner_frame` with `inner_repeat` (a
+  repeated block inside a loop). FLUX.1-dev, Qwen2.5-Omni and MiniMax H3 are rearranged to use
+  them, from the notes their stages already carried; EmbeddingGemma 2, Qwen3.8-Flash-Next and
+  Kimi K3 get a `pipeline` from their own code and configuration.
+- **Fixed** from the sources: Nemotron 3.5 Transcribe is a mixture-of-experts model with 4.3B
+  active parameters (its card); DeepSeek-OCR and Unlimited-OCR use multi-head attention, not MLA
+  (`use_mla: false` in their configuration).
+
 ### Schema 2.6: the `quantization-topic` type (additive)
 
 - **Added** the `quantization-topic` type (folder `quantization/`): one page of the Quantization

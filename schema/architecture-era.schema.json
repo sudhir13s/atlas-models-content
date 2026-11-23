@@ -135,8 +135,22 @@
       }
     },
     "visual": {
-      "$ref": "hyperparameter.schema.json#/$defs/distribution_visual",
-      "description": "A computed figure for the Worked Example: the consumer draws softmax bars from the example scores (attention scores, router scores), with `panel_titles` naming what each panel shows."
+      "description": "A computed figure for the Worked Example. `kind` names the computation and the other fields are its inputs, the same numbers the Worked Example uses; the consumer computes every value it draws from them. `distribution` draws softmax bars of example scores (attention scores, router scores), with `panel_titles` naming what each panel shows.",
+      "oneOf": [
+        { "$ref": "hyperparameter.schema.json#/$defs/distribution_visual" },
+        { "$ref": "#/$defs/recurrent_memory_visual" },
+        { "$ref": "#/$defs/convolution_visual" },
+        { "$ref": "#/$defs/noise_schedule_visual" },
+        { "$ref": "#/$defs/residual_gradient_visual" },
+        { "$ref": "#/$defs/discriminator_visual" },
+        { "$ref": "#/$defs/rotary_visual" },
+        { "$ref": "#/$defs/selective_scan_visual" },
+        { "$ref": "#/$defs/loss_formula_visual" },
+        { "$ref": "#/$defs/group_advantages_visual" },
+        { "$ref": "#/$defs/perceptron_training_visual" },
+        { "$ref": "#/$defs/backprop_visual" },
+        { "$ref": "#/$defs/gaussian_code_visual" }
+      ]
     },
     "comparison": {
       "type": "object",
@@ -216,5 +230,229 @@
       }
     }
   },
-  "required": ["name", "era", "year", "family", "core_innovation"]
+  "required": ["name", "era", "year", "family", "core_innovation"],
+  "$defs": {
+    "numbers": { "type": "array", "minItems": 1, "items": { "type": "number" } },
+    "number_grid": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/numbers" }, "description": "rows of numbers, all of one length" },
+    "caption": { "type": "string", "minLength": 1, "description": "what is drawn, and that the numbers are an example where they are made up" },
+    "recurrent_memory_visual": {
+      "type": "object",
+      "description": "A plain recurrent network hₜ = tanh(plain_weight·hₜ₋₁ + xₜ) beside one LSTM cell (c₀ = 0, cₜ = f·cₜ₋₁ + i·g, hₜ = o·tanh(cₜ)): the gates, the states, and the share of an error left after n steps back (the product of plain_weight·(1 − hₜ²), against the product of the forget gates, the last one repeated past the given steps)",
+      "additionalProperties": false,
+      "required": ["kind", "plain_weight", "inputs", "gates", "horizon", "caption"],
+      "properties": {
+        "kind": { "const": "recurrent_memory" },
+        "plain_weight": { "type": "number" },
+        "inputs": { "$ref": "#/$defs/numbers", "description": "the plain network's input at each step; later steps are empty (x = 0)" },
+        "gates": {
+          "type": "object",
+          "description": "each gate's weighted sum at each step, before the sigmoid (the candidate before tanh)",
+          "additionalProperties": false,
+          "required": ["forget", "input", "candidate", "output"],
+          "properties": {
+            "forget": { "$ref": "#/$defs/numbers" },
+            "input": { "$ref": "#/$defs/numbers" },
+            "candidate": { "$ref": "#/$defs/numbers" },
+            "output": { "$ref": "#/$defs/numbers" }
+          }
+        },
+        "horizon": { "type": "integer", "minimum": 2, "description": "how many steps back the error is followed" },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "convolution_visual": {
+      "type": "object",
+      "description": "One filter slid over an image (stride 1, no padding, plus the bias), then ReLU, then max-pooling of non-overlapping pool × pool blocks; `window` is the 1-based top-left cell of the window worked by hand, outlined at every stage",
+      "additionalProperties": false,
+      "required": ["kind", "image", "filter", "bias", "pool", "window", "caption"],
+      "properties": {
+        "kind": { "const": "convolution" },
+        "image": { "$ref": "#/$defs/number_grid" },
+        "filter": { "$ref": "#/$defs/number_grid" },
+        "bias": { "type": "number" },
+        "pool": { "type": "integer", "minimum": 1 },
+        "window": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["row", "column"],
+          "properties": { "row": { "type": "integer", "minimum": 1 }, "column": { "type": "integer", "minimum": 1 } }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "noise_schedule_visual": {
+      "type": "object",
+      "description": "DDPM's linear schedule: β_t from beta_start to beta_end over `steps`, ᾱ_t = Π(1 − β_s); the consumer draws √ᾱ_t and √(1 − ᾱ_t) at every step and tabulates the `marks`",
+      "additionalProperties": false,
+      "required": ["kind", "beta_start", "beta_end", "steps", "marks", "caption"],
+      "properties": {
+        "kind": { "const": "noise_schedule" },
+        "beta_start": { "type": "number", "exclusiveMinimum": 0 },
+        "beta_end": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+        "steps": { "type": "integer", "minimum": 2 },
+        "marks": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "residual_gradient_visual": {
+      "type": "object",
+      "description": "The derivative through 0 to `depth` one-number blocks: wⁿ for plain blocks, (1 + w)ⁿ for residual ones, on a log axis",
+      "additionalProperties": false,
+      "required": ["kind", "weight", "depth", "caption"],
+      "properties": {
+        "kind": { "const": "residual_gradient" },
+        "weight": { "type": "number", "exclusiveMinimum": 0 },
+        "depth": { "type": "integer", "minimum": 1 },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "discriminator_visual": {
+      "type": "object",
+      "description": "The best discriminator D* = p_data ÷ (p_data + p_g) for each item, and the value of the game it gives against −ln 4",
+      "additionalProperties": false,
+      "required": ["kind", "items", "p_data", "p_g", "caption"],
+      "properties": {
+        "kind": { "const": "discriminator" },
+        "items": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "type": "string", "minLength": 1 } },
+        "p_data": { "$ref": "#/$defs/numbers", "description": "one probability per item, adding up to 1" },
+        "p_g": { "$ref": "#/$defs/numbers", "description": "one probability per item, adding up to 1" },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "rotary_visual": {
+      "type": "object",
+      "description": "Rotary position embedding on one pair of numbers: the query and the key turned counter-clockwise by position × angle_degrees, and their dot product, for each pair of positions",
+      "additionalProperties": false,
+      "required": ["kind", "query", "key", "angle_degrees", "positions", "caption"],
+      "properties": {
+        "kind": { "const": "rotary" },
+        "query": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } },
+        "key": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } },
+        "angle_degrees": { "type": "number" },
+        "positions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["query", "key"],
+            "properties": { "query": { "type": "integer" }, "key": { "type": "integer" } }
+          }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "selective_scan_visual": {
+      "type": "object",
+      "description": "A state space model with a one-number state, discretized by zero-order hold (Ā = e^(Δ·a), B̄ = (Ā − 1) ÷ a · b, hₜ = Ā·hₜ₋₁ + B̄·xₜ from h₀ = 0), with each token's own step size against `fixed_step` for every token",
+      "additionalProperties": false,
+      "required": ["kind", "a", "b", "inputs", "steps", "fixed_step", "caption"],
+      "properties": {
+        "kind": { "const": "selective_scan" },
+        "a": { "type": "number", "exclusiveMaximum": 0 },
+        "b": { "type": "number" },
+        "inputs": { "$ref": "#/$defs/numbers" },
+        "steps": { "$ref": "#/$defs/numbers", "description": "one step size Δ per token" },
+        "fixed_step": { "type": "number", "exclusiveMinimum": 0 },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "loss_formula_visual": {
+      "type": "object",
+      "description": "The fitted loss L(N, D) = e + a ÷ N^alpha + b ÷ D^beta, drawn against N across parameter_range (log axis) at each model's token count, with each model marked; the constants are the ones the record cites",
+      "additionalProperties": false,
+      "required": ["kind", "constants", "models", "parameter_range", "caption"],
+      "properties": {
+        "kind": { "const": "loss_formula" },
+        "constants": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["e", "a", "b", "alpha", "beta"],
+          "properties": {
+            "e": { "type": "number" },
+            "a": { "type": "number" },
+            "b": { "type": "number" },
+            "alpha": { "type": "number" },
+            "beta": { "type": "number" }
+          }
+        },
+        "models": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "parameters", "tokens"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "parameters": { "type": "number", "exclusiveMinimum": 0 },
+              "tokens": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        },
+        "parameter_range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["min", "max"],
+          "properties": { "min": { "type": "number", "exclusiveMinimum": 0 }, "max": { "type": "number", "exclusiveMinimum": 0 } }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "group_advantages_visual": {
+      "type": "object",
+      "description": "Group-relative advantages: each reward minus the group mean, divided by the standard deviation over the group (dividing by G)",
+      "additionalProperties": false,
+      "required": ["kind", "answers", "rewards", "caption"],
+      "properties": {
+        "kind": { "const": "group_advantages" },
+        "answers": { "type": "array", "minItems": 2, "maxItems": 8, "items": { "type": "string", "minLength": 1 }, "description": "the name of each answer, in the order of rewards" },
+        "rewards": { "$ref": "#/$defs/numbers" },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "perceptron_training_visual": {
+      "type": "object",
+      "description": "The perceptron learning rule from zero weights (answer 1 when w·x + b > 0; after a wrong answer w += rate·(y − ŷ)·x and b += rate·(y − ŷ)), the examples seen in order pass after pass until one pass makes no mistake; one panel per correction",
+      "additionalProperties": false,
+      "required": ["kind", "inputs", "targets", "rate", "caption"],
+      "properties": {
+        "kind": { "const": "perceptron_training" },
+        "inputs": { "type": "array", "minItems": 2, "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } } },
+        "targets": { "type": "array", "minItems": 2, "items": { "enum": [0, 1] } },
+        "rate": { "type": "number", "exclusiveMinimum": 0 },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "backprop_visual": {
+      "type": "object",
+      "description": "One forward and one backward pass through inputs → sigmoid hidden units → one sigmoid output, no biases, E = ½(y − target)², then one step of size `rate` and the forward pass again",
+      "additionalProperties": false,
+      "required": ["kind", "inputs", "target", "hidden_weights", "output_weights", "rate", "caption"],
+      "properties": {
+        "kind": { "const": "backprop" },
+        "inputs": { "$ref": "#/$defs/numbers" },
+        "target": { "type": "number" },
+        "hidden_weights": { "$ref": "#/$defs/number_grid", "description": "one row per hidden unit: its weight from each input" },
+        "output_weights": { "$ref": "#/$defs/numbers", "description": "the output unit's weight from each hidden unit" },
+        "rate": { "type": "number", "exclusiveMinimum": 0 },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "gaussian_code_visual": {
+      "type": "object",
+      "description": "A variational autoencoder's code per dimension: the encoder's N(mu, sigma²) against the prior N(0, 1), the code z = mu + sigma·noise marked, and the KL divergence ½(mu² + sigma² − 1 − ln sigma²)",
+      "additionalProperties": false,
+      "required": ["kind", "mu", "sigma", "noise", "caption"],
+      "properties": {
+        "kind": { "const": "gaussian_code" },
+        "mu": { "$ref": "#/$defs/numbers" },
+        "sigma": { "type": "array", "minItems": 1, "items": { "type": "number", "exclusiveMinimum": 0 } },
+        "noise": { "$ref": "#/$defs/numbers" },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    }
+  }
 }

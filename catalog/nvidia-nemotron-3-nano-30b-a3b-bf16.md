@@ -30,7 +30,10 @@ fingerprint:
   context_window_tokens: 262144
   vocabulary_size: 131072
   activation_function: relu2
-  normalization: LayerNorm
+  normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
+  layer_mixers: {"names": ["Mamba-2", "MoE", "attention"], "pattern": "23 Mamba-2 · 23 MoE · 6 attention", "note": "Each of the 52 layers holds one mixer between its norm and its residual add: 23 layers hold a Mamba-2 state-space mixer, 23 a mixture-of-experts feed-forward and 6 attention. The configuration fixes the order, which starts Mamba-2, MoE, Mamba-2, MoE, Mamba-2, attention.", "feed_forward": false}
   positional_encoding: RoPE
   rope_theta: 10000.0
 moe_config:
@@ -87,6 +90,12 @@ sources:
 - url: https://arxiv.org/abs/2512.20856
   title: arXiv:2512.20856
   trust: 0.95
+- url: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16/blob/main/modeling_nemotron_h.py
+  title: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16 — modeling_nemotron_h.py
+  trust: 0.9
+- url: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16/blob/main/configuration_nemotron_h.py
+  title: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16 — configuration_nemotron_h.py
+  trust: 0.9
 ---
 
 ## Summary

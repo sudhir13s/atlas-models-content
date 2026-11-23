@@ -2,7 +2,7 @@
 id: architecture-era/resnet
 type: architecture-era
 slug: resnet
-schema_version: 2.5
+schema_version: 2.7
 title: "Residual Networks (ResNet)"
 name: "ResNet"
 era: foundation
@@ -52,6 +52,12 @@ weaknesses:
   - "**Projections are costly in bottlenecks:** replacing the identity shortcut of a bottleneck block with a projection would, the authors write, **double** the block's time complexity and model size."
   - "**The ReLU after the addition gets in the way:** **He et al. (2016)** report that a 1001-layer ResNet of the original design reaches **7.61%** CIFAR-10 error, against **4.92%** with pre-activation blocks."
   - "**Long training at extreme depth:** the same follow-up reports about **27 hours** on **2 GPUs** for ResNet-1001 on CIFAR, and about **3 weeks** on **8 GPUs** for ResNet-200 on ImageNet."
+
+visual:
+  kind: residual_gradient
+  weight: 0.1
+  depth: 10
+  caption: "Step 6 of the worked example, computed for 0 to 10 blocks: through plain blocks the gradient is multiplied by w = 0.1 per block, through residual blocks by 1 + 0.1 = 1.1. The first panel's vertical axis is in powers of ten, so the vanishing shows; the second panel is linear, so the growth to 2.594 shows. The weight is an example, not from a trained model."
 
 comparison:
   before: "Plain network"

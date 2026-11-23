@@ -15,13 +15,22 @@ summary: 'DistilBART CNN 12-6 is a summarization model: it reads a longer text a
 what_sets_it_apart: The card's table lists the DistilBART variants beside the bart-large-cnn baseline, with their sizes and inference times. It shows distilbart-12-6-cnn at 306 million parameters against 406 million for the baseline, and 307 ms inference time against 381 ms. The card does not describe how the model was made.
 running_it: The card says the checkpoint should be loaded with BartForConditionalGeneration.from_pretrained in the Transformers library.
 fingerprint:
+  attention_type: MHA
   num_layers: 12
+  decoder_layers: 6
+  attention_heads: 16
+  kv_heads: 16
+  head_size: 64
   hidden_size: 1024
+  intermediate_size: 4096
   context_window_tokens: 1024
   vocabulary_size: 50264
   activation_function: gelu
+  normalization: LayerNorm
   norm_placement: post
   stack: encoder-decoder
+  embedding_norm: true
+  positional_encoding: Learned
 filters:
   is_quantized: false
   is_moe: false

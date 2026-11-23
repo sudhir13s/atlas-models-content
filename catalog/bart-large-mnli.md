@@ -19,13 +19,22 @@ summary: bart-large-mnli is a text classification model published on Hugging Fac
 intended_use: The card presents the model for zero-shot text classification, meaning classifying text into labels the model was never explicitly trained on. When more than one label can be correct, it says to pass multi_label=True so each label is scored independently.
 what_sets_it_apart: The card explains that it uses a natural language inference (NLI) trick proposed by Yin et al. The text to classify is posed as a premise, a hypothesis such as "This text is about politics." is built from each candidate label, and the model's probabilities for entailment (the premise supports the hypothesis) and contradiction are converted into label probabilities.
 fingerprint:
+  attention_type: MHA
   num_layers: 12
+  decoder_layers: 12
+  attention_heads: 16
+  kv_heads: 16
+  head_size: 64
   hidden_size: 1024
+  intermediate_size: 4096
   context_window_tokens: 1024
   vocabulary_size: 50265
   activation_function: gelu
+  normalization: LayerNorm
   norm_placement: post
   stack: encoder-decoder
+  embedding_norm: true
+  positional_encoding: Learned
 filters:
   size_category: tiny
   is_quantized: false

@@ -2,7 +2,7 @@
 id: architecture-era/rnn-lstm
 type: architecture-era
 slug: rnn-lstm
-schema_version: 2.5
+schema_version: 2.7
 title: "Recurrent Networks & LSTM"
 name: "Recurrent Neural Network / LSTM"
 era: foundation
@@ -51,6 +51,18 @@ weaknesses:
   - "**More units and weights:** each memory cell block needs **two extra gate units**; the 1997 authors put the growth in weights at **at most a factor of 9** in the fully connected case."
   - "**Exploding gradients remain:** Sutskever et al. write that LSTMs tend not to suffer from vanishing gradients but **can have exploding ones**, and rescaled any gradient whose norm exceeded **5**."
   - "**Tasks it does not solve:** the 1997 authors list **strongly delayed XOR** problems and **counting exact time steps** (telling 99 from 100 steps ago) as beyond the truncated algorithm."
+
+visual:
+  kind: recurrent_memory
+  plain_weight: 0.5
+  inputs: [2, 0, 0]
+  gates:
+    forget: [0, 4, 4]
+    input: [3, -3, -3]
+    candidate: [2, -1, 0]
+    output: [0, -2, 3]
+  horizon: 10
+  caption: "Computed from the worked example's inputs: the plain network hₜ = tanh(0.5 × hₜ₋₁ + xₜ) with x = 2, 0, 0, and one LSTM cell from the gate sums of the three steps. The last panel follows the error further back on a log scale: the plain network continues with empty steps (x = 0), and the LSTM repeats its last forget gate σ(4) ≈ 0.982, as the example does for 10 steps. The numbers are an example, not from a trained model."
 
 comparison:
   before: "Plain recurrent network (BPTT or RTRL)"

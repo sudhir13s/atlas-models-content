@@ -2,7 +2,7 @@
 id: architecture-era/scaling-laws
 type: architecture-era
 slug: scaling-laws
-schema_version: 2.5
+schema_version: 2.7
 title: "Neural Scaling Laws"
 name: "Scaling Laws"
 era: scaling
@@ -51,6 +51,15 @@ weaknesses:
   - "**Few large tests:** Hoffmann et al. had only **two** comparable large runs (Chinchilla and Gopher), saw **curvature** at high compute that may mean they still overestimate the optimal size, and trained every run on **less than one epoch** of data."
   - "**The lines must bend:** Kaplan et al. note that the trends must level off before zero loss, because natural language has non-zero entropy, and that their own laws contradict each other at around **10⁴ PF-days** of compute."
   - "**Training budget only:** the LLaMA authors point out that compute-optimal training ignores the **inference** budget; their **7B** model kept improving after **1T** tokens, where Hoffmann et al. recommend a **10B** model on **200B** tokens."
+
+visual:
+  kind: loss_formula
+  constants: { e: 1.69, a: 406.4, b: 410.7, alpha: 0.34, beta: 0.28 }
+  models:
+    - { name: "Gopher", parameters: 2.8e+11, tokens: 3.0e+11 }
+    - { name: "Chinchilla", parameters: 7.0e+10, tokens: 1.4e+12 }
+  parameter_range: { min: 1.0e+10, max: 1.0e+12 }
+  caption: "Part 2 of the worked example: Hoffmann et al.'s fitted formula with its published constants, drawn against model size for Gopher's 300 billion training tokens and for Chinchilla's 1.4 trillion, each model marked where it was trained. These are the formula's predictions, not losses measured on the models."
 
 comparison:
   before: "Kaplan et al. (2020)"

@@ -14,10 +14,123 @@
       "description": "architecture families this structural parameter appears in"
     },
     "range": { "type": "string" },
-    "controls": { "type": "string" },
-    "if_increased": { "type": "string" },
-    "if_decreased": { "type": "string" },
-    "formula": { "type": "string", "description": "how this parameter contributes to the parameter count" }
+    "controls": { "type": "string", "description": "one plain sentence saying what the parameter is; the page prints it under the title" },
+    "if_increased": { "type": "string", "description": "schema 1.0 form; a 2.9 record uses effects.increase" },
+    "if_decreased": { "type": "string", "description": "schema 1.0 form; a 2.9 record uses effects.decrease" },
+    "formula": { "type": "string", "description": "schema 1.0 form: how this parameter contributes to the parameter count; a 2.9 record explains it in its Calculation section" },
+    "effects": { "$ref": "hyperparameter.schema.json#/$defs/effects" },
+    "scale": { "$ref": "hyperparameter.schema.json#/$defs/scale" },
+    "typical_values": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "hyperparameter.schema.json#/$defs/typical_value" },
+      "description": "the value in named models, each row naming the model and linking its configuration or paper"
+    },
+    "mistakes": { "type": "array", "minItems": 2, "maxItems": 5, "items": { "$ref": "hyperparameter.schema.json#/$defs/mistake" } },
+    "visual": {
+      "oneOf": [
+        { "$ref": "#/$defs/count_sweep_visual" },
+        { "$ref": "#/$defs/count_breakdown_visual" },
+        { "$ref": "#/$defs/head_grid_visual" },
+        { "$ref": "#/$defs/kv_cache_visual" },
+        { "$ref": "#/$defs/context_cost_visual" }
+      ]
+    }
   },
-  "required": ["name", "importance", "priority"]
+  "required": ["name", "importance", "priority"],
+  "$defs": {
+    "caption": { "type": "string", "minLength": 1, "description": "what is drawn and whose configuration it uses" },
+    "decoder_config": {
+      "type": "object",
+      "description": "the keys of a decoder-only transformer's config.json that set its parameter count, copied from the named model's configuration",
+      "additionalProperties": false,
+      "required": ["name", "vocab_size", "hidden_size", "intermediate_size", "num_hidden_layers", "num_attention_heads", "num_key_value_heads", "head_dim", "tie_word_embeddings", "ffn_matrices", "qk_norm"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "vocab_size": { "type": "integer", "minimum": 1 },
+        "hidden_size": { "type": "integer", "minimum": 1 },
+        "intermediate_size": { "type": "integer", "minimum": 1 },
+        "num_hidden_layers": { "type": "integer", "minimum": 1 },
+        "num_attention_heads": { "type": "integer", "minimum": 1 },
+        "num_key_value_heads": { "type": "integer", "minimum": 1 },
+        "head_dim": { "type": "integer", "minimum": 1 },
+        "tie_word_embeddings": { "type": "boolean" },
+        "ffn_matrices": { "type": "integer", "enum": [2, 3], "description": "3 for a gated FFN (gate, up, down), 2 for a plain MLP" },
+        "qk_norm": { "type": "boolean", "description": "a query and a key norm of head_dim weights in every layer, as in Qwen3" }
+      }
+    },
+    "count_sweep_visual": {
+      "type": "object",
+      "description": "the parameter count per layer or in total as one value changes; `width` scales hidden_size, intermediate_size and both head counts by the same factor",
+      "additionalProperties": false,
+      "required": ["kind", "model", "vary", "values", "measure", "caption"],
+      "properties": {
+        "kind": { "const": "count_sweep" },
+        "model": { "$ref": "#/$defs/decoder_config" },
+        "vary": { "type": "string", "enum": ["width", "num_hidden_layers", "intermediate_size", "vocab_size"] },
+        "values": { "type": "array", "minItems": 2, "maxItems": 10, "items": { "type": "number", "exclusiveMinimum": 0 } },
+        "measure": { "type": "string", "enum": ["per_layer", "total"] },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "count_breakdown_visual": {
+      "type": "object",
+      "description": "each model's parameters by part (embedding, attention, feed-forward, norms, output head) as shares of its total",
+      "additionalProperties": false,
+      "required": ["kind", "models", "caption"],
+      "properties": {
+        "kind": { "const": "count_breakdown" },
+        "models": { "type": "array", "minItems": 1, "maxItems": 2, "items": { "$ref": "#/$defs/decoder_config" } },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "head_grid_visual": {
+      "type": "object",
+      "description": "the query heads of one layer as a grid of `columns` columns, each with the key-value head it reads",
+      "additionalProperties": false,
+      "required": ["kind", "model", "columns", "caption"],
+      "properties": {
+        "kind": { "const": "head_grid" },
+        "model": { "$ref": "#/$defs/decoder_config" },
+        "columns": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "kv_cache_visual": {
+      "type": "object",
+      "description": "keys and values cached per token, 2 × layers × key-value heads × head_dim × bytes, and for `tokens` tokens, against one key-value head per query head",
+      "additionalProperties": false,
+      "required": ["kind", "model", "bytes_per_value", "tokens", "caption"],
+      "properties": {
+        "kind": { "const": "kv_cache" },
+        "model": { "$ref": "#/$defs/decoder_config" },
+        "bytes_per_value": { "type": "number", "exclusiveMinimum": 0 },
+        "tokens": { "type": "integer", "minimum": 1 },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    },
+    "context_cost_visual": {
+      "type": "object",
+      "description": "attention-score entries in one layer (length² × query heads) and the KV cache against context length, with named lengths marked",
+      "additionalProperties": false,
+      "required": ["kind", "model", "bytes_per_value", "lengths", "marks", "caption"],
+      "properties": {
+        "kind": { "const": "context_cost" },
+        "model": { "$ref": "#/$defs/decoder_config" },
+        "bytes_per_value": { "type": "number", "exclusiveMinimum": 0 },
+        "lengths": { "type": "array", "minItems": 2, "maxItems": 10, "items": { "type": "integer", "minimum": 1 } },
+        "marks": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["length", "label"],
+            "properties": { "length": { "type": "integer", "minimum": 1 }, "label": { "type": "string", "minLength": 1, "maxLength": 24 } }
+          }
+        },
+        "caption": { "$ref": "#/$defs/caption" }
+      }
+    }
+  }
 }

@@ -43,8 +43,11 @@ diagram: |
 diagram_caption: "<one-line caption>"
 underlying_model_note: "<optional: how a catalog model's whole architecture, shown as a second figure, relates to the idea above; sourced>"
 # ── Schema 2.5 teaching parts (optional; write them together with the How It Works and Worked Example sections) ──
-visual:                          # computed figure for the Worked Example: softmax bars of example scores
-  kind: distribution
+visual:                          # computed figure for the Worked Example; its inputs are the example's numbers
+  kind: distribution             # or one of the kinds in schema/architecture-era.schema.json $defs:
+                                 # recurrent_memory, convolution, noise_schedule, residual_gradient,
+                                 # discriminator, rotary, selective_scan, loss_formula,
+                                 # group_advantages, perceptron_training, backprop, gaussian_code
   tokens: ["<item>", "<item>"]   # what is scored: keys of an attention example, experts of a router
   logits: [<score>, <score>]
   temperatures: [1]              # or truncate: { top_k: <k> }

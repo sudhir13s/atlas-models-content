@@ -21,6 +21,68 @@ summary: 'OpenVLA 7B is a vision-language-action model: it takes a language inst
 intended_use: The card says it can be used zero-shot to control robots for the combinations of robot types and domains seen in its pretraining data, for example a Widow-X robot in BridgeV2 environments, and can be fine-tuned for new tasks and robot setups with minimal demonstration data. Out of scope is zero-shot control of new robot types or setups missing from the pretraining mix; the card suggests collecting demonstrations and fine-tuning instead.
 what_sets_it_apart: The card says it supports controlling multiple robots out of the box and can be adapted to new robot domains through parameter-efficient fine-tuning. Each prediction is a normalized 7-degree-of-freedom end-effector change, covering x, y, z, roll, pitch, yaw and the gripper.
 running_it: 'The card says predicted actions must be un-normalized using statistics computed for each robot and dataset before they run on a real robot. Its example loads the model in bfloat16 on a CUDA GPU with trust_remote_code, optionally with flash attention, and uses a prompt of the form "In: What action should the robot take to {instruction}?" followed by "Out:".'
+pipeline:
+  source: https://arxiv.org/abs/2406.09246
+  summary: A camera image is read by two vision encoders whose features are joined (left), and a small projector maps them into the language model's embedding space. A Llama 2 7B language model reads them with the text instruction and writes seven action tokens, which are turned back into a 7-dimensional robot action.
+  side_into: merge
+  stages:
+  - id: image
+    role: input
+    title: Camera image
+    details:
+    - 224 × 224 pixels
+    side: true
+  - id: vision-encoders
+    role: visionEncoder
+    title: DINOv2 + SigLIP encoders
+    details:
+    - ViT-L/14 · SO400M/14 · 600M total
+    note: The same image patches go through both encoders separately, and the two feature vectors of each patch are joined channel-wise.
+    side: true
+  - id: projector
+    role: projector
+    title: Projector
+    details:
+    - 2-layer MLP · GELU
+    note: Maps the joined visual features into the language model's embedding space.
+    side: true
+  - id: instruction
+    role: tokenizer
+    title: Instruction tokens
+    details:
+    - Llama tokenizer
+  - id: embedding
+    role: embedding
+    title: Token embedding
+  - id: merge
+    role: embedding
+    title: Join image and text
+    details:
+    - one input sequence
+    note: The projected image patches and the instruction embeddings form one sequence for the language model.
+  - id: llm
+    role: attention
+    title: Llama 2 language model
+    details:
+    - 7B parameters
+    note: The language model backbone of the Prismatic-7B vision-language model, fine-tuned to predict actions as text.
+  - id: action-tokens
+    role: outputHead
+    title: Output head
+    details:
+    - one token per action dimension
+    note: The 256 least used tokens of the Llama vocabulary are overwritten with action tokens, one per bin.
+  - id: detokenize
+    role: step
+    title: Action de-tokenizer
+    details:
+    - 256 bins per dimension
+    note: Each token is mapped back to a value; the bins evenly split the range between the 1st and 99th percentile of that dimension in the training data.
+  - id: action
+    role: outputHead
+    title: Robot action
+    details:
+    - 7 dimensions
 filters:
   size_category: medium
   is_quantized: false

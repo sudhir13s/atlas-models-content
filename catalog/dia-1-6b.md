@@ -19,6 +19,85 @@ intended_use: The card's disclaimer says it is intended for research and educati
 what_sets_it_apart: The card says the output can be conditioned on audio to control emotion and tone, and that the model can produce nonverbal sounds such as laughter, coughing and throat clearing, written as tags like (laughs). It lists voice cloning as a feature. The model was not fine-tuned on a specific voice, so each run gives different voices unless an audio prompt is added or the random seed is fixed.
 running_it: The card says it has been tested on GPUs only (PyTorch 2.0 or later, CUDA 12.6), with CPU support still to come. The full version needs around 10GB of video memory (VRAM). On an A4000 GPU it generates roughly 40 tokens per second, where 86 tokens equal one second of audio, and the first run also downloads the Descript Audio Codec.
 limitations: The card says the model only supports English generation at the moment. Several nonverbal tags beyond the main ones are recognized but might give unexpected output.
+pipeline:
+  source: https://github.com/nari-labs/dia/blob/main/dia/layers.py
+  summary: An encoder reads the transcript (left) once. A decoder then writes the audio as codes of the Descript Audio Codec (DAC), nine codes per time step, reading the transcript through cross-attention at every step. The DAC decoder turns the finished codes into a waveform.
+  side_into: cross-attention
+  stages:
+  - id: transcript
+    role: input
+    title: Transcript
+    details:
+    - speakers tagged [S1] and [S2]
+    side: true
+  - id: byte-embedding
+    role: embedding
+    title: Byte embedding
+    details:
+    - 256 byte values · width 1024
+    note: The text is turned into its UTF-8 bytes, with [S1] and [S2] replaced by the bytes 1 and 2, and each byte gets a learned vector.
+    side: true
+  - id: encoder-block
+    role: textEncoder
+    title: Attention + feed-forward
+    details:
+    - 16 heads · RMSNorm before each part
+    frame: Encoder block
+    repeat: 12
+    side: true
+  - id: encoder-norm
+    role: normalisation
+    title: Final RMSNorm
+    side: true
+  - id: codes
+    role: input
+    title: Audio codes so far
+    details:
+    - 9 codebooks · delay pattern
+    note: Each time step holds one code from each of nine DAC codebooks. The codebooks are shifted in time by a fixed delay pattern (0, 8, 9 … 15 steps), and an audio prompt, when given, is encoded into codes and placed first.
+  - id: code-embedding
+    role: embedding
+    title: Sum of code embeddings
+    details:
+    - one table per codebook · width 2048
+    note: Each of the nine codes is looked up in its own embedding table and the nine vectors are added into one.
+  - id: self-attention
+    role: attention
+    title: Self-attention
+    details:
+    - 16 heads · 4 KV heads · RoPE
+    frame: Decoder block
+    repeat: 18
+  - id: cross-attention
+    role: attention
+    title: Cross-attention
+    details:
+    - reads the encoded transcript
+    frame: Decoder block
+  - id: feed-forward
+    role: feedForward
+    title: Feed-forward
+    details:
+    - width 8192
+    frame: Decoder block
+  - id: decoder-norm
+    role: normalisation
+    title: Final RMSNorm
+  - id: output
+    role: outputHead
+    title: Output head
+    details:
+    - 9 codebooks × 1028 logits
+    note: Gives the next code for each of the nine codebooks. Generation runs one time step at a time; by default the pipeline mixes predictions with and without the text (classifier-free guidance, scale 3.0).
+  - id: dac-decoder
+    role: autoencoder
+    title: DAC audio decoder
+    details:
+    - codes to waveform
+    note: After the delay pattern is undone, the Descript Audio Codec turns the codes back into a sound wave.
+  - id: audio
+    role: outputHead
+    title: Audio
 filters:
   size_category: small
   is_quantized: false
@@ -56,6 +135,12 @@ sources:
 - url: https://arxiv.org/abs/2305.09636
   title: arXiv:2305.09636
   trust: 0.95
+- url: https://github.com/nari-labs/dia/blob/main/dia/layers.py
+  title: 'nari-labs/dia — dia/layers.py: model code (GitHub)'
+  trust: 0.9
+- url: https://github.com/nari-labs/dia/blob/main/dia/model.py
+  title: 'nari-labs/dia — dia/model.py: generation and DAC decoding (GitHub)'
+  trust: 0.9
 ---
 
 ## Summary

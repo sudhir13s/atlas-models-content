@@ -30,6 +30,72 @@ fingerprint:
   normalization: LayerNorm
   positional_encoding: RoPE
   rope_theta: 10000.0
+pipeline:
+  source: https://arxiv.org/abs/2510.15821
+  summary: A group of related time series, the targets and any covariates, is scaled, cut into patches of 16 steps and embedded. An encoder-only transformer alternates attention along time within each series with attention across the series of the group, and a head turns the embeddings of the future patches into 21 quantiles per step.
+  stages:
+  - id: series
+    role: input
+    title: Time series group
+    details:
+    - targets + covariates
+    - context up to 8,192 steps
+    note: A group can be one series, several related series, the variates of a multivariate series, or targets with their covariates. Future values that are not known are marked as missing.
+  - id: scaling
+    role: normalisation
+    title: Robust scaling
+    details:
+    - standardise, then arcsinh
+    note: Each series is standardised with its own mean and spread, and the inverse hyperbolic sine is applied to soften extreme values.
+  - id: patches
+    role: tokenizer
+    title: Patches + meta features
+    details:
+    - 16 steps per patch
+    - time index and mask added
+    note: A time index and a mask (1 where a value is observed) are appended, and context and future are each split into non-overlapping patches. A special REG token separates the context patches from the future patches.
+  - id: patch-embedding
+    role: embedding
+    title: Patch embedding
+    details:
+    - residual network · width 768
+    note: A small residual network maps each patch, with its time index and mask, to one vector.
+  - id: time-attention
+    role: attention
+    title: Time attention
+    details:
+    - 12 heads · RoPE positions
+    frame: Encoder block
+    repeat: 12
+    note: Self-attention along time, across the patches of one series. Positions use rotary position embeddings (RoPE).
+  - id: group-attention
+    role: attention
+    title: Group attention
+    details:
+    - across the series of a group
+    frame: Encoder block
+    note: At each patch position, attention runs across all series of the same group and never across groups. It uses no position information, since the series have no natural order.
+  - id: feed-forward
+    role: feedForward
+    title: Feed-forward
+    details:
+    - width 3072 · ReLU
+    frame: Encoder block
+  - id: norm
+    role: normalisation
+    title: Final LayerNorm
+  - id: quantile-head
+    role: outputHead
+    title: Quantile head
+    details:
+    - residual block · 21 quantiles
+    - 16 steps per future patch
+    note: The embeddings of the future patches of each target become forecasts for several patches in one pass, at the quantiles 0.01 to 0.99. The scaling is then undone.
+  - id: forecast
+    role: outputHead
+    title: Quantile forecast
+    details:
+    - up to 1,024 steps ahead
 filters:
   size_category: tiny
   is_quantized: false
@@ -72,6 +138,9 @@ sources:
 - url: https://arxiv.org/abs/2510.15821
   title: arXiv:2510.15821
   trust: 0.95
+- url: https://github.com/amazon-science/chronos-forecasting/blob/main/src/chronos/chronos2/model.py
+  title: 'chronos-forecasting/src/chronos/chronos2/model.py: Chronos-2 model code (Amazon)'
+  trust: 0.9
 ---
 
 ## Summary

@@ -17,6 +17,82 @@ total_parameters: 10732225440
 summary: Qwen2.5-Omni-7B is a multimodal model from Qwen that perceives text, images, audio and video as input and answers with text or with spoken audio. The card describes it as end-to-end, meaning one model handles all of these, and as able to generate text and natural speech responses in a streaming manner, that is, as the input arrives.
 intended_use: The card presents it for real-time voice and video chat, with an architecture that takes chunked input and returns output immediately. It also describes following spoken instructions end to end, and reports results on speech recognition, translation, audio understanding, image reasoning and video understanding.
 what_sets_it_apart: The card describes a Thinker-Talker architecture proposed by the Qwen team. It also describes TMRoPE (Time-aligned Multimodal RoPE), a position embedding that synchronizes the timestamps of video input with audio.
+pipeline:
+  source: https://arxiv.org/abs/2503.20215
+  summary: The Thinker, a language model with audio and vision encoders, reads text, audio, images and video as one sequence and writes the text answer. The Talker reads the Thinker's hidden states and the text it samples and writes speech codes, which a flow-matching DiT (diffusion transformer) turns into a mel-spectrogram and a vocoder turns into a waveform. The figure shows the audio input on the left; images and video enter the same way through a vision encoder.
+  side_into: merge
+  branch_from: thinker-block
+  stages:
+  - id: audio
+    role: input
+    title: Audio
+    details:
+    - 16 kHz · mel-spectrogram, 128 bins
+    side: true
+  - id: audio-block
+    role: audioEncoder
+    title: Attention + feed-forward
+    details:
+    - 20 heads · width 1280
+    note: The audio encoder comes from Qwen2-Audio. Each output vector covers about 40 ms of sound, and a final projection maps it to width 3584.
+    frame: Audio encoder
+    repeat: 32
+    side: true
+  - id: text
+    role: tokenizer
+    title: Text tokens
+    details:
+    - byte-level BPE · 151,643 tokens
+  - id: embedding
+    role: embedding
+    title: Token embedding
+    details:
+    - width 3584
+  - id: merge
+    role: embedding
+    title: Place among text embeddings
+    details:
+    - TMRoPE · 1 time step = 40 ms
+    note: Audio, image and video vectors take their places in the token sequence. Images and video come from the Qwen2.5-VL vision encoder (32 layers, 14 × 14 pixel patches). Time-aligned multimodal RoPE (TMRoPE) gives audio and video frames time positions so they line up.
+  - id: thinker-block
+    role: attention
+    title: Attention + feed-forward
+    details:
+    - 28 heads · 4 KV heads · width 3584
+    frame: Thinker block
+    repeat: 28
+  - id: text-head
+    role: outputHead
+    title: Text head
+    details:
+    - text answer · logits over 152,064
+    note: The Thinker writes the text answer here. Its hidden states and the embeddings of the text tokens it samples go on to the Talker.
+  - id: talker-block
+    role: attention
+    title: Talker
+    details:
+    - 24 blocks
+    - 12 heads · 4 KV heads · width 896
+    note: The Talker is a dual-track autoregressive decoder. It shares the Thinker's context and writes discrete speech codes of the qwen-tts-tokenizer codec.
+    branch: true
+  - id: dit
+    role: denoiser
+    title: Flow-matching DiT
+    details:
+    - codes to mel-spectrogram · 22 blocks
+    note: Turns the speech codes into a mel-spectrogram chunk by chunk. Its attention sees 4 blocks of codes, 2 back and 1 ahead, so speech can stream.
+    branch: true
+  - id: vocoder
+    role: step
+    title: BigVGAN vocoder
+    details:
+    - mel-spectrogram to waveform
+    note: A modified BigVGAN turns the mel-spectrogram into the sound wave, also chunk by chunk.
+    branch: true
+  - id: speech
+    role: outputHead
+    title: Speech
+    branch: true
 filters:
   size_category: medium
   is_quantized: false

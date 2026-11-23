@@ -37,6 +37,72 @@ fingerprint:
   normalization: RMSNorm
   positional_encoding: RoPE
   rope_theta: 100000000.0
+pipeline:
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/voxtral/modeling_voxtral.py
+  summary: An audio encoder turns sound into vectors, a small projector maps them to the language model's width, and the language model reads them in the same sequence as the text tokens and writes text.
+  side_into: merge
+  stages:
+  - id: text
+    role: tokenizer
+    title: Text tokens
+    side: true
+  - id: text-embedding
+    role: embedding
+    title: Token embedding
+    details:
+    - width 5120
+    side: true
+  - id: audio
+    role: input
+    title: Audio
+    details:
+    - log-mel spectrogram · 128 bins
+  - id: stem
+    role: audioEncoder
+    title: Convolution layers
+    details:
+    - two layers · width 1280
+    note: Two convolution layers turn the spectrogram into a sequence of vectors, and position embeddings are added.
+  - id: audio-block
+    role: audioEncoder
+    title: Attention + feed-forward
+    details:
+    - 20 heads · norm before each part
+    frame: Encoder block
+    repeat: 32
+  - id: audio-norm
+    role: normalisation
+    title: Final LayerNorm
+  - id: group
+    role: step
+    title: Join 4 frames
+    details:
+    - width 1280 → 5120
+    note: Four neighbouring audio vectors are joined into one, so the sequence gets four times shorter.
+  - id: projector
+    role: projector
+    title: Projector
+    details:
+    - linear · GELU · linear
+    note: Maps the audio vectors into the space of the language model's token embeddings.
+  - id: merge
+    role: embedding
+    title: Place among text embeddings
+    details:
+    - at the audio token positions
+    note: The audio vectors take the places the prompt reserves with audio tokens, so text and audio form one sequence.
+  - id: language-block
+    role: attention
+    title: Attention + feed-forward
+    details:
+    - 32 heads · 8 KV heads · width 5120
+    frame: Transformer block
+    repeat: 40
+  - id: output
+    role: outputHead
+    title: Output head
+    details:
+    - logits over 131,072
 filters:
   size_category: large
   is_quantized: false
@@ -81,6 +147,9 @@ sources:
 - url: https://arxiv.org/abs/2507.13264
   title: arXiv:2507.13264
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/voxtral/modeling_voxtral.py
+  title: 'transformers/models/voxtral/modeling_voxtral.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

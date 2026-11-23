@@ -17,6 +17,61 @@ summary: 'Stable Video Diffusion Image-to-Video XT is an image-to-video model fr
 intended_use: The card lists research on generative models, safe deployment of models that could generate harmful content, studying the limits and biases of generative models, generating artworks and design material, and educational or creative tools. It says the model was not trained to be factual and that making factual depictions of people or events is out of scope.
 what_sets_it_apart: The card says it is a latent diffusion model, which generates in a compressed image space, and that Stability AI also fine-tuned the f8 decoder for temporal consistency and provides a standard frame-wise decoder as an alternative.
 limitations: 'The card lists these limits: videos are short (4 seconds or less) and not perfectly photorealistic, the model may produce videos with no motion or very slow camera pans, it cannot be controlled through text or render legible text, faces and people may not be generated properly, and its autoencoder is lossy.'
+pipeline:
+  source: https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_video_diffusion/pipeline_stable_video_diffusion.py
+  summary: 'One still image becomes a short video. The image conditions the model in two ways: as latents joined to the noisy frames, and as one vector the U-Net reads. Random noise is cleaned step by step, and a decoder turns the result into frames.'
+  side_into: unet
+  stages:
+  - id: image-vector
+    role: input
+    title: The same image
+    side: true
+  - id: image-encoder
+    role: visionEncoder
+    title: CLIP image encoder
+    details:
+    - one vector per image
+    note: Turns the input image into one embedding vector. The U-Net reads it at every step of the loop.
+    side: true
+  - id: image
+    role: input
+    title: Input image
+  - id: vae-encoder
+    role: autoencoder
+    title: VAE encoder
+    details:
+    - image to latents
+    note: The encoder half of the autoencoder turns the input image into latents.
+  - id: join
+    role: step
+    title: Join with noisy latents
+    details:
+    - one copy per video frame
+    note: The frames start as random noise in the latent space. The image latents are repeated for every frame and joined to the noisy latents before each U-Net call.
+    frame: Denoising loop
+  - id: unet
+    role: denoiser
+    title: Spatio-temporal U-Net
+    details:
+    - predicts the noise in the latents
+    note: Reads the joined latents, the step, the image vector and the frame rate and motion values, and predicts the noise for all frames.
+    frame: Denoising loop
+  - id: scheduler
+    role: step
+    title: Scheduler step
+    details:
+    - Euler discrete
+    note: Uses the predicted noise to make the latents a little cleaner; the loop runs once per inference step.
+    frame: Denoising loop
+  - id: vae-decoder
+    role: autoencoder
+    title: Temporal VAE decoder
+    details:
+    - latents to frames
+    note: Turns the cleaned latents into video frames, a few frames at a time.
+  - id: video
+    role: outputHead
+    title: Video frames
 filters:
   size_category: small
   is_gated: false
@@ -44,6 +99,12 @@ updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt
   title: stabilityai/stable-video-diffusion-img2vid-xt — model page (Hugging Face)
+  trust: 0.9
+- url: https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_video_diffusion/pipeline_stable_video_diffusion.py
+  title: 'diffusers/pipelines/stable_video_diffusion/pipeline_stable_video_diffusion.py: reference pipeline (Hugging Face Diffusers)'
+  trust: 0.9
+- url: https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt/blob/main/model_index.json
+  title: stabilityai/stable-video-diffusion-img2vid-xt — model_index.json
   trust: 0.9
 ---
 

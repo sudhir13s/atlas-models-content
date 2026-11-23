@@ -21,6 +21,7 @@ what_sets_it_apart: The card describes fine-tuning with a batch size of 8 and a 
 fingerprint:
   attention_type: MHA
   num_layers: 6
+  decoder_layers: 6
   attention_heads: 8
   kv_heads: 8
   head_size: 64

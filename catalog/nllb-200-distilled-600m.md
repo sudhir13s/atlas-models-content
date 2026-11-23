@@ -17,13 +17,21 @@ summary: NLLB-200 distilled 600M is a machine translation model from the NLLB (N
 intended_use: 'The card lists researchers and the machine translation research community as the primary users. It marks several uses as out of scope: production deployment, domain-specific text such as medical or legal, document translation, and certified translations. It adds that the model was trained on inputs of up to 512 tokens, so longer sequences may translate worse.'
 what_sets_it_apart: The card describes training on parallel multilingual data from a variety of sources, plus monolingual data built from Common Crawl, and refers to the paper for the strategies used for data imbalance between high and low-resource languages. It notes that many of the chosen languages are low-resource, with a heavy emphasis on African languages.
 fingerprint:
+  attention_type: MHA
   num_layers: 12
+  decoder_layers: 12
+  attention_heads: 16
+  kv_heads: 16
+  head_size: 64
   hidden_size: 1024
+  intermediate_size: 4096
   context_window_tokens: 1024
   vocabulary_size: 256206
   activation_function: relu
+  normalization: LayerNorm
   norm_placement: pre
   stack: encoder-decoder
+  positional_encoding: Sinusoidal
 filters:
   is_quantized: false
   is_moe: false

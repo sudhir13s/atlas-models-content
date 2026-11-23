@@ -16,13 +16,22 @@ summary: 'BART Large CNN is a text summarization model: given a news article, it
 intended_use: The intended-use section of the card says only that the model can be used for text summarization. The card describes BART in general as also effective, once fine-tuned, for translation, text classification and question answering, but this checkpoint is the one fine-tuned on CNN Daily Mail.
 what_sets_it_apart: The card describes BART as a sequence-to-sequence transformer with a bidirectional encoder, like BERT, and an autoregressive decoder, like GPT, which writes one token at a time from left to right. In pre-training the text is first corrupted with a noising function and the model learns to reconstruct the original. This checkpoint was then fine-tuned on CNN Daily Mail.
 fingerprint:
+  attention_type: MHA
   num_layers: 12
+  decoder_layers: 12
+  attention_heads: 16
+  kv_heads: 16
+  head_size: 64
   hidden_size: 1024
+  intermediate_size: 4096
   context_window_tokens: 1024
   vocabulary_size: 50264
   activation_function: gelu
+  normalization: LayerNorm
   norm_placement: post
   stack: encoder-decoder
+  embedding_norm: true
+  positional_encoding: Learned
 filters:
   size_category: tiny
   is_quantized: false

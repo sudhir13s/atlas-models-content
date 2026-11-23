@@ -26,6 +26,73 @@ fingerprint:
   head_size: 72
   hidden_size: 1152
   intermediate_size: 4304
+pipeline:
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/siglip/modeling_siglip.py
+  summary: Two separate encoders, one for the image (right) and one for the text (left), each end in one vector. The model scores how well an image and a text match from the two vectors.
+  side_into: similarity
+  stages:
+  - id: text
+    role: input
+    title: Text
+    side: true
+  - id: text-embedding
+    role: embedding
+    title: Token + position embedding
+    details:
+    - width 1152
+    side: true
+  - id: text-block
+    role: textEncoder
+    title: Attention + feed-forward
+    details:
+    - 16 heads · norm before each part
+    frame: Text block
+    repeat: 27
+    side: true
+  - id: text-norm
+    role: normalisation
+    title: Final LayerNorm
+    side: true
+  - id: text-head
+    role: projector
+    title: Last token + linear head
+    details:
+    - one vector per text
+    note: The vector at the last token position stands for the whole text; a linear layer maps it to the shared space.
+    side: true
+  - id: image
+    role: input
+    title: Image
+    details:
+    - 384 × 384 pixels
+  - id: patches
+    role: embedding
+    title: Patch embedding
+    details:
+    - 14 × 14 pixel patches · width 1152
+    note: A convolution turns each 14 by 14 pixel patch into one vector, and a learned position embedding is added. There is no class token.
+  - id: vision-block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - 16 heads · norm before each part
+    frame: Vision block
+    repeat: 27
+  - id: vision-norm
+    role: normalisation
+    title: Final LayerNorm
+  - id: pooling
+    role: step
+    title: Attention pooling head
+    details:
+    - one vector per image
+    note: One learned query attends over all patch vectors and returns a single vector for the image.
+  - id: similarity
+    role: outputHead
+    title: Image-text match score
+    details:
+    - dot product of the two unit vectors
+    note: Both vectors are scaled to length one and multiplied. The result is scaled and shifted by two learned numbers; a sigmoid turns it into a probability for each image-text pair.
 filters:
   size_category: tiny
   is_quantized: false
@@ -72,6 +139,9 @@ sources:
 - url: https://arxiv.org/abs/2209.06794
   title: arXiv:2209.06794
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/siglip/modeling_siglip.py
+  title: 'transformers/models/siglip/modeling_siglip.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

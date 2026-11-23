@@ -2,7 +2,7 @@
 id: architecture-era/reasoning-models
 type: architecture-era
 slug: reasoning-models
-schema_version: 2.5
+schema_version: 2.7
 title: "Reasoning Models (Inference-Time Scaling)"
 name: "Reasoning Models"
 era: post-transformer
@@ -51,6 +51,12 @@ weaknesses:
   - "**Rough edges in DeepSeek-R1:** its authors list **language mixing**, sensitivity to prompts (few-shot prompting **degrades** it), **overthinking** on simple questions, and no use of tools such as search engines or calculators."
   - "**Not for every task:** OpenAI reports that o1-preview was **not preferred** to GPT-4o on some natural-language tasks."
   - "**Little is published about o1:** users see only a **model-generated summary** of its chain of thought, and OpenAI's announcement does not state o1's size, architecture, training data, reward or reinforcement-learning algorithm."
+
+visual:
+  kind: group_advantages
+  answers: ["Answer 1: 12", "Answer 2: 12", "Answer 3: 15", "Answer 4: 9"]
+  rewards: [2, 2, 1, 1]
+  caption: "Parts 1 and 2 of the worked example: the reward of each of the four answers (accuracy point plus format point; the correct answer is 12), then each answer's group-relative advantage computed from them. The rewards are an example, not from a trained model."
 
 comparison:
   before: "Non-reasoning model (GPT-4o, May 2024)"

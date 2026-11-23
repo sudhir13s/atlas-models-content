@@ -2,7 +2,7 @@
 id: architecture-era/diffusion
 type: architecture-era
 slug: diffusion
-schema_version: 2.5
+schema_version: 2.7
 title: "Diffusion Models"
 name: "Diffusion Model"
 era: post-transformer
@@ -51,6 +51,14 @@ weaknesses:
   - "**Expensive in pixel space:** the latent diffusion authors note that training the strongest pixel-space models takes **hundreds of GPU days** (**150 to 1000 V100 days** in the work they cite)."
   - "**Weaker likelihoods:** DDPM's authors write that their models do **not have competitive log likelihoods** compared with other likelihood-based models."
   - "**Guidance has a price:** classifier-free guidance raises sample quality **at the expense of diversity**, and needs **two network passes** per step, one with and one without the condition."
+
+visual:
+  kind: noise_schedule
+  beta_start: 0.0001
+  beta_end: 0.02
+  steps: 1000
+  marks: [207, 250, 500, 1000]
+  caption: "The share of the clean image (√ᾱ_t) and of the noise (√(1 − ᾱ_t)) in a noisy image at every step of DDPM's schedule, T = 1000 steps with β_t rising linearly from 0.0001 to 0.02, computed from that schedule. Marked: t = 207, where ᾱ_t ≈ 0.64 as in the worked example (shares ≈ 0.8 and 0.6), and the steps How It Works names."
 
 comparison:
   before: "Generative adversarial network (GAN)"

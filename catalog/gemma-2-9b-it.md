@@ -31,6 +31,8 @@ fingerprint:
   vocabulary_size: 256000
   activation_function: GeGLU
   normalization: RMSNorm
+  norm_placement: both
+  stack: decoder
   positional_encoding: RoPE
   rope_theta: 10000
   parameters_active_b: 9.24
@@ -52,6 +54,13 @@ hub_signals:
   last_modified: '2024-08-27'
   observed_at: '2026-11-20'
   source: https://huggingface.co/google/gemma-2-9b-it
+gguf_repositories:
+  repositories:
+  - publisher: bartowski
+    repo_id: bartowski/gemma-2-9b-it-GGUF
+    address: https://huggingface.co/bartowski/gemma-2-9b-it-GGUF
+  observed_at: '2026-11-23'
+  source: https://huggingface.co/models?library=gguf&other=base_model:quantized:google/gemma-2-9b-it
 aliases:
 - google/gemma-2-9b-it
 lineage:
@@ -181,6 +190,9 @@ sources:
 - url: https://arxiv.org/abs/2203.09509
   title: arXiv:2203.09509
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/gemma2/modeling_gemma2.py
+  title: 'transformers/models/gemma2/modeling_gemma2.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 related:
 - architecture-era/transformer
 - license/gemma

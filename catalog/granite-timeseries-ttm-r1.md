@@ -21,6 +21,65 @@ running_it: The card says each pre-trained model sits on its own branch of the r
 fingerprint:
   num_layers: 2
   hidden_size: 192
+pipeline:
+  source: https://arxiv.org/abs/2401.03955
+  summary: Each series is scaled and cut into eight patches of 64 steps. A small backbone of mixer blocks (multilayer perceptrons, no self-attention) works at three patch sizes in turn, a lighter decoder refines the result, and a linear head writes the next 96 values, which are scaled back.
+  stages:
+  - id: history
+    role: input
+    title: Past values
+    details:
+    - 512 steps per series
+    note: The main branch holds the 512-in, 96-out model; other context and forecast lengths are separate models on other branches. In pre-training each series is handled on its own.
+  - id: scaling
+    role: normalisation
+    title: Standard scaling
+    details:
+    - per series · undone at the end
+  - id: patches
+    role: tokenizer
+    title: Patching
+    details:
+    - 8 patches of 64 steps
+  - id: patch-embedding
+    role: embedding
+    title: Patch embedding
+    details:
+    - linear · width 192
+  - id: split
+    role: projector
+    title: Patch partition
+    details:
+    - 4×, 2×, then 1× more patches
+    frame: Backbone level
+    repeat: 3
+    note: Adaptive patching. At the first level each patch vector is split into four narrower ones, at the second into two, at the third it is left whole, so the levels see the series at different granularities.
+  - id: mixer
+    role: feedForward
+    title: TSMixer block
+    details:
+    - 2 per level
+    - mixes across and within patches
+    frame: Backbone level
+    note: Each block mixes information across patches, then across the features of each patch, using multilayer perceptrons with a gated attention step instead of self-attention.
+  - id: merge
+    role: projector
+    title: Patch merging
+    details:
+    - back to 8 patches · width 192
+    frame: Backbone level
+  - id: decoder
+    role: feedForward
+    title: TTM decoder
+    details:
+    - 2 mixer layers · width 128
+    note: Built like the backbone but much smaller. When fine-tuning, its channel mixing can be switched on to model links between series, and an optional exogenous mixer can use known future inputs.
+  - id: head
+    role: outputHead
+    title: Forecast head
+    details:
+    - linear · 96 values ahead
+    note: Produces a point forecast for each series, which is then returned to the original scale.
 filters:
   size_category: tiny
   is_quantized: false
@@ -59,6 +118,9 @@ sources:
 - url: https://arxiv.org/abs/2401.03955
   title: arXiv:2401.03955
   trust: 0.95
+- url: https://github.com/ibm-granite/granite-tsfm/blob/main/tsfm_public/models/tinytimemixer/modeling_tinytimemixer.py
+  title: 'granite-tsfm/tsfm_public/models/tinytimemixer/modeling_tinytimemixer.py: TinyTimeMixer model code (IBM)'
+  trust: 0.9
 ---
 
 ## Summary

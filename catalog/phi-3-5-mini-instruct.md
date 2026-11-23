@@ -51,6 +51,13 @@ hub_signals:
   last_modified: '2025-12-10'
   observed_at: '2026-11-20'
   source: https://huggingface.co/microsoft/Phi-3.5-mini-instruct
+gguf_repositories:
+  repositories:
+  - publisher: bartowski
+    repo_id: bartowski/Phi-3.5-mini-instruct-GGUF
+    address: https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF
+  observed_at: '2026-11-23'
+  source: https://huggingface.co/models?library=gguf&other=base_model:quantized:microsoft/Phi-3.5-mini-instruct
 aliases:
 - microsoft/Phi-3.5-mini-instruct
 - phi-3.5-mini-instruct

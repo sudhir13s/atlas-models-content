@@ -33,6 +33,9 @@ fingerprint:
   vocabulary_size: 151936
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
+  layer_mixers: {"names": ["Gated DeltaNet", "GQA"], "pattern": "3 Gated DeltaNet layers, then 1 GQA", "feed_forward": true, "note": "The 48 layers come in groups of four: the first three use a Gated DeltaNet, a linear-attention mixer, and the fourth uses grouped-query attention. Every layer has the same norms and feed-forward."}
   positional_encoding: RoPE
   rope_theta: 5000000.0
 moe_config:
@@ -77,6 +80,12 @@ sources:
   trust: 0.9
 - url: https://huggingface.co/Qwen/Qwen3-Coder-Next-FP8/blob/main/config.json
   title: Qwen/Qwen3-Coder-Next-FP8 — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3_next/modeling_qwen3_next.py
+  title: 'transformers/models/qwen3_next/modeling_qwen3_next.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3_next/configuration_qwen3_next.py
+  title: 'transformers/models/qwen3_next/configuration_qwen3_next.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

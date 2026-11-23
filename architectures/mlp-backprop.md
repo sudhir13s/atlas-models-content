@@ -2,7 +2,7 @@
 id: architecture-era/mlp-backprop
 type: architecture-era
 slug: mlp-backprop
-schema_version: 2.5
+schema_version: 2.7
 title: "Multilayer Perceptron & Backpropagation"
 name: "Multilayer Perceptron (Backpropagation)"
 era: early
@@ -52,6 +52,15 @@ weaknesses:
   - "**Saturating units in deep networks:** **Glorot and Bengio (2010)** find the logistic sigmoid **unsuited for deep networks** with random initialisation, because its mean value can drive the top hidden layer into **saturation**."
   - "**Existence, not size:** Cybenko's theorem says nothing about how many hidden units are needed; he suspects the overwhelming majority of problems would need **astronomical numbers** of them."
   - "**Not a model of the brain:** the authors state that the procedure, in its current form, is **not a plausible model** of learning in brains."
+
+visual:
+  kind: backprop
+  inputs: [1, 0]
+  target: 1
+  hidden_weights: [[0.5, -0.5], [-1, 1]]
+  output_weights: [1, 1]
+  rate: 1
+  caption: "The worked example's 2-2-1 network, computed: each unit's weighted sum x and output y from the forward pass, and ∂E/∂x from the backward pass; the table gives each weight's derivative and its value after one step with ε = 1. The weights and the example are made up: an example, not from a trained model."
 
 comparison:
   before: "Perceptron (error correction)"

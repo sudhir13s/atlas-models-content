@@ -33,6 +33,53 @@ fingerprint:
 moe_config:
   expert_count: 896
   shared_expert: true
+pipeline:
+  source: https://huggingface.co/moonshotai/Kimi-K3/blob/main/modeling_kimi_k3.py
+  summary: A vision encoder turns an image or video into vectors, a patch merger maps them to the language model's width, and the language model reads them in the same sequence as the text tokens and writes text. The public code file covers the vision side; the inside of the language model's layers is not in it, so it is not drawn.
+  side_into: merge
+  stages:
+  - id: text
+    role: tokenizer
+    title: Text tokens
+    details:
+    - vocabulary 163,840
+    side: true
+  - id: image
+    role: input
+    title: Image or video
+  - id: patches
+    role: embedding
+    title: Patch embedding
+    details:
+    - 14 × 14 pixel patches · width 1024
+  - id: vision-block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - 12 heads
+    frame: Vision block
+    repeat: 27
+  - id: merger
+    role: projector
+    title: Patch merger
+    details:
+    - to width 7168
+    note: Joins neighbouring patch vectors and maps them to the width of the language model.
+  - id: merge
+    role: embedding
+    title: Place among text embeddings
+    details:
+    - at the media placeholder positions
+    note: The image vectors take the places the prompt reserves with media placeholder tokens, so text and image form one sequence.
+  - id: language-model
+    role: attention
+    title: Language model
+    details:
+    - 93 layers · width 7168
+    note: A causal language model writes the answer one token at a time. Its layers are loaded from an implementation that is not part of the public code file, so their inside is not drawn.
+  - id: output
+    role: outputHead
+    title: Text output
 filters:
   size_category: xlarge
   is_quantized: false
@@ -70,6 +117,9 @@ sources:
   trust: 0.9
 - url: https://huggingface.co/moonshotai/Kimi-K3/blob/main/config.json
   title: moonshotai/Kimi-K3 — config.json
+  trust: 0.9
+- url: https://huggingface.co/moonshotai/Kimi-K3/blob/main/modeling_kimi_k3.py
+  title: moonshotai/Kimi-K3 — modeling_kimi_k3.py
   trust: 0.9
 ---
 

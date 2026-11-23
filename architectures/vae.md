@@ -2,7 +2,7 @@
 id: architecture-era/vae
 type: architecture-era
 slug: vae
-schema_version: 2.5
+schema_version: 2.7
 title: "Variational Autoencoder"
 name: "Variational Autoencoder"
 era: foundation
@@ -53,6 +53,13 @@ weaknesses:
   - "**A bound, not the likelihood:** the gap between the log-likelihood and the bound is the **KL divergence** from the encoder to the true posterior, and the true posterior is exactly what cannot be computed here."
   - "**Continuous codes only:** the reparameterisation needs continuous latent variables; the authors note that the wake-sleep algorithm, unlike theirs, also applies to **discrete** ones."
   - "**Deep versions are unstable:** the NVAE authors write that training very deep hierarchical VAEs is **often unstable**, because the KL divergence in the bound is **unbounded**."
+
+visual:
+  kind: gaussian_code
+  mu: [0.5, -1.0]
+  sigma: [1.0, 0.5]
+  noise: [0.4, -0.2]
+  caption: "The worked example's 2-number code, one panel per dimension: the encoder's Gaussian q(z|x) against the prior N(0, 1), with the drawn code z = μ + σ × ε marked and the KL divergence computed. The encoder's outputs and the noise are an example, not from a trained model."
 
 comparison:
   before: "Earlier approaches"

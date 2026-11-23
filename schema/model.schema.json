@@ -163,19 +163,109 @@
         "normalization": { "type": "string" },
         "norm_placement": {
           "type": "string",
-          "enum": ["pre", "post"],
-          "description": "where the block normalises: `pre` is before each sub-layer, inside the residual branch, with one final norm after the last block; `post` is after each residual add, with no final norm. Set only when the model's paper or official implementation was read; absent for any other layout (parallel sub-layers, a norm on both sides, blocks that are not attention plus feed-forward)"
+          "enum": ["pre", "post", "both"],
+          "description": "where the block normalises: `pre` is before each sub-layer, inside the residual branch, with one final norm after the last block; `post` is after each residual add, with no final norm; `both` is a norm before and a norm after each sub-layer, both inside the residual branch, with one final norm. Set only when the model's paper or official implementation was read; absent for any other layout (blocks that are not attention plus feed-forward, or whose layers are not all of one kind)"
+        },
+        "parallel_sublayers": {
+          "type": "string",
+          "enum": ["shared-norm", "separate-norms"],
+          "description": "set only for a block whose attention and feed-forward both read the block's input and are added to it in one step, with `norm_placement: pre`: `shared-norm` when one norm feeds both, `separate-norms` when each has its own norm. Read from the official implementation and the model's configuration"
+        },
+        "output_head": {
+          "type": "string",
+          "enum": ["cell-selection", "cell-selection-aggregation"],
+          "description": "the head of a checkpoint whose task tag does not name it, as the official implementation names it: a table model's cell selection head, alone or with an aggregation head. Absent for every other model"
+        },
+        "layer_mixers": {
+          "type": "object",
+          "description": "set only for a model whose layers do not all hold the same sequence mixer (attention in some layers, a state-space or linear-attention mixer in others), with `norm_placement: pre`: read from the model's own configuration (the per-layer pattern) and official code (what each layer does). The block figure then names the alternatives in one block and states the pattern; the attention fields of the fingerprint describe the attention layers",
+          "required": ["names", "pattern", "feed_forward"],
+          "additionalProperties": false,
+          "properties": {
+            "names": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 3,
+              "items": { "type": "string", "minLength": 1, "maxLength": 16 },
+              "description": "the mixers a layer may hold, as the code names them"
+            },
+            "pattern": { "type": "string", "minLength": 1, "maxLength": 40, "description": "how the mixers are spread over the layers, as counted from the configuration" },
+            "note": { "type": "string", "minLength": 1, "description": "one to three sentences on the pattern, shown when the block is opened and beside the figure" },
+            "feed_forward": { "type": "boolean", "description": "true when every layer also has its own feed-forward sub-layer after the mixer; false when the mixer is the layer's only sub-layer (the feed-forward is then one of the mixers)" }
+          }
         },
         "stack": {
           "type": "string",
           "enum": ["encoder", "decoder", "encoder-decoder"],
           "description": "which transformer stacks the model has: `encoder` (bidirectional blocks only), `decoder` (causal blocks only) or `encoder-decoder` (both, the decoder attending over the encoder's output). Set from the same source as `norm_placement`"
         },
+        "decoder_layers": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "encoder-decoder models only: how many blocks the decoder repeats (`num_layers` is then the encoder's count), from the model's configuration. The other block fields (heads, widths, activation, norm) describe both stacks, so the field is set only when the configuration gives the same values for both; without it a consumer draws no figure of an encoder-decoder"
+        },
+        "embedding_norm": {
+          "type": "boolean",
+          "description": "true when the official implementation applies a norm to the summed embeddings before the first block (in both stacks of an encoder-decoder); absent when it does not or when the implementation was not read"
+        },
+        "input_stem": {
+          "type": "string",
+          "enum": ["spectrogram-convolution", "spectrogram-patches", "waveform-convolution"],
+          "description": "what turns the input into the sequence the first block reads, for a model that does not start from a token embedding: `spectrogram-convolution` (a log-mel spectrogram through convolution layers), `spectrogram-patches` (a spectrogram cut into patches, each projected to one vector) or `waveform-convolution` (the raw waveform through a convolutional feature encoder). Read from the official implementation; absent for a text model"
+        },
         "positional_encoding": { "type": "string" },
+        "decoder_positional_encoding": {
+          "type": "string",
+          "description": "encoder-decoder models only: the decoder's positional encoding when the implementation gives it one that differs from the encoder's (`positional_encoding`)"
+        },
         "rope_theta": { "type": ["number", "null"] },
         "parameters_active_b": { "type": "number" },
         "kv_cache_rating": { "type": "string", "enum": ["low", "medium", "high"] },
         "key_detail": { "type": "string" }
+      }
+    },
+    "pipeline": {
+      "type": "object",
+      "description": "the whole model as an ordered list of stages, for a figure drawn top to bottom: every stage and the order of the stages are read from one primary source (the paper's architecture figure or text, the model card, the configuration or the official code), which `source` names. A stage the source does not state is left out, and a record whose source does not give the structure has no `pipeline`",
+      "required": ["source", "stages"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string", "format": "uri", "description": "the `url` of the entry of `sources` the structure was read from" },
+        "summary": { "type": "string", "minLength": 1, "description": "what the figure shows, in two or three plain sentences, with no ranking words" },
+        "side_into": { "type": "string", "description": "the `id` of the main-column stage that the `side` stages feed; required when a `side` run names no `into`" },
+        "branch_from": { "type": "string", "description": "the `id` of the main-column stage the second output leaves from; required when any stage is `branch`" },
+        "stages": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["id", "role", "title"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+              "role": {
+                "type": "string",
+                "enum": ["input", "tokenizer", "embedding", "positionalEncoding", "normalisation", "attention", "feedForward", "router", "experts", "outputHead", "visionEncoder", "audioEncoder", "textEncoder", "projector", "denoiser", "autoencoder", "step"],
+                "description": "what kind of part the stage is; it gives the block its colour and its entry in the figure's legend. `denoiser` is the network a diffusion loop calls (a U-Net or a diffusion transformer), `autoencoder` a VAE encoder or decoder, `textEncoder`, `visionEncoder` and `audioEncoder` a tower that reads one kind of input, `step` any other processing step (a scheduler step, pooling, a safety check)"
+              },
+              "title": { "type": "string", "minLength": 1, "maxLength": 28 },
+              "details": {
+                "type": "array",
+                "maxItems": 2,
+                "items": { "type": "string", "minLength": 1, "maxLength": 36 },
+                "description": "the stage's own numbers or names, as the source gives them"
+              },
+              "note": { "type": "string", "minLength": 1, "description": "one or two sentences on what the stage does, shown when the block is opened" },
+              "frame": { "type": "string", "minLength": 1, "maxLength": 17, "description": "the name of the group the stage belongs to, short enough to print with its count; consecutive stages with one name share a frame" },
+              "repeat": { "type": "integer", "minimum": 2, "description": "how many times the stage's frame repeats; absent when the source gives no fixed count" },
+              "side": { "type": "boolean", "description": "true for a stage of a side input, drawn in a column left of the main one" },
+              "into": { "type": "string", "description": "on a `side` stage: the `id` of the main-column stage its run feeds. A side stage with `into` starts a new run and the side stages after it continue that run, so two inputs (two text encoders; a vision and an audio encoder) are drawn as separate runs. Absent on a run that feeds `side_into`" },
+              "branch": { "type": "boolean", "description": "true for a stage of the second output, drawn in a column right of the main one, top to bottom from the stage `branch_from` names" },
+              "inner_frame": { "type": "string", "minLength": 1, "maxLength": 14, "description": "on a stage that has a `frame`: the name of a group inside that frame (a repeated block inside a loop); consecutive stages with one name share the inner frame. One inner group per frame" },
+              "inner_repeat": { "type": "integer", "minimum": 2, "description": "how many times the inner group repeats; absent when the source gives no fixed count" }
+            }
+          }
+        }
       }
     },
     "moe_config": {
@@ -210,6 +300,30 @@
         "last_modified": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
         "observed_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
         "source": { "type": "string", "format": "uri" }
+      }
+    },
+    "gguf_repositories": {
+      "type": "object",
+      "description": "links to GGUF copies of the model, copied from Hugging Face by code and owned by the jobs: each repository's own card names this model's repository as the model it quantizes, and its publisher is on the job's allow-list. Links only; the reader opens a repository to see its files",
+      "required": ["repositories", "observed_at", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "repositories": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["publisher", "repo_id", "address"],
+            "additionalProperties": false,
+            "properties": {
+              "publisher": { "type": "string", "minLength": 1, "description": "Hugging Face handle the repository is published under" },
+              "repo_id": { "type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$" },
+              "address": { "type": "string", "format": "uri" }
+            }
+          }
+        },
+        "observed_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "source": { "type": "string", "format": "uri", "description": "the Hub page listing the model's GGUF copies" }
       }
     },
     "lineage": {

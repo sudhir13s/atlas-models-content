@@ -2,7 +2,7 @@
 id: architecture-era/cnn
 type: architecture-era
 slug: cnn
-schema_version: 2.5
+schema_version: 2.7
 title: "Convolutional Neural Networks"
 name: "Convolutional Neural Network"
 era: foundation
@@ -51,6 +51,22 @@ weaknesses:
   - "**Each layer sees only a little more:** with 3 × 3 filters, the VGG authors note, **two** stacked layers see a 5 × 5 patch and **three** see 7 × 7, so a view of the whole image takes many layers."
   - "**Costly at scale:** the AlexNet authors write that CNNs had been **prohibitively expensive** on large high-resolution images until GPUs, and that their network's size was limited mainly by GPU memory and training time."
   - "**Fixed input size:** AlexNet needs a constant input size, so every image was rescaled and cropped to **256 × 256** before 224 × 224 patches were cut from it."
+
+visual:
+  kind: convolution
+  image:
+    - [0, 0, 1, 1, 0]
+    - [0, 0, 1, 1, 0]
+    - [0, 0, 1, 1, 0]
+    - [0, 0, 1, 1, 0]
+    - [0, 0, 1, 1, 0]
+  filter:
+    - [-1, 1]
+    - [-1, 1]
+  bias: 0
+  pool: 2
+  window: { row: 1, column: 2 }
+  caption: "The worked example computed step by step: the 2 × 2 filter slid over the 5 × 5 image gives the 4 × 4 feature map, ReLU sets its negative values to 0, and 2 × 2 max-pooling keeps the largest value of each block. The outlined cells follow the window worked by hand (rows 1–2, columns 2–3) through every stage. The image and the filter are an example, not from a trained model."
 
 comparison:
   before: "Fully connected network"

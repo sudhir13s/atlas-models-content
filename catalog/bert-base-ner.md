@@ -30,6 +30,7 @@ fingerprint:
   normalization: LayerNorm
   norm_placement: post
   stack: encoder
+  embedding_norm: true
 filters:
   size_category: tiny
   is_quantized: false

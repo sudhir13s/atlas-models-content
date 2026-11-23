@@ -17,6 +17,7 @@ what_sets_it_apart: The developers describe reframing all language tasks into on
 fingerprint:
   attention_type: MHA
   num_layers: 12
+  decoder_layers: 12
   attention_heads: 12
   kv_heads: 12
   head_size: 64
@@ -89,6 +90,9 @@ sources:
   trust: 0.95
 - url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/t5/modeling_t5.py
   title: 'transformers/models/t5/modeling_t5.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/t5/configuration_t5.py
+  title: 'transformers/models/t5/configuration_t5.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

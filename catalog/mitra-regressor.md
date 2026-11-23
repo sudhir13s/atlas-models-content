@@ -24,6 +24,65 @@ fingerprint:
   kv_heads: 4
   head_size: 128
   hidden_size: 512
+pipeline:
+  source: https://github.com/autogluon/autogluon/blob/master/tabular/src/autogluon/tabular/models/mitra/_internal/models/tab2d.py
+  summary: The whole table goes in at once, the training rows with their known targets and the rows to predict with the target hidden. Every cell becomes a vector, and 12 layers alternate attention down the rows of each column with attention across the cells of each row. The vector at each predicted row's target cell becomes the predicted number.
+  stages:
+  - id: table
+    role: input
+    title: Table
+    details:
+    - training rows with targets
+    - rows to predict, target hidden
+    note: The training rows act as the examples the model learns from inside one forward pass, so there is no training step for a new table.
+  - id: quantiles
+    role: normalisation
+    title: Quantile transform
+    details:
+    - per feature, from training rows
+    note: Each feature value is replaced by its position among that feature's quantiles in the training rows.
+  - id: embedding
+    role: embedding
+    title: Cell embedding
+    details:
+    - one vector per cell · width 512
+    note: A linear layer turns each feature value and each known target into a vector. The hidden targets of the rows to predict get one learned mask vector instead.
+  - id: row-attention
+    role: attention
+    title: Attention across rows
+    details:
+    - 4 heads · within each column
+    frame: Layer
+    repeat: 12
+    note: Attention between rows, within each column. The rows to predict read the training rows; they do not read each other.
+  - id: feed-forward-1
+    role: feedForward
+    title: Feed-forward
+    details:
+    - width 2048
+    frame: Layer
+  - id: feature-attention
+    role: attention
+    title: Attention across features
+    details:
+    - 4 heads · within each row
+    frame: Layer
+    note: Attention between the cells of one row, the features and the target, so each cell sees the rest of its row.
+  - id: feed-forward-2
+    role: feedForward
+    title: Feed-forward
+    details:
+    - width 2048
+    frame: Layer
+  - id: norm
+    role: normalisation
+    title: Final LayerNorm
+  - id: head
+    role: outputHead
+    title: Output head
+    details:
+    - linear · one number per row
+    note: Only the vector at the target cell of each row to predict is used; a linear layer turns it into the predicted value.
 filters:
   size_category: tiny
   is_quantized: false
@@ -61,6 +120,9 @@ sources:
 - url: https://arxiv.org/abs/2510.21204
   title: arXiv:2510.21204
   trust: 0.95
+- url: https://github.com/autogluon/autogluon/blob/master/tabular/src/autogluon/tabular/models/mitra/_internal/models/tab2d.py
+  title: 'autogluon/tabular/models/mitra/_internal/models/tab2d.py: Mitra model code (AutoGluon)'
+  trust: 0.9
 ---
 
 ## Summary

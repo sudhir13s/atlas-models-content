@@ -31,6 +31,9 @@ fingerprint:
   vocabulary_size: 50304
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: pre
+  stack: decoder
+  parallel_sublayers: separate-norms
   positional_encoding: RoPE
   rope_theta: 10000.0
 filters:
@@ -79,6 +82,9 @@ sources:
 - url: https://arxiv.org/abs/2201.07311
   title: arXiv:2201.07311
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/gpt_neox/modeling_gpt_neox.py
+  title: 'transformers/models/gpt_neox/modeling_gpt_neox.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

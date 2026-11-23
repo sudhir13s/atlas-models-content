@@ -32,6 +32,9 @@ fingerprint:
   vocabulary_size: 51200
   activation_function: gelu_new
   normalization: LayerNorm
+  norm_placement: pre
+  stack: decoder
+  parallel_sublayers: shared-norm
   positional_encoding: RoPE
   rope_theta: 10000.0
 filters:
@@ -71,6 +74,9 @@ sources:
   trust: 0.9
 - url: https://huggingface.co/microsoft/phi-2/blob/main/config.json
   title: microsoft/phi-2 — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/phi/modeling_phi.py
+  title: 'transformers/models/phi/modeling_phi.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

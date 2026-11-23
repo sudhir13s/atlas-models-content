@@ -29,6 +29,87 @@ fingerprint:
   vocabulary_size: 49408
   activation_function: quick_gelu
   normalization: LayerNorm
+pipeline:
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/x_clip/modeling_x_clip.py
+  summary: Eight frames are each read by a CLIP-style vision transformer whose frames exchange one message token per block; a small transformer then joins the frames into one video vector. The text (left) is encoded by a CLIP text transformer and adjusted by a prompt generator that looks at the video, and the model scores how well each text matches the video.
+  side_into: similarity
+  stages:
+  - id: text
+    role: input
+    title: Text
+    details:
+    - for example a class name
+    side: true
+  - id: text-embedding
+    role: embedding
+    title: Token + position embedding
+    details:
+    - width 512 · 77 positions
+    side: true
+  - id: text-block
+    role: attention
+    title: Attention + feed-forward
+    details:
+    - 8 heads · causal
+    frame: Text block
+    repeat: 12
+    side: true
+  - id: text-head
+    role: projector
+    title: End token + projection
+    details:
+    - one vector per text · 512
+    note: The vector at the end-of-text token stands for the whole text; a linear layer maps it to the shared space.
+    side: true
+  - id: prompt
+    role: attention
+    title: Video-specific prompt
+    details:
+    - 2 layers · text reads the frames
+    note: The text vector attends over the frames' patch features (averaged over the frames) and the result, scaled by a learned factor, is added to it.
+    side: true
+  - id: frames
+    role: input
+    title: Video frames
+    details:
+    - 8 frames · 224 × 224 pixels
+  - id: patches
+    role: embedding
+    title: Patch embedding
+    details:
+    - 32 × 32 pixel patches · width 768
+    note: Each frame becomes 7 × 7 patch vectors plus a class token, with position embeddings added.
+  - id: message
+    role: attention
+    title: Cross-frame message
+    details:
+    - one token per frame · attention
+    note: Each frame's class token is turned into a message token; the message tokens of all frames attend to each other, and each frame's own message joins its patches for this block.
+    frame: Frame block
+    repeat: 12
+  - id: frame-block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - 12 heads · within the frame
+    frame: Frame block
+  - id: frame-vector
+    role: projector
+    title: Class token + projection
+    details:
+    - one vector per frame · 512
+  - id: mit
+    role: attention
+    title: Multi-frame integration
+    details:
+    - 1 layer · 8 heads · then average
+    note: Frame position embeddings are added and one transformer layer mixes the 8 frame vectors; the average is the video vector.
+  - id: similarity
+    role: outputHead
+    title: Video-text match score
+    details:
+    - cosine similarity × learned scale
+    note: Both vectors are scaled to length one and multiplied, then scaled by a learned number. A softmax over several texts gives class probabilities.
 filters:
   size_category: tiny
   is_quantized: false
@@ -69,6 +150,9 @@ sources:
 - url: https://arxiv.org/abs/2208.02816
   title: arXiv:2208.02816
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/x_clip/modeling_x_clip.py
+  title: 'transformers/models/x_clip/modeling_x_clip.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

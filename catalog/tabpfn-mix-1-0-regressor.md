@@ -24,6 +24,49 @@ fingerprint:
   kv_heads: 4
   head_size: 128
   hidden_size: 512
+pipeline:
+  source: https://github.com/autogluon/autogluon/blob/master/tabular/src/autogluon/tabular/models/tabpfnmix/_internal/models/foundation/foundation_transformer.py
+  summary: Each table row becomes one vector, built from its features and, for the training rows, its known target. In 12 transformer layers every row attends to the training rows, so the rows to predict read the examples in context. A small head turns each predicted row's vector into a number.
+  stages:
+  - id: table
+    role: input
+    title: Table
+    details:
+    - training rows with targets
+    - rows to predict
+    note: The training rows are given as context in the same forward pass instead of being used to retrain the model.
+  - id: feature-embedding
+    role: embedding
+    title: Row embedding
+    details:
+    - linear · 100 feature slots → 512
+    note: A linear layer maps all the feature values of a row to one vector of width 512.
+  - id: target-embedding
+    role: embedding
+    title: Add target embedding
+    details:
+    - known target → vector · else zero
+    note: For a training row, a linear layer turns its target value into a vector that is added to the row's vector. The rows to predict get nothing added.
+  - id: attention
+    role: attention
+    title: Attention to training rows
+    details:
+    - 4 heads · width 512
+    frame: Layer
+    repeat: 12
+    note: Every row, training row or row to predict, uses the training rows as keys and values. The rows to predict never attend to each other.
+  - id: feed-forward
+    role: feedForward
+    title: Feed-forward
+    details:
+    - width 2048 · GELU
+    frame: Layer
+  - id: head
+    role: outputHead
+    title: Output head
+    details:
+    - two linear layers · one number
+    note: A linear layer of width 2048 with GELU and a second linear layer give one predicted value for each row to predict.
 filters:
   size_category: tiny
   is_quantized: false
@@ -67,6 +110,9 @@ sources:
 - url: https://arxiv.org/abs/2405.13396
   title: arXiv:2405.13396
   trust: 0.95
+- url: https://github.com/autogluon/autogluon/blob/master/tabular/src/autogluon/tabular/models/tabpfnmix/_internal/models/foundation/foundation_transformer.py
+  title: 'autogluon/tabular/models/tabpfnmix/_internal/models/foundation/foundation_transformer.py: TabPFNMix model code (AutoGluon)'
+  trust: 0.9
 ---
 
 ## Summary

@@ -36,6 +36,98 @@ moe_config:
   expert_count: 384
   active_experts: 8
   shared_expert: true
+pipeline:
+  source: https://huggingface.co/moonshotai/Kimi-K2.5/blob/main/modeling_kimi_k25.py
+  summary: A vision encoder (left) turns an image or video into vectors, neighbouring patches are merged, and a projector maps them to the language model's width. They take their places among the text token embeddings, and a 61-layer mixture-of-experts language model reads the whole sequence and writes text.
+  side_into: merge
+  stages:
+  - id: media
+    role: input
+    title: Image or video
+    side: true
+  - id: patches
+    role: embedding
+    title: Patch embedding
+    details:
+    - 14 × 14 pixel patches · width 1152
+    note: A convolution turns each 14 by 14 pixel patch into one vector, and learned position embeddings for height, width and time are added.
+    side: true
+  - id: vision-block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - 16 heads · width 1152
+    note: For video, attention runs across space and time.
+    frame: Vision block
+    repeat: 27
+    side: true
+  - id: patch-merge
+    role: step
+    title: Merge 2 × 2 patches
+    details:
+    - video frames averaged over time
+    note: Each 2 by 2 group of neighbouring patch vectors is gathered into one position; for video, the frames are averaged.
+    side: true
+  - id: projector
+    role: projector
+    title: Projector
+    details:
+    - LayerNorm · MLP 4608 → 7168
+    note: The four gathered vectors are normalized and joined into one of width 4608, and a two-layer network with GELU maps it to the language model's width.
+    side: true
+  - id: text
+    role: tokenizer
+    title: Text tokens
+    details:
+    - vocabulary 163,840
+  - id: embedding
+    role: embedding
+    title: Token embedding
+    details:
+    - width 7168
+  - id: merge
+    role: embedding
+    title: Place among text embeddings
+    details:
+    - at the media placeholder tokens
+    note: The image or video vectors take the places the prompt reserves with the media placeholder token, so text and vision form one sequence.
+  - id: dense-layer
+    role: attention
+    title: Attention + feed-forward
+    details:
+    - dense feed-forward
+    note: The first layer has the same latent attention as the others but one ordinary feed-forward network instead of experts.
+    frame: First layer
+  - id: attention
+    role: attention
+    title: Multi-head latent attention
+    details:
+    - 64 heads · keys and values via 512
+    note: Keys and values are computed from a compressed vector of width 512 (and queries from one of width 1536), which keeps the cache small.
+    frame: MoE block
+    repeat: 60
+  - id: router
+    role: router
+    title: Router
+    details:
+    - sigmoid scores · top 8 of 384
+    note: Scores every routed expert for each token and keeps the eight highest.
+    frame: MoE block
+  - id: experts
+    role: experts
+    title: Experts
+    details:
+    - 8 routed + 1 shared
+    note: The eight chosen experts and one shared expert that every token uses each run a small feed-forward network; their outputs are added.
+    frame: MoE block
+  - id: norm
+    role: normalisation
+    title: Final RMSNorm
+  - id: output
+    role: outputHead
+    title: Output head
+    details:
+    - logits over 163,840
 filters:
   size_category: xlarge
   is_quantized: false
@@ -83,6 +175,12 @@ sources:
 - url: https://arxiv.org/abs/2602.02276
   title: arXiv:2602.02276
   trust: 0.95
+- url: https://huggingface.co/moonshotai/Kimi-K2.5/blob/main/modeling_kimi_k25.py
+  title: moonshotai/Kimi-K2.5 — modeling_kimi_k25.py (Moonshot AI)
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/deepseek_v3/modeling_deepseek_v3.py
+  title: 'transformers/models/deepseek_v3/modeling_deepseek_v3.py: language model implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

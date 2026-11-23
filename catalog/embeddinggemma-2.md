@@ -31,7 +31,87 @@ fingerprint:
   context_window_tokens: 8192
   vocabulary_size: 262144
   normalization: RMSNorm
+  norm_placement: both
+  stack: encoder
   positional_encoding: RoPE
+pipeline:
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/embedding_gemma2/modeling_embedding_gemma2.py
+  summary: Text goes in as tokens. An image or video goes through the vision tower and audio through the audio tower; each tower's vectors are projected and take their places among the token embeddings. One encoder reads the joined sequence, and a last projection gives the vectors that are pooled into the embedding. The second figure shows one encoder block.
+  side_into: merge
+  stages:
+  - id: image
+    role: input
+    title: Image or video
+    side: true
+    into: merge
+  - id: vision-tower
+    role: visionEncoder
+    title: Vision tower
+    details:
+    - 16 blocks · width 768
+    side: true
+  - id: vision-embedder
+    role: projector
+    title: RMSNorm + projection
+    details:
+    - to width 512
+    note: A norm and one linear layer map the vision tower's vectors to the width of the token embeddings.
+    side: true
+  - id: audio
+    role: input
+    title: Audio
+    side: true
+    into: merge
+  - id: audio-tower
+    role: audioEncoder
+    title: Audio tower
+    details:
+    - 12 blocks
+    side: true
+  - id: audio-embedder
+    role: projector
+    title: RMSNorm + projection
+    details:
+    - to width 512
+    note: A norm and one linear layer map the audio tower's vectors to the width of the token embeddings.
+    side: true
+  - id: tokens
+    role: tokenizer
+    title: Text tokens
+    details:
+    - vocabulary 262,144
+  - id: embedding
+    role: embedding
+    title: Token embedding
+    details:
+    - width 512
+  - id: merge
+    role: embedding
+    title: Place among text embeddings
+    details:
+    - at the image and audio positions
+    note: The projected image and audio vectors take the places the prompt reserves for them, so every input forms one sequence.
+  - id: block
+    role: attention
+    title: Attention + feed-forward
+    details:
+    - 4 heads · 2 KV heads
+    frame: Encoder block
+    repeat: 24
+  - id: norm
+    role: normalisation
+    title: Final RMSNorm
+  - id: projection
+    role: projector
+    title: Linear projection
+    details:
+    - width 512 → 768
+  - id: output
+    role: outputHead
+    title: Embedding output
+    details:
+    - one vector per token, then pooled
+    note: The model returns one 768-number vector per token. It is meant to be wrapped by mean pooling and normalization, which turn them into one embedding.
 filters:
   size_category: tiny
   is_quantized: false
@@ -75,6 +155,9 @@ sources:
 - url: https://arxiv.org/abs/2610.37364
   title: arXiv:2610.37364
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/embedding_gemma2/modeling_embedding_gemma2.py
+  title: 'transformers/models/embedding_gemma2/modeling_embedding_gemma2.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

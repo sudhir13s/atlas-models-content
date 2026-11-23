@@ -35,6 +35,66 @@ moe_config:
   expert_count: 512
   active_experts: 10
   shared_expert: true
+pipeline:
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen4_exp/modeling_qwen4_exp.py
+  summary: A vision encoder turns an image or video into vectors, a patch merger joins neighbouring patches and maps them to the language model's width, and the language model reads them in the same sequence as the text tokens and writes text. Its 48 layers do not all hold the same mixer.
+  side_into: merge
+  stages:
+  - id: text
+    role: tokenizer
+    title: Text tokens
+    side: true
+  - id: text-embedding
+    role: embedding
+    title: Token embedding
+    details:
+    - width 2560
+    side: true
+  - id: image
+    role: input
+    title: Image or video
+  - id: patches
+    role: embedding
+    title: Patch embedding
+    details:
+    - 16 × 16 pixel patches · width 1152
+  - id: vision-block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - 16 heads
+    frame: Vision block
+    repeat: 27
+  - id: merger
+    role: projector
+    title: Patch merger
+    details:
+    - 4 patches into one · width 2560
+  - id: merge
+    role: embedding
+    title: Place among text embeddings
+    details:
+    - at the image token positions
+    note: The image vectors take the places the prompt reserves with image tokens, so text and image form one sequence.
+  - id: mixer
+    role: attention
+    title: Gated DeltaNet or attention
+    details:
+    - 3 Gated DeltaNet layers, then 1
+    note: 'The layers come in groups of four: three use a Gated DeltaNet, a linear-attention mixer, and the fourth uses attention with 24 query heads and 2 key-value heads. Each result is added back through a learned gated residual connection, and some layers first add a per-layer embedding of the input tokens.'
+    frame: Layer
+    repeat: 48
+  - id: experts
+    role: experts
+    title: Mixture of experts
+    details:
+    - 512 experts · 10 active per token
+    frame: Layer
+  - id: output
+    role: outputHead
+    title: Output head
+    details:
+    - logits over 248,320
 filters:
   size_category: xlarge
   is_quantized: false
@@ -71,6 +131,9 @@ sources:
   trust: 0.9
 - url: https://huggingface.co/Qwen/Qwen3.8-Flash-Next/blob/main/config.json
   title: Qwen/Qwen3.8-Flash-Next — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen4_exp/modeling_qwen4_exp.py
+  title: 'transformers/models/qwen4_exp/modeling_qwen4_exp.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

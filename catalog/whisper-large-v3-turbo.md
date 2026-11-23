@@ -19,10 +19,22 @@ intended_use: The card says Whisper models are primarily trained and evaluated o
 what_sets_it_apart: The card describes Whisper as a Transformer encoder-decoder model trained on more than 5 million hours of labeled data, which generalizes zero-shot, meaning without extra training, to many datasets and domains. This turbo version keeps the same encoder and reduces the decoder to 4 layers. By default the model predicts the source language automatically and transcribes, and setting the task to translate produces English text.
 limitations: The card says the models were trained on large-scale noisy data in a weakly supervised way, so output may include text that was not spoken, a failure called hallucination. They perform unevenly across languages, accents and dialects, and the card says they are prone to repetitive text.
 fingerprint:
+  attention_type: MHA
   num_layers: 32
+  decoder_layers: 4
+  attention_heads: 20
+  kv_heads: 20
+  head_size: 64
   hidden_size: 1280
+  intermediate_size: 5120
   vocabulary_size: 51866
   activation_function: gelu
+  normalization: LayerNorm
+  norm_placement: pre
+  stack: encoder-decoder
+  input_stem: spectrogram-convolution
+  positional_encoding: Sinusoidal
+  decoder_positional_encoding: Learned
 filters:
   size_category: tiny
   is_quantized: false
@@ -62,6 +74,9 @@ sources:
 - url: https://arxiv.org/abs/2212.04356
   title: arXiv:2212.04356
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/whisper/modeling_whisper.py
+  title: 'transformers/models/whisper/modeling_whisper.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

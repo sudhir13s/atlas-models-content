@@ -2,7 +2,7 @@
 id: architecture-era/perceptron
 type: architecture-era
 slug: perceptron
-schema_version: 2.5
+schema_version: 2.7
 title: "Perceptron"
 name: "Perceptron"
 era: early
@@ -51,6 +51,13 @@ weaknesses:
   - "**Features are not learned:** the association units' input connections are **fixed**; Rumelhart, Hinton and Williams write that such feature analysers are **not true hidden units** because they do not learn representations."
   - "**Relations are out of reach:** Rosenblatt writes that recognising a **relationship** between stimuli, such as the pattern that appeared before the circle, generally becomes **excessively difficult** for the perceptron."
   - "**No step count you can rely on:** the 1961 report calls its upper bounds on the number of corrections **generally quite poor** as estimates of the actual number of steps."
+
+visual:
+  kind: perceptron_training
+  inputs: [[0, 0], [0, 1], [1, 0], [1, 1]]
+  targets: [0, 1, 1, 1]
+  rate: 1
+  caption: "The worked example's training run on OR, computed from zero weights with η = 1: one panel per correction, with the boundary line after it. After the fourth correction the line separates the examples and training stops. The examples and starting weights are an example, not from a trained model."
 
 comparison:
   before: "Logic-based brain models (before 1958)"

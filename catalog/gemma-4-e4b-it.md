@@ -33,6 +33,78 @@ fingerprint:
   vocabulary_size: 262144
   normalization: RMSNorm
   positional_encoding: RoPE
+pipeline:
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/gemma4/modeling_gemma4.py
+  summary: A vision encoder (left) turns an image into a short row of vectors, and a projector maps them to the language model's width. They take their places among the text token embeddings, and a 42-layer language model reads the whole sequence and writes text. Audio enters the same way through its own encoder, which this figure leaves out.
+  side_into: merge
+  stages:
+  - id: image
+    role: input
+    title: Image
+    side: true
+  - id: patches
+    role: embedding
+    title: Patch embedding
+    details:
+    - 16 × 16 pixel patches · width 768
+    note: A linear layer turns the pixels of each 16 by 16 patch into one vector, and learned x and y position embeddings are added.
+    side: true
+  - id: vision-block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - 12 heads · width 768
+    frame: Vision block
+    repeat: 16
+    side: true
+  - id: pool
+    role: step
+    title: Average 3 × 3 patches
+    details:
+    - 280 soft tokens by default
+    note: Each 3 by 3 group of neighbouring patch vectors is averaged into one, so the image becomes nine times fewer vectors; the configuration's default is 280 per image.
+    side: true
+  - id: vision-projector
+    role: projector
+    title: Projector
+    details:
+    - RMSNorm · linear 768 → 2560
+    note: Normalizes the image vectors and maps them into the space of the language model's token embeddings.
+    side: true
+  - id: text
+    role: tokenizer
+    title: Text tokens
+    details:
+    - vocabulary 262,144
+  - id: embedding
+    role: embedding
+    title: Token embedding
+    details:
+    - width 2560
+  - id: merge
+    role: embedding
+    title: Place among text embeddings
+    details:
+    - at the image token positions
+    note: The image vectors take the places the prompt reserves with image tokens. Audio goes through a 12-layer audio encoder and its own projector and is placed at the audio token positions the same way.
+  - id: block
+    role: attention
+    title: Attention + feed-forward
+    details:
+    - 8 heads · 2 KV heads · width 2560
+    - "5 sliding-window : 1 global"
+    note: Five layers attend over a sliding window of 512 tokens, then one layer attends over the whole sequence, and the pattern repeats. Each layer also adds a small per-layer embedding of the token (width 256), and the last 18 layers reuse the keys and values of earlier layers.
+    frame: Transformer block
+    repeat: 42
+  - id: norm
+    role: normalisation
+    title: Final RMSNorm
+  - id: output
+    role: outputHead
+    title: Output head
+    details:
+    - logits over 262,144 · cap 30
+    note: Shares its weights with the token embedding. The logits are soft-capped at 30 before sampling.
 filters:
   size_category: medium
   is_quantized: false
@@ -72,6 +144,9 @@ sources:
 - url: https://arxiv.org/abs/2607.02770
   title: arXiv:2607.02770
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/gemma4/modeling_gemma4.py
+  title: 'transformers/models/gemma4/modeling_gemma4.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

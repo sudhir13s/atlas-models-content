@@ -23,6 +23,10 @@ fingerprint:
   vocabulary_size: 33
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: pre
+  stack: encoder
+  input_stem: waveform-convolution
+  positional_encoding: Convolutional
 filters:
   size_category: tiny
   is_quantized: false
@@ -56,6 +60,9 @@ sources:
   trust: 0.9
 - url: https://huggingface.co/ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition/blob/main/config.json
   title: ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/wav2vec2/modeling_wav2vec2.py
+  title: 'transformers/models/wav2vec2/modeling_wav2vec2.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

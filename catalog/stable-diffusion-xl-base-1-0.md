@@ -17,6 +17,57 @@ summary: 'Stable Diffusion XL (SDXL) 1.0 base is a text-to-image model from Stab
 intended_use: The card says the model is intended for research purposes only, such as artworks and design processes, educational or creative tools, research on generative models, and studying limitations and biases. It says it was not trained to be factual representations of people or events, so using it for that is out of scope.
 what_sets_it_apart: 'The card describes an ensemble-of-experts pipeline: the base model generates noisy latents, and a separate refinement model specialised for the final denoising steps can then process them. The base model can also be used by itself.'
 running_it: The card says to use diffusers 0.19.0 or later, together with transformers, safetensors, accelerate and the invisible watermark package.
+pipeline:
+  source: https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_diffusion_xl/pipeline_stable_diffusion_xl.py
+  summary: The image is made in a small latent space, not in pixels. Two text encoders read the prompt, a U-Net cleans random noise step by step while reading their output, and a decoder turns the result into the picture.
+  side_into: unet
+  stages:
+  - id: prompt
+    role: input
+    title: Text prompt
+    side: true
+  - id: tokenizer
+    role: tokenizer
+    title: CLIP tokenizers
+    details:
+    - two
+    side: true
+  - id: text-encoder
+    role: textEncoder
+    title: CLIP text encoders
+    details:
+    - two · outputs joined
+    note: Each encoder turns the prompt into a sequence of vectors and the two sequences are joined. The second encoder also gives one pooled vector for the whole prompt.
+    side: true
+  - id: noise
+    role: input
+    title: Random noise
+    details:
+    - in the latent space
+    note: Generation starts from random numbers in the latent space of the VAE, not from pixels.
+  - id: unet
+    role: denoiser
+    title: U-Net
+    details:
+    - predicts the noise in the latents
+    note: Reads the noisy latents, the step and the prompt vectors, and predicts the noise. It also receives the pooled prompt vector and the image size and crop values as extra conditioning.
+    frame: Denoising loop
+  - id: scheduler
+    role: step
+    title: Scheduler step
+    details:
+    - Euler discrete
+    note: Uses the predicted noise to make the latents a little cleaner; the loop runs once per inference step.
+    frame: Denoising loop
+  - id: vae
+    role: autoencoder
+    title: VAE decoder
+    details:
+    - latents to pixels
+    note: The decoder half of the autoencoder turns the cleaned latents into an image.
+  - id: image
+    role: outputHead
+    title: Image
 filters:
   size_category: small
   is_gated: false
@@ -57,6 +108,12 @@ sources:
 - url: https://arxiv.org/abs/2112.10752
   title: arXiv:2112.10752
   trust: 0.95
+- url: https://github.com/huggingface/diffusers/blob/main/src/diffusers/pipelines/stable_diffusion_xl/pipeline_stable_diffusion_xl.py
+  title: 'diffusers/pipelines/stable_diffusion_xl/pipeline_stable_diffusion_xl.py: reference pipeline (Hugging Face Diffusers)'
+  trust: 0.9
+- url: https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/blob/main/model_index.json
+  title: stabilityai/stable-diffusion-xl-base-1.0 — model_index.json
+  trust: 0.9
 ---
 
 ## Summary

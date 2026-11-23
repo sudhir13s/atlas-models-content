@@ -31,6 +31,9 @@ fingerprint:
   hidden_size: 4544
   vocabulary_size: 65024
   normalization: LayerNorm
+  norm_placement: pre
+  stack: decoder
+  parallel_sublayers: shared-norm
   positional_encoding: RoPE
 filters:
   size_category: medium
@@ -85,6 +88,9 @@ sources:
 - url: https://arxiv.org/abs/2306.01116
   title: arXiv:2306.01116
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/falcon/modeling_falcon.py
+  title: 'transformers/models/falcon/modeling_falcon.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

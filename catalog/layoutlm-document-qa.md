@@ -32,6 +32,42 @@ fingerprint:
   activation_function: gelu
   normalization: LayerNorm
   positional_encoding: Learned
+pipeline:
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/layoutlm/modeling_layoutlm.py
+  summary: The model reads the words of a page together with where each word sits on the page. Every word's vector is the sum of its token, its place in the text and its box on the page; a transformer encoder then marks where the answer starts and ends.
+  stages:
+  - id: words
+    role: input
+    title: Words + their boxes
+    details:
+    - question, then the page's words
+  - id: tokens
+    role: embedding
+    title: Token + position embedding
+    details:
+    - vocabulary 50,265 · width 768
+  - id: boxes
+    role: positionalEncoding
+    title: Box position embeddings
+    details:
+    - left, top, right, bottom, height
+    - and width of each word's box
+    note: Six learned embeddings place each word on the page. They are added to the word's token and position embeddings.
+  - id: norm
+    role: normalisation
+    title: Embedding LayerNorm
+  - id: block
+    role: attention
+    title: Attention + feed-forward
+    details:
+    - 12 heads · norm after each add
+    frame: Encoder block
+    repeat: 12
+  - id: head
+    role: outputHead
+    title: Answer span head
+    details:
+    - start and end score per token
 filters:
   size_category: tiny
   is_quantized: false
@@ -68,6 +104,9 @@ sources:
   trust: 0.9
 - url: https://huggingface.co/impira/layoutlm-document-qa/blob/main/config.json
   title: impira/layoutlm-document-qa — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/layoutlm/modeling_layoutlm.py
+  title: 'transformers/models/layoutlm/modeling_layoutlm.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

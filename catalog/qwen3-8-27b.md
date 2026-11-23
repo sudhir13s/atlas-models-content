@@ -32,8 +32,66 @@ fingerprint:
   vocabulary_size: 248320
   activation_function: silu
   normalization: RMSNorm
+  norm_placement: pre
+  stack: decoder
+  layer_mixers: {"names": ["Gated DeltaNet", "GQA"], "pattern": "3 Gated DeltaNet layers, then 1 GQA", "feed_forward": true, "note": "The 64 layers come in groups of four: the first three use a Gated DeltaNet, a linear-attention mixer, and the fourth uses grouped-query attention. Every layer has the same norms and feed-forward."}
   positional_encoding: RoPE
   rope_theta: 10000000.0
+pipeline:
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3_5/modeling_qwen3_5.py
+  summary: A vision encoder turns an image or video into vectors, a patch merger joins neighbouring patches and maps them to the language model's width, and the language model reads them in the same sequence as the text tokens and writes text. The second figure shows one layer of the language model.
+  side_into: merge
+  stages:
+  - id: text
+    role: tokenizer
+    title: Text tokens
+    side: true
+  - id: text-embedding
+    role: embedding
+    title: Token embedding
+    details:
+    - width 5120
+    side: true
+  - id: image
+    role: input
+    title: Image or video
+  - id: patches
+    role: embedding
+    title: Patch embedding
+    details:
+    - 16 × 16 pixel patches · width 1152
+  - id: vision-block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - 16 heads
+    frame: Vision block
+    repeat: 27
+  - id: merger
+    role: projector
+    title: Patch merger
+    details:
+    - 4 patches into one · width 5120
+    note: Joins each 2 by 2 group of patch vectors into one and maps it, through two linear layers with a GELU between, to the width of the language model.
+  - id: merge
+    role: embedding
+    title: Place among text embeddings
+    details:
+    - at the image token positions
+    note: The image vectors take the places the prompt reserves with image tokens, so text and image form one sequence.
+  - id: language-block
+    role: attention
+    title: Mixer + feed-forward
+    details:
+    - 3 Gated DeltaNet layers, then 1 GQA
+    note: 'The language model''s layers come in groups of four: three use a Gated DeltaNet and the fourth grouped-query attention.'
+    frame: Transformer block
+    repeat: 64
+  - id: output
+    role: outputHead
+    title: Output head
+    details:
+    - logits over 248,320
 filters:
   size_category: large
   is_quantized: false
@@ -71,6 +129,9 @@ sources:
   trust: 0.9
 - url: https://huggingface.co/Qwen/Qwen3.8-27B/blob/main/config.json
   title: Qwen/Qwen3.8-27B — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3_5/modeling_qwen3_5.py
+  title: 'transformers/models/qwen3_5/modeling_qwen3_5.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

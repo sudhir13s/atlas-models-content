@@ -19,6 +19,45 @@ base_models:
 summary: 'DINOv3 ViT-L/16 is a vision model from Meta AI that reads an image and returns numeric features describing it, rather than a label or a caption. The card calls the DINOv3 models vision backbones: other programs build tasks such as classification or depth estimation on top of their features. This checkpoint is a Vision Transformer with a patch size of 16, pretrained on web data from the LVD-1689M dataset and distilled from the family''s ViT-7B model. Access on Hugging Face requires agreeing to share Hugging Face account information with Meta.'
 intended_use: The card says the models provide multi-purpose features for downstream tasks and can be used without fine-tuning, with downstream classifiers as simple as a linear layer. Its list covers image classification, image retrieval with nearest neighbors, 3D keypoint correspondences, depth estimation and semantic segmentation, unsupervised object discovery, video segmentation tracking and video classification.
 what_sets_it_apart: The card describes DINOv3 as a family of vision foundation models that produces dense features, meaning one feature per image patch as well as one for the whole image. For a 224x224 image this checkpoint returns 1 class token, 4 register tokens and 196 patch tokens, and it accepts larger images whose sides are multiples of 16. The card says the smaller models in the family, this one included, were distilled from a 7-billion-parameter ViT trained from scratch.
+pipeline:
+  source: https://github.com/facebookresearch/dinov3/blob/main/dinov3/hub/backbones.py
+  summary: The image is cut into 16 × 16 pixel patches, each turned into a vector, and one class token and four register tokens are placed in front. A stack of 24 transformer blocks refines all the tokens. The output is one vector for the whole image (the class token) and one vector per patch.
+  stages:
+  - id: image
+    role: input
+    title: Image
+    details:
+    - sides a multiple of 16 pixels
+  - id: patches
+    role: embedding
+    title: Patch embedding
+    details:
+    - 16 × 16 pixel patches · width 1024
+    note: A convolution turns each 16 by 16 pixel patch into one vector of width 1024.
+  - id: tokens
+    role: embedding
+    title: Class + 4 register tokens
+    details:
+    - placed before the patches
+    note: One learned class token and four learned register tokens are placed in front of the patch vectors. No position vectors are added here; positions enter inside attention as rotary embeddings.
+  - id: block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - 16 heads · RoPE positions
+    - MLP feed-forward · LayerScale
+    note: Each block applies a LayerNorm, self-attention with rotary position embedding (RoPE) and a learned per-channel scale, then a LayerNorm, a two-layer MLP and another scale; each part is added back to its input.
+    frame: Encoder block
+    repeat: 24
+  - id: norm
+    role: normalisation
+    title: Final LayerNorm
+  - id: output
+    role: outputHead
+    title: Class token + patch tokens
+    details:
+    - one vector per image and per patch
+    note: The class token after the final norm is the image embedding; the patch tokens give one feature per 16 by 16 patch. A 224 × 224 image gives 1 class, 4 register and 196 patch tokens.
 filters:
   size_category: tiny
   is_gated: true
@@ -49,6 +88,12 @@ sources:
 - url: https://arxiv.org/abs/2508.10104
   title: arXiv:2508.10104
   trust: 0.95
+- url: https://github.com/facebookresearch/dinov3/blob/main/dinov3/hub/backbones.py
+  title: 'dinov3/hub/backbones.py: model definitions (Meta, DINOv3 repository)'
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/dinov3_vit/modeling_dinov3_vit.py
+  title: 'transformers/models/dinov3_vit/modeling_dinov3_vit.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

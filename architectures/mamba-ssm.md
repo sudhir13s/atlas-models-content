@@ -2,7 +2,7 @@
 id: architecture-era/mamba-ssm
 type: architecture-era
 slug: mamba-ssm
-schema_version: 2.5
+schema_version: 2.7
 title: "Mamba & Selective State-Space Models"
 name: "Mamba (Selective SSM)"
 era: post-transformer
@@ -53,6 +53,15 @@ weaknesses:
   - "**A fixed state must compress:** the authors write that a recurrent model's effectiveness is limited by **how well its state has compressed the context**; attention keeps the whole context instead."
   - "**Tested only at small sizes:** the authors' evaluation stays below the **7B** scale of strong open models and leaves open whether Mamba still compares favourably there."
   - "**An unproven toolkit:** the authors ask whether SSMs share the Transformer's affordances, such as fine-tuning, prompting, in-context learning, instruction tuning and quantization."
+
+visual:
+  kind: selective_scan
+  a: -1
+  b: 1
+  inputs: [4, 1, -2]
+  steps: [2.0, 0.05, 1.0]
+  fixed_step: 0.5
+  caption: "The worked example's three tokens through one channel, computed with the zero-order-hold rule (A = −1, B = 1, h₀ = 0): with selection each token uses its own step size Δ, without it every token uses Δ = 0.5. The inputs and step sizes are an example, not from a trained model."
 
 comparison:
   before: "Earlier structured SSMs (S4)"

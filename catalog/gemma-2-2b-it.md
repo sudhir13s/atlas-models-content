@@ -19,6 +19,19 @@ base_models:
 summary: Gemma 2 2B IT is a text-generation model from Google, the instruction-tuned version of the 2B size of the Gemma 2 family. Instruction-tuned means it was trained further to follow requests and hold a conversation. The card describes Gemma models as text-to-text, decoder-only large language models, available in English, with open weights.
 intended_use: 'The card lists content creation and communication: text generation such as poems, scripts, code, marketing copy and email drafts, chatbots and conversational AI, and text summarization. For research and education it lists natural language processing research, language learning tools and knowledge exploration. It says the list is not comprehensive and that its small size makes deployment possible on a laptop, a desktop or a user''s own cloud.'
 what_sets_it_apart: The card says the Gemma family is built from the same research and technology used to create Google's Gemini models, and that open weights are released for both pre-trained and instruction-tuned variants.
+fingerprint:
+  attention_type: GQA
+  num_layers: 26
+  attention_heads: 8
+  kv_heads: 4
+  head_size: 256
+  hidden_size: 2304
+  context_window_tokens: 8192
+  activation_function: GeGLU
+  normalization: RMSNorm
+  norm_placement: both
+  stack: decoder
+  positional_encoding: RoPE
 filters:
   size_category: small
   is_gated: true
@@ -128,6 +141,12 @@ sources:
 - url: https://arxiv.org/abs/2403.13793
   title: arXiv:2403.13793
   trust: 0.95
+- url: https://arxiv.org/abs/2408.00118
+  title: 'Gemma 2: Improving Open Language Models at a Practical Size'
+  trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/gemma2/modeling_gemma2.py
+  title: 'transformers/models/gemma2/modeling_gemma2.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

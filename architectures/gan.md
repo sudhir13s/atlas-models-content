@@ -2,7 +2,7 @@
 id: architecture-era/gan
 type: architecture-era
 slug: gan
-schema_version: 2.5
+schema_version: 2.7
 title: "Generative Adversarial Networks"
 name: "Generative Adversarial Network"
 era: foundation
@@ -54,6 +54,13 @@ weaknesses:
   - "**Instability at scale:** BigGAN's authors report that their large models undergo **complete training collapse** and that full stability came only at a **dramatic cost** to performance."
   - "**A perfect discriminator stops learning:** Miyato et al. note that when the real and generated samples do not overlap, a discriminator can separate them perfectly, and the generator's training then **comes to a complete stop**."
   - "**Hard to evaluate:** BigGAN's authors call the Inception Score and Fréchet Inception Distance (FID) popular **despite notable flaws** and use them only as approximate measures."
+
+visual:
+  kind: discriminator
+  items: ["A", "B", "C"]
+  p_data: [0.5, 0.25, 0.25]
+  p_g: [0.25, 0.25, 0.5]
+  caption: "For each item of the worked example: how common it is in the real data and among the generator's samples, and the best discriminator's answer D* = p_data ÷ (p_data + p_g), computed from the two. The probabilities are an example, not from a trained model."
 
 comparison:
   before: "Boltzmann machines (deep undirected models)"

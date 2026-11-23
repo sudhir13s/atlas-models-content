@@ -36,6 +36,76 @@ fingerprint:
   normalization: RMSNorm
   positional_encoding: RoPE
   rope_theta: 1000000.0
+pipeline:
+  source: https://github.com/LLaVA-VL/LLaVA-NeXT/blob/main/llava/model/llava_arch.py
+  summary: Up to 64 frames are sampled from the video and each is encoded by a SigLIP vision encoder. A small projector maps the frame features to the language model's width, pooling shrinks each frame to fewer tokens, and the Qwen2 language model reads them together with the question, which names the time of each frame, and writes the answer.
+  side_into: merge
+  stages:
+  - id: text
+    role: tokenizer
+    title: Text tokens
+    details:
+    - question + frame times
+    note: The card's example prompt states how long the video is, how many frames were sampled and the time of each one.
+    side: true
+  - id: text-embedding
+    role: embedding
+    title: Token embedding
+    details:
+    - width 3584
+    side: true
+  - id: frames
+    role: input
+    title: Video frames
+    details:
+    - up to 64 · 384 × 384 pixels
+    note: The card's example samples 64 frames evenly across the whole video.
+  - id: patches
+    role: embedding
+    title: Patch embedding
+    details:
+    - 14 × 14 pixel patches · width 1152
+    note: Each frame becomes a 27 × 27 grid of patch vectors.
+  - id: vision-block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - SigLIP SO400M · 16 heads
+    note: The SigLIP encoder has 27 blocks; LLaVA-NeXT removes the last one and its pooling head and takes the patch vectors from block 26.
+    frame: Vision block
+    repeat: 26
+  - id: projector
+    role: projector
+    title: Projector
+    details:
+    - linear · GELU · linear
+    - width 1152 → 3584
+    note: Maps each patch vector into the space of the language model's token embeddings.
+  - id: pool
+    role: projector
+    title: Pool each frame
+    details:
+    - 27 × 27 → 14 × 14 · bilinear
+    note: Each frame's grid is resized to half its side, so a frame costs 196 tokens; a learned newline token is added after each row of the grid.
+  - id: merge
+    role: embedding
+    title: Place among text embeddings
+    details:
+    - at the image token position
+    note: The frame tokens take the place the prompt reserves with an image token, so frames and text form one sequence.
+  - id: language-block
+    role: attention
+    title: Attention + feed-forward
+    details:
+    - 28 heads · 4 KV heads · width 3584
+    note: The Qwen2-7B decoder; attention is causal, so each position sees only what comes before it.
+    frame: Transformer block
+    repeat: 28
+  - id: output
+    role: outputHead
+    title: Output head
+    details:
+    - logits over 152,064
 filters:
   size_category: medium
   is_quantized: false
@@ -76,6 +146,12 @@ sources:
 - url: https://arxiv.org/abs/2410.02713
   title: arXiv:2410.02713
   trust: 0.95
+- url: https://github.com/LLaVA-VL/LLaVA-NeXT/blob/main/llava/model/llava_arch.py
+  title: 'LLaVA-NeXT/llava/model/llava_arch.py: model code (LLaVA-VL)'
+  trust: 0.9
+- url: https://github.com/LLaVA-VL/LLaVA-NeXT/blob/main/llava/model/multimodal_encoder/siglip_encoder.py
+  title: 'LLaVA-NeXT/llava/model/multimodal_encoder/siglip_encoder.py: vision encoder code (LLaVA-VL)'
+  trust: 0.9
 ---
 
 ## Summary

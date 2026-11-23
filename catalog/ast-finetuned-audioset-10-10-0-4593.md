@@ -27,6 +27,10 @@ fingerprint:
   intermediate_size: 3072
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: pre
+  stack: encoder
+  input_stem: spectrogram-patches
+  positional_encoding: Learned
 filters:
   size_category: tiny
   is_quantized: false
@@ -66,6 +70,9 @@ sources:
 - url: https://arxiv.org/abs/2104.01778
   title: arXiv:2104.01778
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/audio_spectrogram_transformer/modeling_audio_spectrogram_transformer.py
+  title: 'transformers/models/audio_spectrogram_transformer/modeling_audio_spectrogram_transformer.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

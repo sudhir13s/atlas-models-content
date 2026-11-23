@@ -32,6 +32,62 @@ fingerprint:
   normalization: RMSNorm
   positional_encoding: RoPE
   rope_theta: 1000000.0
+pipeline:
+  source: https://arxiv.org/abs/2609.33757
+  summary: 'One 28-layer transformer does the work in two modes. In its autoregressive (AR) mode it writes a readable score in ABC notation and then semantic music tokens, one token at a time. In its non-autoregressive (NAR) mode it turns random acoustic latents into music by flow matching while reading the whole plan, and a separate autoencoder decodes them to 48 kHz stereo.'
+  stages:
+  - id: prompt
+    role: input
+    title: Style prompt + lyrics
+  - id: tokenizer
+    role: tokenizer
+    title: Text tokenizer
+    details:
+    - byte-pair encoding
+    note: Text, lyrics and the ABC score share the ordinary text tokenizer; the semantic codes use a separate range of the vocabulary.
+  - id: score
+    role: attention
+    title: Write the ABC score
+    details:
+    - 28 layers · AR experts
+    note: The AR stream predicts the score token by token after the text and lyrics; the score sets tempo, meter, key, chords and melody. For editing or covers a given score is used instead.
+    frame: AR mode
+  - id: semantic
+    role: attention
+    title: Write semantic tokens
+    details:
+    - 25 per second
+    note: The AR stream continues with MERT2 semantic tokens, a dense musical trajectory at 25 tokens per second.
+    frame: AR mode
+  - id: noise
+    role: input
+    title: Random noise
+    details:
+    - acoustic latents · 25 Hz × 64
+  - id: nar
+    role: denoiser
+    title: NAR stream
+    details:
+    - 28 layers · NAR experts
+    note: Each of the 28 layers has separate normalisation, projections and MLP experts for each mode, and both modes take part in one attention computation. The NAR experts predict the flow velocity of the latents. Acoustic positions see the whole score and token sequence and each other; the AR positions never see the acoustic ones.
+    frame: Denoising loop
+  - id: step
+    role: step
+    title: Flow step
+    details:
+    - flow matching
+    frame: Denoising loop
+  - id: vae
+    role: autoencoder
+    title: VAE decoder
+    details:
+    - latents to waveform
+    note: A separately trained decoder turns the 25-per-second, 64-dimensional latents into 48 kHz stereo audio.
+  - id: audio
+    role: outputHead
+    title: Stereo song
+    details:
+    - 48 kHz
 filters:
   size_category: small
   is_quantized: false

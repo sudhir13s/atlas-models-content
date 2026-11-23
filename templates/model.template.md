@@ -42,13 +42,31 @@ fingerprint:
   vocabulary_size: <int>
   activation_function: <SwiGLU | GELU | ...>
   normalization: <RMSNorm | LayerNorm>
-  norm_placement: <pre | post>     # only when read from the paper or official implementation; absent for any other layout
+  norm_placement: <pre | post | both>   # only when read from the paper or official implementation; absent for any other layout
   stack: <encoder | decoder | encoder-decoder>   # same rule
+  parallel_sublayers: <shared-norm | separate-norms>   # only when attention and feed-forward both read the block's input (with norm_placement: pre)
+  output_head: <cell-selection | cell-selection-aggregation>   # table models only, as the implementation names the head
+  layer_mixers: { names: ["<mixer>", "<mixer>"], pattern: "<how they are spread over the layers>", note: "<one to three sentences>", feed_forward: true }   # only when layers hold different mixers
+  decoder_layers: <int>            # encoder-decoder only: the decoder's block count (num_layers is the encoder's)
+  embedding_norm: true             # only when the implementation normalises the summed embeddings before the first block
+  input_stem: <spectrogram-convolution | spectrogram-patches | waveform-convolution>   # audio models only, read from the implementation
   positional_encoding: <RoPE | ALiBi | learned>
+  decoder_positional_encoding: <Learned | ...>   # encoder-decoder only, when it differs from the encoder's
   rope_theta: <number | null>
   parameters_active_b: <number>
   kv_cache_rating: <low | medium | high>
   key_detail: "<notable detail>"
+pipeline:                        # the whole model as stages, only when one primary source states the structure
+  source: "<the url of the entry of sources the structure was read from>"
+  summary: "<two or three plain sentences on what the figure shows>"
+  side_into: <id of the main-column stage the side stages feed>   # only with side stages
+  stages:                        # top to bottom; a stage the source does not state is left out
+    - { id: <slug>, role: input, title: "<at most 28 characters>", details: ["<at most 36 characters>"], note: "<one or two sentences>" }
+    - { id: <slug>, role: visionEncoder, title: "<...>", frame: "<group name>", repeat: <int> }   # consecutive stages of one frame share it
+    - { id: <slug>, role: tokenizer, title: "<...>", side: true }
+    - { id: <slug>, role: textEncoder, title: "<...>", side: true, into: <id> }   # `into` starts a further side run that feeds <id>
+    - { id: <slug>, role: denoiser, title: "<...>", frame: "<loop>", inner_frame: "<block>", inner_repeat: <int> }   # a repeated block inside a loop
+    - { id: <slug>, role: outputHead, title: "<...>", branch: true }   # a second output, leaving from pipeline.branch_from
 moe_config: null                 # or { expert_count, active_experts, shared_expert, notes }
 filters:
   size_category: <tiny | small | medium | large | xlarge>
@@ -65,6 +83,11 @@ hub_signals:                     # owned by the jobs; numbers that change
   last_modified: <YYYY-MM-DD>
   observed_at: <YYYY-MM-DD>
   source: "<url>"
+gguf_repositories:               # owned by the jobs; links to GGUF copies whose own card names this model as their base
+  repositories:
+    - { publisher: <hf-handle>, repo_id: "<owner/repo>", address: "https://huggingface.co/<owner/repo>" }
+  observed_at: <YYYY-MM-DD>
+  source: "https://huggingface.co/models?library=gguf&other=base_model:quantized:<owner/repo>"
 variants:                        # quantised or repackaged copies, one entry each
   - { name: "<owner/repo>", format: awq, address: "https://huggingface.co/<owner/repo>", publisher: <hf-handle> }
 aliases: ["<owner/repo>"]

@@ -26,6 +26,7 @@ fingerprint:
   vocabulary_size: 28996
   norm_placement: post
   stack: encoder
+  embedding_norm: true
 filters:
   size_category: tiny
   is_quantized: false

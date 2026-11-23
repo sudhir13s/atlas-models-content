@@ -33,6 +33,75 @@ fingerprint:
   normalization: RMSNorm
   positional_encoding: RoPE
   rope_theta: 1000000.0
+pipeline:
+  source: https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize/blob/main/modeling_moss_transcribe_diarize.py
+  summary: A Whisper-Medium encoder turns the recording, chunk by chunk, into vectors. Groups of four vectors are joined, an adaptor maps them to the language model's width, and a Qwen3-0.6B language model reads them with the instruction and writes a transcript with timestamps and speaker labels.
+  side_into: merge
+  stages:
+  - id: text
+    role: tokenizer
+    title: Instruction tokens
+    side: true
+  - id: text-embedding
+    role: embedding
+    title: Token embedding
+    details:
+    - width 1024
+    side: true
+  - id: audio
+    role: input
+    title: Audio
+    details:
+    - log-mel spectrogram · 80 bins
+    note: The recording is cut into chunks; the encoder output of all chunks of one recording is joined again before the next step.
+  - id: stem
+    role: audioEncoder
+    title: Convolution layers
+    details:
+    - two layers · width 1024
+    note: Two convolution layers, the second with stride 2, turn the spectrogram into a sequence of vectors, and position embeddings are added.
+  - id: audio-block
+    role: audioEncoder
+    title: Attention + feed-forward
+    details:
+    - 16 heads · norm before each part
+    frame: Encoder block
+    repeat: 24
+  - id: audio-norm
+    role: normalisation
+    title: Final LayerNorm
+  - id: group
+    role: projector
+    title: Join 4 frames
+    details:
+    - width 1024 → 4096
+    note: Four neighbouring audio vectors are joined into one, so the sequence gets four times shorter.
+  - id: adaptor
+    role: projector
+    title: Adaptor
+    details:
+    - linear · SiLU · linear · LayerNorm
+    - width 4096 → 1024
+    note: Maps the joined audio vectors into the space of the language model's token embeddings.
+  - id: merge
+    role: embedding
+    title: Place among text embeddings
+    details:
+    - at the audio token positions
+    note: The audio vectors take the places the prompt reserves with audio tokens, so text and audio form one sequence.
+  - id: language-block
+    role: attention
+    title: Attention + feed-forward
+    details:
+    - 16 heads · 8 KV heads · width 1024
+    frame: Transformer block
+    repeat: 28
+  - id: output
+    role: outputHead
+    title: Output head
+    details:
+    - logits over 151,936
+    note: Writes the transcript one token at a time, with timestamps and speaker labels such as [S01] as part of the text.
 filters:
   size_category: tiny
   is_quantized: false
@@ -73,6 +142,9 @@ sources:
 - url: https://arxiv.org/abs/2601.01554
   title: arXiv:2601.01554
   trust: 0.95
+- url: https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize/blob/main/modeling_moss_transcribe_diarize.py
+  title: OpenMOSS-Team/MOSS-Transcribe-Diarize — modeling_moss_transcribe_diarize.py (model code)
+  trust: 0.9
 ---
 
 ## Summary

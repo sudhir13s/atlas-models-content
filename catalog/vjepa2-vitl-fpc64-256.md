@@ -26,6 +26,54 @@ fingerprint:
   hidden_size: 1024
   activation_function: gelu
   normalization: LayerNorm
+pipeline:
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/vjepa2/modeling_vjepa2.py
+  summary: 'A 64-frame clip is cut into small space-time blocks and a vision transformer turns them into one feature vector per block; these are the video features the card uses. The checkpoint also holds the predictor used in pre-training: from the features of the visible blocks it predicts the features of hidden ones.'
+  stages:
+  - id: video
+    role: input
+    title: Video clip
+    details:
+    - 64 frames · 256 × 256 pixels
+  - id: tubelets
+    role: embedding
+    title: Tubelet embedding
+    details:
+    - 2 frames × 16 × 16 pixels · 1024
+    note: A 3D convolution turns each block of 2 frames by 16 by 16 pixels into one vector, giving 32 × 16 × 16 = 8,192 vectors per clip.
+  - id: encoder-block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - 16 heads · 3D rotary positions
+    note: Positions in time, height and width are given by rotary embeddings inside attention; there is no added position embedding.
+    frame: Encoder block
+    repeat: 24
+  - id: encoder-norm
+    role: normalisation
+    title: Final LayerNorm
+    details:
+    - video features · width 1024
+    note: This output is what the card's get_vision_features example returns, for classification, retrieval or as a video encoder.
+  - id: predictor-input
+    role: projector
+    title: Visible + mask tokens
+    details:
+    - width 1024 → 384
+    note: In pre-training, the features of the visible blocks are mapped to width 384 and learned mask tokens are added at the positions to predict.
+  - id: predictor-block
+    role: attention
+    title: Attention + feed-forward
+    details:
+    - 12 heads · width 384
+    frame: Predictor block
+    repeat: 12
+  - id: predictor-out
+    role: outputHead
+    title: Predicted features
+    details:
+    - LayerNorm · width 384 → 1024
+    note: The outputs at the mask positions are normalised and mapped back to width 1024, as predictions of the hidden blocks' features.
 filters:
   size_category: tiny
   is_quantized: false
@@ -61,6 +109,9 @@ sources:
   trust: 0.9
 - url: https://huggingface.co/facebook/vjepa2-vitl-fpc64-256/blob/main/config.json
   title: facebook/vjepa2-vitl-fpc64-256 — config.json
+  trust: 0.9
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/vjepa2/modeling_vjepa2.py
+  title: 'transformers/models/vjepa2/modeling_vjepa2.py: reference implementation (Hugging Face Transformers)'
   trust: 0.9
 ---
 

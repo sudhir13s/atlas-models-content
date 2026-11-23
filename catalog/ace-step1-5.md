@@ -30,6 +30,73 @@ fingerprint:
   normalization: RMSNorm
   positional_encoding: RoPE
   rope_theta: 1000000.0
+pipeline:
+  source: https://arxiv.org/abs/2602.00744
+  summary: 'Two models work in turn. A language model plans the song: it writes metadata, lyrics and a caption, and a sequence of coarse audio codes. A diffusion transformer (DiT) then renders the sound from those codes in a few steps while reading the caption and lyrics (left), and a 1D autoencoder turns the latents into a 48 kHz stereo waveform.'
+  side_into: dit
+  stages:
+  - id: caption
+    role: input
+    title: Caption + lyrics
+    details:
+    - written or refined by the planner
+    side: true
+  - id: condition-encoders
+    role: textEncoder
+    title: Condition encoders
+    details:
+    - captions · Qwen3-Embedding-0.6B
+    - lyrics 8 layers · timbre 4 layers
+    note: The caption embeddings from Qwen3-0.6B are joined with the outputs of a lyric encoder and a timbre encoder, and the DiT reads them through cross-attention.
+    side: true
+  - id: request
+    role: input
+    title: Song request
+  - id: planner
+    role: attention
+    title: 5 Hz language model planner
+    details:
+    - 1.7B · from Qwen3-1.7B
+    note: The language model first writes chain-of-thought metadata such as tempo, key, duration and structure in YAML, then lyrics, a caption and audio codes at 5 codes per second.
+  - id: codes
+    role: step
+    title: Audio codes as source
+    details:
+    - 5 Hz codes · codebook about 64k
+    note: The finite-scalar-quantized codes are the structural source latent; they fix melody and rhythm for the DiT.
+  - id: join
+    role: projector
+    title: Join source, noise, mask
+    details:
+    - patchified · 25 Hz to 12.5 Hz
+    note: The source latent, the noisy target and a mask are joined into one input. A patchify layer halves the sequence length to 12.5 positions per second. The mask lets one model generate, repaint or cover.
+    frame: Denoising loop
+  - id: dit
+    role: denoiser
+    title: Diffusion transformer
+    details:
+    - 24 layers · 16 heads · 8 KV heads
+    - about 2B parameters · width 2048
+    note: Odd layers use sliding-window attention over 128 positions for local detail and even layers use global grouped-query attention for long-range structure; cross-attention reads the caption, lyric and timbre vectors.
+    frame: Denoising loop
+  - id: scheduler
+    role: step
+    title: Scheduler step
+    details:
+    - flow matching · 8 steps
+    note: This turbo checkpoint was distilled from 50 to 8 steps with shift 3 and runs without classifier-free guidance.
+    frame: Denoising loop
+  - id: vae
+    role: autoencoder
+    title: 1D VAE decoder
+    details:
+    - 64-dim latents at 25 Hz
+    note: The waveform autoencoder turns the 64-dimensional latents, 25 per second, back into audio; it compresses 1920 times.
+  - id: audio
+    role: outputHead
+    title: Stereo music
+    details:
+    - 48 kHz
 filters:
   is_quantized: false
   is_moe: false
@@ -68,6 +135,9 @@ sources:
 - url: https://arxiv.org/abs/2602.00744
   title: arXiv:2602.00744
   trust: 0.95
+- url: https://huggingface.co/ACE-Step/Ace-Step1.5/blob/main/acestep-v15-turbo/config.json
+  title: 'ACE-Step/Ace-Step1.5 — acestep-v15-turbo/config.json'
+  trust: 0.9
 ---
 
 ## Summary

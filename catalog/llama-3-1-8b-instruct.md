@@ -54,6 +54,16 @@ hub_signals:
   last_modified: '2024-09-25'
   observed_at: '2026-11-20'
   source: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
+gguf_repositories:
+  repositories:
+  - publisher: unsloth
+    repo_id: unsloth/Llama-3.1-8B-Instruct-GGUF
+    address: https://huggingface.co/unsloth/Llama-3.1-8B-Instruct-GGUF
+  - publisher: bartowski
+    repo_id: bartowski/Meta-Llama-3.1-8B-Instruct-GGUF
+    address: https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF
+  observed_at: '2026-11-23'
+  source: https://huggingface.co/models?library=gguf&other=base_model:quantized:meta-llama/Llama-3.1-8B-Instruct
 aliases:
 - meta-llama/Llama-3.1-8B-Instruct
 - llama-3.1-8b-instruct

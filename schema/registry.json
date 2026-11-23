@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.6",
+  "schema_version": "2.9",
   "shared": "schema/_shared.schema.json",
   "types": {
     "model": {
@@ -34,7 +34,15 @@
       "folder": "parameters",
       "schema": "schema/parameter.schema.json",
       "id_prefix": "parameter/",
-      "sections": ["Definition", "What to look for", "Calculation", "Example"]
+      "sections": ["Definition"],
+      "optional_sections": [
+        "How It Works",
+        "What to look for",
+        "Calculation",
+        "Example",
+        "Worked Example",
+        "What To Watch"
+      ]
     },
     "parameter-calculator": {
       "folder": "parameter-calculators",
@@ -60,7 +68,17 @@
       "folder": "fine-tuning-methods",
       "schema": "schema/fine-tuning-method.schema.json",
       "id_prefix": "fine-tuning-method/",
-      "sections": ["Definition", "What to look for", "Calculation", "Example"]
+      "sections": ["Definition"],
+      "optional_sections": [
+        "How It Works",
+        "What to look for",
+        "Calculation",
+        "Example",
+        "Worked Example",
+        "Memory",
+        "Trade-offs",
+        "When To Use"
+      ]
     },
     "license": {
       "folder": "licenses",

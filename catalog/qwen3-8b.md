@@ -50,6 +50,16 @@ hub_signals:
   last_modified: '2025-07-26'
   observed_at: '2026-11-20'
   source: https://huggingface.co/Qwen/Qwen3-8B
+gguf_repositories:
+  repositories:
+  - publisher: Qwen
+    repo_id: Qwen/Qwen3-8B-GGUF
+    address: https://huggingface.co/Qwen/Qwen3-8B-GGUF
+  - publisher: unsloth
+    repo_id: unsloth/Qwen3-8B-GGUF
+    address: https://huggingface.co/unsloth/Qwen3-8B-GGUF
+  observed_at: '2026-11-23'
+  source: https://huggingface.co/models?library=gguf&other=base_model:quantized:Qwen/Qwen3-8B
 variants:
 - name: Qwen/Qwen3-8B-AWQ
   format: awq

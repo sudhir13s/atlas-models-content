@@ -40,6 +40,7 @@ fingerprint:
   normalization: LayerNorm
   norm_placement: post
   stack: encoder
+  embedding_norm: true
   positional_encoding: Learned
 filters:
   size_category: tiny
@@ -72,7 +73,7 @@ tags:
 - xlm-roberta
 - dense
 - mha
-updated: '2026-11-22'
+updated: '2026-11-23'
 sources:
 - url: https://huggingface.co/BAAI/bge-m3
   title: BAAI/bge-m3 — model page (Hugging Face)

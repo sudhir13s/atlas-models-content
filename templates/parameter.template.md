@@ -2,29 +2,58 @@
 id: parameter/<slug>
 type: parameter
 slug: <slug>
-schema_version: 1.0
-title: "<Architecture Family> Parameters"
-arch: llm                        # llm | cnn | rnn | gan | diffusion | moe | ssm | mlp
-order: <int>
-color_key: llm
-components:                      # structural knobs, ranked (rank 1 = most impactful)
-  - { name: "<knob>", rank: 1, importance: critical, badge: "Per Layer", formula: "<formula>", range: "<range>" }
-worked_example:
-  label: "<Model Name>"
-  config: { hiddenDim: <int>, numLayers: <int>, attentionHeads: <int>, kvHeads: <int>, ffnDim: <int>, vocabSize: <int>, headDim: <int>, activation: SwiGLU, normalization: RMSNorm, tiedEmbeddings: false }
-  sources:
-    - { url: "<url>", title: "<title>", trust: 0.9 }
+schema_version: 2.9
+title: "<Parameter Name>"
+name: <config_key>               # the exact key in config.json
+priority: <int>                  # 1 = most impactful
+importance: critical             # critical | important | optional
+applies_to: [llm, transformer]   # architecture families
+range: "<low — high>"            # spans typical_values
+controls: "<one plain sentence: what the parameter is>"
+effects:
+  decrease: ["<what changes when it goes down>"]
+  increase: ["<what changes when it goes up>"]
+scale: { min: <number>, max: <number>, typical_min: <number>, typical_max: <number>, spacing: log }
+typical_values:                  # one row per model, each from that model's config.json, card or paper
+  - setting: "<Model> (config.json)"
+    value: "<one plain number>"
+    source: "<url of one entry of sources>"
+mistakes:                        # two to five, drawn as common misunderstandings
+  - mistake: "<the misunderstanding>"
+    why: "<what the source shows instead>"
+    fix: "<what to do>"
+related: [parameter/<slug>]
+visual:                          # count_sweep | count_breakdown | head_grid | kv_cache | context_cost
+  kind: count_sweep
+  model: { name: "<Model>", vocab_size: <int>, hidden_size: <int>, intermediate_size: <int>, num_hidden_layers: <int>, num_attention_heads: <int>, num_key_value_heads: <int>, head_dim: <int>, tie_word_embeddings: false, ffn_matrices: 3, qk_norm: false }
+  vary: width
+  values: [<number>, <number>]
+  measure: per_layer
+  caption: "<what is drawn and whose config.json it uses>"
 tags: [<tag>]
 updated: <YYYY-MM-DD>
 sources:
-  - { url: "<url>", title: "<title>", trust: 0.9 }
+  - { url: "<url>", title: "<title>", trust: 0.95 }
 ---
 
-## Overview
-<What these parameters are and how they combine into the model's capacity.>
+## Definition
 
-## Components
-<One subsection per component with its formula and what to look for.>
+<Under the figure: the parameter in plain words, each term explained at first use.>
+
+## How It Works
+
+<Numbered steps: where the value is used as data passes through the model.>
+
+## Calculation
+
+<How the key enters the parameter count, said in words first, every symbol in a table; link the
+parameter calculators.>
 
 ## Worked Example
-<Plug the worked_example.config into the master formula and show the total.>
+
+<A catalog model's own numbers, named, every step numbered with its result; close with "What this
+means".>
+
+## What To Watch
+
+<Labelled bullets: what to check in a configuration.>

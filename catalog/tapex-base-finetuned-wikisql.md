@@ -15,11 +15,22 @@ intended_use: The card says the model can be used for table question answering o
 what_sets_it_apart: The card says TAPEX learns table reasoning by training a neural SQL executor on a synthetic corpus built from automatically generated executable SQL queries. It is based on the BART architecture, a sequence-to-sequence model with a bidirectional encoder and an autoregressive decoder.
 running_it: The card's example notes that TAPEX accepts uncased input, because it was pre-trained on an uncased corpus.
 fingerprint:
+  attention_type: MHA
   num_layers: 6
+  decoder_layers: 6
+  attention_heads: 12
+  kv_heads: 12
+  head_size: 64
   hidden_size: 768
+  intermediate_size: 3072
   context_window_tokens: 1024
   vocabulary_size: 50265
   activation_function: gelu
+  normalization: LayerNorm
+  norm_placement: post
+  stack: encoder-decoder
+  embedding_norm: true
+  positional_encoding: Learned
 filters:
   is_quantized: false
   is_moe: false
@@ -57,6 +68,9 @@ sources:
 - url: https://arxiv.org/abs/2107.07653
   title: arXiv:2107.07653
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/bart/modeling_bart.py
+  title: 'transformers/models/bart/modeling_bart.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

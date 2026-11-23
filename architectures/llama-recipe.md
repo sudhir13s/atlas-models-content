@@ -2,7 +2,7 @@
 id: architecture-era/llama-recipe
 type: architecture-era
 slug: llama-recipe
-schema_version: 2.5
+schema_version: 2.7
 title: "The LLaMA Recipe"
 name: "LLaMA (Modern Open LLM Recipe)"
 era: post-transformer
@@ -51,6 +51,17 @@ weaknesses:
   - "**Bespoke licences:** the LLaMA model card gives a **non-commercial bespoke licence**; the Llama 2 and Llama 3 model cards give a **custom commercial licence** with an Acceptable Use Policy."
   - "**More training compute per model:** the authors acknowledge that a larger model may be **cheaper to train** to a given level of performance; training the 65B model on 1.4T tokens took about **21 days** on **2,048** A100 GPUs."
   - "**An empirical gain, not an explained one:** Shazeer writes that he offers **no explanation** for why the GLU variants work."
+
+visual:
+  kind: rotary
+  query: [1, 0]
+  key: [2, 1]
+  angle_degrees: 90
+  positions:
+    - { query: 1, key: 3 }
+    - { query: 2, key: 4 }
+    - { query: 1, key: 2 }
+  caption: "Part 3 of the worked example: the query and the key turned by 90° per position, for the three pairs of positions it works through, with each score computed from the turned arrows. The first two pairs are 2 apart and score the same; the third is 1 apart and scores differently. The vectors and the angle are an example, not from a trained model."
 
 comparison:
   before: "Original Transformer (2017)"

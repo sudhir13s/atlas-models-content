@@ -24,6 +24,51 @@ fingerprint:
   intermediate_size: 4096
   activation_function: gelu
   normalization: LayerNorm
+pipeline:
+  source: https://github.com/huggingface/transformers/blob/main/src/transformers/models/dpt/modeling_dpt.py
+  summary: A vision transformer reads the image as patches. The outputs of four of its blocks are turned back into image-like maps at four sizes, merged, and a small convolutional head gives one depth value per pixel.
+  stages:
+  - id: image
+    role: input
+    title: Image
+    details:
+    - 384 × 384 pixels
+  - id: patches
+    role: embedding
+    title: Patch embedding
+    details:
+    - 16 × 16 pixel patches · width 1024
+    note: Each patch becomes one vector; a class token and position embeddings are added.
+  - id: block
+    role: visionEncoder
+    title: Attention + feed-forward
+    details:
+    - 16 heads
+    frame: Encoder block
+    repeat: 24
+  - id: reassemble
+    role: projector
+    title: Reassemble
+    details:
+    - tokens of blocks 6, 12, 18 and 24
+    - to maps at four scales
+    note: The token sequences of four blocks are put back on the image grid and resized, giving four feature maps of different resolution.
+  - id: fusion
+    role: step
+    title: Fusion
+    details:
+    - merges the four maps into one
+    note: Convolution blocks combine the four maps step by step into one detailed feature map.
+  - id: head
+    role: outputHead
+    title: Depth head
+    details:
+    - convolution layers
+  - id: depth
+    role: outputHead
+    title: Depth map
+    details:
+    - one value per pixel
 filters:
   size_category: tiny
   is_quantized: false
@@ -63,6 +108,9 @@ sources:
 - url: https://arxiv.org/abs/2103.13413
   title: arXiv:2103.13413
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/dpt/modeling_dpt.py
+  title: 'transformers/models/dpt/modeling_dpt.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary

@@ -26,6 +26,11 @@ fingerprint:
   vocabulary_size: 30522
   activation_function: gelu
   normalization: LayerNorm
+  norm_placement: post
+  stack: encoder
+  output_head: cell-selection
+  embedding_norm: true
+  positional_encoding: Learned
 filters:
   is_quantized: false
   is_moe: false
@@ -68,6 +73,9 @@ sources:
 - url: https://arxiv.org/abs/2010.00571
   title: arXiv:2010.00571
   trust: 0.95
+- url: https://github.com/huggingface/transformers/blob/main/src/transformers/models/tapas/modeling_tapas.py
+  title: 'transformers/models/tapas/modeling_tapas.py: reference implementation (Hugging Face Transformers)'
+  trust: 0.9
 ---
 
 ## Summary
