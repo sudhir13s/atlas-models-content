@@ -34,7 +34,7 @@ tags:
 - rail
 - bloom
 - open-weight
-updated: '2026-11-19'
+updated: '2026-11-24'
 sources:
 - url: https://huggingface.co/spaces/bigscience/license
   title: BigScience RAIL License v1.0
@@ -49,5 +49,4 @@ share and host the model, including commercially, and the license claims no righ
 generate. The catch is Attachment A, a list of forbidden uses: you must make those restrictions an
 enforceable part of whatever terms you use to pass the model or a derivative on, give recipients a
 copy of the license, and mark files you changed. The licensor may restrict use that breaks the
-license, push updates, and a patent suit over the model ends the patent license. It is not an
-open-source license in the usual sense because of the use restrictions.
+license, push updates, and a patent suit over the model ends the patent license.

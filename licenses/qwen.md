@@ -4,7 +4,7 @@ type: license
 slug: qwen
 schema_version: 3.1
 title: Qwen License Agreement
-name: Qwen License Agreement (Tongyi Qianwen)
+name: Qwen License Agreement
 spdx_id: Qwen
 category: custom
 url: https://huggingface.co/Qwen/Qwen2.5-72B-Instruct/blob/main/LICENSE
@@ -17,24 +17,26 @@ permissions:
   patent_grant: false
   private_use: true
 conditions:
-- Retain copyright and attribution notices
-- Include a copy of the Qwen license with redistributions
+- Keep the attribution notice in a Notice text file
+- Give every recipient a copy of the agreement
 - Mark any files you modified as changed
-- Note that derivatives are built on Qwen where required
+- Display 'Built with Qwen' or 'Improved using Qwen' in the product documentation of any distributed AI model created, trained or improved with the materials or their outputs
+- Comply with applicable laws, including export controls
 limitations:
-- A separate commercial license from Alibaba is required if the product/service exceeds 100 million monthly active users
-- Acceptable-use restrictions apply
-- No trademark rights beyond descriptive use
+- Commercial use in a product or service with more than 100 million monthly active users requires a license from Alibaba Cloud
+- No trademark rights beyond notice requirements and describing and redistributing the materials
+- The license ends if you sue claiming the materials or their output infringe your intellectual property
+- Alibaba Cloud may terminate the agreement if you breach it
 - No warranty
 - No liability
-summary: 'Custom Alibaba license: commercially usable and permissive in practice, but a separate license from Alibaba is required above 100 million monthly active users.'
+summary: 'Custom Alibaba Cloud license: commercial use, modification, redistribution and training on outputs are allowed with attribution, but commercial use above 100 million monthly active users requires a license from Alibaba Cloud.'
 tags:
 - license
 - custom
 - qwen
 - alibaba
 - open-weight
-updated: '2026-07-17'
+updated: '2026-11-24'
 sources:
 - url: https://huggingface.co/Qwen/Qwen2.5-72B-Instruct/blob/main/LICENSE
   title: Qwen LICENSE (Qwen2.5-72B-Instruct)
@@ -43,12 +45,13 @@ sources:
 
 ## Plain-English
 
-The Qwen License Agreement (historically "Tongyi Qianwen") is Alibaba's custom license used on some of
-the larger Qwen checkpoints — including Qwen2.5-72B-Instruct — while many smaller Qwen models ship
-under plain Apache-2.0. For almost everyone it behaves like a permissive open-weight license: you can
-use it commercially, modify it, fine-tune it, distribute it, and train on its outputs, as long as you
-keep the attribution and license notices and mark any changes you make. The one meaningful catch is a
-**scale threshold**: if the product or service built on the model has more than **100 million monthly
-active users**, you must request a separate commercial license from Alibaba. Standard acceptable-use
-restrictions apply, there is no patent grant, and the weights come with no warranty. Think of it as
-"open weight, commercially friendly, with a large-scale carve-out" rather than fully open source.
+The Qwen License Agreement is Alibaba Cloud's custom license; Qwen2.5-72B-Instruct is one model
+released under it. You can use the model commercially, modify it, fine-tune it, distribute it, and
+train on its outputs, as long as you pass on the agreement, keep the attribution notice and mark
+any changes you make. A model you build with Qwen or its outputs and then distribute must say
+"Built with Qwen" or "Improved using Qwen" in its product documentation. The main catch is a
+**scale threshold**: if you use the materials commercially and your product or service has more
+than **100 million monthly active users**, you must request a license from Alibaba Cloud. There is
+no separate acceptable-use policy beyond complying with the law, no explicit patent grant, and no
+warranty. Think of it as "open weight, commercially friendly, with a large-scale carve-out" rather
+than fully open source.

@@ -17,22 +17,25 @@ permissions:
   patent_grant: false
   private_use: true
 conditions:
-- Include the Gemma Terms of Use with any distribution of the model or derivatives
-- Pass the same use restrictions through to downstream recipients
-- Provide notice that you modified the files
-- Do not remove or alter the use-restriction terms
+- Give every recipient of Gemma or a model derivative a copy of the agreement
+- Include the use restrictions as an enforceable provision in your terms and tell downstream users they apply
+- Mark modified files with a prominent notice of the change
+- Ship a Notice text file pointing to the Gemma Terms of Use with every distribution other than a hosted service
+- Any additional terms you impose must not conflict with the agreement
 limitations:
-- Prohibited Use Policy restrictions apply to all use and outputs
-- No trademark rights to the 'Gemma' or Google marks beyond descriptive use
+- The Prohibited Use Policy and applicable laws restrict all use of Gemma and model derivatives
+- Google may restrict use it reasonably believes violates the agreement, remotely or otherwise
+- No rights to use Google's trademarks, trade names or logos
+- Google may terminate the agreement on breach, and you must then delete all copies
 - No warranty
 - No liability
-summary: 'Custom Google license: free commercial use, modification, fine-tuning and distribution, but bound by a Prohibited Use Policy that must flow through to every downstream user.'
+summary: 'Custom Google license: commercial use, modification, fine-tuning and distribution are allowed, but bound by a Prohibited Use Policy that must flow through to every downstream user.'
 tags:
 - license
 - custom
 - gemma
 - google
-updated: '2026-07-17'
+updated: '2026-11-24'
 sources:
 - url: https://ai.google.dev/gemma/terms
   title: Gemma Terms of Use
@@ -44,13 +47,14 @@ sources:
 
 ## Plain-English
 
-The Gemma Terms of Use are a custom Google license, not a standard open-source one, though in practice
-they are quite permissive. You may use Gemma commercially, modify it, fine-tune it, distribute it and
-its derivatives, and generate and use outputs freely — there is **no user-count threshold** like the
+The Gemma Terms of Use are a custom Google license, not a standard open-source one. They cover the
+models listed in their appendix, from Gemma 1 to Gemma 3n and variants; Gemma 4 has its own license.
+You may use Gemma commercially, modify it, fine-tune it, distribute it and its derivatives, and
+Google claims no rights in the outputs you generate — there is **no user-count threshold** like the
 Llama or Qwen licenses impose. The binding condition is Google's **Prohibited Use Policy**: certain
-uses (for example, generating harmful, deceptive, or illegal content) are forbidden, and whenever you
-distribute Gemma or a model derived from it you must pass these same use restrictions on to your
-recipients and include the Gemma terms. You must also flag that you changed the files if you modified
-them. There is no patent grant, no warranty, and no trademark license beyond referring to the model by
-name. Treat it as "open weight, commercially friendly, with an enforceable acceptable-use policy that
-travels with the model."
+uses (for example, dangerous, illegal, malicious, deceptive or fraudulent activities) are forbidden,
+and whenever you distribute Gemma or a model derived from it you must pass these same use
+restrictions on to your recipients and include the Gemma terms. You must also flag that you changed
+the files if you modified them. There is no patent grant, no warranty, and no right to use Google's
+trademarks. Treat it as "open weight, commercially friendly, with an enforceable acceptable-use
+policy that travels with the model."

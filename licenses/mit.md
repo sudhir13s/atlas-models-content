@@ -21,12 +21,12 @@ conditions:
 limitations:
 - No warranty
 - No liability
-summary: 'Maximally permissive: do almost anything, commercially or privately, as long as the copyright and permission notice travel with the software; no patent grant.'
+summary: 'Permissive license: use, copy, modify, distribute and sell without restriction, as long as the copyright and permission notice travel with the software; no patent grant.'
 tags:
 - license
 - permissive
 - mit
-updated: '2026-07-17'
+updated: '2026-11-24'
 sources:
 - url: https://opensource.org/license/mit
   title: MIT License (OSI)
@@ -35,12 +35,11 @@ sources:
 
 ## Plain-English
 
-The MIT License is the shortest and most permissive of the mainstream open-source licenses. You can
-use, copy, modify, merge, publish, distribute, sublicense, and sell the software — commercially or
-privately — and you can fine-tune models released under it and train other models on their outputs.
+The MIT License grants the right to deal in the software without restriction. You can use, copy,
+modify, merge, publish, distribute, sublicense, and sell the software — commercially or privately —
+and you can fine-tune models released under it and train other models on their outputs.
 The single condition is that you keep the original copyright notice and the MIT permission text in any
-copy or substantial portion you distribute. Unlike Apache-2.0, MIT contains **no explicit patent
-grant**, so it says nothing about the patent rights of contributors. You get the software "as is" with
-no warranty and no liability on the authors. For a small open model like Phi-3 Mini, MIT is about as
-frictionless as licensing gets — no field-of-use limits, no user-count thresholds, no acceptable-use
-policy.
+copy or substantial portion. Unlike Apache-2.0, MIT contains **no explicit patent grant**, so it says
+nothing about the patent rights of contributors. You get the software "as is" with no warranty and
+no liability on the authors. It has no field-of-use limits, no user-count thresholds and no
+acceptable-use policy.

@@ -27,16 +27,19 @@ limitations:
 - No trademark license
 - Provided as is, with no warranty and no liability
 - The license ends if you sue Meta over intellectual property in the materials or their outputs
-summary: 'Meta''s custom community license for Llama 2: free commercial use, modification and redistribution with a copy of the agreement and an attribution notice, but no use of the model or its outputs to improve other large language models, and a separate license above 700 million monthly active users.'
+summary: 'Meta''s custom community license for Llama 2: free commercial use, modification and redistribution with a copy of the agreement and an attribution notice, but no use of the model or its outputs to improve other large language models, and a separate license above 700 million monthly active users on the release date.'
 tags:
 - license
 - custom
 - llama
 - open-weight
-updated: '2026-11-19'
+updated: '2026-11-24'
 sources:
 - url: https://www.llama.com/llama2/license/
   title: Llama 2 Community License Agreement
+  trust: 0.95
+- url: https://github.com/meta-llama/llama-models/blob/main/models/llama2/LICENSE
+  title: Llama 2 licence text in Meta's llama-models repository
   trust: 0.95
 ---
 

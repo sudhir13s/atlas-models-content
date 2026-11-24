@@ -17,18 +17,21 @@ permissions:
   patent_grant: true
   private_use: true
 conditions:
-- Include the license and copyright notice
-- State significant changes made to the files
+- Give recipients a copy of the license
+- Mark modified files with a prominent notice of the change
+- Keep copyright, patent, trademark and attribution notices
+- Pass on the attribution notices of a NOTICE file if the work includes one
 limitations:
-- No trademark use
+- No trademark use beyond describing the origin of the work
+- The patent license ends if you sue claiming the work infringes a patent
 - No warranty
 - No liability
-summary: Fully permissive with an explicit patent grant; no restriction on commercial use or training on model outputs.
+summary: Permissive license with an explicit patent grant; no restriction on commercial use or training on model outputs.
 tags:
 - license
 - permissive
 - apache
-updated: '2026-07-16'
+updated: '2026-11-24'
 sources:
 - url: https://www.apache.org/licenses/LICENSE-2.0
   title: Apache License, Version 2.0
@@ -38,6 +41,6 @@ sources:
 ## Plain-English
 
 Do almost anything — use commercially, modify, redistribute, fine-tune, and train other models on
-the outputs — as long as you keep the license and copyright notice and note significant changes.
-It adds an explicit patent grant from contributors, which is why many open-weight models (e.g.
-Mistral, Qwen releases) choose it. You get no warranty and cannot use the licensor's trademarks.
+the outputs — as long as you pass on the license, keep the existing notices and mark files you
+changed. Each contributor grants an explicit patent license, which ends if you sue claiming the
+work infringes a patent. You get no warranty and cannot use the licensor's trademarks.

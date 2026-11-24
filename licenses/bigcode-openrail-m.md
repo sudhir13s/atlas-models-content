@@ -18,11 +18,14 @@ permissions:
   private_use: true
 conditions:
 - Keep the Attachment A use restrictions, or a similar set, as an enforceable condition when sharing the model or modifications of it
-- Give recipients the license
-- Document modifications with documentation of the same or better quality as the original model card
-- Say clearly that generated code or content is machine generated
+- Give recipients a copy of the license agreement
+- Keep the model card and other explanatory documentation, and document modifications with documentation of the same or better quality
+- Keep copyright, patent, trademark and attribution notices
+- Say that generated information placed in any public context is machine generated
 limitations:
-- Attachment A forbids uses such as breaking the law, generating malware or other content meant to harm electronic systems, spreading verifiably false information to harm others, impersonating people to deceive, unlabelled machine-generated content and fully automated decisions that adversely affect legal rights
+- Attachment A forbids uses such as breaking the law, generating malware or other content meant to harm electronic systems, spreading verifiably false information to harm others, impersonating people to deceive, unlabelled machine-generated content in public and fully automated decisions that adversely affect legal rights
+- The licensor may restrict use that violates the agreement, remotely or otherwise
+- Rights for the model end if you sue claiming it infringes a patent
 - The restrictions apply to modifications of the model as well
 - It is not an open-source license by the Open Source Initiative definition
 - Output may carry third-party rights, including open-source licenses
@@ -33,10 +36,13 @@ tags:
 - rail
 - bigcode
 - open-weight
-updated: '2026-11-19'
+updated: '2026-11-24'
 sources:
 - url: https://www.bigcode-project.org/docs/pages/bigcode-openrail/
   title: 'BigCode OpenRAIL-M license: explanation and FAQ'
+  trust: 0.95
+- url: https://huggingface.co/spaces/bigcode/bigcode-model-license-agreement
+  title: BigCode Open RAIL-M v1 License Agreement (full text)
   trust: 0.95
 ---
 
